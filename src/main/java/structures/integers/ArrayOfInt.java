@@ -13,21 +13,22 @@ import java.util.Iterator;
  */
 public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
 
+    // MemoryObject variables
+    private MemoryPool<ArrayOfInt> pool;
+    private int ID = -1;
+    //
+
     private int[] array;
     public int length;
     private final ArrayOfIntIterator iterator = new ArrayOfIntIterator();
-
-    private int ID = -1;
-    private MemoryPool<ArrayOfInt> manager;
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public ArrayOfInt(MemoryPool<ArrayOfInt> manager){
-        this.manager = manager;
-        manager.add(this);
+    public ArrayOfInt(MemoryPool<ArrayOfInt> pool){
+        this.pool = pool;
         this.array = new int[10];
     }
     public ArrayOfInt(int size){
@@ -93,7 +94,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MObject interface
+    // Implementation of MemoryObject interface
 
     @Override
     public void setID(int ID) {
@@ -107,11 +108,11 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
 
     @Override
     public void free(){
-        manager.free(ID);
+        pool.free(this, ID);
     }
 
     @Override
-    public boolean isComposed() {
+    public boolean isAtomic() {
         return false;
     }
 

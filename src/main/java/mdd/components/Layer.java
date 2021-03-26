@@ -3,40 +3,89 @@ package mdd.components;
 import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
-import structures.SetOf;
+import representation.MDDVisitor;
+import structures.generics.SetOf;
 
 import java.util.Iterator;
 
 public class Layer implements MemoryObject, Iterable<Node> {
 
-    private final SetOf<Node> nodes = Memory.SetOfNode();
+    // MemoryObject variables
     private final MemoryPool<Layer> pool;
     private int ID = -1;
+    //
+
+    private SetOf<Node> nodes;
+
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
     public Layer(MemoryPool<Layer> pool){
         this.pool = pool;
     }
 
-    public void add(Node node){
-        nodes.add(node);
+
+    //**************************************//
+    //         SPECIAL FUNCTIONS            //
+    //**************************************//
+    public void accept(MDDVisitor visitor){
+        visitor.visit(this);
+        for(Node node : nodes) node.accept(visitor);
     }
 
-    public boolean contains(Node node){
-        return nodes.contains(node);
+
+    //**************************************//
+    //           LAYER MANAGEMENT           //
+    //**************************************//
+
+    public void add(Node node){
+        nodes.add(node);
     }
 
     public void remove(Node node){
         nodes.remove(node);
     }
 
-    public void removeFull(Node node){
+    public void removeAndFree(Node node){
         node.remove();
         nodes.remove(node);
+        Memory.free(node);
     }
+
+    public void clear(){
+        nodes.clear();
+    }
+
+
+    //**************************************//
+    //               GETTERS                //
+    //**************************************//
+
+    public int size(){
+        return nodes.size();
+    }
+    public boolean contains(Node node){
+        return nodes.contains(node);
+    }
+    public SetOf<Node> getNodes(){
+        return nodes;
+    }
+    public Node getNode(){
+        for(Node node : nodes) return node;
+        return null;
+    }
+
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
 
     @Override
     public void prepare() {
-
+        nodes = Memory.SetOfNode();
     }
 
     @Override
@@ -46,14 +95,21 @@ public class Layer implements MemoryObject, Iterable<Node> {
 
     @Override
     public void free() {
-        this.pool.free(ID);
+        Memory.free(nodes);
+        this.pool.free(this, ID);
     }
 
-    @Override
-    public boolean isComposed() {
-        return false;
+    public void freeAllNodes(){
+        for(Node node : nodes) {
+            node.remove();
+            Memory.free(node);
+        }
     }
 
+    //**************************************//
+    //               ITERATOR               //
+    //**************************************//
+    // Implementation of Iterable<Node> interface
     @Override
     public Iterator<Node> iterator() {
         return nodes.iterator();

@@ -4,47 +4,91 @@ import mdd.components.Node;
 import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.generics.ArrayOf;
+import structures.generics.MapOf;
 
 public class Binder implements MemoryObject {
 
+    // MemoryObject variables
     private final MemoryPool<Binder> pool;
-    private int ID = -1;
+    private int ID;
+    //
 
-    private int depth;
-    private MapOf<Node, Binder> next;
+    private final MapOf<Node, Binder> reduction = new MapOf<>(null);
     private Node leaf;
+    private int depth;
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+    // init
 
     public Binder(MemoryPool<Binder> pool){
         this.pool = pool;
     }
 
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
 
+    //**************************************//
+    //             OPERATIONS               //
+    //**************************************//
+    // add              || setLeaf
+    // hasLeaf          || getLeaf
+    // clear            || -isLeaf
+
+    /**
+     * Add an array of nodes to the structure
+     * @param nodes Nodes to add to the structure
+     * @return The last Binder added to the general structure.
+     */
     public Binder path(ArrayOf<Node> nodes){
-        if(this.depth >= nodes.length) return this;
-        Binder next = this.next.get(nodes.get(depth));
-        if(next == null) {
-            next = Memory.Binder();
-            next.setDepth(depth+1);
-            this.next.put(nodes.get(depth), next);
+        if(isLeaf(nodes.length)) return this;
+        else if(reduction.get(nodes.get(depth)) != null) return reduction.get(nodes.get(depth)).path(nodes);
+        else {
+            Binder next = Memory.Binder();
+            next.depth = depth + 1;
+            reduction.put(nodes.get(depth), next);
+            return next.path(nodes);
         }
-        return next.path(nodes);
     }
 
-    public Node getLeaf(){
-        return leaf;
-    }
-
+    /**
+     * Set the leaf of the LayerReduction
+     * @param leaf Node that will be the leaf
+     */
     public void setLeaf(Node leaf){
         this.leaf = leaf;
     }
 
-    @Override
-    public void prepare() {
-
+    /**
+     * Get the leaf
+     * @return (Node) The leaf
+     */
+    public Node getLeaf(){
+        return leaf;
     }
+
+    /**
+     * Clear all information in the LayerReduction, recursively.
+     */
+    public void clear(){
+        for(Binder l : reduction.values()) Memory.free(l);
+        prepare();
+    }
+
+    /**
+     * Check if the LayerReduction is the last one in the structure
+     * @param size Size of the structure
+     * @return true if this is the final level, false otherwise
+     */
+    private boolean isLeaf(int size){
+        return depth == size;
+    }
+
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
 
     @Override
     public void setID(int ID) {
@@ -53,11 +97,15 @@ public class Binder implements MemoryObject {
 
     @Override
     public void free() {
-        this.pool.free(ID);
+        for(Binder l : reduction.values()) Memory.free(l);
+        prepare();
+        pool.free(this, ID);
     }
 
     @Override
-    public boolean isComposed() {
-        return true;
+    public void prepare(){
+        this.reduction.clear();
+        this.leaf = null;
+        this.depth = 0;
     }
 }

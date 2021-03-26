@@ -1,4 +1,4 @@
-package structures;
+package structures.generics;
 
 
 import memory.MemoryObject;
@@ -16,6 +16,11 @@ import java.util.Iterator;
  */
 public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
+    // MemoryObject variables
+    private MemoryPool<ArrayOf<E>> pool;
+    private int ID = -1;
+    //
+
     // The proper array
     private E[] array;
     // Length of the array. The actual size of the array might be greater.
@@ -23,19 +28,13 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
     // Iterator
     private final ArrayOfIterator iterator = new ArrayOfIterator();
 
-    // Memory variable
-    private int ID = -1;
-    private MemoryPool<ArrayOf<E>> manager;
-
-
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
     @SuppressWarnings("unchecked")
-    public ArrayOf(MemoryPool<ArrayOf<E>> manager){
-        this.manager = manager;
-        manager.add(this);
+    public ArrayOf(MemoryPool<ArrayOf<E>> pool){
+        this.pool = pool;
         this.array = (E[]) new Object[10];
     }
 
@@ -102,11 +101,10 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MObject interface
+    // Implementation of MemoryObject interface
 
     @Override
     public void prepare() {
-
     }
 
     @Override
@@ -116,12 +114,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
     @Override
     public void free(){
-        manager.free(ID);
-    }
-
-    @Override
-    public boolean isComposed() {
-        return false;
+        pool.free(this, ID);
     }
 
 

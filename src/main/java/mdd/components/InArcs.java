@@ -3,20 +3,33 @@ package mdd.components;
 import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
-import structures.SetOf;
+import structures.generics.SetOf;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class InArcs implements MemoryObject, Iterable<Integer> {
 
-    private final HashMap<Integer, SetOf<Node>> arcs = new HashMap<>();
+    // MemoryObject variables
     private final MemoryPool<InArcs> pool;
-    private int ID;
+    private int ID = -1;
+    //
+
+    private final HashMap<Integer, SetOf<Node>> arcs = new HashMap<>();
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
     public InArcs(MemoryPool<InArcs> pool){
         this.pool = pool;
     }
+
+
+
+    //**************************************//
+    //           ARCS MANAGEMENT            //
+    //**************************************//
 
     public void add(int value, Node node){
         if(!this.arcs.containsKey(value)) this.arcs.put(value, Memory.SetOfNode());
@@ -29,7 +42,7 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
             boolean result = nodes.remove(node);
             if(result && nodes.size() == 0) {
                 arcs.remove(nodes);
-                nodes.free();
+                Memory.free(nodes);
             }
             return result;
         }
@@ -41,13 +54,22 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
     }
 
     public void clear(){
-        for(int value : arcs.keySet()) arcs.get(value).free();
+        for(int value : arcs.keySet()) Memory.free(arcs.get(value));
         arcs.clear();
     }
 
+    public int size(){
+        return arcs.size();
+    }
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
+
     @Override
     public void prepare() {
-
+        arcs.clear();
     }
 
     @Override
@@ -57,13 +79,17 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
 
     @Override
     public void free() {
-        this.pool.free(ID);
+        for(SetOf<Node> nodes : arcs.values()) Memory.free(nodes);
+        arcs.clear();
+        this.pool.free(this, ID);
     }
 
-    @Override
-    public boolean isComposed() {
-        return true;
-    }
+
+
+    //**************************************//
+    //               ITERATOR               //
+    //**************************************//
+    // Implementation of Iterable<Integer> interface
 
     @Override
     public Iterator<Integer> iterator() {
