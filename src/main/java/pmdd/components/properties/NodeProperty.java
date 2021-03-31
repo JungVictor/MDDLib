@@ -2,6 +2,8 @@ package pmdd.components.properties;
 
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.integers.ArrayOfInt;
+import structures.integers.MatrixOfInt;
 
 
 /**
@@ -176,7 +178,7 @@ public abstract class NodeProperty implements MemoryObject {
      * Return the data held by the property as an array
      * @return An array holding result
      */
-    public int[] getArray(){
+    public ArrayOfInt getArray(){
         return null;
     }
 
@@ -184,7 +186,7 @@ public abstract class NodeProperty implements MemoryObject {
      * Return the data held by the property as a 2D-array
      * @return A two dimensional array holding result
      */
-    public int[][] getArray2(){ return null; }
+    public MatrixOfInt getArray2(){ return null; }
 
 
     //**************************************//

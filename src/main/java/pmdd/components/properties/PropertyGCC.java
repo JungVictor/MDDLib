@@ -2,7 +2,9 @@ package pmdd.components.properties;
 
 
 import memory.MemoryPool;
-import pmdd.memory.Memory;
+import pmdd.memory.PMemory;
+import structures.integers.ArrayOfInt;
+import structures.integers.MatrixOfInt;
 
 import java.util.Arrays;
 
@@ -13,24 +15,20 @@ import java.util.Arrays;
  */
 public class PropertyGCC extends NodeProperty {
 
-    private final int[] max;
-    private int[][] values;
+    private final ArrayOfInt max = memory.Memory.ArrayOfInt(2);
+    private final MatrixOfInt values = memory.Memory.MatrixOfInt(2, 2);
 
-    public PropertyGCC(MemoryPool<NodeProperty> pool, int size){
-        this(pool, new int[size]);
-    }
-
-    public PropertyGCC(MemoryPool<NodeProperty> pool, int[] max){
+    public PropertyGCC(MemoryPool<NodeProperty> pool, ArrayOfInt max){
         super(pool);
-        this.max = max;
-        this.values = new int[max.length][2];
+        this.max.copy(max);
+        this.values.setSize(max.length, 2);
         super.setType(DataType.ARRAY2);
         super.setName(GCC);
     }
 
     @Override
     public String toString(){
-        return Arrays.deepToString(values);
+        return values.toString();
     }
 
     //**************************************//
@@ -39,7 +37,7 @@ public class PropertyGCC extends NodeProperty {
     // getArray2
 
     @Override
-    public int[][] getArray2(){
+    public MatrixOfInt getArray2(){
         return values;
     }
 
@@ -51,17 +49,15 @@ public class PropertyGCC extends NodeProperty {
     @Override
     public NodeProperty createProperty(int value) {
         value--;
-        PropertyGCC next = Memory.PropertyGCC(max);
-        int[][] nVals = new int[max.length][2];
-        for(int i = 0; i < nVals.length; i++){
-            nVals[i][0] = values[i][0];
-            nVals[i][1] = values[i][1];
+        PropertyGCC next = PMemory.PropertyGCC(max);
+        for(int i = 0; i < next.values.getHeight(); i++){
+            next.values.set(i, 0, values.get(i, 0));
+            next.values.set(i, 1, values.get(i, 1));
         }
-        if(max[value] >= 0) {
-            nVals[value][0] += 1;
-            nVals[value][1] += 1;
+        if(max.get(value) >= 0) {
+            next.values.incr(value, 0, 1);
+            next.values.incr(value, 1, 1);
         }
-        next.values = nVals;
         return next;
     }
 
@@ -72,8 +68,9 @@ public class PropertyGCC extends NodeProperty {
         value--;
         for(int i = 0; i < max.length; i++) {
             add = i == value ? 1 : 0;
-            if(values[i][0]+add < property.values[i][0]) property.values[i][0] = values[i][0]+add;
-            if(property.values[i][1] < values[i][1]+add) property.values[i][1] = values[i][1]+add;
+            int min = values.get(i, 0) + add, max = values.get(i, 1) + add;
+            if(min < property.values.get(i, 0)) property.values.set(i, 0, min);
+            if(property.values.get(i, 1) < max) property.values.set(i, 1, max);
         }
     }
 
@@ -83,8 +80,8 @@ public class PropertyGCC extends NodeProperty {
         PropertyGCC gcc = (PropertyGCC) property;
 
         for(int i = 0; i < max.length; i++) {
-            if(gcc.values[i][0] < values[i][0]) values[i][0] = gcc.values[i][0];
-            if(values[i][1] < gcc.values[i][1]) values[i][1] = gcc.values[i][1];
+            if(gcc.values.get(i,0) < values.get(i,0)) values.set(i,0, gcc.values.get(i, 0));
+            if(values.get(i,1) < gcc.values.get(i,1)) values.set(i,1, gcc.values.get(i, 1));
         }
     }
 
@@ -97,7 +94,7 @@ public class PropertyGCC extends NodeProperty {
     @Override
     public boolean isDegenerate(int v) {
         v--;
-        return values[v][1]+1 > max[v] && max[v] > 0;
+        return values.get(v,1)+1 > max.get(v) && max.get(v) > 0;
     }
 
 

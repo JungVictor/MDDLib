@@ -6,6 +6,7 @@ import memory.Memory;
 import memory.MemoryPool;
 import pmdd.components.PNode;
 import pmdd.components.properties.NodeProperty;
+import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
 public class PMDD extends MDD {
@@ -16,12 +17,12 @@ public class PMDD extends MDD {
 
     @Override
     public Node Node(){
-        return Memory.PNode();
+        return PMemory.PNode();
     }
 
     @Override
     public MDD MDD(){
-        return Memory.PMDD();
+        return PMemory.PMDD();
     }
 
     //**************************************//

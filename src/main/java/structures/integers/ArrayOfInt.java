@@ -78,8 +78,8 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     }
 
     public void copy(int[] array){
-        if(array.length > this.array.length) this.array = array;
-        else System.arraycopy(array, 0, this.array, 0, array.length);
+        if(array.length > this.array.length) this.array = new int[array.length];
+        System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
     public void copy(ArrayOfInt array){

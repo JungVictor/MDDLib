@@ -1,7 +1,10 @@
 package pmdd.components.properties;
 
 
-import java.util.Arrays;
+import memory.Memory;
+import memory.MemoryPool;
+import pmdd.memory.PMemory;
+import structures.integers.ArrayOfInt;
 
 /**
  * SUM CONSTRAINT
@@ -9,15 +12,20 @@ import java.util.Arrays;
  */
 public class PropertySum extends NodeProperty {
 
-    private final int[] value;
-    private final int max;
+    private final ArrayOfInt value = Memory.ArrayOfInt(2);
+    private int max;
 
-    public PropertySum(int value){
-        this(new int[]{value, value}, Integer.MAX_VALUE);
+    public PropertySum(MemoryPool<NodeProperty> pool, int value){
+        this(pool, value, value);
     }
 
-    public PropertySum(int[] value, int max){
-        this.value = value;
+    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2){
+        this(pool, v1, v2, Integer.MAX_VALUE);
+    }
+
+    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2, int max){
+        super(pool);
+        this.value.set(0, v1); this.value.set(1, v2);
         this.max = max;
         super.setType(DataType.ARRAY);
         super.setName(SUM);
@@ -25,7 +33,7 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public String toString(){
-        return Arrays.toString(value);
+        return value.toString();
     }
 
     //**************************************//
@@ -34,7 +42,7 @@ public class PropertySum extends NodeProperty {
     // getArray
 
     @Override
-    public int[] getArray() {
+    public ArrayOfInt getArray() {
         return value;
     }
 
@@ -46,14 +54,14 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int val) {
-        return new PropertySum(new int[]{value[0]+val, value[1]+val}, max);
+        return PMemory.PropertySum(value.get(0)+val, value.get(1)+val, max);
     }
 
     @Override
     public void mergeWithProperty(int val, NodeProperty nodeProperty){
         PropertySum property = (PropertySum) nodeProperty;
-        property.value[0] = Math.min(value[0]+val, property.value[0]);
-        property.value[1] = Math.max(value[1]+val, property.value[1]);
+        property.value.set(0, Math.min(value.get(0)+val, property.value.get(0)));
+        property.value.set(1, Math.max(value.get(1)+val, property.value.get(1)));
     }
 
     @Override
@@ -61,8 +69,8 @@ public class PropertySum extends NodeProperty {
         if(property.getClass() != PropertySum.class) return;
         PropertySum sum = (PropertySum) property;
 
-        value[0] = Math.min(value[0], sum.value[0]);
-        value[1] = Math.max(value[1], sum.value[1]);
+        value.set(0, Math.min(value.get(0), sum.value.get(0)));
+        value.set(1, Math.max(value.get(1), sum.value.get(1)));
     }
 
 
@@ -73,11 +81,11 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public boolean isDegenerate() {
-        return value[1] > max || value[0] > max;
+        return value.get(1) > max || value.get(0) > max;
     }
 
     @Override
     public boolean isDegenerate(int v) {
-        return value[1]+v > max || value[0]+v > max;
+        return value.get(1)+v > max || value.get(0)+v > max;
     }
 }

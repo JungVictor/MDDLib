@@ -1,9 +1,11 @@
 package pmdd.components.properties;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import memory.Memory;
+import memory.MemoryPool;
+import pmdd.memory.PMemory;
+import structures.generics.SetOf;
+import structures.integers.MatrixOfInt;
 
 /**
  * SEQUENCE CONSTRAINT
@@ -14,49 +16,27 @@ import java.util.Set;
 public class PropertySequence extends NodeProperty {
 
     private PropertySequence accumulator;
-    private int[][] values;
-    private Set<Integer> label;
+    private final MatrixOfInt values;
+    private final SetOf<Integer> label = Memory.SetOfInteger();
 
-    private PropertySequence(){
+    public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size, boolean base) {
+        this(pool, label, 1);
+        accumulator = PMemory.PropertySequence(label, size, false);
+    }
+
+    public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size){
+        super(pool);
+        for(int j : label) this.label.add(j);
         super.setType(DataType.ARRAY2);
         super.setName(SEQ);
-    }
 
-    public PropertySequence(int label, int size){
-        this(new int[]{label}, size);
-    }
-
-    public PropertySequence(int[][] values, int[] label){
-        this.values = values;
-        this.label = new HashSet<>();
-        for (int j : label) this.label.add(j);
-        super.setType(DataType.ARRAY2);
-        super.setName(SEQ);
-    }
-
-    public PropertySequence(int[] label, int size){
-        this(new int[1][2], label);
-        accumulator = new PropertySequence();
-        accumulator.values = new int[size][2];
-        for(int i = 0; i < size; i++) accumulator.values[i][0] = i;
-    }
-
-    private PropertySequence(Set<Integer> label, int depth){
-        this.values = new int[depth+1][2];
-        this.label = label;
-        super.setType(DataType.ARRAY2);
-        super.setName(SEQ);
-    }
-
-    private PropertySequence(int[][] values){
-        this.values = values;
-        super.setType(DataType.ARRAY2);
-        super.setName(SEQ);
+        this.values = Memory.MatrixOfInt(size, 2);
+        for(int i = 0; i < size; i++) values.set(i, 0, i);
     }
 
     @Override
     public String toString(){
-        return Arrays.deepToString(values);
+        return values.toString();
     }
 
     //**************************************//
@@ -65,7 +45,7 @@ public class PropertySequence extends NodeProperty {
     // getArray2
 
     @Override
-    public int[][] getArray2() {
+    public MatrixOfInt getArray2() {
         return values;
     }
 
@@ -77,10 +57,10 @@ public class PropertySequence extends NodeProperty {
     // getResult        || -labelToValue
     @Override
     public NodeProperty createProperty(int value) {
-        PropertySequence next = new PropertySequence(label, values.length);
-        for(int i = 1; i < values.length+1; i++){
-            next.values[i][0] = values[i-1][0]+ labelToValue(value);
-            next.values[i][1] = values[i-1][1]+ labelToValue(value);
+        PropertySequence next = PMemory.PropertySequence(label, values.getHeight()+1, false);
+        for(int i = 1; i < values.getHeight()+1; i++){
+            next.values.set(i,0,values.get(i-1,0 )+ labelToValue(value));
+            next.values.set(i,1,values.get(i-1,1) + labelToValue(value));
         }
         accumulator.mergeWithProperty(next);
         next.accumulator = accumulator;
@@ -90,9 +70,9 @@ public class PropertySequence extends NodeProperty {
     @Override
     public void mergeWithProperty(int value, NodeProperty nodeProperty){
         PropertySequence property = (PropertySequence) nodeProperty;
-        for(int i = 1; i < property.values.length; i++){
-            property.values[i][0] = Math.min(values[i-1][0]+ labelToValue(value), property.values[i][0]);
-            property.values[i][1] = Math.max(values[i-1][1]+ labelToValue(value), property.values[i][1]);
+        for(int i = 1; i < property.values.getHeight(); i++){
+            property.values.set(i, 0, Math.min(values.get(i-1, 0)+ labelToValue(value), property.values.get(i,0)));
+            property.values.set(i,1, Math.max(values.get(i-1, 1)+ labelToValue(value), property.values.get(i,1)));
         }
         accumulator.mergeWithProperty(property);
     }
@@ -101,9 +81,9 @@ public class PropertySequence extends NodeProperty {
     public void mergeWithProperty(NodeProperty property){
         if(property.getClass() != PropertySequence.class) return;
         PropertySequence seq = (PropertySequence) property;
-        for(int i = 1; i < seq.values.length; i++){
-            values[i][0] = Math.min(values[i][0], seq.values[i][0]);
-            values[i][1] = Math.max(values[i][1], seq.values[i][1]);
+        for(int i = 1; i < seq.values.getHeight(); i++){
+            values.set(i,0, Math.min(values.get(i,0), seq.values.get(i,0)));
+            values.set(i,1, Math.max(values.get(i,1), seq.values.get(i,1)));
         }
     }
 
@@ -129,5 +109,12 @@ public class PropertySequence extends NodeProperty {
     @Override
     public boolean isDegenerate(int v) {
         return false;
+    }
+
+    @Override
+    public void free(){
+        super.free();
+        accumulator = null;
+        label.clear();
     }
 }

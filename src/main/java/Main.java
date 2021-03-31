@@ -1,7 +1,11 @@
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
+import pmdd.PMDD;
+import pmdd.components.properties.NodeProperty;
+import pmdd.memory.PMemory;
 import representation.MDDPrinter;
+import structures.generics.MapOf;
 
 public class Main {
 
@@ -34,6 +38,20 @@ public class Main {
         mdd.reduce();
 
         mdd.accept(new MDDPrinter());
+        Memory.free(mdd);
+
+        PMDD pmdd = PMemory.PMDD();
+        pmdd.setSize(5);
+        pmdd.addPath(8, 1, 2, 5);
+        pmdd.addPath(8, 1, 2, 6);
+        pmdd.reduce();
+
+        pmdd.addRootProperty("Sum", PMemory.PropertySum(0, 0));
+        pmdd.addRootProperty("Sequence", PMemory.PropertySequence(pmdd.getV(), pmdd.size()));
+        MapOf<String, NodeProperty> properties = pmdd.propagateProperties();
+        for(String key : properties){
+            System.out.println(key + " : " + properties.get(key));
+        }
     }
 
 }

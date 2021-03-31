@@ -14,6 +14,7 @@ import structures.Binder;
 import structures.generics.ListOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
+import structures.integers.MatrixOfInt;
 
 public class Memory {
 
@@ -76,6 +77,19 @@ public class Memory {
         object.prepare();
         return object;
     }
+
+
+    private static final MemoryPool<MatrixOfInt> matrixOfInts = new MemoryPool<>();
+    public static MatrixOfInt MatrixOfInt(int height, int length){
+        MatrixOfInt object = matrixOfInts.get();
+        if(object == null){
+            object = new MatrixOfInt(matrixOfInts, height, length);
+            matrixOfInts.add(object);
+        } else object.setSize(height, length);
+        object.prepare();
+        return object;
+    }
+
 
     private static final MemoryPool<ArrayOfBoolean> arrayOfBooleans = new MemoryPool<>();
     public static ArrayOfBoolean ArrayOfBoolean(int capacity){
@@ -165,17 +179,6 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<Node> pnodes = new MemoryPool<>();
-    public static PNode PNode(){
-        PNode object = (PNode) pnodes.get();
-        if(object == null){
-            object = new PNode(pnodes);
-            pnodes.add(object);
-        }
-        object.prepare();
-        return object;
-    }
-
     private static final MemoryPool<InArcs> inArcs = new MemoryPool<>();
     public static InArcs InArcs(){
         InArcs object = inArcs.get();
@@ -204,17 +207,6 @@ public class Memory {
         if(object == null){
             object = new MDD(mdds);
             mdds.add(object);
-        }
-        object.prepare();
-        return object;
-    }
-
-    private static final MemoryPool<MDD> pmdds = new MemoryPool<>();
-    public static PMDD PMDD(){
-        PMDD object = (PMDD) pmdds.get();
-        if(object == null){
-            object = new PMDD(pmdds);
-            pmdds.add(object);
         }
         object.prepare();
         return object;
