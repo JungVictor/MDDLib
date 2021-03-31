@@ -1,5 +1,4 @@
-package structures.integers;
-
+package structures.booleans;
 
 import memory.MemoryObject;
 import memory.MemoryPool;
@@ -11,31 +10,31 @@ import java.util.Iterator;
  * Class to symbolize an array of int. Similar to the ArrayOf class, this one is
  * specifically for the primitive type int. Works similarly.
  */
-public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
+public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
 
     // MemoryObject variables
-    private MemoryPool<ArrayOfInt> pool;
+    private MemoryPool<ArrayOfBoolean> pool;
     private int ID = -1;
     //
 
-    private int[] array;
+    private boolean[] array;
     public int length;
-    private final ArrayOfIntIterator iterator = new ArrayOfIntIterator();
+    private final ArrayOfBooleanIterator iterator = new ArrayOfBooleanIterator();
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public ArrayOfInt(MemoryPool<ArrayOfInt> pool, int capacity){
+    public ArrayOfBoolean(MemoryPool<ArrayOfBoolean> pool, int capacity){
         this.pool = pool;
-        this.array = new int[capacity];
+        this.array = new boolean[capacity];
     }
-    public ArrayOfInt(int size){
-        this.array = new int[size];
+    public ArrayOfBoolean(int size){
+        this.array = new boolean[size];
         this.length = size;
     }
-    public ArrayOfInt(int[] array){
+    public ArrayOfBoolean(boolean[] array){
         this.array = array;
         this.length = array.length;
     }
@@ -59,10 +58,10 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     // setLength        || copy
     // contains
 
-    public void set(int position, int value){
+    public void set(int position, boolean value){
         array[position] = value;
     }
-    public int get(int position){
+    public boolean get(int position){
         return array[position];
     }
     public int length(){
@@ -73,21 +72,21 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
         length = 0;
     }
     public void setLength(int length){
-        if(length > array.length) this.array = new int[length];
+        if(length > array.length) this.array = new boolean[length];
         this.length = length;
     }
 
-    public void copy(int[] array){
+    public void copy(boolean[] array){
         if(array.length > this.array.length) this.array = array;
         else System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
-    public void copy(ArrayOfInt array){
+    public void copy(ArrayOfBoolean array){
         copy(array.array);
     }
 
-    public boolean contains(int value){
-        for(int v : this) if(v == value) return true;
+    public boolean contains(boolean value){
+        for(boolean v : this) if(v == value) return true;
         return false;
     }
 
@@ -123,12 +122,12 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     // Implementation of Iterable<Integer> interface
 
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<Boolean> iterator() {
         iterator.i = 0;
         return iterator;
     }
 
-    private class ArrayOfIntIterator implements Iterator<Integer> {
+    private class ArrayOfBooleanIterator implements Iterator<Boolean> {
         private int i = 0;
 
         @Override
@@ -137,7 +136,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
         }
 
         @Override
-        public Integer next() {
+        public Boolean next() {
             return array[i++];
         }
     }

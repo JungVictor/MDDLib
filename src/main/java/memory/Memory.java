@@ -6,6 +6,9 @@ import mdd.components.Layer;
 import mdd.components.Node;
 import mdd.components.OutArcs;
 import mdd.operations.Pack;
+import pmdd.PMDD;
+import pmdd.components.PNode;
+import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.ListOf;
@@ -63,13 +66,24 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<ArrayOfInt> arrayofInts = new MemoryPool<>();
+    private static final MemoryPool<ArrayOfInt> arrayOfInts = new MemoryPool<>();
     public static ArrayOfInt ArrayOfInt(int capacity){
-        ArrayOfInt object = arrayofInts.get();
+        ArrayOfInt object = arrayOfInts.get();
         if(object == null){
-            object = new ArrayOfInt(arrayofInts);
-            arrayofInts.add(object);
-        }
+            object = new ArrayOfInt(arrayOfInts, capacity);
+            arrayOfInts.add(object);
+        } else object.setLength(capacity);
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<ArrayOfBoolean> arrayOfBooleans = new MemoryPool<>();
+    public static ArrayOfBoolean ArrayOfBoolean(int capacity){
+        ArrayOfBoolean object = arrayOfBooleans.get();
+        if(object == null){
+            object = new ArrayOfBoolean(arrayOfBooleans, capacity);
+            arrayOfBooleans.add(object);
+        } else object.setLength(capacity);
         object.prepare();
         return object;
     }
@@ -151,6 +165,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<Node> pnodes = new MemoryPool<>();
+    public static PNode PNode(){
+        PNode object = (PNode) pnodes.get();
+        if(object == null){
+            object = new PNode(pnodes);
+            pnodes.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     private static final MemoryPool<InArcs> inArcs = new MemoryPool<>();
     public static InArcs InArcs(){
         InArcs object = inArcs.get();
@@ -179,6 +204,17 @@ public class Memory {
         if(object == null){
             object = new MDD(mdds);
             mdds.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MDD> pmdds = new MemoryPool<>();
+    public static PMDD PMDD(){
+        PMDD object = (PMDD) pmdds.get();
+        if(object == null){
+            object = new PMDD(pmdds);
+            pmdds.add(object);
         }
         object.prepare();
         return object;

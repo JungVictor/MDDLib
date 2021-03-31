@@ -8,6 +8,10 @@ import structures.generics.ArrayOf;
 
 public class Node implements MemoryObject {
 
+    public enum NodeType {
+        SIMPLE_NODE, PROPERTY_NODE
+    }
+
     // MemoryObject variables
     private final MemoryPool<Node> pool;
     private int ID = -1;
@@ -39,6 +43,9 @@ public class Node implements MemoryObject {
         children.accept(visitor);
     }
 
+    public NodeType getNodeType(){
+        return NodeType.SIMPLE_NODE;
+    }
 
     //**************************************//
     //               SETTERS                //
@@ -95,6 +102,13 @@ public class Node implements MemoryObject {
         return children.size();
     }
 
+    protected OutArcs getChildren(){
+        return children;
+    }
+
+    protected InArcs getParents(){
+        return parents;
+    }
 
     //**************************************//
     //           NODE MANAGEMENT            //

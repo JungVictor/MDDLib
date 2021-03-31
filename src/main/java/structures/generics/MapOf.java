@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-public class MapOf<K extends MemoryObject, V extends MemoryObject> implements MemoryObject, Iterable<K> {
+public class MapOf<K, V extends MemoryObject> implements MemoryObject, Iterable<K> {
 
     // MemoryObject variables
     private final MemoryPool<MapOf<K, V>> pool;
@@ -57,6 +57,9 @@ public class MapOf<K extends MemoryObject, V extends MemoryObject> implements Me
         return map.values();
     }
 
+    public boolean contains(K key){
+        return map.containsKey(key);
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

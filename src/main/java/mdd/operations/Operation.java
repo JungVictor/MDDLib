@@ -3,6 +3,7 @@ package mdd.operations;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
+import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.SetOf;
@@ -12,6 +13,21 @@ public class Operation {
     private enum Operator {
         UNION, INTERSECTION, DIAMOND, MINUS, INCLUSION;
     }
+
+
+    //**************************************//
+    //           UNARY OPERATIONS           //
+    //**************************************//
+
+    public static MDD negation(MDD mdd){
+        MDD universal = Memory.MDD();
+        return minus(universal, mdd);
+    }
+
+
+    //**************************************//
+    //          BINARY OPERATIONS           //
+    //**************************************//
 
     public static MDD union(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.UNION);
@@ -27,11 +43,6 @@ public class Operation {
 
     public static MDD minus(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.MINUS);
-    }
-
-    public static MDD negation(MDD mdd){
-        MDD universal = Memory.MDD();
-        return minus(universal, mdd);
     }
 
     public static boolean inclusion(MDD mdd1, MDD mdd2){
@@ -56,19 +67,19 @@ public class Operation {
      * @return The MDD resulting from : this OP mdd.
      */
     private static MDD perform(MDD mdd1, MDD mdd2, Operator OP){
-        MDD result = Memory.MDD();
-        result.setSize(mdd1.getSize());
+        MDD result = mdd1.MDD();
+        result.setSize(mdd1.size());
         Binder binder = Memory.Binder();
 
         // Construction of V
         SetOf<Integer> V = Memory.SetOfInteger();
         V.add(mdd1.getV());
-        if(OP == Operator.INCLUSION) V.intersect(mdd2.getV());
+        if(OP == Operator.INTERSECTION) V.intersect(mdd2.getV());
         else V.add(mdd2.getV());
 
 
         result.getRoot().associates(mdd1.getRoot(), mdd2.getRoot());
-        int r = mdd1.getSize();
+        int r = mdd1.size();
 
         for(int i = 1; i < r; i++){
             for(Node x : result.getLayer(i-1)){
@@ -110,7 +121,7 @@ public class Operation {
             Binder lastBinder = binder.path(nodes);
             y = lastBinder.getLeaf();
             if (y == null) {
-                y = Memory.Node();
+                y = mdd.Node();
                 y.associates(y1, y2);
                 lastBinder.setLeaf(y);
                 mdd.addNode(y, layer);
@@ -119,5 +130,99 @@ public class Operation {
         }
         mdd.addArc(x, label, y);
     }
+
+
+    //**************************************//
+    //           N-ARY OPERATIONS           //
+    //**************************************//
+
+    public static MDD union(ArrayOf<MDD> mdds){
+        return perform(mdds, Operator.UNION);
+    }
+
+    public static MDD intersection(ArrayOf<MDD> mdds){
+        return perform(mdds, Operator.INTERSECTION);
+    }
+
+    private static boolean apply(ArrayOfBoolean a, Operator OP){
+        switch (OP){
+            case INTERSECTION:
+            case INCLUSION:
+                for(boolean b : a) if(!b) return false;
+                return true;
+            case UNION:
+                for(boolean b : a) if(b) return true;
+                return false;
+        }
+        return false;
+    }
+
+    private static MDD perform(ArrayOf<MDD> mdds, Operator OP){
+
+        // Allocations : Need to be free
+        ArrayOf<Node> ys = Memory.ArrayOfNode(mdds.length());
+        ArrayOfBoolean a = Memory.ArrayOfBoolean(mdds.length());
+        Binder binder = Memory.Binder();
+        SetOf<Integer> V = Memory.SetOfInteger();
+        //
+
+        if(OP != Operator.INTERSECTION && OP != Operator.UNION) {
+            throw new UnsupportedOperationException("N-ary operations only support intersection and union !");
+        }
+        MDD result = mdds.get(0).MDD();
+        result.setSize(mdds.get(0).size());
+
+        // Construction of V
+        V.add(mdds.get(0).getV());
+        if(OP == Operator.INTERSECTION) for(int i = 1; i < mdds.length(); i++) V.intersect(mdds.get(i).getV());
+        else for(int i = 1; i < mdds.length(); i++) V.add(mdds.get(i).getV());
+
+
+        for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());
+        result.getRoot().associates(ys);
+        int r = result.size();
+
+        for(int i = 1; i < r; i++){
+            for(Node x : result.getLayer(i-1)){
+                ArrayOf<Node> xs = x.getAssociations();
+                for(int v : V){
+                    for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
+                    if(apply(a, OP)) {
+                        for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
+                        addArcAndNode(result, x, ys, v, i, binder);
+                    }
+                }
+            }
+            if(result.getLayer(i).size() == 0) return result;
+            binder.clear();
+        }
+        Memory.free(ys);
+        Memory.free(a);
+        Memory.free(binder);
+        Memory.free(V);
+
+        result.reduce();
+        return result;
+    }
+
+    private static void addArcAndNode(MDD mdd, Node x, ArrayOf<Node> ys, int label, int layer, Binder binder){
+        Node y;
+        if(binder == null){
+            y = Memory.Node();
+            y.associates(ys);
+            mdd.addNode(y, layer);
+        } else {
+            Binder lastBinder = binder.path(ys);
+            y = lastBinder.getLeaf();
+            if (y == null) {
+                y = mdd.Node();
+                y.associates(ys);
+                lastBinder.setLeaf(y);
+                mdd.addNode(y, layer);
+            }
+        }
+        mdd.addArc(x, label, y);
+    }
+
 
 }

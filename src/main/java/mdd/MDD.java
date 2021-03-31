@@ -9,10 +9,6 @@ import memory.MemoryPool;
 import representation.MDDVisitor;
 import structures.generics.ListOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
-
-import java.util.ArrayList;
-import java.util.Set;
 
 public class MDD implements MemoryObject {
 
@@ -22,7 +18,7 @@ public class MDD implements MemoryObject {
     //
 
     // Root node
-    private final Node root = Memory.Node();
+    private final Node root;
     private Node tt;
 
     // Layers
@@ -40,6 +36,7 @@ public class MDD implements MemoryObject {
     public MDD(MemoryPool<MDD> pool){
         this.pool = pool;
         L.add(Memory.Layer());
+        root = Node();
         L.get(0).add(root);
     }
 
@@ -55,6 +52,14 @@ public class MDD implements MemoryObject {
     public void accept(MDDVisitor visitor){
         visitor.visit(this);
         for(int i = 0; i < size; i++) getLayer(i).accept(visitor);
+    }
+
+    public Node Node(){
+        return Memory.Node();
+    }
+
+    public MDD MDD(){
+        return Memory.MDD();
     }
 
     //**************************************//
@@ -73,7 +78,7 @@ public class MDD implements MemoryObject {
         return L.get(i);
     }
 
-    public int getSize(){
+    public int size(){
         return size;
     }
 
@@ -96,7 +101,6 @@ public class MDD implements MemoryObject {
     }
 
 
-
     //**************************************//
     //             MANAGE MDD               //
     //**************************************//
@@ -107,7 +111,7 @@ public class MDD implements MemoryObject {
             int v = values[i];
             if(current.containsLabel(v)) current = current.getChild(v);
             else{
-                Node next = Memory.Node();
+                Node next = Node();
                 addArcAndNode(current, v, next, i+1);
                 current = next;
             }
@@ -150,7 +154,7 @@ public class MDD implements MemoryObject {
             this.tt = getLayer(size - 1).getNode();
             return;
         }
-        Node newTT = Memory.Node();
+        Node newTT = Node();
         for(Node leaf : getLayer(size - 1)) leaf.replaceReferencesBy(newTT);
 
         getLayer(size - 1).clear();
@@ -170,8 +174,15 @@ public class MDD implements MemoryObject {
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
+
     @Override
-    public void prepare() {}
+    public void prepare() {
+        Layer L0 = getLayer(0);
+        L.clear();
+        L.add(L0);
+        V.clear();
+        root.clear();
+    }
 
     @Override
     public void setID(int ID) {
@@ -184,11 +195,7 @@ public class MDD implements MemoryObject {
             getLayer(i).freeAllNodes();
             Memory.free(getLayer(i));
         }
-        Layer L0 = getLayer(0);
-        L.clear();
-        L.add(L0);
-        V.clear();
-        root.clear();
+        prepare();
         this.pool.free(this, ID);
     }
 
