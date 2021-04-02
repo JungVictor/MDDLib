@@ -60,12 +60,13 @@ public class MatrixOfInt implements MemoryObject {
         builder.append("[");
         builder.append("\n");
         for(int i = 0; i < height; i++){
-            builder.append("\t[");
+            builder.append("\t");
+            builder.append(i);
+            builder.append(" : [");
             for(int j = 0; j < length; j++) {
                 builder.append(get(i, j));
-                if(j <= length - 1) builder.append(", ");
+                if(j < length - 1) builder.append(", ");
             }
-            builder.append(get(i, length-1));
             if(i == height - 1) builder.append("],\n");
             else builder.append("]\n");
         }

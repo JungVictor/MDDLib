@@ -1,3 +1,4 @@
+import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
@@ -6,6 +7,7 @@ import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
 import representation.MDDPrinter;
 import structures.generics.MapOf;
+import structures.generics.SetOf;
 
 public class Main {
 
@@ -41,17 +43,18 @@ public class Main {
         Memory.free(mdd);
 
         PMDD pmdd = PMemory.PMDD();
-        pmdd.setSize(5);
-        pmdd.addPath(8, 1, 2, 5);
-        pmdd.addPath(8, 1, 2, 6);
-        pmdd.reduce();
+        MDDBuilder.among(pmdd, 4, 2, 3);
 
+        SetOf<Integer> V = Memory.SetOfInteger();
+        V.add(1);
         pmdd.addRootProperty("Sum", PMemory.PropertySum(0, 0));
-        pmdd.addRootProperty("Sequence", PMemory.PropertySequence(pmdd.getV(), pmdd.size()));
+        pmdd.addRootProperty("Sequence", PMemory.PropertySequence(V, pmdd.size()));
         MapOf<String, NodeProperty> properties = pmdd.propagateProperties();
-        for(String key : properties){
-            System.out.println(key + " : " + properties.get(key));
-        }
+        for(String key : properties) System.out.println(key + " : " + properties.get(key));
+
+
+
+
     }
 
 }

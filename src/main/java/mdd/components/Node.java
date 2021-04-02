@@ -102,7 +102,7 @@ public class Node implements MemoryObject {
         return children.size();
     }
 
-    protected OutArcs getChildren(){
+    public OutArcs getChildren(){
         return children;
     }
 
