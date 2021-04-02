@@ -52,8 +52,15 @@ public class Main {
         MapOf<String, NodeProperty> properties = pmdd.propagateProperties();
         for(String key : properties) System.out.println(key + " : " + properties.get(key));
 
+        Memory.free(V);
 
+        PMDD pmdd_copy1 = (PMDD) pmdd.copy();
+        PMDD pmdd_copy2 = (PMDD) pmdd.copy();
 
+        System.out.println(pmdd_copy2.getTt() == pmdd_copy1.getTt());
+
+        Memory.free(pmdd_copy1);
+        Memory.free(pmdd_copy2);
 
     }
 

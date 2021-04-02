@@ -62,6 +62,38 @@ public class MDD implements MemoryObject {
         return Memory.MDD();
     }
 
+    public MDD copy(MDD copy, Node root, int offset){
+        getRoot().associates(root, null);
+        for(int i = 0; i < size(); i++){
+            for(Node original : getLayer(i)) {
+                Node copyNode = original.getX1();
+                for(int arc : original.getChildren()){
+                    Node child = original.getChild(arc);
+                    Node copyChild = child.getX1();
+                    // Child node is not yet copied
+                    if(copyChild == null) {
+                        copyChild = copy.Node();
+                        child.associates(copyChild, null);
+                        copy.addNode(copyChild, i+1+offset);
+                    }
+                    copy.addArc(copyNode, arc, copyChild);
+                }
+                original.associates(null, null);
+            }
+        }
+        copy.setTT();
+        return copy;
+    }
+
+    public MDD copy(MDD copy){
+        copy.setSize(size());
+        return copy(copy, copy.getRoot(), 0);
+    }
+
+    public MDD copy(){
+        return copy(MDD());
+    }
+
     //**************************************//
     //               GETTERS                //
     //**************************************//
@@ -169,6 +201,17 @@ public class MDD implements MemoryObject {
         reduce(size, true);
     }
 
+    private void setTT(){
+        if(getLayer(size - 1).size() == 1) this.tt = getLayer(size - 1).getNode();
+        else {
+            Node newTT = Node();
+            for (Node leaf : getLayer(size - 1)) leaf.replaceReferencesBy(newTT);
+
+            getLayer(size - 1).clear();
+            getLayer(size - 1).add(newTT);
+            this.tt = newTT;
+        }
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

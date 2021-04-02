@@ -8,6 +8,8 @@ import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.SetOf;
 
+import java.lang.reflect.Array;
+
 public class Operation {
 
     private enum Operator {
@@ -28,6 +30,13 @@ public class Operation {
     //**************************************//
     //          BINARY OPERATIONS           //
     //**************************************//
+
+    public static MDD concatenate(MDD mdd1, MDD mdd2){
+        MDD result = mdd1.copy();
+        result.setSize(mdd1.size() + mdd2.size() - 1);
+        mdd2.copy(result, result.getTt(), mdd1.size() - 1);
+        return result;
+    }
 
     public static MDD union(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.UNION);
@@ -135,6 +144,15 @@ public class Operation {
     //**************************************//
     //           N-ARY OPERATIONS           //
     //**************************************//
+
+    public static MDD concatenate(ArrayOf<MDD> mdds){
+        MDD result = mdds.get(0).copy();
+        for(int i = 1; i < mdds.length(); i++){
+            result.setSize(result.size() + mdds.get(i).size() - 1);
+            mdds.get(i).copy(result, result.getTt(), result.size() - 1);
+        }
+        return result;
+    }
 
     public static MDD union(ArrayOf<MDD> mdds){
         return perform(mdds, Operator.UNION);

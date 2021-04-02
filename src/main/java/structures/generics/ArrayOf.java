@@ -33,7 +33,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
     //**************************************//
 
     @SuppressWarnings("unchecked")
-    public ArrayOf(MemoryPool<ArrayOf<E>> pool){
+    public ArrayOf(MemoryPool<ArrayOf<E>> pool, int i){
         this.pool = pool;
         this.array = (E[]) new Object[10];
     }
