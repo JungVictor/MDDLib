@@ -57,8 +57,6 @@ public class Main {
         PMDD pmdd_copy1 = (PMDD) pmdd.copy();
         PMDD pmdd_copy2 = (PMDD) pmdd.copy();
 
-        System.out.println(pmdd_copy2.getTt() == pmdd_copy1.getTt());
-
         Memory.free(pmdd_copy1);
         Memory.free(pmdd_copy2);
 

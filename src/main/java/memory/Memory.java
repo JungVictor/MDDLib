@@ -59,10 +59,9 @@ public class Memory {
     public static ArrayOf<Node> ArrayOfNode(int capacity){
         ArrayOf<Node> object = arrayOfNodes.get();
         if(object == null){
-            object = new ArrayOf<>(arrayOfNodes);
+            object = new ArrayOf<>(arrayOfNodes, capacity);
             arrayOfNodes.add(object);
-        }
-        object.setLength(capacity);
+        } else object.setLength(capacity);
         object.prepare();
         return object;
     }

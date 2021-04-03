@@ -62,9 +62,8 @@ public class MDD implements MemoryObject {
         return Memory.MDD();
     }
 
-    public MDD copy(MDD copy, Node root, int offset){
-        getRoot().associates(root, null);
-        for(int i = 0; i < size(); i++){
+    public MDD copy(MDD copy, int offset, int start, int stop){
+        for(int i = start; i < stop; i++){
             for(Node original : getLayer(i)) {
                 Node copyNode = original.getX1();
                 for(int arc : original.getChildren()){
@@ -81,6 +80,12 @@ public class MDD implements MemoryObject {
                 original.associates(null, null);
             }
         }
+        return copy;
+    }
+
+    public MDD copy(MDD copy, Node root, int offset){
+        getRoot().associates(root, null);
+        copy(copy, offset, 0, size());
         copy.setTT();
         return copy;
     }

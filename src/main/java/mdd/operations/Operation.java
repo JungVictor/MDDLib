@@ -31,6 +31,62 @@ public class Operation {
     //          BINARY OPERATIONS           //
     //**************************************//
 
+    public static MDD layerIntersection(MDD mdd1, MDD mdd2, int start){
+
+        int size = Math.max(start + mdd2.size(), mdd1.size());
+        int stop = Math.min(start + mdd2.size(), mdd1.size());
+
+        // Copy the first MDD until the first layer of intersection
+        MDD result = mdd1.MDD();
+        result.setSize(size);
+        mdd1.getRoot().associates(result.getRoot(), null);
+        mdd1.copy(result, 0, 0, start);
+
+        // Binding all nodes in layer start to the root of mdd2
+        if(start > 0) for(Node node : mdd1.getLayer(start)) node.getX1().associates(node, mdd2.getRoot());
+        else result.getRoot().associates(mdd1.getRoot(), mdd2.getRoot());
+
+        // Normal intersection
+        SetOf<Integer> V = Memory.SetOfInteger();
+        Binder binder = Memory.Binder();
+
+        // Construction of V
+        V.add(mdd1.getV());
+        V.intersect(mdd2.getV());
+
+        for(int i = start+1; i < stop; i++){
+            for(Node x : result.getLayer(i-1)){
+                Node x1 = x.getX1(), x2 = x.getX2();
+                for(int v : V){
+                    boolean a1 = x1.containsLabel(v), a2 = a1;
+                    if(x2 != x1) a2 = x2.containsLabel(v);
+                    if(apply(a1, a2, Operator.INTERSECTION, i == stop - 1)) {
+                        addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);
+                    }
+                }
+            }
+            if(result.getLayer(i).size() == 0) return result;
+            binder.clear();
+        }
+
+        Memory.free(V);
+        Memory.free(binder);
+
+        // Final step
+        if(stop < mdd1.size()){
+            // mdd2 is contained in the intersection
+            // Therefore, we need to construct the rest of the mdd from mdd1
+            for(Node node : result.getLayer(stop)) node.getX1().associates(node, null);
+            mdd1.copy(result, stop, stop, mdd1.size());
+        } else if (stop >= mdd1.size()){
+            for(Node node : result.getLayer(stop-1)) node.getX2().associates(node, null);
+            mdd2.copy(result, start, stop - start - 1, mdd2.size());
+        }
+
+        result.reduce();
+        return result;
+    }
+
     public static MDD concatenate(MDD mdd1, MDD mdd2){
         MDD result = mdd1.copy();
         result.setSize(mdd1.size() + mdd2.size() - 1);
@@ -241,6 +297,5 @@ public class Operation {
         }
         mdd.addArc(x, label, y);
     }
-
 
 }
