@@ -9,6 +9,7 @@ import representation.MDDPrinter;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
+import structures.integers.MatrixOfInt;
 
 public class Main {
 
@@ -69,8 +70,14 @@ public class Main {
         properties = seq.propagateProperties();
         for(String key : properties) System.out.println(key + " : " + properties.get(key));
 
+        ArrayOfInt B = Memory.ArrayOfInt(2);
+        B.set(0,0); B.set(1,1);
+        MatrixOfInt couples = Memory.MatrixOfInt(1, 3);
+        couples.set(0, 0, 1);
+        couples.set(0, 1, 2);
+        couples.set(0, 2, 5);
 
-        MDD sum = MDDBuilder.sum(Memory.MDD(), 4, 10);
+        MDD sum = MDDBuilder.gcc(Memory.MDD(), 5, couples, B);
         sum.accept(new MDDPrinter());
     }
 

@@ -36,6 +36,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
     public ArrayOf(MemoryPool<ArrayOf<E>> pool, int i){
         this.pool = pool;
         this.array = (E[]) new Object[10];
+        setLength(i);
     }
 
     @SuppressWarnings("unchecked")

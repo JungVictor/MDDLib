@@ -63,6 +63,10 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
         return values.get(index);
     }
 
+    public ArrayList<Integer> getValues(){
+        return values;
+    }
+
     public boolean remove(int value){
         values.remove(Integer.valueOf(value));
         return this.arcs.remove(value) != null;

@@ -6,6 +6,8 @@ import memory.MemoryPool;
 import representation.MDDVisitor;
 import structures.generics.ArrayOf;
 
+import java.util.ArrayList;
+
 public class Node implements MemoryObject {
 
     public enum NodeType {
@@ -139,6 +141,10 @@ public class Node implements MemoryObject {
 
     public void removeChild(int value){
         this.children.remove(value);
+    }
+
+    public ArrayList<Integer> getValues(){
+        return children.getValues();
     }
 
     public void addParent(int value, Node parent){

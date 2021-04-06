@@ -1,12 +1,10 @@
 package builder;
 
-import builder.constraints.MDDAmong;
-import builder.constraints.MDDSequence;
-import builder.constraints.MDDSum;
-import builder.constraints.MDDUniversal;
+import builder.constraints.*;
 import mdd.MDD;
 import memory.Memory;
 import structures.integers.ArrayOfInt;
+import structures.integers.MatrixOfInt;
 
 public class MDDBuilder {
 
@@ -31,5 +29,8 @@ public class MDDBuilder {
         MDDSum.generate(mdd, s, s, n, V);
         Memory.free(V);
         return mdd;
+    }
+    public static MDD gcc(MDD mdd, int n, MatrixOfInt couples, ArrayOfInt V){
+        return MDDGCC.generate(mdd, n, couples, V);
     }
 }

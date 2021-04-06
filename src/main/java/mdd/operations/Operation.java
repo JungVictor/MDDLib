@@ -226,6 +226,10 @@ public class Operation {
         return perform(mdds, Operator.INTERSECTION);
     }
     public static MDD intersection(MDD result, ArrayOf<MDD> mdds){
+        if(mdds.length == 1) {
+            mdds.get(0).copy(result);
+            return result;
+        }
         return perform(result, mdds, Operator.INTERSECTION);
     }
 

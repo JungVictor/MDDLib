@@ -10,6 +10,7 @@ import representation.MDDVisitor;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.ArrayOfInt;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -108,7 +109,27 @@ public class MDD implements MemoryObject {
     }
 
     // TODO : Implementation of replace
-    public void replace(MapOf<Integer, SetOf<Integer>> values){}
+    public void replace(MapOf<Integer, SetOf<Integer>> values){
+        MapOf<Integer, Node> V = Memory.MapOfIntegerNode();
+        SetOf<Integer> setV = Memory.SetOfInteger();
+        for(int i = 0; i < size; i++){
+            for(Node node : getLayer(i)) {
+                setV.clear();
+                setV.add(node.getValues());
+                for(int v : setV) {
+                    V.put(v, node.getChild(v));
+                    node.getChild(v).removeParent(v, node);
+                    node.removeChild(v);
+                }
+                for(int v : V) {
+                    Node child = V.get(v);
+                    for(int value : values.get(v)) addArc(node, value, child);
+                }
+            }
+        }
+        Memory.free(V);
+        Memory.free(setV);
+    }
 
     public void replace(SetOf<Integer> V0, SetOf<Integer> V1){
         MapOf<Integer, SetOf<Integer>> values = Memory.MapOfIntegerSetOfInteger();
