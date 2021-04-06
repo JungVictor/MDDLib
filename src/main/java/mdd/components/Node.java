@@ -125,6 +125,9 @@ public class Node implements MemoryObject {
         associations.clear();
     }
 
+    public void clearAssociations(){
+        associations.clear();
+    }
 
     //**************************************//
     //           ARCS MANAGEMENT            //

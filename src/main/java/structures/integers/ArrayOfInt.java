@@ -30,6 +30,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     public ArrayOfInt(MemoryPool<ArrayOfInt> pool, int capacity){
         this.pool = pool;
         this.array = new int[capacity];
+        this.length = capacity;
     }
     public ArrayOfInt(int size){
         this.array = new int[size];

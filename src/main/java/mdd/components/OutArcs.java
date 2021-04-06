@@ -47,7 +47,7 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     //**************************************//
 
     public void add(int value, Node node){
-        if(!this.arcs.containsKey(value)) addValueAndSort(value);
+        if(!this.values.contains(value)) addValueAndSort(value);
         this.arcs.put(value, node);
     }
 
@@ -64,6 +64,7 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     }
 
     public boolean remove(int value){
+        values.remove(Integer.valueOf(value));
         return this.arcs.remove(value) != null;
     }
 
@@ -80,6 +81,7 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     }
 
     public void clear(){
+        this.values.clear();
         this.arcs.clear();
     }
 
@@ -123,6 +125,6 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     // Implementation of Iterable<Integer> interface
     @Override
     public Iterator<Integer> iterator() {
-        return arcs.keySet().iterator();
+        return values.iterator();
     }
 }

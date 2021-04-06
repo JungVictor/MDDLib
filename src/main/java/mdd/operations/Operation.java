@@ -32,18 +32,22 @@ public class Operation {
     //**************************************//
 
     public static MDD layerIntersection(MDD mdd1, MDD mdd2, int start){
-
-        int size = Math.max(start + mdd2.size(), mdd1.size());
-        int stop = Math.min(start + mdd2.size(), mdd1.size());
-
+        return layerIntersection(mdd1.MDD(), mdd1, mdd2, start, Math.min(start + mdd2.size(), mdd1.size()), Math.max(start + mdd2.size(), mdd1.size()));
+    }
+    public static MDD layerIntersection(MDD mdd1, MDD mdd2, int start, int stop, int size){
+        return layerIntersection(mdd1.MDD(), mdd1, mdd2, start, stop, size);
+    }
+    public static MDD layerIntersection(MDD result, MDD mdd1, MDD mdd2, int start, int stop, int size){
+        mdd1.clearAllAssociations();
         // Copy the first MDD until the first layer of intersection
-        MDD result = mdd1.MDD();
         result.setSize(size);
         mdd1.getRoot().associates(result.getRoot(), null);
         mdd1.copy(result, 0, 0, start);
 
         // Binding all nodes in layer start to the root of mdd2
-        if(start > 0) for(Node node : mdd1.getLayer(start)) node.getX1().associates(node, mdd2.getRoot());
+        if(start > 0)
+            for(Node node : mdd1.getLayer(start))
+                node.getX1().associates(node, mdd2.getRoot());
         else result.getRoot().associates(mdd1.getRoot(), mdd2.getRoot());
 
         // Normal intersection
@@ -65,7 +69,8 @@ public class Operation {
                     }
                 }
             }
-            if(result.getLayer(i).size() == 0) return result;
+            if(result.getLayer(i).size() == 0)
+                return result;
             binder.clear();
         }
 
@@ -73,14 +78,17 @@ public class Operation {
         Memory.free(binder);
 
         // Final step
-        if(stop < mdd1.size()){
-            // mdd2 is contained in the intersection
-            // Therefore, we need to construct the rest of the mdd from mdd1
-            for(Node node : result.getLayer(stop)) node.getX1().associates(node, null);
-            mdd1.copy(result, stop, stop, mdd1.size());
-        } else if (stop >= mdd1.size()){
-            for(Node node : result.getLayer(stop-1)) node.getX2().associates(node, null);
-            mdd2.copy(result, start, stop - start - 1, mdd2.size());
+        if(stop != size){
+            if(stop < mdd1.size()){
+                // mdd2 is contained in the intersection
+                // Therefore, we need to construct the rest of the mdd from mdd1
+                for(Node node : result.getLayer(stop)) node.getX1().associates(node, null);
+                mdd1.copy(result, stop, stop, mdd1.size());
+            } else if (stop >= mdd1.size()){
+                // We need to construct the rest of the mdd from mdd2
+                for(Node node : result.getLayer(stop-1)) node.getX2().associates(node, null);
+                mdd2.copy(result, start, stop - start - 1, mdd2.size());
+            }
         }
 
         result.reduce();
@@ -217,6 +225,9 @@ public class Operation {
     public static MDD intersection(ArrayOf<MDD> mdds){
         return perform(mdds, Operator.INTERSECTION);
     }
+    public static MDD intersection(MDD result, ArrayOf<MDD> mdds){
+        return perform(result, mdds, Operator.INTERSECTION);
+    }
 
     private static boolean apply(ArrayOfBoolean a, Operator OP){
         switch (OP){
@@ -232,6 +243,9 @@ public class Operation {
     }
 
     private static MDD perform(ArrayOf<MDD> mdds, Operator OP){
+        return perform(mdds.get(0).MDD(), mdds, OP);
+    }
+    private static MDD perform(MDD result, ArrayOf<MDD> mdds, Operator OP){
 
         // Allocations : Need to be free
         ArrayOf<Node> ys = Memory.ArrayOfNode(mdds.length());
@@ -243,7 +257,6 @@ public class Operation {
         if(OP != Operator.INTERSECTION && OP != Operator.UNION) {
             throw new UnsupportedOperationException("N-ary operations only support intersection and union !");
         }
-        MDD result = mdds.get(0).MDD();
         result.setSize(mdds.get(0).size());
 
         // Construction of V

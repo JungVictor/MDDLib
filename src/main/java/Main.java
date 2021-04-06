@@ -8,6 +8,7 @@ import pmdd.memory.PMemory;
 import representation.MDDPrinter;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.ArrayOfInt;
 
 public class Main {
 
@@ -52,7 +53,7 @@ public class Main {
         MapOf<String, NodeProperty> properties = pmdd.propagateProperties();
         for(String key : properties) System.out.println(key + " : " + properties.get(key));
 
-        Memory.free(V);
+        //Memory.free(V);
 
         PMDD pmdd_copy1 = (PMDD) pmdd.copy();
         PMDD pmdd_copy2 = (PMDD) pmdd.copy();
@@ -60,6 +61,17 @@ public class Main {
         Memory.free(pmdd_copy1);
         Memory.free(pmdd_copy2);
 
+        PMDD seq = PMemory.PMDD();
+        MDDBuilder.sequence(seq, 5, 2, 3, 10);
+
+        seq.accept(new MDDPrinter());
+        seq.addRootProperty("Sequence", PMemory.PropertySequence(V, seq.size()));
+        properties = seq.propagateProperties();
+        for(String key : properties) System.out.println(key + " : " + properties.get(key));
+
+
+        MDD sum = MDDBuilder.sum(Memory.MDD(), 4, 10);
+        sum.accept(new MDDPrinter());
     }
 
 }

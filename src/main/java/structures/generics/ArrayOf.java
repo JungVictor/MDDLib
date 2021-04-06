@@ -81,6 +81,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
     }
 
     public void clear(){
+        Arrays.fill(array, null);
         length = 0;
     }
 

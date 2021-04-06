@@ -12,6 +12,7 @@ import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.ListOf;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
@@ -22,6 +23,32 @@ public class Memory {
         memoryObject.free();
     }
 
+
+    //**************************************//
+    //                MAPS                  //
+    //**************************************//
+
+    private static final MemoryPool<MapOf<Integer, Node>> mapOfIntegersNodes = new MemoryPool<>();
+    public static MapOf<Integer, Node> MapOfIntegerNode(){
+        MapOf<Integer, Node> object = mapOfIntegersNodes.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegersNodes);
+            mapOfIntegersNodes.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MapOf<Integer, SetOf<Integer>>> mapOfIntegersSetOfIntegers = new MemoryPool<>();
+    public static MapOf<Integer, SetOf<Integer>> MapOfIntegerSetOfInteger(){
+        MapOf<Integer, SetOf<Integer>> object = mapOfIntegersSetOfIntegers.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegersSetOfIntegers);
+            mapOfIntegersSetOfIntegers.add(object);
+        }
+        object.prepare();
+        return object;
+    }
 
     //**************************************//
     //                SETS                  //
@@ -54,6 +81,17 @@ public class Memory {
     //**************************************//
     //               ARRAYS                 //
     //**************************************//
+
+    private static final MemoryPool<ArrayOf<MDD>> arrayOfMdds = new MemoryPool<>();
+    public static ArrayOf<MDD> ArrayOfMDD(int capacity){
+        ArrayOf<MDD> object = arrayOfMdds.get();
+        if(object == null){
+            object = new ArrayOf<>(arrayOfMdds, capacity);
+            arrayOfMdds.add(object);
+        } else object.setLength(capacity);
+        object.prepare();
+        return object;
+    }
 
     private static final MemoryPool<ArrayOf<Node>> arrayOfNodes = new MemoryPool<>();
     public static ArrayOf<Node> ArrayOfNode(int capacity){

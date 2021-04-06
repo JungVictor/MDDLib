@@ -8,7 +8,11 @@ import memory.MemoryObject;
 import memory.MemoryPool;
 import representation.MDDVisitor;
 import structures.generics.ListOf;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
+
+import java.util.HashMap;
+import java.util.Set;
 
 public class MDD implements MemoryObject {
 
@@ -99,6 +103,21 @@ public class MDD implements MemoryObject {
         return copy(MDD());
     }
 
+    public void clearAllAssociations(){
+        for(int i = 0; i < size(); i++) for(Node node : getLayer(i)) node.clearAssociations();
+    }
+
+    // TODO : Implementation of replace
+    public void replace(MapOf<Integer, SetOf<Integer>> values){}
+
+    public void replace(SetOf<Integer> V0, SetOf<Integer> V1){
+        MapOf<Integer, SetOf<Integer>> values = Memory.MapOfIntegerSetOfInteger();
+        values.put(0, V0);
+        values.put(1, V1);
+        replace(values);
+        Memory.free(values);
+    }
+
     //**************************************//
     //               GETTERS                //
     //**************************************//
@@ -160,7 +179,7 @@ public class MDD implements MemoryObject {
     }
 
     public void removeNode(Node node, int layer){
-        getLayer(layer).remove(node);
+        getLayer(layer).removeAndFree(node);
     }
 
     public void addArc(Node source, int value, Node destination){
@@ -175,31 +194,18 @@ public class MDD implements MemoryObject {
     }
 
     public void reduce(int size, boolean remove){
-        // Remove all useless nodes (without child or parent)
-        if(remove) {
-            ListOf<Node> layer = Memory.ListOfNode();
-            for (int i = size - 2; i > 0; i--) {
-                layer.add(getLayer(i).getNodes());
-                for (Node node : layer) if (node.numberOfChildren() == 0) removeNode(node, i);
-                layer.clear();
-            }
-            Memory.free(layer);
-        }
-
         // Merge the leaves of the MDD into a tt node
-        if(getLayer(size - 1).size() == 1) {
-            this.tt = getLayer(size - 1).getNode();
-            return;
+        if(getLayer(size - 1).size() == 1) this.tt = getLayer(size - 1).getNode();
+        else {
+            Node newTT = Node();
+            for (Node leaf : getLayer(size - 1)) leaf.replaceReferencesBy(newTT);
+            getLayer(size - 1).clear();
+            getLayer(size - 1).add(newTT);
+            this.tt = newTT;
         }
-        Node newTT = Node();
-        for(Node leaf : getLayer(size - 1)) leaf.replaceReferencesBy(newTT);
-
-        getLayer(size - 1).clear();
-        getLayer(size - 1).add(newTT);
-        this.tt = newTT;
 
         // Merge similar nodes
-        if(getLayer(size - 1).size() != 0) Pack.pReduce(L, size, V);
+        if(getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
     }
 
     public void reduce(){
