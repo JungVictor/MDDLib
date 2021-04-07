@@ -112,9 +112,10 @@ public class MDD implements MemoryObject {
     public void replace(MapOf<Integer, SetOf<Integer>> values){
         MapOf<Integer, Node> V = Memory.MapOfIntegerNode();
         SetOf<Integer> setV = Memory.SetOfInteger();
-        for(int i = 0; i < size; i++){
+        for(int i = 0; i < size-1; i++){
             for(Node node : getLayer(i)) {
                 setV.clear();
+                V.clear();
                 setV.add(node.getValues());
                 for(int v : setV) {
                     V.put(v, node.getChild(v));
@@ -257,6 +258,7 @@ public class MDD implements MemoryObject {
         L.add(L0);
         V.clear();
         root.clear();
+        this.tt = null;
     }
 
     @Override

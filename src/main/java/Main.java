@@ -70,12 +70,13 @@ public class Main {
         properties = seq.propagateProperties();
         for(String key : properties) System.out.println(key + " : " + properties.get(key));
 
-        ArrayOfInt B = Memory.ArrayOfInt(2);
-        B.set(0,0); B.set(1,1);
+        ArrayOfInt B = Memory.ArrayOfInt(4);
+        B.set(0,0); B.set(1,1); B.set(2,2); B.set(3,3);
         MatrixOfInt couples = Memory.MatrixOfInt(1, 3);
         couples.set(0, 0, 1);
         couples.set(0, 1, 2);
         couples.set(0, 2, 5);
+        //couples.set(1, new int[]{3, 2, 3});
 
         MDD sum = MDDBuilder.gcc(Memory.MDD(), 5, couples, B);
         sum.accept(new MDDPrinter());

@@ -38,8 +38,8 @@ public class MatrixOfInt implements MemoryObject {
         matrix[row * length + column] = value;
     }
 
-    public void set(int column, int[] values){
-        for(int i = 0, start = column * length; i < values.length; i++) matrix[start + i] = values[i];
+    public void set(int row, int[] values){
+        for(int i = 0, start = row * length; i < values.length; i++) matrix[start + i] = values[i];
     }
 
     public void incr(int row, int column, int value){

@@ -226,10 +226,7 @@ public class Operation {
         return perform(mdds, Operator.INTERSECTION);
     }
     public static MDD intersection(MDD result, ArrayOf<MDD> mdds){
-        if(mdds.length == 1) {
-            mdds.get(0).copy(result);
-            return result;
-        }
+        if(mdds.length == 1) return mdds.get(0).copy(result);
         return perform(result, mdds, Operator.INTERSECTION);
     }
 
@@ -282,6 +279,7 @@ public class Operation {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
                         addArcAndNode(result, x, ys, v, i, binder);
                     }
+                    for(int n = 0; n < xs.length(); n++) a.set(n, false);
                 }
             }
             if(result.getLayer(i).size() == 0) return result;

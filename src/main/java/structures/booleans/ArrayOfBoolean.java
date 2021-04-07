@@ -29,6 +29,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
     public ArrayOfBoolean(MemoryPool<ArrayOfBoolean> pool, int capacity){
         this.pool = pool;
         this.array = new boolean[capacity];
+        this.setLength(capacity);
     }
     public ArrayOfBoolean(int size){
         this.array = new boolean[size];
@@ -70,6 +71,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
 
     public void clear(){
         length = 0;
+        prepare();
     }
     public void setLength(int length){
         if(length > array.length) this.array = new boolean[length];
@@ -102,7 +104,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
 
     @Override
     public void prepare() {
-
+        Arrays.fill(array, false);
     }
 
     @Override
