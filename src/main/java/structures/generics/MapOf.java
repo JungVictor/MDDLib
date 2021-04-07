@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-public class MapOf<K, V extends MemoryObject> implements MemoryObject, Iterable<K> {
+public class MapOf<K, V> implements MemoryObject, Iterable<K> {
 
     // MemoryObject variables
     private final MemoryPool<MapOf<K, V>> pool;

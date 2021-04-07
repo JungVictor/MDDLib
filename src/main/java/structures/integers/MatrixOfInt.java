@@ -67,8 +67,7 @@ public class MatrixOfInt implements MemoryObject {
                 builder.append(get(i, j));
                 if(j < length - 1) builder.append(", ");
             }
-            if(i == height - 1) builder.append("],\n");
-            else builder.append("]\n");
+            builder.append("]\n");
         }
         builder.append("]");
         return builder.toString();

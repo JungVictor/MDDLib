@@ -17,6 +17,8 @@ import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
 
+import java.util.Map;
+
 public class Memory {
 
     public static void free(MemoryObject memoryObject){
@@ -27,6 +29,28 @@ public class Memory {
     //**************************************//
     //                MAPS                  //
     //**************************************//
+
+    private static final MemoryPool<MapOf<Integer, ListOf<Integer>>> mapOfIntegersListOfIntegers = new MemoryPool<>();
+    public static MapOf<Integer, ListOf<Integer>> MapOfIntegerListOfInteger(){
+        MapOf<Integer, ListOf<Integer>> object = mapOfIntegersListOfIntegers.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegersListOfIntegers);
+            mapOfIntegersListOfIntegers.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MapOf<Integer, Integer>> mapOfIntegersIntegers = new MemoryPool<>();
+    public static MapOf<Integer, Integer> MapOfIntegerInteger(){
+        MapOf<Integer, Integer> object = mapOfIntegersIntegers.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegersIntegers);
+            mapOfIntegersIntegers.add(object);
+        }
+        object.prepare();
+        return object;
+    }
 
     private static final MemoryPool<MapOf<Integer, Node>> mapOfIntegersNodes = new MemoryPool<>();
     public static MapOf<Integer, Node> MapOfIntegerNode(){
