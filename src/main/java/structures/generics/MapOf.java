@@ -27,7 +27,10 @@ public class MapOf<K, V> implements MemoryObject, Iterable<K> {
         this.pool = pool;
     }
 
-
+    @Override
+    public String toString(){
+        return map.toString();
+    }
 
     //**************************************//
     //            MAP MANAGEMENT            //

@@ -1,5 +1,7 @@
 package structures.integers;
 
+import java.util.Arrays;
+
 /**
  * Stack structure to store primitive type int.
  * Used to store free indices for the memory management system.
@@ -20,6 +22,10 @@ public class StackOfInt {
         this.array = new int[initial_capacity];
     }
 
+    @Override
+    public String toString(){
+        return Arrays.toString(array);
+    }
 
     //**************************************//
     //           COMMON FUNCTIONS           //

@@ -24,6 +24,10 @@ public class SetOf<E> implements MemoryObject, Iterable<E> {
         this.pool = pool;
     }
 
+    @Override
+    public String toString(){
+        return set.toString();
+    }
 
     //**************************************//
     //            SET MANAGEMENT            //
