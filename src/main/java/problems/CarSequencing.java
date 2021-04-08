@@ -6,6 +6,7 @@ import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.memory.PMemory;
 import problems.carsequencing.CarSequencingData;
+import representation.MDDPrinter;
 import structures.generics.ArrayOf;
 import structures.generics.SetOf;
 
@@ -32,9 +33,10 @@ public class CarSequencing {
 
         ArrayOf<MDD> mdds = Memory.ArrayOfMDD(options.length + configs.length);
         for(int i = 0; i < options().length; i++) mdds.set(i, options.get(i));
-        for(int i = 0; i < configs.length; i++) mdds.set(i+ options.length, configs.get(i));
+        for(int i = 0; i < configs.length; i++) mdds.set(i+options.length, configs.get(i));
 
         MDD solution = Operation.intersection(PMemory.PMDD(), mdds);
+        solution.reduce();
 
         for(MDD mdd : mdds) Memory.free(mdd);
         Memory.free(mdds);
@@ -48,8 +50,8 @@ public class CarSequencing {
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
         ArrayOf<MDD> options = Memory.ArrayOfMDD(data.nOptions());
         for(int i = 0; i < data.nOptions(); i++){
-            options.set(i, option(i, V0, V1));
             V0.clear(); V1.clear();
+            options.set(i, option(i, V0, V1));
         }
         Memory.free(V0);
         Memory.free(V1);
@@ -71,6 +73,8 @@ public class CarSequencing {
         Memory.free(seq);
         Memory.free(sum);
 
+        option.accept(new MDDPrinter());
+
         return option;
     }
 
@@ -80,12 +84,11 @@ public class CarSequencing {
 
         int i = 0;
         for(int v : data.getV()){
+            V0.clear(); V1.clear();
             V1.add(v);
             V0.add(data.getV()); V0.remove(v);
 
             configs.set(i, config(i, V0, V1));
-
-            V0.clear(); V1.clear();
 
             i++;
         }

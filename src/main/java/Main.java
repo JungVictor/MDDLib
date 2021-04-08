@@ -5,6 +5,7 @@ import memory.Memory;
 import pmdd.PMDD;
 import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
+import problems.CarSequencing;
 import representation.MDDPrinter;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -80,6 +81,39 @@ public class Main {
 
         MDD sum = MDDBuilder.gcc(Memory.MDD(), 5, couples, B);
         sum.accept(new MDDPrinter());
+
+
+        CarSequencing cs = new CarSequencing(
+                new int[]{1, 2, 1, 2, 1},
+                new int[]{2, 3, 3, 5, 5},
+                new int[][]{
+                        {6, 1, 0, 0, 1, 0},
+                        {10, 1, 1, 1, 0, 0},
+                        {2, 1, 1, 0, 0, 1},
+                        {2, 0, 1, 1, 0, 0},
+                        {8, 0, 0, 0, 1, 0},
+                        {15, 0, 1, 0, 0, 0},
+                        {1, 0, 1, 1, 1, 0},
+                        {5, 0, 0, 1, 1, 0},
+                        {2, 1, 0, 1, 1, 0},
+                        {3, 0, 0, 1, 0, 0},
+                        {2, 1, 0, 1, 0, 0},
+                        {1, 1, 1, 1, 0, 1},
+                        {8, 0, 1, 0, 1, 0},
+                        {3, 1, 0, 0, 1, 1},
+                        {10, 1, 0, 0, 0, 0},
+                        {4, 0, 1, 0, 0, 1},
+                        {4, 0, 0, 0, 0, 1},
+                        {2, 1, 0, 0, 0, 1},
+                        {4, 1, 1, 0, 0, 0},
+                        {6, 1, 1, 0, 1, 0},
+                        {1, 1, 0, 1, 0, 1},
+                        {1, 1, 1, 1, 1, 1},
+                }, 0, 1);
+
+        MDD solution = cs.solve();
+        solution.accept(new MDDPrinter());
+
     }
 
 }

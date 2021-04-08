@@ -1,17 +1,14 @@
 package problems.carsequencing;
 
 import memory.Memory;
-import problems.CarSequencing;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
-import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
-import structures.integers.MatrixOfInt;
 
 public class CarSequencingData {
 
     private final int[] max, size;
     private final int[][] options;
+    private int nCars;
 
     private MapOf<Integer, ListOf<Integer>> data;
     private ListOf<Integer> enabledOptions;
@@ -26,6 +23,9 @@ public class CarSequencingData {
         for(int option : enabledOptions) this.enabledOptions.add(option);
         V = Memory.ListOfInteger();
         data = Memory.MapOfIntegerListOfInteger();
+        binding = Memory.MapOfIntegerInteger();
+
+        for(int[] opt : options) nCars += opt[0];
     }
 
     public CarSequencingData(int[] max, int[] size, int[][] options){
@@ -49,11 +49,12 @@ public class CarSequencingData {
             if(!V.contains(value)) {
                 V.add(value);
                 data.put(value, Memory.ListOfInteger());
+                data.get(value).add(0);
                 for(int j = 0; j < enabledOptions.size(); j++)
-                    data.get(value).add(j, options[i][enabledOptions.get(j)]);
+                    data.get(value).add(options[i][enabledOptions.get(j)+1]);
             }
             binding.put(i, value);
-            data.get(value).add(0, data.get(value).get(0) + options[i][0]);
+            data.get(value).set(0, data.get(value).get(0) + options[i][0]);
         }
     }
 
@@ -62,15 +63,15 @@ public class CarSequencingData {
     }
 
     public int nCars(){
-        return 0;
+        return nCars+1;
     }
 
     public int seqSizeOption(int option){
-        return size[option];
+        return size[enabledOptions.get(option)];
     }
 
     public int seqMaxOption(int option){
-        return max[option];
+        return max[enabledOptions.get(option)];
     }
 
     public int nCarsWithOption(int option){
@@ -94,7 +95,7 @@ public class CarSequencingData {
     }
 
     public boolean isOptionInConfig(int option, int config){
-        return data.get(config).get(option+1) == 1;
+        return data.get(config).get(enabledOptions.get(option)+1) == 1;
     }
 
     public int nCarsInConfig(int config){

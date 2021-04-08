@@ -36,8 +36,8 @@ public class ListOf<E> implements MemoryObject, Iterable<E> {
         this.list.add(element);
     }
 
-    public void add(int index, E element){
-        this.list.add(index, element);
+    public void set(int index, E element){
+        this.list.set(index, element);
     }
 
     public void add(ListOf<E> list){
@@ -76,6 +76,7 @@ public class ListOf<E> implements MemoryObject, Iterable<E> {
 
     @Override
     public void prepare() {
+        clear();
     }
 
     @Override
