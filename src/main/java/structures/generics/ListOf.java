@@ -23,6 +23,9 @@ public class ListOf<E> implements MemoryObject, Iterable<E> {
         this.pool = pool;
     }
 
+    public String toString(){
+        return list.toString();
+    }
 
     //**************************************//
     //           LIST MANAGEMENT            //

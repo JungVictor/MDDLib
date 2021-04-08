@@ -33,7 +33,6 @@ public class MDD implements MemoryObject {
     // Domain of the MDD
     private final SetOf<Integer> V = Memory.SetOfInteger();
 
-
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
@@ -164,6 +163,17 @@ public class MDD implements MemoryObject {
         return V;
     }
 
+    public int nodes(){
+        int n = 0;
+        for(int i = 0; i < size; i++) n += getLayer(i).size();
+        return n;
+    }
+
+    public int arcs(){
+        int n = 0;
+        for(int i = 0; i < size; i++) for(Node x : getLayer(i)) n += x.numberOfChildren();
+        return n;
+    }
 
     //**************************************//
     //               SETTERS                //

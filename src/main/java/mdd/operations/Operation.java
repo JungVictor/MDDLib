@@ -279,7 +279,7 @@ public class Operation {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
                         addArcAndNode(result, x, ys, v, i, binder);
                     }
-                    for(int n = 0; n < xs.length(); n++) a.set(n, false);
+                    //for(int n = 0; n < xs.length(); n++) a.set(n, false);
                 }
             }
             if(result.getLayer(i).size() == 0) return result;

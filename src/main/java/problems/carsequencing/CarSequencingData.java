@@ -63,7 +63,7 @@ public class CarSequencingData {
     }
 
     public int nCars(){
-        return nCars+1;
+        return nCars;
     }
 
     public int seqSizeOption(int option){

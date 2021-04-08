@@ -73,8 +73,6 @@ public class CarSequencing {
         Memory.free(seq);
         Memory.free(sum);
 
-        option.accept(new MDDPrinter());
-
         return option;
     }
 
