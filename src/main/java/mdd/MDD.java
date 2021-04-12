@@ -6,6 +6,7 @@ import mdd.operations.Pack;
 import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
+import pmdd.memory.PMemory;
 import representation.MDDVisitor;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
@@ -62,7 +63,11 @@ public class MDD implements MemoryObject {
     }
 
     public MDD MDD(){
-        return Memory.MDD();
+        return MDD(Node());
+    }
+
+    public MDD MDD(Node root){
+        return Memory.MDD(root);
     }
 
     public MDD copy(MDD copy, int offset, int start, int stop){

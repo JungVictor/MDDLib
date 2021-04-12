@@ -9,10 +9,18 @@ import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
+import java.util.InputMismatchException;
+
 public class PMDD extends MDD {
 
     public PMDD(MemoryPool<MDD> pool) {
         super(pool);
+    }
+
+    @Override
+    public void setRoot(Node node){
+        if(node instanceof PNode) super.setRoot(node);
+        else throw new InputMismatchException("Expected the root to be at least a PNode !");
     }
 
     @Override
@@ -23,7 +31,12 @@ public class PMDD extends MDD {
 
     @Override
     public MDD MDD(){
-        return PMemory.PMDD();
+        return MDD(Node());
+    }
+
+    @Override
+    public MDD MDD(Node root){
+        return PMemory.PMDD(root);
     }
 
     //**************************************//
