@@ -49,6 +49,10 @@ public class Node implements MemoryObject {
         return NodeType.SIMPLE_NODE;
     }
 
+    public Node Node(){
+        return Memory.Node();
+    }
+
     //**************************************//
     //               SETTERS                //
     //**************************************//

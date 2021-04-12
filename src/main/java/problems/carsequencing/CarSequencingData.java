@@ -82,6 +82,10 @@ public class CarSequencingData {
         return cars;
     }
 
+    public MapOf<Integer, Integer> getBinding(){
+        return binding;
+    }
+
     public int nOptions(){
         return enabledOptions.size();
     }

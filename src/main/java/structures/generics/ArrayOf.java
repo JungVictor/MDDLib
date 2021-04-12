@@ -39,17 +39,6 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
         setLength(i);
     }
 
-    @SuppressWarnings("unchecked")
-    public ArrayOf(int size){
-        this.array = (E[]) new Object[size];
-        this.length = size;
-    }
-
-    public ArrayOf(E[] array){
-        this.array = array;
-        this.length = array.length;
-    }
-
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //

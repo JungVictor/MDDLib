@@ -3,6 +3,7 @@ package pmdd.components;
 import mdd.components.Node;
 import memory.MemoryPool;
 import pmdd.components.properties.NodeProperty;
+import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
 public class PNode extends Node {
@@ -18,6 +19,10 @@ public class PNode extends Node {
         return NodeType.PROPERTY_NODE;
     }
 
+    @Override
+    public Node Node(){
+        return PMemory.PNode();
+    }
 
     //**************************************//
     //              PROPERTIES              //

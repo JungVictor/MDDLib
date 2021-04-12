@@ -116,10 +116,11 @@ public class Main {
                 }, 0, 1);
 
         long clock = System.currentTimeMillis();
-        System.out.print("Génération du MDDsol100 : en cours...");
+        System.out.println("Génération du MDDsol100 : en cours...");
         MDD solution = cs.solve();
         System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
-        //solution.accept(new MDDPrinter());
+
+        cs.solve(solution, 2);
 
     }
 

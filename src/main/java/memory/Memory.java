@@ -264,12 +264,17 @@ public class Memory {
 
     private static final MemoryPool<MDD> mdds = new MemoryPool<>();
     public static MDD MDD(){
+        return MDD(Node());
+    }
+
+    public static MDD MDD(Node node){
         MDD object = mdds.get();
         if(object == null){
             object = new MDD(mdds);
             mdds.add(object);
         }
         object.prepare();
+        object.setRoot(node);
         return object;
     }
 

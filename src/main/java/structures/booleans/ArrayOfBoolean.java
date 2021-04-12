@@ -31,14 +31,6 @@ public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
         this.array = new boolean[capacity];
         this.setLength(capacity);
     }
-    public ArrayOfBoolean(int size){
-        this.array = new boolean[size];
-        this.length = size;
-    }
-    public ArrayOfBoolean(boolean[] array){
-        this.array = array;
-        this.length = array.length;
-    }
 
 
     //**************************************//

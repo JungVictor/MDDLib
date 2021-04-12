@@ -7,6 +7,7 @@ import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.SetOf;
+import utils.Logger;
 
 import java.lang.reflect.Array;
 
@@ -270,7 +271,9 @@ public class Operation {
         result.getRoot().associates(ys);
         int r = result.size();
 
+        Logger.out.information("N-ARY Intersection ["+mdds.length+" MDDs]\n");
         for(int i = 1; i < r; i++){
+            Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
                 ArrayOf<Node> xs = x.getAssociations();
                 for(int v : V){
@@ -279,7 +282,7 @@ public class Operation {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
                         addArcAndNode(result, x, ys, v, i, binder);
                     }
-                    //for(int n = 0; n < xs.length(); n++) a.set(n, false);
+                    for(int n = 0; n < xs.length(); n++) a.set(n, false);
                 }
             }
             if(result.getLayer(i).size() == 0) return result;

@@ -10,10 +10,6 @@ import representation.MDDVisitor;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
-
-import java.util.HashMap;
-import java.util.Set;
 
 public class MDD implements MemoryObject {
 
@@ -23,7 +19,7 @@ public class MDD implements MemoryObject {
     //
 
     // Root node
-    private final Node root;
+    private Node root;
     private Node tt;
 
     // Layers
@@ -39,11 +35,13 @@ public class MDD implements MemoryObject {
 
     public MDD(MemoryPool<MDD> pool){
         this.pool = pool;
-        L.add(Memory.Layer());
-        root = Node();
-        L.get(0).add(root);
     }
 
+    public void setRoot(Node root){
+        L.get(0).freeAllNodes();
+        this.root = root;
+        L.get(0).add(root);
+    }
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //
@@ -59,6 +57,7 @@ public class MDD implements MemoryObject {
     }
 
     public Node Node(){
+        if(root != null) return root.Node();
         return Memory.Node();
     }
 
@@ -220,6 +219,11 @@ public class MDD implements MemoryObject {
         addValue(value);
     }
 
+    public void removeArc(Node source, int value){
+        source.getChild(value).removeParent(value, source);
+        source.removeChild(value);
+    }
+
     public void addArcAndNode(Node source, int value, Node destination, int layer){
         addArc(source, value, destination);
         addNode(destination, layer);
@@ -263,12 +267,7 @@ public class MDD implements MemoryObject {
 
     @Override
     public void prepare() {
-        Layer L0 = getLayer(0);
-        L.clear();
-        L.add(L0);
-        V.clear();
-        root.clear();
-        this.tt = null;
+        L.add(Memory.Layer());
     }
 
     @Override
@@ -278,11 +277,16 @@ public class MDD implements MemoryObject {
 
     @Override
     public void free() {
-        for(int i = 1; i < size; i++){
+        for(int i = 0; i < size; i++){
             getLayer(i).freeAllNodes();
             Memory.free(getLayer(i));
         }
+        Memory.free(root);
         prepare();
+        L.clear();
+        V.clear();
+        this.root = null;
+        this.tt = null;
         this.pool.free(this, ID);
     }
 

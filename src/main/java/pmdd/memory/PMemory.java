@@ -18,12 +18,16 @@ public class PMemory {
 
     private static final MemoryPool<MDD> pmdds = new MemoryPool<>();
     public static PMDD PMDD(){
+        return PMDD(PNode());
+    }
+    public static PMDD PMDD(Node node){
         PMDD object = (PMDD) pmdds.get();
         if(object == null){
             object = new PMDD(pmdds);
             pmdds.add(object);
         }
         object.prepare();
+        object.setRoot(node);
         return object;
     }
 
