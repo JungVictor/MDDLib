@@ -3,6 +3,7 @@ package mdd.operations;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
+import representation.MDDPrinter;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
@@ -40,6 +41,7 @@ public class Operation {
     }
     public static MDD layerIntersection(MDD result, MDD mdd1, MDD mdd2, int start, int stop, int size){
         mdd1.clearAllAssociations();
+        mdd2.clearAllAssociations();
         // Copy the first MDD until the first layer of intersection
         result.setSize(size);
         mdd1.getRoot().associates(result.getRoot(), null);
@@ -70,8 +72,12 @@ public class Operation {
                     }
                 }
             }
-            if(result.getLayer(i).size() == 0)
+            if(result.getLayer(i).size() == 0) {
+                result.reduce();
+                Memory.free(V);
+                Memory.free(binder);
                 return result;
+            }
             binder.clear();
         }
 
@@ -83,8 +89,8 @@ public class Operation {
             if(stop < mdd1.size()){
                 // mdd2 is contained in the intersection
                 // Therefore, we need to construct the rest of the mdd from mdd1
-                for(Node node : result.getLayer(stop)) node.getX1().associates(node, null);
-                mdd1.copy(result, stop, stop, mdd1.size());
+                for(Node node : result.getLayer(stop-1)) node.getX1().associates(node, null);
+                mdd1.copy(result, 0, stop-1, mdd1.size());
             } else if (stop >= mdd1.size()){
                 // We need to construct the rest of the mdd from mdd2
                 for(Node node : result.getLayer(stop-1)) node.getX2().associates(node, null);
@@ -109,6 +115,9 @@ public class Operation {
 
     public static MDD intersection(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.INTERSECTION);
+    }
+    public static MDD intersection(MDD result, MDD mdd1, MDD mdd2){
+        return perform(result, mdd1, mdd2, Operator.INTERSECTION);
     }
 
     public static MDD diamond(MDD mdd1, MDD mdd2){
@@ -140,8 +149,7 @@ public class Operation {
      * @param OP Type of operation (union, intersection[])
      * @return The MDD resulting from : this OP mdd.
      */
-    private static MDD perform(MDD mdd1, MDD mdd2, Operator OP){
-        MDD result = mdd1.MDD();
+    private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
         result.setSize(mdd1.size());
         Binder binder = Memory.Binder();
 
@@ -178,6 +186,9 @@ public class Operation {
 
         result.reduce();
         return result;
+    }
+    private static MDD perform(MDD mdd1, MDD mdd2, Operator OP){
+        return perform(mdd1.MDD(), mdd1, mdd2, OP);
     }
 
     private static void addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){

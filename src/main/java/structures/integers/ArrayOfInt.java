@@ -49,7 +49,17 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
 
     @Override
     public String toString(){
-        return Arrays.toString(array);
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        if(length > 0) {
+            for (int i = 0; i < length - 1; i++) {
+                builder.append(array[i]);
+                builder.append(", ");
+            }
+            builder.append(array[length - 1]);
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     //**************************************//
@@ -84,7 +94,9 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
         this.length = array.length;
     }
     public void copy(ArrayOfInt array){
-        copy(array.array);
+        if(array.length > this.array.length) this.array = new int[array.length];
+        System.arraycopy(array.array, 0, this.array, 0, array.length);
+        this.length = array.length;
     }
 
     public boolean contains(int value){

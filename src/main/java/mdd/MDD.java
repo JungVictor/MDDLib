@@ -12,6 +12,8 @@ import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 
+import java.util.Random;
+
 public class MDD implements MemoryObject {
 
     // MemoryObject variables
@@ -111,11 +113,13 @@ public class MDD implements MemoryObject {
         for(int i = 0; i < size(); i++) for(Node node : getLayer(i)) node.clearAssociations();
     }
 
-    // TODO : Implementation of replace
     public void replace(MapOf<Integer, SetOf<Integer>> values){
+        replace(values, 0, size);
+    }
+    public void replace(MapOf<Integer, SetOf<Integer>> values, int start, int stop){
         MapOf<Integer, Node> V = Memory.MapOfIntegerNode();
         SetOf<Integer> setV = Memory.SetOfInteger();
-        for(int i = 0; i < size-1; i++){
+        for(int i = start; i < stop - 1; i++){
             for(Node node : getLayer(i)) {
                 setV.clear();
                 V.clear();
@@ -127,7 +131,8 @@ public class MDD implements MemoryObject {
                 }
                 for(int v : V) {
                     Node child = V.get(v);
-                    for(int value : values.get(v)) addArc(node, value, child);
+                    if(values.contains(v)) for(int value : values.get(v)) addArc(node, value, child);
+                    else addArc(node, v, child);
                 }
             }
         }
@@ -141,6 +146,25 @@ public class MDD implements MemoryObject {
         values.put(1, V1);
         replace(values);
         Memory.free(values);
+    }
+
+
+    /**
+     * Perform a random walk in the MDD.
+     * FOR TESTING PURPOSES
+     * @return A valid path in the MDD
+     */
+    public int[] randomWalk(){
+        Node current = root;
+        Random random = new Random();
+        int[] path = new int[size-1];
+        int i=0;
+        while (current != tt){
+            int idx = random.nextInt(current.numberOfChildren());
+            path[i++] = current.getValue(idx);
+            current = current.getChild(path[i-1]);
+        }
+        return path;
     }
 
     //**************************************//
@@ -177,6 +201,16 @@ public class MDD implements MemoryObject {
         int n = 0;
         for(int i = 0; i < size; i++) for(Node x : getLayer(i)) n += x.numberOfChildren();
         return n;
+    }
+
+    public double nSolutions(){
+        root.s = 1;
+        for(int i = 0; i < size; i++){
+            for(Node x : getLayer(i)){
+                for(int arc : x.getChildren()) x.getChild(arc).s += x.s;
+            }
+        }
+        return tt.s;
     }
 
     //**************************************//

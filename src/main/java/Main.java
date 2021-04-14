@@ -1,16 +1,21 @@
 import builder.MDDBuilder;
+import builder.constraints.MDDAllDiff;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
 import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
+import problems.AllDiffKN;
 import problems.CarSequencing;
 import representation.MDDPrinter;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
+import utils.Logger;
+
+import java.util.Arrays;
 
 public class Main {
 
@@ -116,11 +121,35 @@ public class Main {
                 }, 0, 1);
 
         long clock = System.currentTimeMillis();
-        System.out.println("Génération du MDDsol100 : en cours...");
-        MDD solution = cs.solve();
-        System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
+        //System.out.println("Génération du MDDsol100 : en cours...");
+        //MDD solution = cs.solve();
+        //System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
 
-        cs.solve(solution, 2);
+        //cs.solve(solution, 2);
+
+        ArrayOfInt ADV = Memory.ArrayOfInt(30);
+        for(int i = 0; i < ADV.length; i++) ADV.set(i,i);
+        //MDDBuilder.alldiff(Memory.MDD(), ADV, 30);
+
+        System.out.println("finished");
+
+        Logger.out.information("START\n");
+        AllDiffKN kn = new AllDiffKN(4, 70);
+        MDD sol = kn.solve(Memory.MDD());
+        //sol.accept(new MDDPrinter());
+
+        System.out.println(sol.nSolutions() + " " + (System.currentTimeMillis() - clock));
+        Logger.out.information("FINISH");
+
+
+        for(int i = 0; i < 200000; i++) {
+            int[] random = sol.randomWalk();
+            int[] cpt = new int[74];
+            for(int j = 0; j < cpt.length; j++) {
+                for(int r : random) if (r == j) cpt[j]++;
+                if(cpt[j] > 1) System.out.println(Arrays.toString(random));
+            }
+        }
 
     }
 

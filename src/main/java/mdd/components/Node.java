@@ -19,6 +19,7 @@ public class Node implements MemoryObject {
     private int ID = -1;
     //
 
+    public double s = 0;
     private OutArcs children;
     private InArcs parents;
     private ArrayOf<Node> associations;

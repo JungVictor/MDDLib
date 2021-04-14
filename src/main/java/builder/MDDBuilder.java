@@ -33,4 +33,10 @@ public class MDDBuilder {
     public static MDD gcc(MDD mdd, int n, MatrixOfInt couples, ArrayOfInt V){
         return MDDGCC.generate(mdd, n, couples, V);
     }
+    public static MDD alldiff(MDD mdd, ArrayOfInt V, int size){
+        return MDDAllDiff.generate(mdd, V, size);
+    }
+    public static MDD alldiff(MDD mdd, ArrayOfInt V, ArrayOfInt C, int size){
+        return MDDAllDiff.generate(mdd, V, C, size);
+    }
 }

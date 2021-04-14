@@ -71,12 +71,14 @@ public class ArrayOfBoolean implements Iterable<Boolean>, MemoryObject {
     }
 
     public void copy(boolean[] array){
-        if(array.length > this.array.length) this.array = array;
-        else System.arraycopy(array, 0, this.array, 0, array.length);
+        if(array.length > this.array.length) this.array = new boolean[array.length];
+        System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
     public void copy(ArrayOfBoolean array){
-        copy(array.array);
+        if(array.length > this.array.length) this.array = new boolean[array.length];
+        System.arraycopy(array.array, 0, this.array, 0, array.length);
+        this.length = array.length;
     }
 
     public boolean contains(boolean value){

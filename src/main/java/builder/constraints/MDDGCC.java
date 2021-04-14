@@ -20,8 +20,6 @@ public class MDDGCC {
         ArrayOfInt B = Memory.ArrayOfInt(2);
         B.set(0,0); B.set(1,1);
 
-
-
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
         int min, max;
 

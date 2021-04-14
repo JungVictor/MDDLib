@@ -5,6 +5,7 @@ import memory.MemoryPool;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class SetOf<E> implements MemoryObject, Iterable<E> {
 
@@ -63,8 +64,6 @@ public class SetOf<E> implements MemoryObject, Iterable<E> {
     public boolean contains(E object){
         return set.contains(object);
     }
-
-
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
