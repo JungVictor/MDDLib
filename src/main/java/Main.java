@@ -20,6 +20,7 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) {
+        Logger.out.information("BEGIN");
         MDD mdd = Memory.MDD();
         mdd.setSize(6);
         mdd.addPath(0, 1, 2, 3, 4);
@@ -121,25 +122,23 @@ public class Main {
                 }, 0, 1);
 
         long clock = System.currentTimeMillis();
-        //System.out.println("Génération du MDDsol100 : en cours...");
-        //MDD solution = cs.solve();
-        //System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
+        System.out.println("Génération du MDDsol100 : en cours...");
+        MDD solution = cs.solve();
+        System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
 
         //cs.solve(solution, 2);
-
-        ArrayOfInt ADV = Memory.ArrayOfInt(30);
-        for(int i = 0; i < ADV.length; i++) ADV.set(i,i);
-        //MDDBuilder.alldiff(Memory.MDD(), ADV, 30);
 
         System.out.println("finished");
 
         Logger.out.information("START\n");
         AllDiffKN kn = new AllDiffKN(4, 70);
-        MDD sol = kn.solve(Memory.MDD());
-        //sol.accept(new MDDPrinter());
+        PMDD sol = PMemory.PMDD();
+        kn.solve(sol);
+        sol.accept(new MDDPrinter());
 
         System.out.println(sol.nSolutions() + " " + (System.currentTimeMillis() - clock));
         Logger.out.information("FINISH");
+
 
 
         for(int i = 0; i < 200000; i++) {

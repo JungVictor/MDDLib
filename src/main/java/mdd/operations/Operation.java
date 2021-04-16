@@ -3,14 +3,11 @@ package mdd.operations;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
-import representation.MDDPrinter;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
 import structures.generics.SetOf;
 import utils.Logger;
-
-import java.lang.reflect.Array;
 
 public class Operation {
 
@@ -33,15 +30,14 @@ public class Operation {
     //          BINARY OPERATIONS           //
     //**************************************//
 
-    public static MDD layerIntersection(MDD mdd1, MDD mdd2, int start){
-        return layerIntersection(mdd1.MDD(), mdd1, mdd2, start, Math.min(start + mdd2.size(), mdd1.size()), Math.max(start + mdd2.size(), mdd1.size()));
+    public static MDD intersection(MDD mdd1, MDD mdd2, int start){
+        return intersection(mdd1.MDD(), mdd1, mdd2, start, Math.min(start + mdd2.size(), mdd1.size()), Math.max(start + mdd2.size(), mdd1.size()));
     }
-    public static MDD layerIntersection(MDD mdd1, MDD mdd2, int start, int stop, int size){
-        return layerIntersection(mdd1.MDD(), mdd1, mdd2, start, stop, size);
+    public static MDD intersection(MDD mdd1, MDD mdd2, int start, int stop, int size){
+        return intersection(mdd1.MDD(), mdd1, mdd2, start, stop, size);
     }
-    public static MDD layerIntersection(MDD result, MDD mdd1, MDD mdd2, int start, int stop, int size){
+    public static MDD intersection(MDD result, MDD mdd1, MDD mdd2, int start, int stop, int size){
         mdd1.clearAllAssociations();
-        mdd2.clearAllAssociations();
         // Copy the first MDD until the first layer of intersection
         result.setSize(size);
         mdd1.getRoot().associates(result.getRoot(), null);
@@ -129,7 +125,31 @@ public class Operation {
     }
 
     public static boolean inclusion(MDD mdd1, MDD mdd2){
-        return perform(mdd1, mdd2, Operator.INCLUSION) != null;
+        if(mdd2.size() > mdd1.size()) return false;
+
+        // Construction of V
+        SetOf<Integer> V = Memory.SetOfInteger();
+        V.add(mdd1.getV()); V.intersect(mdd2.getV());
+
+        if(V.size() == 0) return false;
+
+        for(int i = 0; i < mdd1.size() - mdd2.size(); i++){
+            for(Node root : mdd1.getLayer(i)) {
+                if(inclusion(root, mdd2.getRoot(), mdd2.size(), V)) {
+                    Memory.free(V);
+                    return true;
+                }
+            }
+        }
+        Memory.free(V);
+        return false;
+    }
+
+    public static boolean inclusion(Node root1, Node root2, int size, SetOf<Integer> V){
+        MDD inclusion = Memory.MDD();
+        boolean result = perform(inclusion, root1, root2, size, V, Operator.INCLUSION) != null;
+        Memory.free(inclusion);
+        return result;
     }
 
     private static boolean apply(boolean a1, boolean a2, Operator OP, boolean isFinalLayer){
@@ -144,24 +164,11 @@ public class Operation {
         return false;
     }
 
-    /**
-     * Create a new MDD by applying the operator OP between this and mdd.
-     * @param OP Type of operation (union, intersection[])
-     * @return The MDD resulting from : this OP mdd.
-     */
-    private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
-        result.setSize(mdd1.size());
+    private static MDD perform(MDD result, Node root1, Node root2, int r, SetOf<Integer> V, Operator OP){
+        result.setSize(r);
         Binder binder = Memory.Binder();
 
-        // Construction of V
-        SetOf<Integer> V = Memory.SetOfInteger();
-        V.add(mdd1.getV());
-        if(OP == Operator.INTERSECTION) V.intersect(mdd2.getV());
-        else V.add(mdd2.getV());
-
-
-        result.getRoot().associates(mdd1.getRoot(), mdd2.getRoot());
-        int r = mdd1.size();
+        result.getRoot().associates(root1, root2);
 
         for(int i = 1; i < r; i++){
             for(Node x : result.getLayer(i-1)){
@@ -182,9 +189,26 @@ public class Operation {
             binder.clear();
         }
         Memory.free(binder);
-        Memory.free(V);
 
         result.reduce();
+        return result;
+    }
+
+    /**
+     * Create a new MDD by applying the operator OP between this and mdd.
+     * @param OP Type of operation (union, intersection[])
+     * @return The MDD resulting from : this OP mdd.
+     */
+    private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
+        result.setSize(mdd1.size());
+        // Construction of V
+        SetOf<Integer> V = Memory.SetOfInteger();
+        V.add(mdd1.getV());
+        if(OP == Operator.INTERSECTION) V.intersect(mdd2.getV());
+        else V.add(mdd2.getV());
+
+        perform(result, mdd1.getRoot(), mdd2.getRoot(), mdd1.size(), V, OP);
+        Memory.free(V);
         return result;
     }
     private static MDD perform(MDD mdd1, MDD mdd2, Operator OP){

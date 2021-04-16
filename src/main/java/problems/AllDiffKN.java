@@ -6,11 +6,10 @@ import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Memory;
 import representation.MDDPrinter;
+import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
-
-import java.util.Arrays;
 
 public class AllDiffKN {
 
@@ -22,21 +21,22 @@ public class AllDiffKN {
     }
 
     public MDD solve(MDD mdd){
+
+        ArrayOfInt initial_domain = Memory.ArrayOfInt(K + K + 1);
         // The initial domain and mapping
-        ArrayOfInt initial_domain = Memory.ArrayOfInt(K+1);
+        initial_domain.setLength(K+1+K);
+        for (int i = 0; i <= K+K; i++) initial_domain.set(i, i);
+        ArrayOfInt tokens = Memory.ArrayOfInt(initial_domain.length - 1);
+        for (int i = 0; i < tokens.length; i++) tokens.set(i, K + K + i + 1);
+
+        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
+
+
+
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
-        for(int i = 0; i <= K; i++) {
-            initial_domain.set(i, i);
-            mapping.put(i, Memory.SetOfInteger());
-        }
-        for(int i = 0; i < K; i++) mapping.put(K+1+i, Memory.SetOfInteger());
+        for(int i = 0; i < K*4+1; i++) mapping.put(i, Memory.SetOfInteger());
 
-        ArrayOfInt tokens = Memory.ArrayOfInt(K);
-        for(int i = 0; i < tokens.length; i++) tokens.set(i, K+i+1);
-
-        // The AllDiff MDD defined over K variables
-        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+1);
-
+        /*
         MDD alldiffN = alldiff.copy();
         MDD old_alldiffN = alldiffN;
         while(alldiffN.size() < n+1) {
@@ -44,18 +44,29 @@ public class AllDiffKN {
             Memory.free(old_alldiffN);
             old_alldiffN = alldiffN;
         }
-        Memory.free(alldiff);
+
+         */
+        //Memory.free(alldiff);
 
         MDD accumulator = domains(n);
         MDD old_accumulator = accumulator;
+        //accumulator = Operation.intersection(accumulator, alldiff.copy(), 0, alldiff.size(), n+1);
+        //accumulator.accept(new MDDPrinter());
+
         for(int i = 0; i < K; i++) {
-            accumulator = Operation.layerIntersection(accumulator, replaceValues(alldiffN.copy(), i, mapping), i, n+1, n+1);
+            accumulator = Operation.intersection(accumulator, alldiff.copy(), i, alldiff.size() + i, n+1);
             Memory.free(old_accumulator);
             old_accumulator = accumulator;
         }
-        Operation.layerIntersection(mdd, accumulator, replaceValues(alldiffN.copy(), K, mapping), K, n+1, n+1);
 
-        Memory.free(alldiffN);
+        for(int i = K; i < n-1; i++) {
+            accumulator = Operation.intersection(accumulator, replaceValues(alldiff.copy(), i-K, mapping), i, Math.min(n+1, alldiff.size() + i), n+1);
+            Memory.free(old_accumulator);
+            old_accumulator = accumulator;
+        }
+        Operation.intersection(mdd, accumulator, replaceValues(alldiff.copy(), n-1-K, mapping), n-1, n+1, n+1);
+
+        //Memory.free(alldiffN);
         Memory.free(accumulator);
 
         return mdd;
@@ -63,13 +74,13 @@ public class AllDiffKN {
 
     private MDD replaceValues(MDD allDiffN, int offset, MapOf<Integer, SetOf<Integer>> values) {
         // We know that size is multiple of K+1
-        int size = allDiffN.size() / (K+1);
+        int size = allDiffN.size() / (K*2+1);
         for(int i = 0; i < size; i++) {
             for(int k : values) {
                 values.get(k).clear();
-                values.get(k).add(k + offset + i * (K+1));
+                values.get(k).add(k + offset + i * (K*2+1));
             }
-            int start = i * (K+1), stop = start + K + 1;
+            int start = i * (K*2+1), stop = start + K*2 + 1;
             allDiffN.replace(values, start, stop + 1);
         }
         return allDiffN;
@@ -82,7 +93,10 @@ public class AllDiffKN {
         for(int i = 0; i < domains.size() - 1; i++){
             Node next = domains.Node();
             domains.addNode(next, i+1);
-            for(int j = 0; j <= K; j++) domains.addArc(current, j+i, next);
+            for(int j = 0; j <= K; j++) {
+                if(i-j >= 0) domains.addArc(current, i-j, next);
+                domains.addArc(current, j+i, next);
+            }
             current = next;
         }
         domains.reduce();

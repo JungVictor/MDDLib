@@ -4,7 +4,6 @@ import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
-import representation.MDDPrinter;
 
 public class MDDSequence {
 
@@ -28,12 +27,12 @@ public class MDDSequence {
         MDD accumulator = amongN.copy();
         MDD old_accumulator = accumulator;
         for(int i = 1; i < Q - 1; i++) {
-            accumulator = Operation.layerIntersection(accumulator, amongN, i, size, size);
+            accumulator = Operation.intersection(accumulator, amongN, i, size, size);
             Memory.free(old_accumulator);
             old_accumulator = accumulator;
         }
 
-        Operation.layerIntersection(mdd, accumulator, amongN, Q-1, size, size);
+        Operation.intersection(mdd, accumulator, amongN, Q-1, size, size);
 
         Memory.free(amongN);
         Memory.free(accumulator);
