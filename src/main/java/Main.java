@@ -1,5 +1,4 @@
 import builder.MDDBuilder;
-import builder.constraints.MDDAllDiff;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
@@ -126,15 +125,13 @@ public class Main {
         MDD solution = cs.solve();
         System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
 
-        //cs.solve(solution, 2);
-
         System.out.println("finished");
 
         Logger.out.information("START\n");
         AllDiffKN kn = new AllDiffKN(4, 70);
-        PMDD sol = PMemory.PMDD();
+        MDD sol = Memory.MDD();
         kn.solve(sol);
-        sol.accept(new MDDPrinter());
+        //sol.accept(new MDDPrinter());
 
         System.out.println(sol.nSolutions() + " " + (System.currentTimeMillis() - clock));
         Logger.out.information("FINISH");

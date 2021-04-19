@@ -5,6 +5,8 @@ import memory.MemoryObject;
 import memory.MemoryPool;
 import representation.MDDVisitor;
 import structures.generics.ArrayOf;
+import structures.generics.MapOf;
+import structures.generics.SetOf;
 
 import java.util.ArrayList;
 
@@ -185,6 +187,28 @@ public class Node implements MemoryObject {
         replaceParentsReferencesBy(node);
     }
 
+    public void replaceValues(MapOf<Integer, SetOf<Integer>> values, SetOf<Integer> added){
+        OutArcs new_children = Memory.OutArcs();
+        for(int v : getValues()) getChild(v).removeParent(v, this);
+
+        for(int v : getValues()) {
+            if(values.contains(v)) {
+                for (int arc : values.get(v)) {
+                    new_children.add(arc, getChild(v));
+                    added.add(arc);
+                    getChild(v).addParent(arc, this);
+                }
+            }
+            else {
+                new_children.add(v, getChild(v));
+                getChild(v).addParent(v, this);
+                added.add(v);
+            }
+        }
+
+        Memory.free(children);
+        children = new_children;
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

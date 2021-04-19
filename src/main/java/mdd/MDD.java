@@ -6,7 +6,6 @@ import mdd.operations.Pack;
 import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import representation.MDDVisitor;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
@@ -117,26 +116,14 @@ public class MDD implements MemoryObject {
         replace(values, 0, size);
     }
     public void replace(MapOf<Integer, SetOf<Integer>> values, int start, int stop){
-        MapOf<Integer, Node> V = Memory.MapOfIntegerNode();
         SetOf<Integer> setV = Memory.SetOfInteger();
         for(int i = start; i < stop - 1; i++){
             for(Node node : getLayer(i)) {
-                setV.clear();
-                V.clear();
-                setV.add(node.getValues());
-                for(int v : setV) {
-                    V.put(v, node.getChild(v));
-                    node.getChild(v).removeParent(v, node);
-                    node.removeChild(v);
-                }
-                for(int v : V) {
-                    Node child = V.get(v);
-                    if(values.contains(v)) for(int value : values.get(v)) addArc(node, value, child);
-                    else addArc(node, v, child);
-                }
+                node.replaceValues(values, setV);
             }
         }
-        Memory.free(V);
+        this.V.clear();
+        this.V.add(setV);
         Memory.free(setV);
     }
 
@@ -193,7 +180,7 @@ public class MDD implements MemoryObject {
 
     public int nodes(){
         int n = 0;
-        for(int i = 0; i < size; i++) n += getLayer(i).size();
+        for(int i = 0; i < size; i++) if(L.size() >= size()) n += getLayer(i).size();
         return n;
     }
 

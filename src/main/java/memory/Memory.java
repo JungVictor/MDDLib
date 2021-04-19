@@ -6,8 +6,6 @@ import mdd.components.Layer;
 import mdd.components.Node;
 import mdd.components.OutArcs;
 import mdd.operations.Pack;
-import pmdd.PMDD;
-import pmdd.components.PNode;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
@@ -16,8 +14,6 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
-
-import java.util.Map;
 
 public class Memory {
 
@@ -262,7 +258,7 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<MDD> mdds = new MemoryPool<>();
+    public static final MemoryPool<MDD> mdds = new MemoryPool<>();
     public static MDD MDD(){
         return MDD(Node());
     }

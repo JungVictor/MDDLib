@@ -12,7 +12,7 @@ public class MemoryPool<E extends MemoryObject> {
     // The Stack of free indices (= the index of a free object)
     private final StackOfInt freeIndices;
     // The last value in the array and the size of the array
-    private int last, size;
+    private int size = 0;
 
     //**************************************//
     //           INITIALISATION             //
@@ -22,7 +22,6 @@ public class MemoryPool<E extends MemoryObject> {
     public MemoryPool(int capacity){
         pool = (E[]) new MemoryObject[capacity];
         freeIndices = new StackOfInt(capacity);
-        last = -1;
     }
 
     public MemoryPool(){
@@ -43,7 +42,6 @@ public class MemoryPool<E extends MemoryObject> {
      * @return A free object from the pool if there is one available, null otherwise.
      */
     public E get(){
-        last++;
         if(freeIndices.isEmpty()) return null;
         int index = freeIndices.pop();
         E object = pool[index];
@@ -52,18 +50,10 @@ public class MemoryPool<E extends MemoryObject> {
     }
 
     /**
-     * Get the last object of the pool
-     * @return The last object of the pool. Might be null.
-     */
-    public E last(){
-        return pool[last];
-    }
-
-    /**
      * Add an element to the pool
      * @param element element to push into the pool
      */
-    public void add(E element){
+    public synchronized void add(E element){
         objects++;
         if(size == pool.length) expand();
         pool[size] = element;
@@ -75,9 +65,10 @@ public class MemoryPool<E extends MemoryObject> {
      * @param position The position of the object to free.
      */
     public void free(E object, int position){
-        freeIndices.push(position);
-        pool[position] = object;
-        last--;
+        if(pool[position] == null) {
+            freeIndices.push(position);
+            pool[position] = object;
+        }
     }
 
     /**

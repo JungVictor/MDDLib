@@ -53,15 +53,21 @@ public class AllDiffKN {
         //accumulator = Operation.intersection(accumulator, alldiff.copy(), 0, alldiff.size(), n+1);
         //accumulator.accept(new MDDPrinter());
 
+        MDD allDiffCopy;
         for(int i = 0; i < K; i++) {
-            accumulator = Operation.intersection(accumulator, alldiff.copy(), i, alldiff.size() + i, n+1);
+            allDiffCopy = alldiff.copy();
+            accumulator = Operation.intersection(accumulator, allDiffCopy, i, alldiff.size() + i, n+1);
             Memory.free(old_accumulator);
+            Memory.free(allDiffCopy);
             old_accumulator = accumulator;
         }
 
         for(int i = K; i < n-1; i++) {
-            accumulator = Operation.intersection(accumulator, replaceValues(alldiff.copy(), i-K, mapping), i, Math.min(n+1, alldiff.size() + i), n+1);
+            allDiffCopy = alldiff.copy();
+            replaceValues(allDiffCopy, i-K, mapping);
+            accumulator = Operation.intersection(accumulator, allDiffCopy, i, Math.min(n+1, alldiff.size() + i), n+1);
             Memory.free(old_accumulator);
+            Memory.free(allDiffCopy);
             old_accumulator = accumulator;
         }
         Operation.intersection(mdd, accumulator, replaceValues(alldiff.copy(), n-1-K, mapping), n-1, n+1, n+1);
@@ -72,18 +78,18 @@ public class AllDiffKN {
         return mdd;
     }
 
-    private MDD replaceValues(MDD allDiffN, int offset, MapOf<Integer, SetOf<Integer>> values) {
+    private MDD replaceValues(MDD mdd, int offset, MapOf<Integer, SetOf<Integer>> values) {
         // We know that size is multiple of K+1
-        int size = allDiffN.size() / (K*2+1);
+        int size = mdd.size() / (K*2+1);
         for(int i = 0; i < size; i++) {
             for(int k : values) {
                 values.get(k).clear();
                 values.get(k).add(k + offset + i * (K*2+1));
             }
             int start = i * (K*2+1), stop = start + K*2 + 1;
-            allDiffN.replace(values, start, stop + 1);
+            mdd.replace(values, start, stop + 1);
         }
-        return allDiffN;
+        return mdd;
     }
 
     private MDD domains(int n){
