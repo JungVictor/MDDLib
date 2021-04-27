@@ -14,11 +14,29 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
+import structures.integers.TupleOfInt;
 
 public class Memory {
 
     public static void free(MemoryObject memoryObject){
         memoryObject.free();
+    }
+
+
+    private static final MemoryPool<TupleOfInt> tupleOfIntPool = new MemoryPool<>();
+    public static TupleOfInt TupleOfInt(){
+        return TupleOfInt(0,0);
+    }
+
+    public static TupleOfInt TupleOfInt(int e1, int e2){
+        TupleOfInt object = tupleOfIntPool.get();
+        if(object == null){
+            object = new TupleOfInt(tupleOfIntPool);
+            tupleOfIntPool.add(object);
+        }
+        object.prepare();
+        object.set(e1, e2);
+        return object;
     }
 
 
@@ -65,6 +83,17 @@ public class Memory {
         if(object == null){
             object = new MapOf<>(mapOfIntegersSetOfIntegers);
             mapOfIntegersSetOfIntegers.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MapOf<Node, Integer>> mapOfNodeIntegerPool = new MemoryPool<>();
+    public static MapOf<Node, Integer> MapOfNodeInteger(){
+        MapOf<Node, Integer> object = mapOfNodeIntegerPool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfNodeIntegerPool);
+            mapOfNodeIntegerPool.add(object);
         }
         object.prepare();
         return object;

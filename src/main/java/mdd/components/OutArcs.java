@@ -16,6 +16,7 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     private int ID = -1;
     //
 
+
     private final HashMap<Integer, Node> arcs = new HashMap<>();
     private final ArrayList<Integer> values = new ArrayList<>();
 
@@ -46,13 +47,13 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     //           ARCS MANAGEMENT            //
     //**************************************//
 
-    public void add(int value, Node node){
-        if(!this.values.contains(value)) addValueAndSort(value);
-        this.arcs.put(value, node);
+    public void add(int label, Node node){
+        if(!this.values.contains(label)) addValueAndSort(label);
+        this.arcs.put(label, node);
     }
 
-    public Node get(int value){
-        return arcs.get(value);
+    public Node get(int label){
+        return arcs.get(label);
     }
 
     public Node getByIndex(int index){
@@ -67,9 +68,9 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
         return values;
     }
 
-    public boolean remove(int value){
-        values.remove(Integer.valueOf(value));
-        return this.arcs.remove(value) != null;
+    public boolean remove(int label){
+        values.remove(Integer.valueOf(label));
+        return this.arcs.remove(label) != null;
     }
 
     public boolean contains(int value){

@@ -103,6 +103,10 @@ public class Node implements MemoryObject {
         return children.getValue(index);
     }
 
+    public ArrayList<Integer> getValues(){
+        return children.getValues();
+    }
+
     public boolean containsLabel(int label){
         return children.contains(label);
     }
@@ -142,24 +146,20 @@ public class Node implements MemoryObject {
     //           ARCS MANAGEMENT            //
     //**************************************//
 
-    public void addChild(int value, Node child){
-        this.children.add(value, child);
+    public void addChild(int label, Node child){
+        this.children.add(label, child);
     }
 
-    public void removeChild(int value){
-        this.children.remove(value);
+    public void removeChild(int label){
+        this.children.remove(label);
     }
 
-    public ArrayList<Integer> getValues(){
-        return children.getValues();
+    public void addParent(int label, Node parent){
+        this.parents.add(label, parent);
     }
 
-    public void addParent(int value, Node parent){
-        this.parents.add(value, parent);
-    }
-
-    public void removeParent(int value, Node parent){
-        this.parents.remove(value, parent);
+    public void removeParent(int label, Node parent){
+        this.parents.remove(label, parent);
     }
 
     public void replaceParentsReferencesBy(Node node){
@@ -187,7 +187,13 @@ public class Node implements MemoryObject {
         replaceParentsReferencesBy(node);
     }
 
-    public void replaceValues(MapOf<Integer, SetOf<Integer>> values, SetOf<Integer> added){
+    public void replace(MapOf<Integer, SetOf<Integer>> values){
+        SetOf<Integer> added = Memory.SetOfInteger();
+        replace(values, added);
+        Memory.free(added);
+    }
+
+    public void replace(MapOf<Integer, SetOf<Integer>> values, SetOf<Integer> added){
         OutArcs new_children = Memory.OutArcs();
         for(int v : getValues()) getChild(v).removeParent(v, this);
 

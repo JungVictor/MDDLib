@@ -1,4 +1,6 @@
 import builder.MDDBuilder;
+import builder.constraints.MDDAllDifferent;
+import builder.constraints.MDDSum;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
@@ -68,9 +70,52 @@ public class Main {
         Memory.free(pmdd_copy1);
         Memory.free(pmdd_copy2);
 
+        int SIZE = 200;
+        int SUM = SIZE / 2;
         PMDD seq = PMemory.PMDD();
-        MDDBuilder.sequence(seq, 5, 2, 3, 10);
+        MDDBuilder.sequence(seq, 5, 2, 3, SIZE);
 
+        ArrayOfInt values = Memory.ArrayOfInt(seq.getV().size());
+        int cpt = 0;
+        for(int v : seq.getV()) values.set(cpt++, v);
+
+        Logger.out.information("BEGIN\n");
+        PMDD test2 = PMemory.PMDD();
+        Operation.intersection(test2, seq, MDDBuilder.sum(Memory.MDD(), SUM, SUM, SIZE, values));
+        Logger.out.information("STOP\n");
+
+
+        Logger.out.information("BEGIN\n");
+        PMDD test1 = PMemory.PMDD();
+        MDDSum.intersection(test1, seq, SUM, SUM);
+        Logger.out.information("STOP\n");
+
+        System.out.println(Operation.inclusion(test1, test2));
+        System.out.println(Operation.inclusion(test2, test1));
+
+
+        values.setLength(21);
+        for(int i = 0; i < values.length; i++) values.set(i,i);
+
+        MDD sum = MDDBuilder.sum(Memory.MDD(), 160, 220,20, values);
+
+        MDD lt = MDDBuilder.leq(Memory.MDD(), values.length, values);
+
+        MDD test = lt;
+        System.out.println(lt.nSolutions());
+
+
+        MDD allDiffResult;
+
+        Logger.out.information("BEGIN\n");
+        allDiffResult = MDDAllDifferent.intersection(PMemory.PMDD(), test, values);
+        Logger.out.information("STOP : " + allDiffResult.nSolutions() + " solutions\n");
+
+        Logger.out.information("BEGIN\n");
+        allDiffResult = Operation.intersection(test, MDDBuilder.alldiff(Memory.MDD(), values, test.size()));
+        Logger.out.information("STOP : " + allDiffResult.nSolutions() + " solutions\n");
+
+        /*
         seq.accept(new MDDPrinter());
         seq.addRootProperty("Sequence", PMemory.PropertySequence(V, seq.size()));
         properties = seq.propagateProperties();
@@ -146,6 +191,7 @@ public class Main {
                 if(cpt[j] > 1) System.out.println(Arrays.toString(random));
             }
         }
+        */
 
     }
 

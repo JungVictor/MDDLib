@@ -133,16 +133,9 @@ public class Operation {
 
         if(V.size() == 0) return false;
 
-        for(int i = 0; i < mdd1.size() - mdd2.size(); i++){
-            for(Node root : mdd1.getLayer(i)) {
-                if(inclusion(root, mdd2.getRoot(), mdd2.size(), V)) {
-                    Memory.free(V);
-                    return true;
-                }
-            }
-        }
+        boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), V);
         Memory.free(V);
-        return false;
+        return result;
     }
 
     public static boolean inclusion(Node root1, Node root2, int size, SetOf<Integer> V){

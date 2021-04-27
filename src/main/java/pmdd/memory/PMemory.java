@@ -2,6 +2,7 @@ package pmdd.memory;
 
 import mdd.MDD;
 import mdd.components.Node;
+import memory.Memory;
 import memory.MemoryPool;
 import pmdd.PMDD;
 import pmdd.components.PNode;
@@ -9,6 +10,7 @@ import pmdd.components.properties.NodeProperty;
 import pmdd.components.properties.PropertyGCC;
 import pmdd.components.properties.PropertySequence;
 import pmdd.components.properties.PropertySum;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 
@@ -43,13 +45,23 @@ public class PMemory {
     }
 
     private static final MemoryPool<NodeProperty> gccs = new MemoryPool<>();
-    public static PropertyGCC PropertyGCC(ArrayOfInt max){
+    public static PropertyGCC PropertyGCC(MapOf<Integer, Integer> max){
         PropertyGCC object = (PropertyGCC) gccs.get();
         if(object == null){
-            object = new PropertyGCC(gccs, max);
+            object = new PropertyGCC(gccs);
             gccs.add(object);
         }
         object.prepare();
+        object.setMaxValues(max);
+        return object;
+    }
+
+    public static PropertyGCC PropertyAllDiff(SetOf<Integer> values){
+        MapOf<Integer, Integer> max = Memory.MapOfIntegerInteger();
+        for(int v : values) max.put(v, 1);
+        PropertyGCC object = PropertyGCC(max);
+        object.setName(NodeProperty.ALLDIFF);
+        Memory.free(max);
         return object;
     }
 

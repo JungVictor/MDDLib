@@ -31,13 +31,13 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
     //           ARCS MANAGEMENT            //
     //**************************************//
 
-    public void add(int value, Node node){
-        if(!this.arcs.containsKey(value)) this.arcs.put(value, Memory.SetOfNode());
-        this.arcs.get(value).add(node);
+    public void add(int label, Node node){
+        if(!this.arcs.containsKey(label)) this.arcs.put(label, Memory.SetOfNode());
+        this.arcs.get(label).add(node);
     }
 
-    public boolean remove(int value, Node node){
-        SetOf<Node> nodes = this.arcs.get(value);
+    public boolean remove(int label, Node node){
+        SetOf<Node> nodes = this.arcs.get(label);
         if(nodes != null){
             boolean result = nodes.remove(node);
             if(result && nodes.size() == 0) {
@@ -49,8 +49,8 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
         return false;
     }
 
-    public SetOf<Node> get(int value){
-        return arcs.get(value);
+    public SetOf<Node> get(int label){
+        return arcs.get(label);
     }
 
     public void clear(){
@@ -61,6 +61,7 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
     public int size(){
         return arcs.size();
     }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

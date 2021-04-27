@@ -1,10 +1,13 @@
 package pmdd.components.properties;
 
 
+import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
+import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
+import structures.integers.TupleOfInt;
 
 import java.util.Arrays;
 
@@ -15,20 +18,27 @@ import java.util.Arrays;
  */
 public class PropertyGCC extends NodeProperty {
 
-    private final ArrayOfInt max = memory.Memory.ArrayOfInt(2);
-    private final MatrixOfInt values = memory.Memory.MatrixOfInt(2, 2);
+    private final MapOf<Integer, Integer> maxValues = Memory.MapOfIntegerInteger();
+    // TODO : memory allocation
+    private final MapOf<Integer, TupleOfInt> currentValues = new MapOf<>(null);
 
-    public PropertyGCC(MemoryPool<NodeProperty> pool, ArrayOfInt max){
+    public PropertyGCC(MemoryPool<NodeProperty> pool){
         super(pool);
-        this.max.copy(max);
-        this.values.setSize(max.length, 2);
         super.setType(DataType.ARRAY2);
         super.setName(GCC);
     }
 
+    public void setMaxValues(MapOf<Integer, Integer> maxValues){
+        this.maxValues.clear();
+        for(int value : maxValues) {
+            this.maxValues.put(value, maxValues.get(value));
+            this.currentValues.put(value, Memory.TupleOfInt());
+        }
+    }
+
     @Override
     public String toString(){
-        return values.toString();
+        return currentValues.toString();
     }
 
     //**************************************//
@@ -37,8 +47,8 @@ public class PropertyGCC extends NodeProperty {
     // getArray2
 
     @Override
-    public MatrixOfInt getArray2(){
-        return values;
+    public MapOf getData(){
+        return currentValues;
     }
 
     //**************************************//
@@ -48,29 +58,29 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        value--;
-        PropertyGCC next = PMemory.PropertyGCC(max);
-        for(int i = 0; i < next.values.getHeight(); i++){
-            next.values.set(i, 0, values.get(i, 0));
-            next.values.set(i, 1, values.get(i, 1));
+        PropertyGCC next = PMemory.PropertyGCC(maxValues);
+        TupleOfInt tuple;
+        for(int v : currentValues){
+            tuple = currentValues.get(v);
+            next.currentValues.put(v, Memory.TupleOfInt(tuple.getFirst(), tuple.getSecond()));
         }
-        if(max.get(value) >= 0) {
-            next.values.incr(value, 0, 1);
-            next.values.incr(value, 1, 1);
-        }
+
+        if(maxValues.contains(value)) next.currentValues.get(value).incr(1,1);
         return next;
     }
 
     @Override
     public void mergeWithProperty(int value, NodeProperty nodeProperty){
         PropertyGCC property = (PropertyGCC) nodeProperty;
-        int add;
-        value--;
-        for(int i = 0; i < max.length; i++) {
-            add = i == value ? 1 : 0;
-            int min = values.get(i, 0) + add, max = values.get(i, 1) + add;
-            if(min < property.values.get(i, 0)) property.values.set(i, 0, min);
-            if(property.values.get(i, 1) < max) property.values.set(i, 1, max);
+        int add, min, max;
+        for(int v : maxValues){
+            add = v == value ? 1 : 0;
+            TupleOfInt tuple = currentValues.get(v);
+            TupleOfInt pTuple = property.currentValues.get(v);
+            min = tuple.getFirst() + add;
+            max = tuple.getSecond() + add;
+            if(min < pTuple.getFirst()) pTuple.setFirst(min);
+            if(max > pTuple.getSecond()) pTuple.setSecond(max);
         }
     }
 
@@ -79,9 +89,10 @@ public class PropertyGCC extends NodeProperty {
         if(property.getClass() != PropertyGCC.class) return;
         PropertyGCC gcc = (PropertyGCC) property;
 
-        for(int i = 0; i < max.length; i++) {
-            if(gcc.values.get(i,0) < values.get(i,0)) values.set(i,0, gcc.values.get(i, 0));
-            if(values.get(i,1) < gcc.values.get(i,1)) values.set(i,1, gcc.values.get(i, 1));
+        for(int v : maxValues){
+            TupleOfInt tuple = currentValues.get(v), pTuple = gcc.currentValues.get(v);
+            if(pTuple.getFirst() < tuple.getFirst()) tuple.setFirst(pTuple.getFirst());
+            if(tuple.getSecond() < pTuple.getSecond()) tuple.setSecond(pTuple.getSecond());
         }
     }
 
@@ -93,8 +104,8 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public boolean isDegenerate(int v) {
-        v--;
-        return values.get(v,1)+1 > max.get(v) && max.get(v) > 0;
+        if(!maxValues.contains(v)) return false;
+        return currentValues.get(v).getSecond()+1 > maxValues.get(v);
     }
 
 
@@ -105,6 +116,14 @@ public class PropertyGCC extends NodeProperty {
     // Implementation of MemoryObject interface
     @Override
     public void prepare() {
+        setName(GCC);
+    }
 
+    @Override
+    public void free(){
+        for(int v : currentValues) Memory.free(currentValues.get(v));
+        maxValues.clear();
+        currentValues.clear();
+        super.free();
     }
 }

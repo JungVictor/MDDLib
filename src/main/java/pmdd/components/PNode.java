@@ -1,6 +1,7 @@
 package pmdd.components;
 
 import mdd.components.Node;
+import memory.Memory;
 import memory.MemoryPool;
 import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
@@ -62,6 +63,7 @@ public class PNode extends Node {
     }
 
     public void clearProperties(){
+        for(String property : properties) Memory.free(properties.get(property));
         properties.clear();
     }
 

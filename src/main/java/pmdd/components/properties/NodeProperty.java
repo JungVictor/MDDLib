@@ -2,6 +2,7 @@ package pmdd.components.properties;
 
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
 
@@ -56,7 +57,7 @@ public abstract class NodeProperty implements MemoryObject {
     //           INITIALISATION             //
     //**************************************//
 
-    protected NodeProperty(MemoryPool<NodeProperty> pool) {
+    public NodeProperty(MemoryPool<NodeProperty> pool) {
         this.pool = pool;
     }
 
@@ -65,7 +66,7 @@ public abstract class NodeProperty implements MemoryObject {
      * Used to store properties in a map.
      * @param name Name of the property
      */
-    protected void setName(String name){
+    public void setName(String name){
         this.name = name;
     }
 
@@ -187,6 +188,8 @@ public abstract class NodeProperty implements MemoryObject {
      * @return A two dimensional array holding result
      */
     public MatrixOfInt getArray2(){ return null; }
+
+    public MapOf getData(){return null;}
 
 
     //**************************************//

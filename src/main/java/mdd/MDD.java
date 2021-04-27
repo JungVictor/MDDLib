@@ -119,7 +119,7 @@ public class MDD implements MemoryObject {
         SetOf<Integer> setV = Memory.SetOfInteger();
         for(int i = start; i < stop - 1; i++){
             for(Node node : getLayer(i)) {
-                node.replaceValues(values, setV);
+                node.replace(values, setV);
             }
         }
         this.V.clear();
