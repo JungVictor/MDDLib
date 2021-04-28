@@ -33,13 +33,19 @@ public class CarSequencing {
         for(int i = 0; i < options().length; i++) mdds.set(i, options.get(i));
         for(int i = 0; i < configs.length; i++) mdds.set(i+options.length, configs.get(i));
 
-        MDD solution = Operation.intersection(PMemory.PMDD(), mdds);
+        MDD opts = Operation.intersection(Memory.MDD(), options);
+        MDD conf = Operation.intersection(Memory.MDD(), configs);
+
+        MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
+
         solution.reduce();
 
         for(MDD mdd : mdds) Memory.free(mdd);
         Memory.free(mdds);
         Memory.free(options);
         Memory.free(configs);
+        Memory.free(opts);
+        Memory.free(conf);
 
         return solution;
     }
@@ -65,14 +71,17 @@ public class CarSequencing {
         Logger.out.information("Replacing values done\n");
 
         MDD new_option = option(data.nOptions()-1, V0, V1);
+        Logger.out.information("CarSequencing : New MDDs intersection\n");
+        MDD newMDD = Operation.intersection(mdd, new_option);
+
+        Memory.free(new_option);
         ArrayOf<MDD> configs = configs();
-        ArrayOf<MDD> mdds = Memory.ArrayOfMDD(configs.length + 2);
 
-        for(int i = 0; i < configs.length; i++) mdds.set(i, configs.get(i));
-        mdds.set(configs.length, new_option);
-        mdds.set(configs.length + 1, mdd);
+        Logger.out.information("CarSequencing : Configurations MDD\n");
+        MDD conf = Operation.intersection(Memory.MDD(), configs);
 
-        MDD result = Operation.intersection(mdds);
+        Logger.out.information("CarSequencing : Final Operation\n");
+        MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
         Memory.free(values);
@@ -80,7 +89,6 @@ public class CarSequencing {
         Memory.free(V1);
         Memory.free(mdd);
         Memory.free(configs);
-        Memory.free(new_option);
         Memory.free(old_bindings);
 
         return result;

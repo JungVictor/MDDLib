@@ -4,12 +4,14 @@ package pmdd.components.properties;
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
+import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
 import structures.integers.TupleOfInt;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * GLOBAL CARDINALITY CONSTRAINT
@@ -38,7 +40,17 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public String toString(){
-        return currentValues.toString();
+        ListOf<Integer> integers = Memory.ListOfInteger();
+        integers.add(currentValues.keySet());
+        Collections.sort(integers.getList());
+        StringBuilder builder = new StringBuilder();
+        for (int v : integers) {
+            builder.append(v);
+            builder.append(" -> ");
+            builder.append(currentValues.get(v));
+            builder.append("; ");
+        }
+        return builder.toString();
     }
 
     //**************************************//

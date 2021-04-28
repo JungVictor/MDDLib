@@ -2,6 +2,7 @@ import builder.MDDBuilder;
 import builder.constraints.MDDAllDifferent;
 import builder.constraints.MDDSum;
 import mdd.MDD;
+import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
@@ -108,7 +109,7 @@ public class Main {
         MDD allDiffResult;
 
         Logger.out.information("BEGIN\n");
-        allDiffResult = MDDAllDifferent.intersection(PMemory.PMDD(), test, values);
+        allDiffResult = ConstraintOperation.allDiff(test);
         Logger.out.information("STOP : " + allDiffResult.nSolutions() + " solutions\n");
 
         Logger.out.information("BEGIN\n");
@@ -169,29 +170,11 @@ public class Main {
         System.out.println("Génération du MDDsol100 : en cours...");
         MDD solution = cs.solve();
         System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
+        solution = cs.solve(solution, 2);
+        System.out.println("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs");
 
         System.out.println("finished");
-
-        Logger.out.information("START\n");
-        AllDiffKN kn = new AllDiffKN(4, 70);
-        MDD sol = Memory.MDD();
-        kn.solve(sol);
-        //sol.accept(new MDDPrinter());
-
-        System.out.println(sol.nSolutions() + " " + (System.currentTimeMillis() - clock));
-        Logger.out.information("FINISH");
-
-
-
-        for(int i = 0; i < 200000; i++) {
-            int[] random = sol.randomWalk();
-            int[] cpt = new int[74];
-            for(int j = 0; j < cpt.length; j++) {
-                for(int r : random) if (r == j) cpt[j]++;
-                if(cpt[j] > 1) System.out.println(Arrays.toString(random));
-            }
-        }
-        */
+*/
 
     }
 

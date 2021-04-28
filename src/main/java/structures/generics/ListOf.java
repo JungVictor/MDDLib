@@ -4,7 +4,9 @@ import memory.MemoryObject;
 import memory.MemoryPool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class ListOf<E> implements MemoryObject, Iterable<E> {
 
@@ -13,7 +15,7 @@ public class ListOf<E> implements MemoryObject, Iterable<E> {
     private int ID = -1;
     //
 
-    private final ArrayList<E> list = new ArrayList<>();
+    private final List<E> list = new ArrayList<>();
 
 
     //**************************************//
@@ -72,6 +74,9 @@ public class ListOf<E> implements MemoryObject, Iterable<E> {
         return list.size();
     }
 
+    public List<E> getList(){
+        return list;
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
