@@ -101,7 +101,7 @@ public class AllDiffKN {
             domains.addNode(next, i+1);
             for(int j = 0; j <= K; j++) {
                 if(i-j >= 0) domains.addArc(current, i-j, next);
-                domains.addArc(current, j+i, next);
+                if(j+i < n) domains.addArc(current, j+i, next);
             }
             current = next;
         }
