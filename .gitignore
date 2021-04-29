@@ -3,6 +3,7 @@
 
 # Maven
 target/
+*.iml
 
 # Log file
 *.log
