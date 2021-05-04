@@ -13,20 +13,21 @@ import structures.integers.ArrayOfInt;
 public class PropertySum extends NodeProperty {
 
     private final ArrayOfInt value = Memory.ArrayOfInt(2);
-    private int max;
+    private int min, max;
 
     public PropertySum(MemoryPool<NodeProperty> pool, int value){
         this(pool, value, value);
     }
 
     public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2){
-        this(pool, v1, v2, Integer.MAX_VALUE);
+        this(pool, v1, v2, Integer.MAX_VALUE, Integer.MIN_VALUE);
     }
 
-    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2, int max){
+    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2, int min, int max){
         super(pool);
         this.value.set(0, v1); this.value.set(1, v2);
         this.max = max;
+        this.min = min;
         super.setType(DataType.ARRAY);
         super.setName(SUM);
     }
@@ -54,7 +55,7 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int val) {
-        return PMemory.PropertySum(value.get(0)+val, value.get(1)+val, max);
+        return PMemory.PropertySum(value.get(0)+val, value.get(1)+val, min, max);
     }
 
     @Override
@@ -87,5 +88,11 @@ public class PropertySum extends NodeProperty {
     @Override
     public boolean isDegenerate(int v) {
         return value.get(1)+v > max || value.get(0)+v > max;
+    }
+
+    @Override
+    public boolean isDegenerate(int v, boolean finalLayer) {
+        if(finalLayer) return value.get(1)+v > max || value.get(0)+v < min;
+        return isDegenerate(v);
     }
 }

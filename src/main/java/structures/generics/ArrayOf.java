@@ -96,7 +96,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
     @Override
     public void prepare() {
-        for(int i = 0; i < array.length; i++) array[i] = null;
+
     }
 
     @Override
@@ -106,6 +106,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
     @Override
     public void free(){
+        for(int i = 0; i < array.length; i++) array[i] = null;
         pool.free(this, ID);
     }
 

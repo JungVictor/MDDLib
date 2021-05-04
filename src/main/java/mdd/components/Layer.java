@@ -104,6 +104,7 @@ public class Layer implements MemoryObject, Iterable<Node> {
             node.remove();
             Memory.free(node);
         }
+        nodes.clear();
     }
 
     //**************************************//

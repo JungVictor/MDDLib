@@ -9,6 +9,7 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Node implements MemoryObject {
 
@@ -111,6 +112,10 @@ public class Node implements MemoryObject {
         return children.contains(label);
     }
 
+    public boolean containsChild(Node child){
+        return children.contains(child);
+    }
+
     public int numberOfChildren(){
         return children.size();
     }
@@ -119,8 +124,12 @@ public class Node implements MemoryObject {
         return children;
     }
 
-    protected InArcs getParents(){
+    public InArcs getParents(){
         return parents;
+    }
+
+    public int getRandomParentValue(Random random){
+        return parents.randomValue(random);
     }
 
     //**************************************//
@@ -238,6 +247,7 @@ public class Node implements MemoryObject {
         Memory.free(children);
         Memory.free(parents);
         Memory.free(associations);
+        s = 0;
         this.pool.free(this, ID);
     }
 }

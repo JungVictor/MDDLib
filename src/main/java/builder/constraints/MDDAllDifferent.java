@@ -1,20 +1,10 @@
 package builder.constraints;
 
-import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
-import pmdd.PMDD;
-import pmdd.components.PNode;
-import pmdd.components.properties.NodeProperty;
-import pmdd.memory.PMemory;
-import representation.MDDPrinter;
-import structures.Binder;
-import structures.generics.MapOf;
-import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class MDDAllDifferent {

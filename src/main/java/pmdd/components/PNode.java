@@ -73,4 +73,10 @@ public class PNode extends Node {
         properties.clear();
     }
 
+    @Override
+    public void free(){
+        super.free();
+        clearProperties();
+    }
+
 }

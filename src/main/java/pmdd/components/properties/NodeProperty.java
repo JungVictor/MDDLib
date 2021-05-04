@@ -141,6 +141,17 @@ public abstract class NodeProperty implements MemoryObject {
         return false;
     }
 
+    /**
+     * Check if the information held by the property is degenerate IF we consider the transition with given label
+     * specifying if it is for the final layer
+     * You need to create the property in a way that it acts as a "checker".
+     * @param v Value of the label
+     * @return true if the information is degenerate after the transition, false otherwise.
+     */
+    public boolean isDegenerate(int v, boolean finalLayer){
+        return isDegenerate(v);
+    }
+
 
     //**************************************//
     //             RAW RESULTS              //
