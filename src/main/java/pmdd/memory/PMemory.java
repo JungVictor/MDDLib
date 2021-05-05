@@ -93,7 +93,7 @@ public class PMemory {
         if(object == null){
             object = new PropertySum(sums, v1, v2, min, max);
             sums.add(object);
-        }
+        } else object.setValue(v1, v2);
         object.prepare();
         return object;
     }

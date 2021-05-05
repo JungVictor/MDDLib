@@ -63,7 +63,7 @@ public class ConstraintOperation {
                 Node x1 = node.getX1();
                 for(int value : x1.getValues()) {
                     NodeProperty property = x2.getProperty(propertyName);
-                    if(!property.isDegenerate(value)) {
+                    if(!property.isDegenerate(value, i == mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
                             NodeProperty newProperty = property.createProperty(value);
                             PNode y2 = bindings.get(newProperty.toString());

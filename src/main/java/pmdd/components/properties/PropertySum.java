@@ -32,6 +32,11 @@ public class PropertySum extends NodeProperty {
         super.setName(SUM);
     }
 
+    public void setValue(int v1, int v2){
+        this.value.set(0,v1);
+        this.value.set(1,v2);
+    }
+
     @Override
     public String toString(){
         return value.toString();
