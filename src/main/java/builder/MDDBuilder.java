@@ -15,6 +15,13 @@ public class MDDBuilder {
     public static MDD universal(MDD mdd, ArrayOfInt V, int size){
         return MDDUniversal.generate(mdd, V, size);
     }
+    public static MDD universal(MDD mdd, int V, int size){
+        ArrayOfInt values = Memory.ArrayOfInt(V);
+        for(int i = 0; i < values.length; i++) values.set(i,i);
+        MDD universal = MDDUniversal.generate(mdd, values, size);
+        Memory.free(values);
+        return universal;
+    }
 
     /* AMONG / SEQ */
     public static MDD among(MDD mdd, int q, int min, int max){
@@ -79,7 +86,7 @@ public class MDDBuilder {
 
         Node y;
         if(binder == null){
-            y = Memory.Node();
+            y = mdd.Node();
             y.associates(y1, y2);
             mdd.addNode(y, layer);
         } else {

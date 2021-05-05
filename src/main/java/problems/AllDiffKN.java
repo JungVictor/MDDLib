@@ -56,7 +56,7 @@ public class AllDiffKN {
         MDD allDiffCopy;
         for(int i = 0; i < K; i++) {
             allDiffCopy = alldiff.copy();
-            accumulator = Operation.intersection(accumulator, allDiffCopy, i, alldiff.size() + i, n+1);
+            accumulator = Operation.intersection(accumulator, allDiffCopy, i, Math.min(n+1, alldiff.size() + i), n+1);
             Memory.free(old_accumulator);
             Memory.free(allDiffCopy);
             old_accumulator = accumulator;

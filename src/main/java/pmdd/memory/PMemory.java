@@ -6,10 +6,7 @@ import memory.Memory;
 import memory.MemoryPool;
 import pmdd.PMDD;
 import pmdd.components.PNode;
-import pmdd.components.properties.NodeProperty;
-import pmdd.components.properties.PropertyGCC;
-import pmdd.components.properties.PropertySequence;
-import pmdd.components.properties.PropertySum;
+import pmdd.components.properties.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
@@ -56,12 +53,15 @@ public class PMemory {
         return object;
     }
 
-    public static PropertyGCC PropertyAllDiff(SetOf<Integer> values){
-        MapOf<Integer, Integer> max = Memory.MapOfIntegerInteger();
-        for(int v : values) max.put(v, 1);
-        PropertyGCC object = PropertyGCC(max);
-        object.setName(NodeProperty.ALLDIFF);
-        Memory.free(max);
+    private static final MemoryPool<NodeProperty> alldiffs = new MemoryPool<>();
+    public static PropertyAllDiff PropertyAllDiff(SetOf<Integer> values){
+        PropertyAllDiff object = (PropertyAllDiff) alldiffs.get();
+        if(object == null){
+            object = new PropertyAllDiff(alldiffs);
+            alldiffs.add(object);
+        }
+        object.prepare();
+        object.addValues(values);
         return object;
     }
 
@@ -88,17 +88,17 @@ public class PMemory {
     }
 
     private static final MemoryPool<NodeProperty> sums = new MemoryPool<>();
-    public static PropertySum PropertySum(int v1, int v2, int max){
+    public static PropertySum PropertySum(int v1, int v2, int min, int max){
         PropertySum object = (PropertySum) sums.get();
         if(object == null){
-            object = new PropertySum(sums, v1, v2, max);
+            object = new PropertySum(sums, v1, v2, min, max);
             sums.add(object);
-        }
+        } else object.setValue(v1, v2);
         object.prepare();
         return object;
     }
     public static PropertySum PropertySum(int v1, int v2){
-        return PropertySum(v1, v2, Integer.MAX_VALUE);
+        return PropertySum(v1, v2, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
 }

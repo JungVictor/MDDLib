@@ -8,8 +8,8 @@ public class Logger {
     private boolean debug, verbose, information = true, normal, memory = true, time = true;
     private String str, prestr;
 
-    private long timer;
-    private Runtime rt;
+    private final long timer;
+    private final Runtime rt;
 
     private Logger(){
         this.timer = System.currentTimeMillis();
@@ -17,19 +17,19 @@ public class Logger {
     }
 
     public void setDebug(boolean debug) {
-        debug = debug;
+        this.debug = debug;
     }
 
     public void setVerbose(boolean verbose) {
-        verbose = verbose;
+        this.verbose = verbose;
     }
 
     public void setInformation(boolean information) {
-        information = information;
+        this.information = information;
     }
 
     public void setNormal(boolean normal) {
-        normal = normal;
+        this.normal = normal;
     }
 
     public void setMemory(boolean memory) {
@@ -49,7 +49,7 @@ public class Logger {
     }
 
     public void print(Object object){
-        if(normal) print(object);
+        if(normal) print("", object);
     }
 
     public void information(Object object){

@@ -77,6 +77,11 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
         return arcs.containsKey(value);
     }
 
+    public boolean contains(Node child){
+        for(Node node : arcs.values()) if(node == child) return true;
+        return false;
+    }
+
     public void merge(OutArcs outArcs){
         for(int value : outArcs) if(!this.arcs.containsKey(value)) this.arcs.put(value, outArcs.get(value));
     }

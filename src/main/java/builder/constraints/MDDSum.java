@@ -2,12 +2,9 @@ package builder.constraints;
 
 import builder.MDDBuilder;
 import mdd.MDD;
-import mdd.components.Layer;
 import mdd.components.Node;
-import mdd.operations.Operation;
 import memory.Memory;
 import structures.Binder;
-import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 

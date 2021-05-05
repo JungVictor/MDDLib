@@ -5,8 +5,10 @@ import memory.MemoryObject;
 import memory.MemoryPool;
 import structures.generics.SetOf;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 public class InArcs implements MemoryObject, Iterable<Integer> {
 
@@ -41,7 +43,7 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
         if(nodes != null){
             boolean result = nodes.remove(node);
             if(result && nodes.size() == 0) {
-                arcs.remove(nodes);
+                arcs.remove(label);
                 Memory.free(nodes);
             }
             return result;
@@ -51,6 +53,15 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
 
     public SetOf<Node> get(int label){
         return arcs.get(label);
+    }
+
+    public Collection<Integer> values(){
+        return arcs.keySet();
+    }
+
+    public int randomValue(Random random){
+        Object[] arr = arcs.keySet().toArray();
+        return (int) arr[random.nextInt(arr.length)];
     }
 
     public void clear(){
@@ -80,7 +91,7 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
 
     @Override
     public void free() {
-        for(SetOf<Node> nodes : arcs.values()) Memory.free(nodes);
+        for(int value : arcs.keySet()) Memory.free(arcs.get(value));
         arcs.clear();
         this.pool.free(this, ID);
     }

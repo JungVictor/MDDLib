@@ -56,7 +56,6 @@ public class MemoryPool<E extends MemoryObject> {
     public synchronized void add(E element){
         objects++;
         if(size == pool.length) expand();
-        pool[size] = element;
         element.setID(size++);
     }
 
