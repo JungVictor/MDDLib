@@ -11,14 +11,14 @@ import pmdd.memory.PMemory;
 import structures.Binder;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.TupleOfInt;
+import utils.Logger;
 
 import java.util.HashMap;
 
 public class ConstraintOperation {
 
     static public MDD allDiff(MDD result, MDD mdd){
-        result.setSize(mdd.size());
-
         PNode constraint = PMemory.PNode();
         constraint.addProperty(NodeProperty.ALLDIFF, PMemory.PropertyAllDiff(mdd.getV()));
 
@@ -33,20 +33,29 @@ public class ConstraintOperation {
     }
 
     static public MDD sum(MDD result, MDD mdd, int min, int max){
-        result.setSize(mdd.size());
-
         PNode constraint = PMemory.PNode();
         constraint.addProperty(NodeProperty.SUM, PMemory.PropertySum(0, 0, min, max));
 
         intersection(result, mdd, constraint, NodeProperty.SUM);
 
         Memory.free(constraint);
+        result.reduce();
+        return result;
+    }
 
+    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
+        PNode constraint = PMemory.PNode();
+        constraint.addProperty(NodeProperty.GCC, PMemory.PropertyGCC(maxValues));
+
+        intersection(result, mdd, constraint, NodeProperty.GCC);
+
+        Memory.free(constraint);
         result.reduce();
         return result;
     }
 
     static public MDD intersection(MDD result, MDD mdd, PNode constraint, String propertyName){
+        result.setSize(mdd.size());
         result.getRoot().associates(mdd.getRoot(), constraint);
 
         Binder binder = Memory.Binder();
@@ -56,6 +65,7 @@ public class ConstraintOperation {
                     tmp;
 
         for(int i = 1; i < mdd.size(); i++){
+            Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
                 PNode x2 = (PNode) node.getX2();
                 Node x1 = node.getX1();

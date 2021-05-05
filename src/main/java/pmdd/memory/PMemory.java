@@ -10,6 +10,7 @@ import pmdd.components.properties.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
+import structures.integers.TupleOfInt;
 
 public class PMemory {
 
@@ -42,7 +43,7 @@ public class PMemory {
     }
 
     private static final MemoryPool<NodeProperty> gccs = new MemoryPool<>();
-    public static PropertyGCC PropertyGCC(MapOf<Integer, Integer> max){
+    public static PropertyGCC PropertyGCC(MapOf<Integer, TupleOfInt> max){
         PropertyGCC object = (PropertyGCC) gccs.get();
         if(object == null){
             object = new PropertyGCC(gccs);

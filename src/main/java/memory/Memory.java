@@ -39,6 +39,10 @@ public class Memory {
         return object;
     }
 
+    public static TupleOfInt TupleOfInt(TupleOfInt tuple){
+        return TupleOfInt(tuple.getFirst(), tuple.getSecond());
+    }
+
 
     //**************************************//
     //                MAPS                  //
@@ -94,6 +98,17 @@ public class Memory {
         if(object == null){
             object = new MapOf<>(mapOfNodeIntegerPool);
             mapOfNodeIntegerPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MapOf<Integer, TupleOfInt>> mapOfIntegerTupleOfIntPool = new MemoryPool<>();
+    public static MapOf<Integer, TupleOfInt> MapOfIntegerTupleOfInt(){
+        MapOf<Integer, TupleOfInt> object = mapOfIntegerTupleOfIntPool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegerTupleOfIntPool);
+            mapOfIntegerTupleOfIntPool.add(object);
         }
         object.prepare();
         return object;

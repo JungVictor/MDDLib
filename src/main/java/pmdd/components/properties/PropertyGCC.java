@@ -20,9 +20,10 @@ import java.util.Collections;
  */
 public class PropertyGCC extends NodeProperty {
 
-    private final MapOf<Integer, Integer> maxValues = Memory.MapOfIntegerInteger();
+    private final MapOf<Integer, TupleOfInt> maxValues = Memory.MapOfIntegerTupleOfInt();
     // TODO : memory allocation
     private final MapOf<Integer, TupleOfInt> currentValues = new MapOf<>(null);
+    private int BASE = 2;
 
     public PropertyGCC(MemoryPool<NodeProperty> pool){
         super(pool);
@@ -30,12 +31,36 @@ public class PropertyGCC extends NodeProperty {
         super.setName(GCC);
     }
 
-    public void setMaxValues(MapOf<Integer, Integer> maxValues){
+    public void setMaxValues(MapOf<Integer, TupleOfInt> maxValues){
         this.maxValues.clear();
+        int val;
         for(int value : maxValues) {
+            val = maxValues.get(value).getSecond();
             this.maxValues.put(value, maxValues.get(value));
             this.currentValues.put(value, Memory.TupleOfInt());
+            if(val > BASE) BASE = val;
         }
+    }
+
+    @Override
+    public int hash(){
+        int hash = 0;
+        for(int value : maxValues){
+            hash += currentValues.get(value).getSecond();
+            hash *= BASE;
+        }
+        return hash;
+    }
+
+    @Override
+    public int hash(int v){
+        int hash = 0;
+        for(int value : maxValues){
+            hash += currentValues.get(value).getSecond();
+            if(value == v) hash++;
+            hash *= BASE;
+        }
+        return hash;
     }
 
     @Override
@@ -117,7 +142,16 @@ public class PropertyGCC extends NodeProperty {
     @Override
     public boolean isDegenerate(int v) {
         if(!maxValues.contains(v)) return false;
-        return currentValues.get(v).getSecond()+1 > maxValues.get(v);
+        return currentValues.get(v).getSecond()+1 > maxValues.get(v).getSecond();
+    }
+
+    @Override
+    public boolean isDegenerate(int v, boolean finalLayer){
+        if(!maxValues.contains(v)) return false;
+        TupleOfInt t1 = currentValues.get(v);
+        TupleOfInt t2 = maxValues.get(v);
+        if(finalLayer) return t1.getSecond() + 1 > t2.getSecond() || t1.getFirst() + 1 < t2.getFirst();
+        return t1.getSecond() + 1 > t2.getSecond();
     }
 
 

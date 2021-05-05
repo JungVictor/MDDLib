@@ -2,6 +2,7 @@ package problems;
 
 import builder.MDDBuilder;
 import mdd.MDD;
+import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.memory.PMemory;
@@ -10,6 +11,7 @@ import representation.MDDPrinter;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.TupleOfInt;
 import utils.Logger;
 
 public class CarSequencing {
@@ -34,9 +36,15 @@ public class CarSequencing {
         for(int i = 0; i < configs.length; i++) mdds.set(i+options.length, configs.get(i));
 
         MDD opts = Operation.intersection(Memory.MDD(), options);
-        MDD conf = Operation.intersection(Memory.MDD(), configs);
+        //MDD conf = Operation.intersection(Memory.MDD(), configs);
 
-        MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
+        MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
+        for(int v : data.getV()){
+            int ncars = data.nCarsInConfig(v);
+            gcc.put(v, Memory.TupleOfInt(ncars, ncars));
+        }
+        MDD solution = ConstraintOperation.gcc(PMemory.PMDD(), opts, gcc);
+        //MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
 
         solution.reduce();
 
@@ -45,7 +53,7 @@ public class CarSequencing {
         Memory.free(options);
         Memory.free(configs);
         Memory.free(opts);
-        Memory.free(conf);
+        //Memory.free(conf);
 
         return solution;
     }
@@ -78,10 +86,18 @@ public class CarSequencing {
         ArrayOf<MDD> configs = configs();
 
         Logger.out.information("CarSequencing : Configurations MDD\n");
-        MDD conf = Operation.intersection(Memory.MDD(), configs);
+        //MDD conf = Operation.intersection(Memory.MDD(), configs);
 
+
+        MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
+        int i = 0;
+        for(int v : data.getV()){
+            int ncars = data.nCarsInConfig(i);
+            gcc.put(v, Memory.TupleOfInt(ncars, ncars));
+        }
         Logger.out.information("CarSequencing : Final Operation\n");
-        MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
+        MDD result = ConstraintOperation.gcc(Memory.MDD(), newMDD, gcc);
+        //MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
         Memory.free(values);
