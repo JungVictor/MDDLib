@@ -24,12 +24,12 @@ public class ConstraintIntersection {
         int i = 0;
         for(int v : test.getV()) V.set(i++, v);
 
-        PMDD result;
+        MDD result;
 
         Logger.out.information("#Solutions : " + test.nSolutions() + "\n");
 
         Logger.out.information("BEGIN\n");
-        result = ConstraintOperation.sum(test, min, max);
+        result = ConstraintOperation.sum(Memory.MDD(), test, min, max);
         Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
 
         result = PMemory.PMDD();
@@ -39,5 +39,27 @@ public class ConstraintIntersection {
         Operation.intersection(result, test, sum);
         Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
     }
+
+    private static void alldiff(MDD test){
+        ArrayOfInt V = Memory.ArrayOfInt(test.getV().size());
+        int i = 0;
+        for(int v : test.getV()) V.set(i++, v);
+
+        MDD result;
+
+        Logger.out.information("#Solutions : " + test.nSolutions() + "\n");
+
+        Logger.out.information("BEGIN\n");
+        result = ConstraintOperation.allDiff(Memory.MDD(), test);
+        Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
+
+        result = PMemory.PMDD();
+
+        Logger.out.information("BEGIN\n");
+        MDD sum = MDDBuilder.alldiff(Memory.MDD(), V, test.size());
+        Operation.intersection(result, test, sum);
+        Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
+    }
+
 
 }

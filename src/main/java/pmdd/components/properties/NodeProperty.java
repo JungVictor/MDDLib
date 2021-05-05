@@ -202,6 +202,12 @@ public abstract class NodeProperty implements MemoryObject {
 
     public MapOf getData(){return null;}
 
+    public int hash(){
+        return 0;
+    }
+    public int hash(int value){
+        return 0;
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

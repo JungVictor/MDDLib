@@ -37,7 +37,8 @@ public class Main {
         Logger.out.information("STOP : " + allDiffResult.nSolutions() + " solutions\n");
 
         Logger.out.information("BEGIN\n");
-        allDiffResult = ConstraintOperation.allDiff(test);
+        allDiffResult = PMemory.PMDD();
+        ConstraintOperation.allDiff(allDiffResult, test);
         Logger.out.information("STOP : " + allDiffResult.nSolutions() + " solutions\n");
 
         Logger.out.information("BEGIN\n");

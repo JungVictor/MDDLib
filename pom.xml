@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>MDDLib</artifactId>
-    <version>CarSequencing</version>
+    <version>AllDiffIntersection</version>
 
     <build>
         <plugins>
@@ -25,7 +25,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Main</mainClass>
+                            <mainClass>benchmarks/AllDiffIntersection</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

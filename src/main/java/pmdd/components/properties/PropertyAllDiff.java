@@ -35,6 +35,28 @@ public class PropertyAllDiff extends NodeProperty {
         this.values.add(values);
     }
 
+    @Override
+    public int hash(){
+        int hash = 0;
+        for(int v : values) {
+            if(alldiff.contains(v)) hash += 1;
+            hash += hash;
+        }
+        return hash;
+    }
+
+    @Override
+    public int hash(int value){
+        if(alldiff.contains(value)) return hash();
+        int hash = 0;
+        for(int v : values) {
+            if(alldiff.contains(v)) hash += 1;
+            else if(v == value) hash += 1;
+            hash += hash;
+        }
+        return hash;
+    }
+
     //**************************************//
     //             RAW RESULTS              //
     //**************************************//

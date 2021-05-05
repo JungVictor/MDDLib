@@ -16,8 +16,7 @@ import java.util.HashMap;
 
 public class ConstraintOperation {
 
-    static public PMDD allDiff(MDD mdd){
-        PMDD result = PMemory.PMDD();
+    static public MDD allDiff(MDD result, MDD mdd){
         result.setSize(mdd.size());
 
         PNode constraint = PMemory.PNode();
@@ -33,8 +32,7 @@ public class ConstraintOperation {
         return result;
     }
 
-    static public PMDD sum(MDD mdd, int min, int max){
-        PMDD result = PMemory.PMDD();
+    static public MDD sum(MDD result, MDD mdd, int min, int max){
         result.setSize(mdd.size());
 
         PNode constraint = PMemory.PNode();
@@ -52,7 +50,7 @@ public class ConstraintOperation {
         result.getRoot().associates(mdd.getRoot(), constraint);
 
         Binder binder = Memory.Binder();
-        HashMap<String, PNode> bindings = new HashMap<>();
+        HashMap<Integer, PNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                     nextNodesConstraint = Memory.SetOfNode(),
                     tmp;
@@ -65,15 +63,17 @@ public class ConstraintOperation {
                     NodeProperty property = x2.getProperty(propertyName);
                     if(!property.isDegenerate(value, i == mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
-                            NodeProperty newProperty = property.createProperty(value);
-                            PNode y2 = bindings.get(newProperty.toString());
-                            if (y2 != null) Memory.free(newProperty);
-                            else {
+                            //NodeProperty newProperty = property.createProperty(value);
+                            //PNode y2 = bindings.get(newProperty.toString());
+                            int hash = property.hash(value);
+                            PNode y2 = bindings.get(hash);
+                            if (y2 == null) {
                                 y2 = PMemory.PNode();
-                                y2.addProperty(propertyName, newProperty);
-                                bindings.put(newProperty.toString(), y2);
+                                y2.addProperty(propertyName, property.createProperty(value));
+                                bindings.put(hash, y2);
                                 nextNodesConstraint.add(y2);
                             }
+                            // else Memory.free(newProperty);
                             x2.addChild(value, y2);
                         }
                         MDDBuilder.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);

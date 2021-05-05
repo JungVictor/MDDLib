@@ -42,6 +42,16 @@ public class PropertySum extends NodeProperty {
         return value.toString();
     }
 
+    @Override
+    public int hash(){
+        return value.get(0);
+    }
+
+    @Override
+    public int hash(int value){
+        return this.value.get(0)+value;
+    }
+
     //**************************************//
     //             RAW RESULTS              //
     //**************************************//
@@ -87,12 +97,12 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public boolean isDegenerate() {
-        return value.get(1) > max || value.get(0) > max;
+        return value.get(1) > max;
     }
 
     @Override
     public boolean isDegenerate(int v) {
-        return value.get(1)+v > max || value.get(0)+v > max;
+        return value.get(1)+v > max;
     }
 
     @Override

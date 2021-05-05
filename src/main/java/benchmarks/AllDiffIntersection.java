@@ -13,7 +13,10 @@ import java.util.Arrays;
 public class AllDiffIntersection {
 
     public static void main(String[] args){
-        alldiff(5,10,5,10,0);
+        // default parameters
+        int[] parameters = {5, 10, 5, 10, 0};
+        for(int i = 0; i < args.length; i++) parameters[i] = Integer.parseInt(args[i]);
+        alldiff(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
     }
 
     public static void alldiff(int MIN_SGROUP, int MAX_SGROUP, int MIN_NGROUP, int MAX_NGROUP, int PROBA) {
@@ -60,15 +63,20 @@ public class AllDiffIntersection {
             }
             // Memory.free(test);
         }
+        String[] tables = {"Time(ms)", "Memory(mb)", "#Arcs"};
         for(int j = 0; j < results.length; j++){
-            for(int k = 0; k < results[j].length; j++) {
+            System.out.println(tables[j]+";");
+            System.out.print(";");
+            for(int k = 0; k < results[j][0].length; k++) System.out.print((k+MIN_SGROUP)+";");
+            System.out.println("size of groups;");
+            for(int k = 0; k < results[j].length; k++) {
                 System.out.print(k+MIN_NGROUP+";");
                 for(int i = 0; i < results[j][k].length; i++) {
                     System.out.print(results[j][k][i]+";");
                 }
                 System.out.println();
             }
-            System.out.println();
+            System.out.println("number of groups;\n");
         }
     }
 
