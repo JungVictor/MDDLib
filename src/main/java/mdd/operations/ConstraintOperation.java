@@ -1,10 +1,8 @@
 package mdd.operations;
 
-import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
-import pmdd.PMDD;
 import pmdd.components.PNode;
 import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
@@ -16,8 +14,17 @@ import utils.Logger;
 
 import java.util.HashMap;
 
+/**
+ * The class dedicated to perform on-the-fly constraint operations
+ */
 public class ConstraintOperation {
 
+    /**
+     * Perform the intersection operation between mdd and a alldiff constraint
+     * @param result Tee MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @return the MDD resulting from the intersection between mdd and the alldiff constraint
+     */
     static public MDD allDiff(MDD result, MDD mdd){
         PNode constraint = PMemory.PNode();
         constraint.addProperty(NodeProperty.ALLDIFF, PMemory.PropertyAllDiff(mdd.getV()));
@@ -32,6 +39,12 @@ public class ConstraintOperation {
         return result;
     }
 
+    /**
+     * Perform the intersection operation between mdd and a sum constraint
+     * @param result Tee MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @return the MDD resulting from the intersection between mdd and the sum constraint
+     */
     static public MDD sum(MDD result, MDD mdd, int min, int max){
         PNode constraint = PMemory.PNode();
         constraint.addProperty(NodeProperty.SUM, PMemory.PropertySum(0, 0, min, max));
@@ -43,6 +56,12 @@ public class ConstraintOperation {
         return result;
     }
 
+    /**
+     * Perform the intersection operation between mdd and a gcc constraint
+     * @param result Tee MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @return the MDD resulting from the intersection between mdd and the gcc constraint
+     */
     static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
         PNode constraint = PMemory.PNode();
         constraint.addProperty(NodeProperty.GCC, PMemory.PropertyGCC(maxValues));
@@ -54,7 +73,14 @@ public class ConstraintOperation {
         return result;
     }
 
-    static public MDD intersection(MDD result, MDD mdd, PNode constraint, String propertyName){
+    /**
+     * Perform the intersection operation between the given mdd and the given constraint
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @param constraint The PNode containing the constraint (= root node of the constraint)
+     * @param propertyName The name of the property to propagate
+     */
+    static private void intersection(MDD result, MDD mdd, PNode constraint, String propertyName){
         result.setSize(mdd.size());
         result.getRoot().associates(mdd.getRoot(), constraint);
 
@@ -86,7 +112,7 @@ public class ConstraintOperation {
                             // else Memory.free(newProperty);
                             x2.addChild(value, y2);
                         }
-                        MDDBuilder.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
+                        Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
                     }
                 }
             }
@@ -102,7 +128,6 @@ public class ConstraintOperation {
         Memory.free(currentNodesConstraint);
         Memory.free(nextNodesConstraint);
         Memory.free(binder);
-        return result;
     }
 
 }

@@ -50,18 +50,22 @@ public class Main {
                         {1, 1, 1, 1, 1, 1},
                 }, 0, 1);
 
+        MDD load = MDDReader.load(Memory.MDD(), "CarSeq012.mdd");
+
+        /*
         long clock = System.currentTimeMillis();
         System.out.println("Génération du MDDsol100 : en cours...");
         MDD solution = cs.solve();
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
         solution = cs.solve(solution, 2);
-        MDDReader.save(solution, "CarSeq012.mdd");
+        MDDReader.save(solution, "CarSeq012");
+
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
         solution = cs.solve(solution, 3);
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
         solution = cs.solve(solution, 4);
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
-
+*/
         System.out.println("finished");
 
     }

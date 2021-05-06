@@ -3,6 +3,7 @@ package builder.constraints;
 import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
+import mdd.operations.Operation;
 import memory.Memory;
 import structures.Binder;
 import structures.generics.MapOf;
@@ -79,7 +80,7 @@ public class MDDSum {
                             nextNodeValue.put(y2, nSum);
                         } else y2 = next.get(nSum);
                         x2.addChild(v, y2);
-                        MDDBuilder.addArcAndNode(result, x, x1.getChild(v), y2, v, i, binder);
+                        Operation.addArcAndNode(result, x, x1.getChild(v), y2, v, i, binder);
                     }
                 }
                 x.clearAssociations();

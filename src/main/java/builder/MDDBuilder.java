@@ -79,29 +79,4 @@ public class MDDBuilder {
     public static MDD neq(MDD mdd, int size, ArrayOfInt V){
         return MDDCompareNextValue.generate(mdd, size, V, MDDCompareNextValue.OP.NEQ);
     }
-
-    public static void addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){
-        if(y1 == null) y1 = y2;
-        else if(y2 == null) y2 = y1;
-
-        Node y;
-        if(binder == null){
-            y = mdd.Node();
-            y.associates(y1, y2);
-            mdd.addNode(y, layer);
-        } else {
-            ArrayOf<Node> nodes = Memory.ArrayOfNode(2);
-            nodes.set(0, y1); nodes.set(1, y2);
-            Binder lastBinder = binder.path(nodes);
-            y = lastBinder.getLeaf();
-            if (y == null) {
-                y = mdd.Node();
-                y.associates(y1, y2);
-                lastBinder.setLeaf(y);
-                mdd.addNode(y, layer);
-            }
-            Memory.free(nodes);
-        }
-        mdd.addArc(x, label, y);
-    }
 }

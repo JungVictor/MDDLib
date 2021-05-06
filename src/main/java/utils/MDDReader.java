@@ -53,12 +53,15 @@ public class MDDReader {
 
     public static MDD load(MDD mdd, String file){
         int line = 0;
+        mdd.setSize(1);
         HashMap<String, Node> currentBinding = new HashMap<>(), nextBinding = new HashMap<>(), tmp;
         currentBinding.put("root", mdd.getRoot());
         try {
             Scanner reader = new Scanner(new File(file));
             while (reader.hasNextLine()){
+                mdd.setSize(mdd.size()+1);
                 loadLayer(mdd, line++, reader.nextLine(), currentBinding, nextBinding);
+                Logger.out.information("\rLOADING LAYER " + line);
                 tmp = currentBinding;
                 currentBinding = nextBinding;
                 nextBinding = tmp;

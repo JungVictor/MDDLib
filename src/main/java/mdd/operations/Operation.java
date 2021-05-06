@@ -9,12 +9,14 @@ import structures.Binder;
 import structures.generics.SetOf;
 import utils.Logger;
 
+/**
+ * The class dedicated to perform classical operation on and between MDDs
+ */
 public class Operation {
 
     private enum Operator {
         UNION, INTERSECTION, DIAMOND, MINUS, INCLUSION;
     }
-
 
     //**************************************//
     //           UNARY OPERATIONS           //
@@ -30,12 +32,56 @@ public class Operation {
     //          BINARY OPERATIONS           //
     //**************************************//
 
-    public static MDD intersection(MDD mdd1, MDD mdd2, int start){
-        return intersection(mdd1.MDD(), mdd1, mdd2, start, Math.min(start + mdd2.size(), mdd1.size()), Math.max(start + mdd2.size(), mdd1.size()));
+    // ------------ //
+    // INTERSECTION //
+    // ------------ //
+    /**
+     * Perform an intersection between mdd1 and mdd2.
+     * Create a new MDD to stock the result.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return The result of the intersection between mdd1 and mdd2
+     */
+    public static MDD intersection(MDD mdd1, MDD mdd2){
+        return perform(mdd1, mdd2, Operator.INTERSECTION);
     }
+
+    /**
+     * Perform an intersection between mdd1 and mdd2.
+     * Stock the result in the given result MDD.
+     * @param result The MDD to stock the result
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return The result of the intersection between mdd1 and mdd2
+     */
+    public static MDD intersection(MDD result, MDD mdd1, MDD mdd2){
+        return perform(result, mdd1, mdd2, Operator.INTERSECTION);
+    }
+
+    /**
+     * Perform an intersection between mdd1 and mdd2 from layer start to layer stop.
+     * Create a new MDD to stock the result.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @param start The starting layer
+     * @param stop The stopping layer
+     * @param size The size of the result
+     * @return The result of the intersection between mdd1 and mdd2 from layer start to layer stop.
+     */
     public static MDD intersection(MDD mdd1, MDD mdd2, int start, int stop, int size){
         return intersection(mdd1.MDD(), mdd1, mdd2, start, stop, size);
     }
+
+    /**
+     * Perform an intersection between mdd1 and mdd2 from layer start to layer stop.
+     * Stock the result in the given result MDD.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @param start The starting layer
+     * @param stop The stopping layer
+     * @param size The size of the result
+     * @return The result of the intersection between mdd1 and mdd2 from layer start to layer stop.
+     */
     public static MDD intersection(MDD result, MDD mdd1, MDD mdd2, int start, int stop, int size){
         mdd1.clearAllAssociations();
         // Copy the first MDD until the first layer of intersection
@@ -98,6 +144,18 @@ public class Operation {
         return result;
     }
 
+
+    // ------------- //
+    // CONCATENATION //
+    // ------------- //
+    /**
+     * Perform a concatenation of the two MDD. That is to say, the tt node of mdd1 will be replaced by
+     * the root node from mdd2.
+     * Create a new MDD to stock the result
+     * @param mdd1 The first MDD (top)
+     * @param mdd2 The second MDD (bottom)
+     * @return The result of the concatenate operation.
+     */
     public static MDD concatenate(MDD mdd1, MDD mdd2){
         MDD result = mdd1.copy();
         result.setSize(mdd1.size() + mdd2.size() - 1);
@@ -105,25 +163,62 @@ public class Operation {
         return result;
     }
 
+
+    // ----- //
+    // UNION //
+    // ----- //
+    /**
+     * Perform the union of mdd1 and mdd2.
+     * Create a new MDD to stock the result.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return the union of mdd1 and mdd2.
+     */
     public static MDD union(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.UNION);
     }
 
-    public static MDD intersection(MDD mdd1, MDD mdd2){
-        return perform(mdd1, mdd2, Operator.INTERSECTION);
-    }
-    public static MDD intersection(MDD result, MDD mdd1, MDD mdd2){
-        return perform(result, mdd1, mdd2, Operator.INTERSECTION);
-    }
 
+    // ------- //
+    // DIAMOND //
+    // ------- //
+    /**
+     * Perform the diamond operation between mdd1 and mdd2.
+     * Create a new MDD to stock the result.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return the result of the diamond operation between mdd1 and mdd2
+     */
     public static MDD diamond(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.DIAMOND);
     }
 
+
+    // ----- //
+    // MINUS //
+    // ----- //
+    /**
+     * Perform the minus operation between mdd1 and mdd2.
+     * Create a new MDD to stock the result.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return the result of the minus operation between mdd1 and mdd2
+     */
     public static MDD minus(MDD mdd1, MDD mdd2){
         return perform(mdd1, mdd2, Operator.MINUS);
     }
 
+
+    // --------- //
+    // INCLUSION //
+    // --------- //
+
+    /**
+     * Check if mdd2 is included in mdd1.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @return true if mdd2 is included in mdd1, false otherwise
+     */
     public static boolean inclusion(MDD mdd1, MDD mdd2){
         if(mdd2.size() > mdd1.size()) return false;
 
@@ -138,6 +233,15 @@ public class Operation {
         return result;
     }
 
+    /**
+     * Check if the sub-MDD of the given size starting from node root2 is included in the sub-MDD starting from
+     * node root1 of the given size.
+     * @param root1 The first root
+     * @param root2 The second root
+     * @param size The size of both sub-MDDs
+     * @param V The set of values to check
+     * @return true if there is an inclusion, false otherwise
+     */
     public static boolean inclusion(Node root1, Node root2, int size, SetOf<Integer> V){
         MDD inclusion = Memory.MDD();
         boolean result = perform(inclusion, root1, root2, size, V, Operator.INCLUSION) != null;
@@ -145,6 +249,19 @@ public class Operation {
         return result;
     }
 
+
+    // ---- //
+    // CORE //
+    // ---- //
+
+    /**
+     * Check if an arc must be created, given the different inputs.
+     * @param a1 Existence of the arc in the first MDD
+     * @param a2 Existence of the arc in the second MDD
+     * @param OP The type of operation
+     * @param isFinalLayer Whether the given layer is the final one
+     * @return true if an arc must be created, false otherwise
+     */
     private static boolean apply(boolean a1, boolean a2, Operator OP, boolean isFinalLayer){
         switch (OP){
             case INTERSECTION:
@@ -157,19 +274,29 @@ public class Operation {
         return false;
     }
 
-    private static MDD perform(MDD result, Node root1, Node root2, int r, SetOf<Integer> V, Operator OP){
-        result.setSize(r);
+    /**
+     *
+     * @param result The MDD that will contains the result of the operation
+     * @param root1 The root node of the first MDD
+     * @param root2 The root node of the second MDD
+     * @param size The size of the MDD result
+     * @param V The set of values to consider during the operation
+     * @param OP The type of operation
+     * @return The MDD resulting from the operation
+     */
+    private static MDD perform(MDD result, Node root1, Node root2, int size, SetOf<Integer> V, Operator OP){
+        result.setSize(size);
         Binder binder = Memory.Binder();
 
         result.getRoot().associates(root1, root2);
 
-        for(int i = 1; i < r; i++){
+        for(int i = 1; i < size; i++){
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
                 for(int v : V){
                     boolean a1 = x1.containsLabel(v), a2 = a1;
                     if(x2 != x1) a2 = x2.containsLabel(v);
-                    if(apply(a1, a2, OP, i == r - 1)) {
+                    if(apply(a1, a2, OP, i == size - 1)) {
                         addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);
                     }
                     else if(OP == Operator.INCLUSION && a1) return null;
@@ -188,9 +315,11 @@ public class Operation {
     }
 
     /**
-     * Create a new MDD by applying the operator OP between this and mdd.
-     * @param OP Type of operation (union, intersection[])
-     * @return The MDD resulting from : this OP mdd.
+     * @param result The MDD that will contains the result of the operation
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @param OP Type of operation (union, intersection, ...)
+     * @return The MDD resulting from : mdd1 OP mdd2 stocked in result
      */
     private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
         result.setSize(mdd1.size());
@@ -204,11 +333,29 @@ public class Operation {
         Memory.free(V);
         return result;
     }
+
+    /**
+     * Create a new MDD by applying the operator OP between mdd1 and mdd2.
+     * @param mdd1 The first MDD
+     * @param mdd2 The second MDD
+     * @param OP Type of operation (union, intersection, ...)
+     * @return The MDD resulting from : mdd1 OP mdd2.
+     */
     private static MDD perform(MDD mdd1, MDD mdd2, Operator OP){
         return perform(mdd1.MDD(), mdd1, mdd2, OP);
     }
 
-    private static void addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){
+    /**
+     * Add an arc and a node to the given MDD
+     * @param mdd The MDD where the node will be added
+     * @param x The source node
+     * @param y1 The child of the first associated node to x (x1), corresponding to the given label
+     * @param y2 The child of the second associated node to x (x2), corresponding to the given label
+     * @param label Label of the arc to add
+     * @param layer index of the layer where the node will be added
+     * @param binder The binder
+     */
+    public static void addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){
         if(y1 == null) y1 = y2;
         else if(y2 == null) y2 = y1;
 
@@ -238,6 +385,13 @@ public class Operation {
     //           N-ARY OPERATIONS           //
     //**************************************//
 
+    /**
+     * Perform the concatenation of multiple MDDs.
+     * Create a new MDD to stock the result.
+     * The operation is performed in chain, so the first MDD will me on top and the last on bottom.
+     * @param mdds The array of all MDDs
+     * @return The concatenation of all the MDDs
+     */
     public static MDD concatenate(ArrayOf<MDD> mdds){
         MDD result = mdds.get(0).copy();
         for(int i = 1; i < mdds.length(); i++){
@@ -247,18 +401,43 @@ public class Operation {
         return result;
     }
 
+    /**
+     * Perform the union of multiple MDDs
+     * Create a new MDD to stock the result.
+     * @param mdds The array of all MDDs
+     * @return the union of all the MDDs.
+     */
     public static MDD union(ArrayOf<MDD> mdds){
         return perform(mdds, Operator.UNION);
     }
 
+    /**
+     * Perform the intersection of multiple MDDs
+     * Create a new MDD to stock the result.
+     * @param mdds The array of all MDDs
+     * @return the intersection of all the MDDs.
+     */
     public static MDD intersection(ArrayOf<MDD> mdds){
         return perform(mdds, Operator.INTERSECTION);
     }
+
+    /**
+     * Perform the intersection of multiple MDDs
+     * Stock the result in the given result MDD.
+     * @param mdds The array of all MDDs
+     * @return the intersection of all the MDDs.
+     */
     public static MDD intersection(MDD result, ArrayOf<MDD> mdds){
         if(mdds.length == 1) return mdds.get(0).copy(result);
         return perform(result, mdds, Operator.INTERSECTION);
     }
 
+    /**
+     * Check if an arc must be created, given the different inputs.
+     * @param a Existence of the arc in the different MDDs
+     * @param OP The type of operation
+     * @return true if an arc must be created, false otherwise
+     */
     private static boolean apply(ArrayOfBoolean a, Operator OP){
         switch (OP){
             case INTERSECTION:
@@ -272,9 +451,23 @@ public class Operation {
         return false;
     }
 
+    /**
+     * Create a new MDD to stock the result
+     * @param mdds The array of all MDDs
+     * @param OP Type of operation (union, intersection, ...)
+     * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
+     */
     private static MDD perform(ArrayOf<MDD> mdds, Operator OP){
         return perform(mdds.get(0).MDD(), mdds, OP);
     }
+
+    /**
+     * Stock the result in the given result MDD
+     * @param result The MDD that will contains the result of the operation
+     * @param mdds The first MDD
+     * @param OP Type of operation (union, intersection, ...)
+     * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
+     */
     private static MDD perform(MDD result, ArrayOf<MDD> mdds, Operator OP){
 
         // Allocations : Need to be free
@@ -325,7 +518,16 @@ public class Operation {
         return result;
     }
 
-    private static void addArcAndNode(MDD mdd, Node x, ArrayOf<Node> ys, int label, int layer, Binder binder){
+    /**
+     * Add an arc and a node to the given MDD
+     * @param mdd The MDD where the node will be added
+     * @param x The source node
+     * @param ys The child of the associated nodes to x, corresponding to the given label
+     * @param label Label of the arc to add
+     * @param layer index of the layer where the node will be added
+     * @param binder The binder
+     */
+    public static void addArcAndNode(MDD mdd, Node x, ArrayOf<Node> ys, int label, int layer, Binder binder){
         Node y;
         if(binder == null){
             y = Memory.Node();

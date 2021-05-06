@@ -5,6 +5,9 @@
 target/
 *.iml
 
+# MDDs
+*.mdd
+
 # Log file
 *.log
 
