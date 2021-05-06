@@ -1,10 +1,10 @@
 package pmdd.components.properties;
 
-
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
-import structures.integers.ArrayOfInt;
+import structures.generics.MapOf;
+import structures.integers.TupleOfInt;
 
 /**
  * SUM CONSTRAINT
@@ -12,29 +12,30 @@ import structures.integers.ArrayOfInt;
  */
 public class PropertySum extends NodeProperty {
 
-    private final ArrayOfInt value = Memory.ArrayOfInt(2);
+    private TupleOfInt value;
     private int min, max;
 
-    public PropertySum(MemoryPool<NodeProperty> pool, int value){
-        this(pool, value, value);
-    }
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
-    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2){
-        this(pool, v1, v2, Integer.MAX_VALUE, Integer.MIN_VALUE);
-    }
-
-    public PropertySum(MemoryPool<NodeProperty> pool, int v1, int v2, int min, int max){
+    public PropertySum(MemoryPool<NodeProperty> pool){
         super(pool);
-        this.value.set(0, v1); this.value.set(1, v2);
-        this.max = max;
-        this.min = min;
-        super.setType(DataType.ARRAY);
         super.setName(SUM);
     }
 
-    public void setValue(int v1, int v2){
-        this.value.set(0,v1);
-        this.value.set(1,v2);
+    /**
+     * Set the current values of the property and the minimum and maximum values
+     * @param v1 current min value
+     * @param v2 current max value
+     * @param min absolute min value
+     * @param max absolute max value
+     */
+    public void setValue(int v1, int v2, int min, int max){
+        this.value = Memory.TupleOfInt();
+        this.value.set(v1, v2);
+        this.min = min;
+        this.max = max;
     }
 
     @Override
@@ -42,15 +43,6 @@ public class PropertySum extends NodeProperty {
         return value.toString();
     }
 
-    @Override
-    public int hash(){
-        return value.get(0);
-    }
-
-    @Override
-    public int hash(int value){
-        return this.value.get(0)+value;
-    }
 
     //**************************************//
     //             RAW RESULTS              //
@@ -58,8 +50,8 @@ public class PropertySum extends NodeProperty {
     // getArray
 
     @Override
-    public ArrayOfInt getArray() {
-        return value;
+    public MapOf getData(){
+        return null;
     }
 
 
@@ -70,14 +62,14 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int val) {
-        return PMemory.PropertySum(value.get(0)+val, value.get(1)+val, min, max);
+        return PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, min, max);
     }
 
     @Override
     public void mergeWithProperty(int val, NodeProperty nodeProperty){
         PropertySum property = (PropertySum) nodeProperty;
-        property.value.set(0, Math.min(value.get(0)+val, property.value.get(0)));
-        property.value.set(1, Math.max(value.get(1)+val, property.value.get(1)));
+        property.value.set(0, Math.min(value.getFirst()+val, property.value.getFirst()));
+        property.value.set(1, Math.max(value.getSecond()+val, property.value.getSecond()));
     }
 
     @Override
@@ -85,8 +77,8 @@ public class PropertySum extends NodeProperty {
         if(property.getClass() != PropertySum.class) return;
         PropertySum sum = (PropertySum) property;
 
-        value.set(0, Math.min(value.get(0), sum.value.get(0)));
-        value.set(1, Math.max(value.get(1), sum.value.get(1)));
+        value.set(0, Math.min(value.getFirst(), sum.value.getFirst()));
+        value.set(1, Math.max(value.getSecond(), sum.value.getSecond()));
     }
 
 
@@ -97,17 +89,51 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public boolean isDegenerate() {
-        return value.get(1) > max;
+        return value.getSecond() > max;
     }
 
     @Override
     public boolean isDegenerate(int v) {
-        return value.get(1)+v > max;
+        return value.getSecond()+v > max;
     }
 
     @Override
     public boolean isDegenerate(int v, boolean finalLayer) {
-        if(finalLayer) return value.get(1)+v > max || value.get(0)+v < min;
+        if(finalLayer) return value.getSecond()+v > max || value.getSecond()+v < min;
         return isDegenerate(v);
+    }
+
+
+    //**************************************//
+    //           HASH FUNCTIONS             //
+    //**************************************//
+    // hash
+
+    @Override
+    public int hash(){
+        return value.getFirst();
+    }
+
+    @Override
+    public int hash(int value){
+        return this.value.getFirst()+value;
+    }
+
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
+
+    @Override
+    public void free(){
+        Memory.free(value);
+        super.free();
+    }
+
+    @Override
+    public void prepare(){
+        super.prepare();
+        this.value = Memory.TupleOfInt();
     }
 }

@@ -21,7 +21,7 @@ public class ConstraintOperation {
 
     /**
      * Perform the intersection operation between mdd and a alldiff constraint
-     * @param result Tee MDD that will store the result
+     * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
@@ -41,7 +41,7 @@ public class ConstraintOperation {
 
     /**
      * Perform the intersection operation between mdd and a sum constraint
-     * @param result Tee MDD that will store the result
+     * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
@@ -58,7 +58,7 @@ public class ConstraintOperation {
 
     /**
      * Perform the intersection operation between mdd and a gcc constraint
-     * @param result Tee MDD that will store the result
+     * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
@@ -67,6 +67,23 @@ public class ConstraintOperation {
         constraint.addProperty(NodeProperty.GCC, PMemory.PropertyGCC(maxValues));
 
         intersection(result, mdd, constraint, NodeProperty.GCC);
+
+        Memory.free(constraint);
+        result.reduce();
+        return result;
+    }
+
+    /**
+     * Perform the intersection operation between mdd and a sequence constraint
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @return the MDD resulting from the intersection between mdd and the sequence constraint
+     */
+    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max){
+        PNode constraint = PMemory.PNode();
+        constraint.addProperty(NodeProperty.AMONG, PMemory.PropertyAmong(q, min, max, mdd.getV()));
+
+        intersection(result, mdd, constraint, NodeProperty.AMONG);
 
         Memory.free(constraint);
         result.reduce();
@@ -99,8 +116,6 @@ public class ConstraintOperation {
                     NodeProperty property = x2.getProperty(propertyName);
                     if(!property.isDegenerate(value, i == mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
-                            //NodeProperty newProperty = property.createProperty(value);
-                            //PNode y2 = bindings.get(newProperty.toString());
                             int hash = property.hash(value);
                             PNode y2 = bindings.get(hash);
                             if (y2 == null) {
@@ -109,7 +124,6 @@ public class ConstraintOperation {
                                 bindings.put(hash, y2);
                                 nextNodesConstraint.add(y2);
                             }
-                            // else Memory.free(newProperty);
                             x2.addChild(value, y2);
                         }
                         Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);

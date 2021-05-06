@@ -1,16 +1,12 @@
 package pmdd.components.properties;
 
-
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
-import structures.integers.ArrayOfInt;
-import structures.integers.MatrixOfInt;
 import structures.integers.TupleOfInt;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -20,47 +16,33 @@ import java.util.Collections;
  */
 public class PropertyGCC extends NodeProperty {
 
-    private final MapOf<Integer, TupleOfInt> maxValues = Memory.MapOfIntegerTupleOfInt();
-    // TODO : memory allocation
-    private final MapOf<Integer, TupleOfInt> currentValues = new MapOf<>(null);
+    private MapOf<Integer, TupleOfInt> bounds;
+    private MapOf<Integer, TupleOfInt> currentValues;
     private int BASE = 2;
+
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
     public PropertyGCC(MemoryPool<NodeProperty> pool){
         super(pool);
-        super.setType(DataType.ARRAY2);
         super.setName(GCC);
     }
 
-    public void setMaxValues(MapOf<Integer, TupleOfInt> maxValues){
-        this.maxValues.clear();
+    /**
+     * Initialise the minimum and maximum values possible for the GCC.
+     * @param bounds the mapping of value -> (min, max)
+     */
+    public void setMaxValues(MapOf<Integer, TupleOfInt> bounds){
+        this.bounds.clear();
         int val;
-        for(int value : maxValues) {
-            val = maxValues.get(value).getSecond();
-            this.maxValues.put(value, maxValues.get(value));
+        for(int value : bounds) {
+            val = bounds.get(value).getSecond();
+            this.bounds.put(value, bounds.get(value));
             this.currentValues.put(value, Memory.TupleOfInt());
             if(val > BASE) BASE = val;
         }
-    }
-
-    @Override
-    public int hash(){
-        int hash = 0;
-        for(int value : maxValues){
-            hash += currentValues.get(value).getSecond();
-            hash *= BASE;
-        }
-        return hash;
-    }
-
-    @Override
-    public int hash(int v){
-        int hash = 0;
-        for(int value : maxValues){
-            hash += currentValues.get(value).getSecond();
-            if(value == v) hash++;
-            hash *= BASE;
-        }
-        return hash;
     }
 
     @Override
@@ -78,6 +60,7 @@ public class PropertyGCC extends NodeProperty {
         return builder.toString();
     }
 
+
     //**************************************//
     //             RAW RESULTS              //
     //**************************************//
@@ -88,6 +71,7 @@ public class PropertyGCC extends NodeProperty {
         return currentValues;
     }
 
+
     //**************************************//
     //         PROPERTY PROPAGATION         //
     //**************************************//
@@ -95,14 +79,14 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        PropertyGCC next = PMemory.PropertyGCC(maxValues);
+        PropertyGCC next = PMemory.PropertyGCC(bounds);
         TupleOfInt tuple;
         for(int v : currentValues){
             tuple = currentValues.get(v);
             next.currentValues.put(v, Memory.TupleOfInt(tuple.getFirst(), tuple.getSecond()));
         }
 
-        if(maxValues.contains(value)) next.currentValues.get(value).incr(1,1);
+        if(bounds.contains(value)) next.currentValues.get(value).incr(1,1);
         return next;
     }
 
@@ -110,7 +94,7 @@ public class PropertyGCC extends NodeProperty {
     public void mergeWithProperty(int value, NodeProperty nodeProperty){
         PropertyGCC property = (PropertyGCC) nodeProperty;
         int add, min, max;
-        for(int v : maxValues){
+        for(int v : bounds){
             add = v == value ? 1 : 0;
             TupleOfInt tuple = currentValues.get(v);
             TupleOfInt pTuple = property.currentValues.get(v);
@@ -126,7 +110,7 @@ public class PropertyGCC extends NodeProperty {
         if(property.getClass() != PropertyGCC.class) return;
         PropertyGCC gcc = (PropertyGCC) property;
 
-        for(int v : maxValues){
+        for(int v : bounds){
             TupleOfInt tuple = currentValues.get(v), pTuple = gcc.currentValues.get(v);
             if(pTuple.getFirst() < tuple.getFirst()) tuple.setFirst(pTuple.getFirst());
             if(tuple.getSecond() < pTuple.getSecond()) tuple.setSecond(pTuple.getSecond());
@@ -141,35 +125,64 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public boolean isDegenerate(int v) {
-        if(!maxValues.contains(v)) return false;
-        return currentValues.get(v).getSecond()+1 > maxValues.get(v).getSecond();
+        if(!bounds.contains(v)) return false;
+        return currentValues.get(v).getSecond()+1 > bounds.get(v).getSecond();
     }
 
     @Override
     public boolean isDegenerate(int v, boolean finalLayer){
-        if(!maxValues.contains(v)) return false;
+        if(!bounds.contains(v)) return false;
         TupleOfInt t1 = currentValues.get(v);
-        TupleOfInt t2 = maxValues.get(v);
+        TupleOfInt t2 = bounds.get(v);
         if(finalLayer) return t1.getSecond() + 1 > t2.getSecond() || t1.getFirst() + 1 < t2.getFirst();
         return t1.getSecond() + 1 > t2.getSecond();
     }
 
 
+    //**************************************//
+    //           HASH FUNCTIONS             //
+    //**************************************//
+    // hash
+
+    @Override
+    public int hash(){
+        int hash = 0;
+        for(int value : bounds){
+            hash += currentValues.get(value).getSecond();
+            hash *= BASE;
+        }
+        return hash;
+    }
+
+    @Override
+    public int hash(int v){
+        int hash = 0;
+        for(int value : bounds){
+            hash += currentValues.get(value).getSecond();
+            if(value == v) hash++;
+            hash *= BASE;
+        }
+        return hash;
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
+
     @Override
     public void prepare() {
+        bounds = Memory.MapOfIntegerTupleOfInt();
+        currentValues = Memory.MapOfIntegerTupleOfInt();
         setName(GCC);
     }
 
     @Override
     public void free(){
         for(int v : currentValues) Memory.free(currentValues.get(v));
-        maxValues.clear();
-        currentValues.clear();
+        Memory.free(bounds);
+        Memory.free(currentValues);
+        BASE = 2;
         super.free();
     }
 }

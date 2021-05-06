@@ -29,14 +29,8 @@ public class CarSequencing {
     public MDD solve(){
         data.generate();
         ArrayOf<MDD> options = options();
-        ArrayOf<MDD> configs = configs();
-
-        ArrayOf<MDD> mdds = Memory.ArrayOfMDD(options.length + configs.length);
-        for(int i = 0; i < options().length; i++) mdds.set(i, options.get(i));
-        for(int i = 0; i < configs.length; i++) mdds.set(i+options.length, configs.get(i));
 
         MDD opts = Operation.intersection(Memory.MDD(), options);
-        //MDD conf = Operation.intersection(Memory.MDD(), configs);
 
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         for(int v : data.getV()){
@@ -44,16 +38,12 @@ public class CarSequencing {
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
         MDD solution = ConstraintOperation.gcc(PMemory.PMDD(), opts, gcc);
-        //MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
 
         solution.reduce();
 
-        for(MDD mdd : mdds) Memory.free(mdd);
-        Memory.free(mdds);
+        for(MDD mdd : options) Memory.free(mdd);
         Memory.free(options);
-        Memory.free(configs);
         Memory.free(opts);
-        //Memory.free(conf);
 
         return solution;
     }
@@ -83,11 +73,6 @@ public class CarSequencing {
         MDD newMDD = Operation.intersection(mdd, new_option);
 
         Memory.free(new_option);
-        ArrayOf<MDD> configs = configs();
-
-        Logger.out.information("CarSequencing : Configurations MDD\n");
-        //MDD conf = Operation.intersection(Memory.MDD(), configs);
-
 
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         int i = 0;
@@ -97,14 +82,12 @@ public class CarSequencing {
         }
         Logger.out.information("CarSequencing : Final Operation\n");
         MDD result = ConstraintOperation.gcc(Memory.MDD(), newMDD, gcc);
-        //MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
         Memory.free(values);
         Memory.free(V0);
         Memory.free(V1);
         Memory.free(mdd);
-        Memory.free(configs);
         Memory.free(old_bindings);
 
         return result;

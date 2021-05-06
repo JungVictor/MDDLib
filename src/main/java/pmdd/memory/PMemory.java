@@ -92,14 +92,27 @@ public class PMemory {
     public static PropertySum PropertySum(int v1, int v2, int min, int max){
         PropertySum object = (PropertySum) sums.get();
         if(object == null){
-            object = new PropertySum(sums, v1, v2, min, max);
+            object = new PropertySum(sums);
             sums.add(object);
-        } else object.setValue(v1, v2);
+        }
         object.prepare();
+        object.setValue(v1, v2, min, max);
         return object;
     }
     public static PropertySum PropertySum(int v1, int v2){
         return PropertySum(v1, v2, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    private static final MemoryPool<NodeProperty> amongs = new MemoryPool<>();
+    public static PropertyAmong PropertyAmong(int q, int min, int max, SetOf<Integer> V){
+        PropertyAmong object = (PropertyAmong) amongs.get();
+        if(object == null){
+            object = new PropertyAmong(amongs);
+            amongs.add(object);
+        }
+        object.setParameters(q, min, max, V);
+        object.prepare();
+        return object;
     }
 
 }

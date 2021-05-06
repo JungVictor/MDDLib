@@ -1,13 +1,10 @@
 package pmdd.components.properties;
 
-
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
-import structures.generics.ListOf;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
-
-import java.util.Collections;
 
 /**
  * ALL DIFFERENT CONSTRAINT
@@ -20,20 +17,72 @@ public class PropertyAllDiff extends NodeProperty {
 
     private SetOf<Integer> values;
     private SetOf<Integer> alldiff;
-    private int result = 1;
+
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
     public PropertyAllDiff(MemoryPool<NodeProperty> pool){
         super(pool);
         super.setName(ALLDIFF);
     }
 
-    public void addValue(int value){
-        values.add(value);
-    }
-
+    /**
+     * Add all values contained in the given set to the property
+     * @param values Set of values
+     */
     public void addValues(SetOf<Integer> values){
         this.values.add(values);
     }
+
+    @Override
+    public String toString(){
+        return alldiff.toString();
+    }
+
+
+    //**************************************//
+    //             RAW RESULTS              //
+    //**************************************//
+    // getSingle
+
+    @Override
+    public MapOf getData(){
+        return null;
+    }
+
+
+    //**************************************//
+    //         PROPERTY PROPAGATION         //
+    //**************************************//
+    // createProperty
+
+    @Override
+    public NodeProperty createProperty(int value) {
+        PropertyAllDiff allDiff = PMemory.PropertyAllDiff(values);
+        for(int v : this.alldiff) allDiff.alldiff.add(v);
+
+        if(values.contains(value)) allDiff.alldiff.add(value);
+        return allDiff;
+    }
+
+
+    //**************************************//
+    //               CHECKERS               //
+    //**************************************//
+    // isDegenerate
+
+    @Override
+    public boolean isDegenerate(int v) {
+        return alldiff.contains(v);
+    }
+
+
+    //**************************************//
+    //           HASH FUNCTIONS             //
+    //**************************************//
+    // hash
 
     @Override
     public int hash(){
@@ -57,53 +106,12 @@ public class PropertyAllDiff extends NodeProperty {
         return hash;
     }
 
-    //**************************************//
-    //             RAW RESULTS              //
-    //**************************************//
-    // getSingle
-
-    @Override
-    public int getSingle(){
-        return result;
-    }
-
-
-    //**************************************//
-    //         PROPERTY PROPAGATION         //
-    //**************************************//
-    // createProperty
-
-    @Override
-    public NodeProperty createProperty(int value) {
-        PropertyAllDiff allDiff = PMemory.PropertyAllDiff(values);
-        for(int v : this.alldiff) allDiff.alldiff.add(v);
-        allDiff.result = allDiff.alldiff.contains(value) ? 0 : 1;
-
-        if(values.contains(value)) allDiff.alldiff.add(value);
-        return allDiff;
-    }
-
-
-    //**************************************//
-    //               CHECKERS               //
-    //**************************************//
-    // isDegenerate
-
-    @Override
-    public boolean isDegenerate(int v) {
-        return alldiff.contains(v);
-    }
-
-    @Override
-    public String toString(){
-        return alldiff.toString();
-    }
-
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
+
     @Override
     public void prepare() {
         this.alldiff = Memory.SetOfInteger();
@@ -114,6 +122,8 @@ public class PropertyAllDiff extends NodeProperty {
     public void free(){
         values.clear();
         alldiff.clear();
+        Memory.free(values);
+        Memory.free(alldiff);
         super.free();
     }
 }

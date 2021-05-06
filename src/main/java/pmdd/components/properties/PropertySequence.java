@@ -1,9 +1,9 @@
 package pmdd.components.properties;
 
-
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.MatrixOfInt;
 
@@ -15,9 +15,16 @@ import structures.integers.MatrixOfInt;
  */
 public class PropertySequence extends NodeProperty {
 
+    // TODO : hash
+
     private PropertySequence accumulator;
     private final MatrixOfInt values;
     private final SetOf<Integer> label = Memory.SetOfInteger();
+
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
 
     public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size, boolean base) {
         this(pool, label, 1);
@@ -27,7 +34,6 @@ public class PropertySequence extends NodeProperty {
     public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size){
         super(pool);
         for(int j : label) this.label.add(j);
-        super.setType(DataType.ARRAY2);
         super.setName(SEQ);
 
         this.values = Memory.MatrixOfInt(size, 2);
@@ -39,14 +45,20 @@ public class PropertySequence extends NodeProperty {
         return values.toString();
     }
 
+
     //**************************************//
     //             RAW RESULTS              //
     //**************************************//
     // getArray2
 
     @Override
-    public MatrixOfInt getArray2() {
-        return values;
+    public MapOf getData(){
+        return null;
+    }
+
+    @Override
+    public NodeProperty getResult(){
+        return accumulator;
     }
 
 
@@ -54,7 +66,8 @@ public class PropertySequence extends NodeProperty {
     //         PROPERTY PROPAGATION         //
     //**************************************//
     // createProperty   || mergeWithProperty
-    // getResult        || -labelToValue
+    // -labelToValue
+
     @Override
     public NodeProperty createProperty(int value) {
         PropertySequence next = PMemory.PropertySequence(label, values.getHeight()+1, false);
@@ -87,11 +100,6 @@ public class PropertySequence extends NodeProperty {
         }
     }
 
-    @Override
-    public NodeProperty getResult(){
-        return accumulator;
-    }
-
     /**
      * Check if the label is contained in the set of values in the sequence
      * @param label Label
@@ -102,19 +110,27 @@ public class PropertySequence extends NodeProperty {
         return 0;
     }
 
+
     //**************************************//
     //               CHECKERS               //
     //**************************************//
     // isDegenerate
+
     @Override
     public boolean isDegenerate(int v) {
         return false;
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
+
     @Override
     public void free(){
-        super.free();
         accumulator = null;
         label.clear();
+        super.free();
     }
 }

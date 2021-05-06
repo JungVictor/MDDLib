@@ -33,7 +33,8 @@ public abstract class NodeProperty implements MemoryObject {
             ALLDIFF = "allDiff",
             GCC = "gcc",
             SEQ = "sequence",
-            CONSECUTIVE = "consecutive";
+            CONSECUTIVE = "consecutive",
+            AMONG = "among";
 
     // What kind of data the NodeProperty holds
 
@@ -156,55 +157,36 @@ public abstract class NodeProperty implements MemoryObject {
     //**************************************//
     //             RAW RESULTS              //
     //**************************************//
-    // getType          || setType
-    // getSingle        || getArray
-    // getArray2
+    // getData
 
     /**
-     * Get the type of data held by the property
-     * Currently, it is the dimension of the result (0 = single value, 1 = array, 2 = matrix...)
-     * @return Type of data held
+     * Return the raw data contained in the NodeProperty as a MapOf.
+     * The map can be anything.
+     * @return Raw data held by the NodeProperty
      */
-    public DataType getType(){
-        return type;
-    }
+    public MapOf getData(){ return null; }
+
+
+    //**************************************//
+    //           HASH FUNCTIONS             //
+    //**************************************//
+    // hash
 
     /**
-     * Set the type of data held by the property.
-     * Currently, it is the dimension of the result (0 = single value, 1 = array, 2 = matrix...)
-     * @param type Type of data held
+     * Hash function on the current NodeProperty.
+     * Used to compare properties.
+     * @return hash code of the object
      */
-    protected void setType(DataType type){
-        this.type = type;
-    }
-
-    /**
-     * Return the data held by the property as a single value
-     * @return A single value holding result
-     */
-    public int getSingle(){
-        return -1;
-    }
-
-    /**
-     * Return the data held by the property as an array
-     * @return An array holding result
-     */
-    public ArrayOfInt getArray(){
-        return null;
-    }
-
-    /**
-     * Return the data held by the property as a 2D-array
-     * @return A two dimensional array holding result
-     */
-    public MatrixOfInt getArray2(){ return null; }
-
-    public MapOf getData(){return null;}
-
     public int hash(){
         return 0;
     }
+
+    /**
+     * Hash function of the NodeProperty obtained by doing the transition with the given value.
+     * Used to compare properties.
+     * @param value Value of the transition
+     * @return hash code of the object
+     */
     public int hash(int value){
         return 0;
     }
