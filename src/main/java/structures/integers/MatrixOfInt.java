@@ -5,6 +5,10 @@ import memory.MemoryPool;
 
 import java.util.Arrays;
 
+/**
+ * <b>The class representing a matrix of int</b><br>
+ * This prevent the creation of many arrays of int as it can be free and reused.
+ */
 public class MatrixOfInt implements MemoryObject {
 
     // MemoryObject variables
@@ -15,6 +19,11 @@ public class MatrixOfInt implements MemoryObject {
     private int[] matrix;
     private int height, length;
 
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
     public MatrixOfInt(MemoryPool<MatrixOfInt> pool, int height, int length){
         this.pool = pool;
         matrix = new int[height*length];
@@ -22,37 +31,11 @@ public class MatrixOfInt implements MemoryObject {
         this.length = length;
     }
 
-    public void setSize(int height, int length){
-        int size = height * length;
-        if(size > matrix.length) matrix = new int[size];
-        this.length = length;
-        this.height = height;
-        prepare();
-    }
 
-    public int get(int row, int column){
-        return matrix[row * length + column];
-    }
-
-    public void set(int row, int column, int value){
-        matrix[row * length + column] = value;
-    }
-
-    public void set(int row, int[] values){
-        for(int i = 0, start = row * length; i < values.length; i++) matrix[start + i] = values[i];
-    }
-
-    public void incr(int row, int column, int value){
-        matrix[row * length + column] += value;
-    }
-
-    public int getHeight(){
-        return height;
-    }
-
-    public int getLength(){
-        return length;
-    }
+    //**************************************//
+    //         SPECIAL FUNCTIONS            //
+    //**************************************//
+    // toString
 
     @Override
     public String toString(){
@@ -72,6 +55,85 @@ public class MatrixOfInt implements MemoryObject {
         builder.append("]");
         return builder.toString();
     }
+
+
+    //**************************************//
+    //          MATRIX MANAGEMENT           //
+    //**************************************//
+
+    /**
+     * Set the size of the matrix
+     * @param height Height of the matrix (number of rows)
+     * @param length Length of the matrix (number of columns)
+     */
+    public void setSize(int height, int length){
+        int size = height * length;
+        if(size > matrix.length) matrix = new int[size];
+        this.length = length;
+        this.height = height;
+        prepare();
+    }
+
+    /**
+     * Get the value of the element at the specified position
+     * @param row Index of the rox
+     * @param column Index of the column
+     * @return the value of the element at the specified position
+     */
+    public int get(int row, int column){
+        return matrix[row * length + column];
+    }
+
+    /**
+     * Set the value of the element at the specified position
+     * @param row Index of the rox
+     * @param column Index of the column
+     * @param value Value of the element
+     */
+    public void set(int row, int column, int value){
+        matrix[row * length + column] = value;
+    }
+
+    /**
+     * Set the values of the specified row
+     * @param row Index of the row
+     * @param values Array of values
+     */
+    public void set(int row, int[] values){
+        for(int i = 0, start = row * length; i < values.length; i++) matrix[start + i] = values[i];
+    }
+
+    /**
+     * Increase the value at the specified position by the given amount
+     * @param row Index of the row
+     * @param column Index of the column
+     * @param value Amount to add
+     */
+    public void incr(int row, int column, int value){
+        matrix[row * length + column] += value;
+    }
+
+    /**
+     * Get the height of the matrix (number of rows)
+     * @return the height of the matrix (number of rows)
+     */
+    public int getHeight(){
+        return height;
+    }
+
+    /**
+     * Get the length of the matrix (number of columns)
+     * @return the length of the matrix (number of columns)
+     */
+    public int getLength(){
+        return length;
+    }
+
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
 
     @Override
     public void prepare() {

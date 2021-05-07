@@ -14,7 +14,8 @@ import structures.generics.SetOf;
 import java.util.Random;
 
 /**
- * The class representing the MDD.
+ * <b>The class representing the MDD.</b> <br>
+ * Contains a root node that is not null, a set of layers and a tt node if the MDD has been reduce.
  */
 public class MDD implements MemoryObject {
 
@@ -462,10 +463,5 @@ public class MDD implements MemoryObject {
         this.root = null;
         this.tt = null;
         this.pool.free(this, ID);
-    }
-
-    @Override
-    public boolean isAtomic() {
-        return false;
     }
 }

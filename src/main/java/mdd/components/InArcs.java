@@ -10,6 +10,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
+/**
+ * <b>This class is used to represent the binding between a node and its parents.</b> <br>
+ * The in-going arcs (InArcs) is represented using a Map, binding the labels of the arcs to the parents node.
+ * As a node can have multiple parents having the same label, the map is actually binding an integer to a set of nodes.
+ */
 public class InArcs implements MemoryObject, Iterable<Integer> {
 
     // MemoryObject variables

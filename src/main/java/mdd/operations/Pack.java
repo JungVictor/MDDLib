@@ -12,7 +12,7 @@ import structures.generics.SetOf;
 import java.util.*;
 
 /**
- * Structure of Pack used when performing the reduce operation on MDD.
+ * <b>Structure of Pack used when performing the reduce operation on MDD.</b>
  */
 public class Pack implements MemoryObject {
 

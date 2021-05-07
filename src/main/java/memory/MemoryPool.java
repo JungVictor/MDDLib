@@ -2,6 +2,12 @@ package memory;
 
 import structures.integers.StackOfInt;
 
+/**
+ * <b>The MemoryPool is the structure that contains all objects in the pool of memory.</b>
+ * It is implemented using an array to stock the objects, and a stack to stock the indices of free objects,
+ * i.e their position in the array.
+ * @param <E> The type of the object the MemoryPool will hold
+ */
 public class MemoryPool<E extends MemoryObject> {
 
     // DEBUG

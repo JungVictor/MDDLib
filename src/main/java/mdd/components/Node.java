@@ -11,6 +11,13 @@ import structures.generics.SetOf;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * <b>This class is used to represent a node of a MDD.</b> <br>
+ * The Node might be the most important structure in the MDD.
+ * It contains all information about its parents and its children.
+ * Furthermore, you can associate other node to a given node, which is
+ * notably useful during operations such as intersection or union.
+ */
 public class Node implements MemoryObject {
 
     public enum NodeType {

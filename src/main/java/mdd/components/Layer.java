@@ -8,6 +8,11 @@ import structures.generics.SetOf;
 
 import java.util.Iterator;
 
+/**
+ * <b>This class is used to represent a layer of a MDD</b> <br>
+ * The Layer is the structure used to stock and manage nodes.
+ * As a layer is implemented using a Set, there is no notion of order. However, the notion of order in a layer is not important.
+ */
 public class Layer implements MemoryObject, Iterable<Node> {
 
     // MemoryObject variables

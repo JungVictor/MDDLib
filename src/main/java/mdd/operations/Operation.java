@@ -10,7 +10,7 @@ import structures.generics.SetOf;
 import utils.Logger;
 
 /**
- * The class dedicated to perform classical operation on and between MDDs
+ * <b>The class dedicated to perform classical operation on and between MDDs</b>
  */
 public class Operation {
 

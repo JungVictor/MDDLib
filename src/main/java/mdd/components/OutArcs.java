@@ -9,7 +9,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * <b>This class is used to represent the binding between a node and its children.</b> <br>
+ * The out-going arcs (OutArcs) is represented using a simple map binding integer to node,
+ * as the MDD is determinist by default (i.e. can only have one children with a specific label).
+ */
 public class OutArcs implements MemoryObject, Iterable<Integer> {
+
 
     // MemoryObject variables
     private final MemoryPool<OutArcs> pool;

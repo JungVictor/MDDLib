@@ -16,31 +16,17 @@ import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
 import structures.integers.TupleOfInt;
 
+/**
+ * <b>The class that allocate and manage all objects in memory.</b>
+ */
 public class Memory {
 
+    /**
+     * Free the object
+     * @param memoryObject The object to free
+     */
     public static void free(MemoryObject memoryObject){
         memoryObject.free();
-    }
-
-
-    private static final MemoryPool<TupleOfInt> tupleOfIntPool = new MemoryPool<>();
-    public static TupleOfInt TupleOfInt(){
-        return TupleOfInt(0,0);
-    }
-
-    public static TupleOfInt TupleOfInt(int e1, int e2){
-        TupleOfInt object = tupleOfIntPool.get();
-        if(object == null){
-            object = new TupleOfInt(tupleOfIntPool);
-            tupleOfIntPool.add(object);
-        }
-        object.prepare();
-        object.set(e1, e2);
-        return object;
-    }
-
-    public static TupleOfInt TupleOfInt(TupleOfInt tuple){
-        return TupleOfInt(tuple.getFirst(), tuple.getSecond());
     }
 
 
@@ -48,45 +34,45 @@ public class Memory {
     //                MAPS                  //
     //**************************************//
 
-    private static final MemoryPool<MapOf<Integer, ListOf<Integer>>> mapOfIntegersListOfIntegers = new MemoryPool<>();
+    private static final MemoryPool<MapOf<Integer, ListOf<Integer>>> mapOfIntegerListOfIntegerPool = new MemoryPool<>();
     public static MapOf<Integer, ListOf<Integer>> MapOfIntegerListOfInteger(){
-        MapOf<Integer, ListOf<Integer>> object = mapOfIntegersListOfIntegers.get();
+        MapOf<Integer, ListOf<Integer>> object = mapOfIntegerListOfIntegerPool.get();
         if(object == null){
-            object = new MapOf<>(mapOfIntegersListOfIntegers);
-            mapOfIntegersListOfIntegers.add(object);
+            object = new MapOf<>(mapOfIntegerListOfIntegerPool);
+            mapOfIntegerListOfIntegerPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<MapOf<Integer, Integer>> mapOfIntegersIntegers = new MemoryPool<>();
+    private static final MemoryPool<MapOf<Integer, Integer>> mapOfIntegerIntegerPool = new MemoryPool<>();
     public static MapOf<Integer, Integer> MapOfIntegerInteger(){
-        MapOf<Integer, Integer> object = mapOfIntegersIntegers.get();
+        MapOf<Integer, Integer> object = mapOfIntegerIntegerPool.get();
         if(object == null){
-            object = new MapOf<>(mapOfIntegersIntegers);
-            mapOfIntegersIntegers.add(object);
+            object = new MapOf<>(mapOfIntegerIntegerPool);
+            mapOfIntegerIntegerPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<MapOf<Integer, Node>> mapOfIntegersNodes = new MemoryPool<>();
+    private static final MemoryPool<MapOf<Integer, Node>> mapOfIntegerNodePool = new MemoryPool<>();
     public static MapOf<Integer, Node> MapOfIntegerNode(){
-        MapOf<Integer, Node> object = mapOfIntegersNodes.get();
+        MapOf<Integer, Node> object = mapOfIntegerNodePool.get();
         if(object == null){
-            object = new MapOf<>(mapOfIntegersNodes);
-            mapOfIntegersNodes.add(object);
+            object = new MapOf<>(mapOfIntegerNodePool);
+            mapOfIntegerNodePool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<MapOf<Integer, SetOf<Integer>>> mapOfIntegersSetOfIntegers = new MemoryPool<>();
+    private static final MemoryPool<MapOf<Integer, SetOf<Integer>>> mapOfIntegerSetOfIntegerPool = new MemoryPool<>();
     public static MapOf<Integer, SetOf<Integer>> MapOfIntegerSetOfInteger(){
-        MapOf<Integer, SetOf<Integer>> object = mapOfIntegersSetOfIntegers.get();
+        MapOf<Integer, SetOf<Integer>> object = mapOfIntegerSetOfIntegerPool.get();
         if(object == null){
-            object = new MapOf<>(mapOfIntegersSetOfIntegers);
-            mapOfIntegersSetOfIntegers.add(object);
+            object = new MapOf<>(mapOfIntegerSetOfIntegerPool);
+            mapOfIntegerSetOfIntegerPool.add(object);
         }
         object.prepare();
         return object;
@@ -114,28 +100,29 @@ public class Memory {
         return object;
     }
 
+
     //**************************************//
     //                SETS                  //
     //**************************************//
 
-    private static final MemoryPool<SetOf<Node>> setOfNodes = new MemoryPool<>();
+    private static final MemoryPool<SetOf<Node>> setOfNodePool = new MemoryPool<>();
     public static SetOf<Node> SetOfNode(){
-        SetOf<Node> object = setOfNodes.get();
+        SetOf<Node> object = setOfNodePool.get();
         if(object == null) {
-            object = new SetOf<>(setOfNodes);
-            setOfNodes.add(object);
+            object = new SetOf<>(setOfNodePool);
+            setOfNodePool.add(object);
         }
         object.prepare();
         return object;
 
     }
 
-    private static final MemoryPool<SetOf<Integer>> setOfIntegers = new MemoryPool<>();
+    private static final MemoryPool<SetOf<Integer>> setOfIntegerPool = new MemoryPool<>();
     public static SetOf<Integer> SetOfInteger(){
-        SetOf<Integer> object = setOfIntegers.get();
+        SetOf<Integer> object = setOfIntegerPool.get();
         if(object == null){
-            object = new SetOf<>(setOfIntegers);
-            setOfIntegers.add(object);
+            object = new SetOf<>(setOfIntegerPool);
+            setOfIntegerPool.add(object);
         }
         object.prepare();
         return object;
@@ -146,59 +133,68 @@ public class Memory {
     //               ARRAYS                 //
     //**************************************//
 
-    private static final MemoryPool<ArrayOf<MDD>> arrayOfMdds = new MemoryPool<>();
+    private static final MemoryPool<ArrayOf<MDD>> arrayOfMDDPool = new MemoryPool<>();
     public static ArrayOf<MDD> ArrayOfMDD(int capacity){
-        ArrayOf<MDD> object = arrayOfMdds.get();
+        ArrayOf<MDD> object = arrayOfMDDPool.get();
         if(object == null){
-            object = new ArrayOf<>(arrayOfMdds, capacity);
-            arrayOfMdds.add(object);
+            object = new ArrayOf<>(arrayOfMDDPool, capacity);
+            arrayOfMDDPool.add(object);
         } else object.setLength(capacity);
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<ArrayOf<Node>> arrayOfNodes = new MemoryPool<>();
+    private static final MemoryPool<ArrayOf<Node>> arrayOfNodePool = new MemoryPool<>();
     public static ArrayOf<Node> ArrayOfNode(int capacity){
-        ArrayOf<Node> object = arrayOfNodes.get();
+        ArrayOf<Node> object = arrayOfNodePool.get();
         if(object == null){
-            object = new ArrayOf<>(arrayOfNodes, capacity);
-            arrayOfNodes.add(object);
+            object = new ArrayOf<>(arrayOfNodePool, capacity);
+            arrayOfNodePool.add(object);
         } else object.setLength(capacity);
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<ArrayOfInt> arrayOfInts = new MemoryPool<>();
+    private static final MemoryPool<ArrayOfInt> arrayOfIntPool = new MemoryPool<>();
     public static ArrayOfInt ArrayOfInt(int capacity){
-        ArrayOfInt object = arrayOfInts.get();
+        ArrayOfInt object = arrayOfIntPool.get();
         if(object == null){
-            object = new ArrayOfInt(arrayOfInts, capacity);
-            arrayOfInts.add(object);
+            object = new ArrayOfInt(arrayOfIntPool, capacity);
+            arrayOfIntPool.add(object);
         } else object.setLength(capacity);
         object.prepare();
         return object;
     }
 
-
-    private static final MemoryPool<MatrixOfInt> matrixOfInts = new MemoryPool<>();
-    public static MatrixOfInt MatrixOfInt(int height, int length){
-        MatrixOfInt object = matrixOfInts.get();
-        if(object == null){
-            object = new MatrixOfInt(matrixOfInts, height, length);
-            matrixOfInts.add(object);
-        } else object.setSize(height, length);
-        object.prepare();
-        return object;
-    }
-
-
-    private static final MemoryPool<ArrayOfBoolean> arrayOfBooleans = new MemoryPool<>();
+    private static final MemoryPool<ArrayOfBoolean> arrayOfBooleanPool = new MemoryPool<>();
     public static ArrayOfBoolean ArrayOfBoolean(int capacity){
-        ArrayOfBoolean object = arrayOfBooleans.get();
+        ArrayOfBoolean object = arrayOfBooleanPool.get();
         if(object == null){
-            object = new ArrayOfBoolean(arrayOfBooleans, capacity);
-            arrayOfBooleans.add(object);
+            object = new ArrayOfBoolean(arrayOfBooleanPool, capacity);
+            arrayOfBooleanPool.add(object);
         } else object.setLength(capacity);
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<ArrayOf<TupleOfInt>> arrayOfTupleOfIntPool = new MemoryPool<>();
+    public static ArrayOf<TupleOfInt> ArrayOfTupleOfInt(int length){
+        ArrayOf<TupleOfInt> object = arrayOfTupleOfIntPool.get();
+        if(object == null){
+            object = new ArrayOf<>(arrayOfTupleOfIntPool, length);
+            arrayOfTupleOfIntPool.add(object);
+        } else object.setLength(length);
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<MatrixOfInt> matrixOfIntPool = new MemoryPool<>();
+    public static MatrixOfInt MatrixOfInt(int height, int length){
+        MatrixOfInt object = matrixOfIntPool.get();
+        if(object == null){
+            object = new MatrixOfInt(matrixOfIntPool, height, length);
+            matrixOfIntPool.add(object);
+        } else object.setSize(height, length);
         object.prepare();
         return object;
     }
@@ -208,34 +204,34 @@ public class Memory {
     //                LISTS                 //
     //**************************************//
 
-    private static final MemoryPool<ListOf<Layer>> listOfLayers = new MemoryPool<>();
+    private static final MemoryPool<ListOf<Layer>> listOfLayerPool = new MemoryPool<>();
     public static ListOf<Layer> ListOfLayer(){
-        ListOf<Layer> object = listOfLayers.get();
+        ListOf<Layer> object = listOfLayerPool.get();
         if(object == null){
-            object = new ListOf<>(listOfLayers);
-            listOfLayers.add(object);
+            object = new ListOf<>(listOfLayerPool);
+            listOfLayerPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<ListOf<Node>> listOfNodes = new MemoryPool<>();
+    private static final MemoryPool<ListOf<Node>> listOfNodePool = new MemoryPool<>();
     public static ListOf<Node> ListOfNode(){
-        ListOf<Node> object = listOfNodes.get();
+        ListOf<Node> object = listOfNodePool.get();
         if(object == null){
-            object = new ListOf<>(listOfNodes);
-            listOfNodes.add(object);
+            object = new ListOf<>(listOfNodePool);
+            listOfNodePool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<ListOf<Integer>> listOfIntegers = new MemoryPool<>();
+    private static final MemoryPool<ListOf<Integer>> listOfIntegerPool = new MemoryPool<>();
     public static ListOf<Integer> ListOfInteger(){
-        ListOf<Integer> object = listOfIntegers.get();
+        ListOf<Integer> object = listOfIntegerPool.get();
         if(object == null){
-            object = new ListOf<>(listOfIntegers);
-            listOfIntegers.add(object);
+            object = new ListOf<>(listOfIntegerPool);
+            listOfIntegerPool.add(object);
         }
         object.prepare();
         return object;
@@ -246,84 +242,102 @@ public class Memory {
     //            ATOMIC OBJECTS            //
     //**************************************//
 
-    private static final MemoryPool<Pack> packs = new MemoryPool<>();
-    public static Pack Pack(int pos, int l, Layer L){
-        Pack object = packs.get();
+    private static final MemoryPool<TupleOfInt> tupleOfIntPool = new MemoryPool<>();
+    public static TupleOfInt TupleOfInt(){
+        return TupleOfInt(0,0);
+    }
+    public static TupleOfInt TupleOfInt(int e1, int e2){
+        TupleOfInt object = tupleOfIntPool.get();
         if(object == null){
-            object = new Pack(packs);
-            packs.add(object);
+            object = new TupleOfInt(tupleOfIntPool);
+            tupleOfIntPool.add(object);
+        }
+        object.prepare();
+        object.set(e1, e2);
+        return object;
+    }
+    public static TupleOfInt TupleOfInt(TupleOfInt tuple){
+        return TupleOfInt(tuple.getFirst(), tuple.getSecond());
+    }
+
+
+    private static final MemoryPool<Pack> packPool = new MemoryPool<>();
+    public static Pack Pack(int pos, int l, Layer L){
+        Pack object = packPool.get();
+        if(object == null){
+            object = new Pack(packPool);
+            packPool.add(object);
         }
         object.prepare();
         object.init(pos, l, L);
         return object;
     }
 
-    private static final MemoryPool<Binder> binders = new MemoryPool<>();
+    private static final MemoryPool<Binder> binderPool = new MemoryPool<>();
     public static Binder Binder(){
-        Binder object = binders.get();
+        Binder object = binderPool.get();
         if(object == null){
-            object = new Binder(binders);
-            binders.add(object);
+            object = new Binder(binderPool);
+            binderPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<Node> nodes = new MemoryPool<>();
+    private static final MemoryPool<Node> nodePool = new MemoryPool<>();
     public static Node Node(){
-        Node object = nodes.get();
+        Node object = nodePool.get();
         if(object == null){
-            object = new Node(nodes);
-            nodes.add(object);
+            object = new Node(nodePool);
+            nodePool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<InArcs> inArcs = new MemoryPool<>();
+    private static final MemoryPool<InArcs> inArcsPool = new MemoryPool<>();
     public static InArcs InArcs(){
-        InArcs object = inArcs.get();
+        InArcs object = inArcsPool.get();
         if(object == null){
-            object = new InArcs(inArcs);
-            inArcs.add(object);
+            object = new InArcs(inArcsPool);
+            inArcsPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    private static final MemoryPool<OutArcs> outArcs = new MemoryPool<>();
+    private static final MemoryPool<OutArcs> outArcsPool = new MemoryPool<>();
     public static OutArcs OutArcs(){
-        OutArcs object = outArcs.get();
+        OutArcs object = outArcsPool.get();
         if(object == null){
-            object = new OutArcs(outArcs);
-            outArcs.add(object);
+            object = new OutArcs(outArcsPool);
+            outArcsPool.add(object);
         }
         object.prepare();
         return object;
     }
 
-    public static final MemoryPool<MDD> mdds = new MemoryPool<>();
+    public static final MemoryPool<MDD> mddPool = new MemoryPool<>();
     public static MDD MDD(){
         return MDD(Node());
     }
-
     public static MDD MDD(Node node){
-        MDD object = mdds.get();
+        MDD object = mddPool.get();
         if(object == null){
-            object = new MDD(mdds);
-            mdds.add(object);
+            object = new MDD(mddPool);
+            mddPool.add(object);
         }
         object.prepare();
         object.setRoot(node);
         return object;
     }
 
-    private static final MemoryPool<Layer> layers = new MemoryPool<>();
+    private static final MemoryPool<Layer> layerPool = new MemoryPool<>();
     public static Layer Layer(){
-        Layer object = layers.get();
+        Layer object = layerPool.get();
         if(object == null){
-            object = new Layer(layers);
-            layers.add(object);
+            object = new Layer(layerPool);
+            layerPool.add(object);
         }
         object.prepare();
         return object;

@@ -3,8 +3,6 @@ package pmdd.components.properties;
 import memory.MemoryObject;
 import memory.MemoryPool;
 import structures.generics.MapOf;
-import structures.integers.ArrayOfInt;
-import structures.integers.MatrixOfInt;
 
 
 /**
@@ -36,20 +34,12 @@ public abstract class NodeProperty implements MemoryObject {
             CONSECUTIVE = "consecutive",
             AMONG = "among";
 
-    // What kind of data the NodeProperty holds
-
-    protected enum DataType {
-        UNDEFINED, SINGLE, ARRAY, ARRAY2
-    }
-
 
     // MemoryObject variables
     private final MemoryPool<NodeProperty> pool;
     private int ID = -1;
     //
 
-    // Type of data
-    private DataType type = DataType.UNDEFINED;
     // Name of the property
     private String name;
 

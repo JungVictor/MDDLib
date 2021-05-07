@@ -3,9 +3,11 @@ package pmdd.components.properties;
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
+import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.MatrixOfInt;
+import structures.integers.TupleOfInt;
 
 /**
  * SEQUENCE CONSTRAINT
@@ -18,7 +20,7 @@ public class PropertySequence extends NodeProperty {
     // TODO : hash
 
     private PropertySequence accumulator;
-    private final MatrixOfInt values;
+    private final ArrayOf<TupleOfInt> values;
     private final SetOf<Integer> label = Memory.SetOfInteger();
 
 
@@ -36,8 +38,8 @@ public class PropertySequence extends NodeProperty {
         for(int j : label) this.label.add(j);
         super.setName(SEQ);
 
-        this.values = Memory.MatrixOfInt(size, 2);
-        for(int i = 0; i < size; i++) values.set(i, 0, i);
+        this.values = Memory.ArrayOfTupleOfInt(size);
+        for(int i = 0; i < size; i++) values.get(i).set(0, i);
     }
 
     @Override
@@ -70,10 +72,10 @@ public class PropertySequence extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        PropertySequence next = PMemory.PropertySequence(label, values.getHeight()+1, false);
-        for(int i = 1; i < values.getHeight()+1; i++){
-            next.values.set(i,0,values.get(i-1,0 )+ labelToValue(value));
-            next.values.set(i,1,values.get(i-1,1) + labelToValue(value));
+        PropertySequence next = PMemory.PropertySequence(label, values.length()+1, false);
+        for(int i = 1; i < values.length()+1; i++){
+            next.values.get(i).setFirst(values.get(i-1).getFirst() + labelToValue(value));
+            next.values.get(i).setSecond(values.get(i-1).getSecond() + labelToValue(value));
         }
         accumulator.mergeWithProperty(next);
         next.accumulator = accumulator;
@@ -83,9 +85,10 @@ public class PropertySequence extends NodeProperty {
     @Override
     public void mergeWithProperty(int value, NodeProperty nodeProperty){
         PropertySequence property = (PropertySequence) nodeProperty;
-        for(int i = 1; i < property.values.getHeight(); i++){
-            property.values.set(i, 0, Math.min(values.get(i-1, 0)+ labelToValue(value), property.values.get(i,0)));
-            property.values.set(i,1, Math.max(values.get(i-1, 1)+ labelToValue(value), property.values.get(i,1)));
+        for(int i = 1; i < property.values.length(); i++){
+            int min = Math.min(values.get(i-1).getFirst() + labelToValue(value), property.values.get(i).getFirst());
+            int max = Math.max(values.get(i-1).getSecond() + labelToValue(value), property.values.get(i).getSecond());
+            property.values.get(i).set(min, max);
         }
         accumulator.mergeWithProperty(property);
     }
@@ -94,9 +97,9 @@ public class PropertySequence extends NodeProperty {
     public void mergeWithProperty(NodeProperty property){
         if(property.getClass() != PropertySequence.class) return;
         PropertySequence seq = (PropertySequence) property;
-        for(int i = 1; i < seq.values.getHeight(); i++){
-            values.set(i,0, Math.min(values.get(i,0), seq.values.get(i,0)));
-            values.set(i,1, Math.max(values.get(i,1), seq.values.get(i,1)));
+        for(int i = 1; i < seq.values.length(); i++){
+            values.get(i).setFirst(Math.min(values.get(i).getFirst(), seq.values.get(i).getFirst()));
+            values.get(i).setSecond(Math.max(values.get(i).getSecond(), seq.values.get(i).getSecond()));
         }
     }
 

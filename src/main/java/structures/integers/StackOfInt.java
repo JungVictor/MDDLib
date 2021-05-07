@@ -3,7 +3,7 @@ package structures.integers;
 import java.util.Arrays;
 
 /**
- * Stack structure to store primitive type int.
+ * <b>Stack structure to store primitive type int.</b> <br>
  * Used to store free indices for the memory management system.
  */
 public class StackOfInt {

@@ -1,5 +1,8 @@
 package memory;
 
+/**
+ * <b>MemoryObject is an interface that must be implemented if you want your object to be able to be reused.</b>
+ */
 public interface MemoryObject {
 
     /**
@@ -18,9 +21,5 @@ public interface MemoryObject {
      */
     void free();
 
-
-    default boolean isAtomic() {
-        return true;
-    }
 
 }

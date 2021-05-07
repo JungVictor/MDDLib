@@ -7,6 +7,12 @@ import memory.MemoryPool;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 
+/**
+ * <b>This class is used to represent the binding between multiple nodes and an equivalent node</b> <br>
+ * This class is used when performing operations between MDD to bind multiple nodes, for instance x1 and x2 to a node x
+ * that would be the result of the combination of the two nodes.<br>
+ * This is useful when you do not want to create many nodes that represent the same couple.
+ */
 public class Binder implements MemoryObject {
 
     // MemoryObject variables

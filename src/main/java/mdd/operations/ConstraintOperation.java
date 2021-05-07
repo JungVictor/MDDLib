@@ -15,7 +15,7 @@ import utils.Logger;
 import java.util.HashMap;
 
 /**
- * The class dedicated to perform on-the-fly constraint operations
+ * <b>The class dedicated to perform on-the-fly constraint operations</b>
  */
 public class ConstraintOperation {
 
