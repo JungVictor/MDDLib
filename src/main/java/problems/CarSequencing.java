@@ -1,7 +1,9 @@
 package problems;
 
 import builder.MDDBuilder;
+import builder.constraints.MDDGCC;
 import mdd.MDD;
+import mdd.operations.ConstraintMDD;
 import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
@@ -11,12 +13,14 @@ import representation.MDDPrinter;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 
 public class CarSequencing {
 
     private final CarSequencingData data;
+    private final ConstraintMDD constraint = new ConstraintMDD();
 
     public CarSequencing(int[] min, int[] max, int[][] options, int... enabledOptions){
         data = new CarSequencingData(min, max, options, enabledOptions);
@@ -37,7 +41,13 @@ public class CarSequencing {
             int ncars = data.nCarsInConfig(v);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        MDD solution = ConstraintOperation.gcc(PMemory.PMDD(), opts, gcc);
+        //MDD solution = ConstraintOperation.gcc(PMemory.PMDD(), opts, gcc);
+        MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
+
+        //ArrayOf<MDD> configs = configs();
+        //MDD conf = Operation.intersection(Memory.MDD(), configs);
+        //MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
+        //Memory.free(conf);
 
         solution.reduce();
 
@@ -46,6 +56,28 @@ public class CarSequencing {
         Memory.free(opts);
 
         return solution;
+    }
+    public MDD solve_relaxed(){
+        data.generate();
+
+        SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
+
+        MDD current = option_relaxed(0, V0, V1);
+        MDD prev = current;
+
+        for(int i = 1; i < data.nOptions(); i++) {
+            current = Operation.intersection(current, option_relaxed(i, V0, V1));
+            Memory.free(prev);
+            prev = current;
+        }
+
+        for(int i = 1; i < data.nOptions(); i++) {
+            current = Operation.intersection(current, config_relaxed(i, V0, V1));
+            Memory.free(prev);
+            prev = current;
+        }
+
+        return current;
     }
 
     public MDD solve(MDD mdd, int option){
@@ -64,12 +96,12 @@ public class CarSequencing {
             values.get(old_bindings.get(key)).add(bindings.get(key));
         }
 
-        Logger.out.information("Replacing values...\n");
+        Logger.out.information("\rReplacing values...");
         mdd.replace(values);
-        Logger.out.information("Replacing values done\n");
+        Logger.out.information("\rReplacing values done");
 
         MDD new_option = option(data.nOptions()-1, V0, V1);
-        Logger.out.information("CarSequencing : New MDDs intersection\n");
+        Logger.out.information("\rCarSequencing : Adding new option sequence\n");
         MDD newMDD = Operation.intersection(mdd, new_option);
 
         Memory.free(new_option);
@@ -77,11 +109,12 @@ public class CarSequencing {
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         int i = 0;
         for(int v : data.getV()){
-            int ncars = data.nCarsInConfig(i);
+            int ncars = data.nCarsInConfig(i++);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        Logger.out.information("CarSequencing : Final Operation\n");
-        MDD result = ConstraintOperation.gcc(Memory.MDD(), newMDD, gcc);
+        Logger.out.information("\rCarSequencing : Adding GCC\n");
+        //MDD result = ConstraintOperation.gcc(Memory.MDD(), newMDD, gcc);
+        MDD result = MDDGCC.intersection(Memory.MDD(), newMDD, gcc);
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
         Memory.free(values);
@@ -89,6 +122,7 @@ public class CarSequencing {
         Memory.free(V1);
         Memory.free(mdd);
         Memory.free(old_bindings);
+        Memory.free(newMDD);
 
         return result;
     }
@@ -123,6 +157,29 @@ public class CarSequencing {
         return option;
     }
 
+    private MDD option_relaxed(int idx, SetOf<Integer> V0, SetOf<Integer> V1){
+        V0.clear(); V1.clear();
+
+        for(int v : data.getV()){
+            if(data.isOptionInConfig(idx, v)) V1.add(v);
+            else V0.add(v);
+        }
+
+        ArrayOfInt B = Memory.ArrayOfInt(2);
+        B.set(0,0); B.set(1,1);
+
+        MDD seq = MDDBuilder.sequence(Memory.MDD(), data.seqSizeOption(idx), 0, data.seqMaxOption(idx), data.nCarsRelaxed());
+        MDD sum = MDDBuilder.sum(Memory.MDD(), data.nOptionMin(idx), data.nOptionMax(idx), data.nCarsRelaxed(), B);
+        MDD option = Operation.intersection(seq, sum);
+        option.replace(V0, V1);
+
+        Memory.free(seq);
+        Memory.free(sum);
+        Memory.free(B);
+
+        return option;
+    }
+
     private ArrayOf<MDD> configs(){
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
         ArrayOf<MDD> configs = Memory.ArrayOfMDD(data.nConfigs());
@@ -147,6 +204,21 @@ public class CarSequencing {
     private MDD config(int i, SetOf<Integer> V0, SetOf<Integer> V1){
         MDD config = MDDBuilder.sum(Memory.MDD(), data.nCarsInConfig(i), data.nCars());
         config.replace(V0, V1);
+        return config;
+    }
+
+    private MDD config_relaxed(int idx, SetOf<Integer> V0, SetOf<Integer> V1){
+        V0.clear(); V1.clear();
+        for(int i = 0; i < data.getV().size(); i++){
+            if (i == idx) V1.add(data.getV().get(i));
+            else V0.add(data.getV().get(i));
+        }
+
+        ArrayOfInt B = Memory.ArrayOfInt(2);
+        B.set(0,0); B.set(1,1);
+        MDD config = MDDBuilder.sum(Memory.MDD(), data.nConfigMin(idx), data.nConfigMax(idx), data.nCars(), B);
+        config.replace(V0, V1);
+        Memory.free(B);
         return config;
     }
 }

@@ -102,7 +102,7 @@ public class ConstraintOperation {
         result.getRoot().associates(mdd.getRoot(), constraint);
 
         Binder binder = Memory.Binder();
-        HashMap<Integer, PNode> bindings = new HashMap<>();
+        HashMap<String, PNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                     nextNodesConstraint = Memory.SetOfNode(),
                     tmp;
@@ -116,7 +116,7 @@ public class ConstraintOperation {
                     NodeProperty property = x2.getProperty(propertyName);
                     if(!property.isDegenerate(value, i == mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
-                            int hash = property.hash(value);
+                            String hash = property.hashstr(value);
                             PNode y2 = bindings.get(hash);
                             if (y2 == null) {
                                 y2 = PMemory.PNode();

@@ -8,7 +8,8 @@ public class CarSequencingData {
 
     private final int[] max, size;
     private final int[][] options;
-    private int nCars;
+    private int[] nConfigMin, nConfigMax, nOptionsMin, nOptionsMax;
+    private int nCars, nCarsRelaxed;
 
     private MapOf<Integer, ListOf<Integer>> data;
     private ListOf<Integer> enabledOptions;
@@ -56,6 +57,32 @@ public class CarSequencingData {
             binding.put(i, value);
             data.get(value).set(0, data.get(value).get(0) + options[i][0]);
         }
+
+        generate_relaxed(10);
+    }
+
+    public void generate_relaxed(int seqSize){
+        this.nConfigMax = new int[options.length];
+        this.nConfigMin = new int[this.nConfigMax.length];
+
+        for(int i = 0; i < options.length; i++) {
+            double X = 1;
+            for(int j = 0; j < options[i].length - 1; j++) if(options[i][j+1] == 1) X = Math.min(X, max[j] / (double) size[j]);
+            this.nConfigMax[i] = (int) Math.min(Math.ceil(seqSize * X), options[i][0]);
+            this.nConfigMin[i] = (int) Math.max((seqSize - Math.floor((nCars * X)) + options[i][0]) * X, 0);
+        }
+
+        this.nOptionsMax = new int[options[0].length - 1];
+        this.nOptionsMin = new int[this.nOptionsMax.length];
+
+        for(int i = 0; i < options.length; i++) {
+            for (int j = 1; j < options[0].length; j++) {
+                nOptionsMax[j - 1] += options[i][j] * nConfigMax[i];
+                nOptionsMin[j - 1] += options[i][j] * nConfigMin[i];
+            }
+        }
+
+        nCarsRelaxed = seqSize;
     }
 
     public void addOptions(int... options){
@@ -64,6 +91,9 @@ public class CarSequencingData {
 
     public int nCars(){
         return nCars;
+    }
+    public int nCarsRelaxed(){
+        return nCarsRelaxed;
     }
 
     public int seqSizeOption(int option){
@@ -92,6 +122,19 @@ public class CarSequencingData {
 
     public int nConfigs(){
         return V.size();
+    }
+
+    public int nConfigMin(int i){
+        return nConfigMin[i];
+    }
+    public int nConfigMax(int i){
+        return nConfigMax[i];
+    }
+    public int nOptionMin(int i){
+        return nOptionsMin[i];
+    }
+    public int nOptionMax(int i){
+        return nOptionsMax[i];
     }
 
     public ListOf<Integer> getV(){

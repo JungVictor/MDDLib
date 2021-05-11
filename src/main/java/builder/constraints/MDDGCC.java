@@ -2,15 +2,19 @@ package builder.constraints;
 
 import builder.MDDBuilder;
 import mdd.MDD;
+import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Memory;
-import representation.MDDPrinter;
+import structures.Binder;
 import structures.generics.ArrayOf;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
+import structures.integers.TupleOfInt;
+import utils.Logger;
 
-import java.util.HashSet;
+import java.util.HashMap;
 
 public class MDDGCC {
 
@@ -60,4 +64,72 @@ public class MDDGCC {
         return mdd;
     }
 
+    public static MDD intersection(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> couples){
+        result.setSize(mdd.size());
+
+        Binder binder = Memory.Binder();
+
+        // TODO : allocation from memory
+        HashMap<Node, ArrayOfInt> values = new HashMap<>(),
+                nextValues = new HashMap<>(),
+                tmp;
+        HashMap<String, Node> gcc = new HashMap<>();
+
+        Node fakeroot = Memory.Node();
+
+        ArrayOfInt Vcopy = Memory.ArrayOfInt(couples.keySet().size());
+
+        values.put(fakeroot, Vcopy);
+
+        result.getRoot().associates(mdd.getRoot(), fakeroot);
+
+        for(int i = 1; i < result.size(); i++){
+            Logger.out.information("\rLAYER " + i);
+            for(Node x : result.getLayer(i-1)) {
+                Node x1 = x.getX1();
+                ArrayOfInt domain = values.get(x.getX2());
+                for(int j = 0; j < domain.length; j++){
+                    if(!x1.containsLabel(j)) continue;
+                    if(domain.get(j)+1 > couples.get(j).getSecond()) continue;
+                    if(i >= result.size() - 1 && domain.get(j)+1 < couples.get(j).getFirst()) continue;
+                    ArrayOfInt newDomain = domain(domain, j);
+                    String key = newDomain.toString();
+                    Node y2 = gcc.get(key);
+
+                    if(y2 == null) {
+                        y2 = result.Node();
+                        gcc.put(key, y2);
+                        nextValues.put(y2, newDomain);
+                    } else Memory.free(newDomain);
+
+                    Operation.addArcAndNode(result, x, x1.getChild(j), y2, j, i, binder);
+                }
+            }
+            for(Node node : values.keySet()) Memory.free(node);
+            for(ArrayOfInt array : values.values()) Memory.free(array);
+            gcc.clear();
+            values.clear();
+            tmp = values;
+            values = nextValues;
+            nextValues = tmp;
+            binder.clear();
+
+            // TODO : Cleanup
+            if(result.getLayer(i).size() == 0) {
+                result.clear();
+                return result;
+            }
+
+        }
+
+        result.reduce();
+        return result;
+    }
+
+    private static ArrayOfInt domain(ArrayOfInt V, int value){
+        ArrayOfInt domain = Memory.ArrayOfInt(V.length);
+        domain.copy(V);
+        domain.set(value, domain.get(value)+1);
+        return domain;
+    }
 }

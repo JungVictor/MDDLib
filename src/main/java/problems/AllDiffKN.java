@@ -13,7 +13,7 @@ import structures.integers.ArrayOfInt;
 
 public class AllDiffKN {
 
-    private int K, n;
+    private final int K, n;
 
     public AllDiffKN(int K, int n) {
         this.K = K;
@@ -32,26 +32,11 @@ public class AllDiffKN {
         MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
 
 
-
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
         for(int i = 0; i < K*4+1; i++) mapping.put(i, Memory.SetOfInteger());
 
-        /*
-        MDD alldiffN = alldiff.copy();
-        MDD old_alldiffN = alldiffN;
-        while(alldiffN.size() < n+1) {
-            alldiffN = Operation.concatenate(alldiffN, alldiff);
-            Memory.free(old_alldiffN);
-            old_alldiffN = alldiffN;
-        }
-
-         */
-        //Memory.free(alldiff);
-
         MDD accumulator = domains(n);
         MDD old_accumulator = accumulator;
-        //accumulator = Operation.intersection(accumulator, alldiff.copy(), 0, alldiff.size(), n+1);
-        //accumulator.accept(new MDDPrinter());
 
         MDD allDiffCopy;
         for(int i = 0; i < K; i++) {
@@ -72,7 +57,6 @@ public class AllDiffKN {
         }
         Operation.intersection(mdd, accumulator, replaceValues(alldiff.copy(), n-1-K, mapping), n-1, n+1, n+1);
 
-        //Memory.free(alldiffN);
         Memory.free(accumulator);
 
         return mdd;

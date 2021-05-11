@@ -7,6 +7,10 @@ import pmdd.components.properties.NodeProperty;
 import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
+/**
+ * <b>The Node containing properties</b> <br>
+ * It extends the basic function of Node and add functions relative to properties
+ */
 public class PNode extends Node {
 
     private final MapOf<String, NodeProperty> properties = new MapOf<>(null);

@@ -181,6 +181,11 @@ public abstract class NodeProperty implements MemoryObject {
         return 0;
     }
 
+
+    public String hashstr(int value) {
+        return "";
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

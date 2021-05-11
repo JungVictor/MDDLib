@@ -291,6 +291,7 @@ public class Operation {
         result.getRoot().associates(root1, root2);
 
         for(int i = 1; i < size; i++){
+            Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
                 for(int v : V){
@@ -492,7 +493,7 @@ public class Operation {
         result.getRoot().associates(ys);
         int r = result.size();
 
-        Logger.out.information("N-ARY Intersection ["+mdds.length+" MDDs]\n");
+        Logger.out.information("\rN-ARY Intersection ["+mdds.length+" MDDs]\n");
         for(int i = 1; i < r; i++){
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){

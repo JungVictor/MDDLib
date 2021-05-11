@@ -224,6 +224,12 @@ public class MDD implements MemoryObject {
         return path;
     }
 
+    public void clear(){
+        for(int i = 1; i < size; i++) getLayer(i).freeAllNodes();
+        V.clear();
+        this.tt = null;
+    }
+
     //**************************************//
     //               GETTERS                //
     //**************************************//
@@ -294,6 +300,7 @@ public class MDD implements MemoryObject {
      * @return The number of solutions represented by the MDD
      */
     public double nSolutions(){
+        if(tt == null) return 0;
         root.s = 1;
         for(int i = 0; i < size; i++){
             for(Node x : getLayer(i)){

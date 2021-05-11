@@ -5,13 +5,9 @@ import mdd.MDD;
 import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Memory;
-import representation.MDDPrinter;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
-import utils.Logger;
-
-import java.util.HashSet;
 import java.util.Random;
 
 public class AllDiff {

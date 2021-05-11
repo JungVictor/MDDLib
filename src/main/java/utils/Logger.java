@@ -5,7 +5,7 @@ public class Logger {
     private static final String[] RAM_UNITS = {"b", "kb", "mb"};
     public static final Logger out = new Logger();
 
-    private boolean debug, verbose, information = true, normal, memory = true, time = true;
+    private boolean debug, verbose, information = true, normal = true, memory = true, time = true;
     private String str, prestr;
 
     private final long timer;

@@ -165,6 +165,28 @@ public class PropertyGCC extends NodeProperty {
         return hash;
     }
 
+    @Override
+    public String hashstr(int value){
+        ListOf<Integer> integers = Memory.ListOfInteger();
+        integers.add(currentValues.keySet());
+        Collections.sort(integers.getList());
+        StringBuilder builder = new StringBuilder();
+        for (int v : integers) {
+            builder.append(v);
+            builder.append(" -> ");
+            if(v != value) builder.append(currentValues.get(v));
+            else {
+                TupleOfInt tmp = Memory.TupleOfInt(currentValues.get(v));
+                tmp.incr(1,1);
+                builder.append(tmp);
+                Memory.free(tmp);
+            }
+            builder.append("; ");
+        }
+        Memory.free(integers);
+        return builder.toString();
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

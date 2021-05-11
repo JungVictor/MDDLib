@@ -79,6 +79,7 @@ public class MemoryPool<E extends MemoryObject> {
     /**
      * Expand the capacity of the pool
      */
+    @SuppressWarnings("unchecked")
     private void expand(){
         E[] arr = (E[]) new MemoryObject[pool.length + pool.length];
         System.arraycopy(pool, 0, arr, 0, pool.length);

@@ -106,6 +106,16 @@ public class PropertyAllDiff extends NodeProperty {
         return hash;
     }
 
+    @Override
+    public String hashstr(int value){
+        StringBuilder builder = new StringBuilder();
+        for(int v : values) {
+            if(v == value || alldiff.contains(v)) builder.append("1");
+            else builder.append("0");
+        }
+        return builder.toString();
+    }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
