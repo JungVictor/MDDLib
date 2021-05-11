@@ -300,6 +300,7 @@ public class MDD implements MemoryObject {
      * @return The number of solutions represented by the MDD
      */
     public double nSolutions(){
+        clearS();
         if(tt == null) return 0;
         root.s = 1;
         for(int i = 0; i < size; i++){
@@ -308,6 +309,10 @@ public class MDD implements MemoryObject {
             }
         }
         return tt.s;
+    }
+
+    private void clearS(){
+        for(int i = 0; i < size; i++) for(Node x : getLayer(i)) x.s = 0;
     }
 
     //**************************************//

@@ -32,9 +32,9 @@ public class CarSequencing {
 
     public MDD solve(){
         data.generate();
-        ArrayOf<MDD> options = options();
-
-        MDD opts = Operation.intersection(Memory.MDD(), options);
+        //ArrayOf<MDD> options = options();
+        //MDD opts = Operation.intersection(Memory.MDD(), options);
+        MDD opts = options_constraint();
 
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         for(int v : data.getV()){
@@ -43,22 +43,24 @@ public class CarSequencing {
         }
         // NEW METHOD
         // MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
-
+        constraint.gcc(gcc);
+        MDD solution = constraint.intersection(Memory.MDD(), opts);
+        constraint.clear();
 
         // OLD METHOD
         //ArrayOf<MDD> configs = configs();
         //MDD conf = Operation.intersection(Memory.MDD(), configs);
-        MDD conf = MDDGCC.generate(Memory.MDD(), data.nCars()+1, gcc, null);
+        //MDD conf = MDDGCC.generate(Memory.MDD(), data.nCars()+1, gcc, null);
         //for(MDD config : configs) Memory.free(config);
         //Memory.free(configs);
-        MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
-        Memory.free(conf);
+        //MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
+        //Memory.free(conf);
 
 
         solution.reduce();
 
-        for(MDD mdd : options) Memory.free(mdd);
-        Memory.free(options);
+        //for(MDD mdd : options) Memory.free(mdd);
+        //Memory.free(options);
         Memory.free(opts);
 
         return solution;
@@ -163,6 +165,7 @@ public class CarSequencing {
         return options;
     }
 
+
     private MDD option(int i, SetOf<Integer> V0, SetOf<Integer> V1){
         for(int v : data.getV()){
             if(data.isOptionInConfig(i, v)) V1.add(v);
@@ -178,6 +181,26 @@ public class CarSequencing {
         Memory.free(sum);
 
         return option;
+    }
+
+    private MDD options_constraint(){
+        SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
+        MDD opt = option(0, V0, V1);
+        for(int i = 0; i < data.nOptions(); i++) option_constraint(i);
+        Memory.free(V0);
+        Memory.free(V1);
+
+        return opt;
+    }
+    private void option_constraint(int i){
+        SetOf<Integer> V1 = Memory.SetOfInteger();
+        for(int v : data.getV()) if(data.isOptionInConfig(i, v)) V1.add(v);
+
+        MapOf<Integer, TupleOfInt> count = Memory.MapOfIntegerTupleOfInt();
+        for(int v : V1) count.put(v, Memory.TupleOfInt(0, data.nCarsWithOption(i)));
+
+        constraint.sequence("seq"+i, data.seqSizeOption(i), 0, data.seqMaxOption(i), V1);
+        constraint.gcc("count"+i, count);
     }
 
     private MDD option_relaxed(int idx, SetOf<Integer> V0, SetOf<Integer> V1){

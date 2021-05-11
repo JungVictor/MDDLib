@@ -62,14 +62,16 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int val) {
-        return PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, min, max);
+        NodeProperty next = PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, min, max);
+        return next;
     }
 
     @Override
     public void mergeWithProperty(int val, NodeProperty nodeProperty){
         PropertySum property = (PropertySum) nodeProperty;
-        property.value.set(0, Math.min(value.getFirst()+val, property.value.getFirst()));
-        property.value.set(1, Math.max(value.getSecond()+val, property.value.getSecond()));
+        property.value.setFirst(Math.min(value.getFirst()+val, property.value.getFirst()));
+        property.value.setSecond(Math.max(value.getSecond()+val, property.value.getSecond()));
+        System.out.print("");
     }
 
     @Override
@@ -77,8 +79,8 @@ public class PropertySum extends NodeProperty {
         if(property.getClass() != PropertySum.class) return;
         PropertySum sum = (PropertySum) property;
 
-        value.set(0, Math.min(value.getFirst(), sum.value.getFirst()));
-        value.set(1, Math.max(value.getSecond(), sum.value.getSecond()));
+        value.setFirst(Math.min(value.getFirst(), sum.value.getFirst()));
+        value.setSecond(Math.max(value.getSecond(), sum.value.getSecond()));
     }
 
 

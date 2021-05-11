@@ -19,6 +19,7 @@ public class ConstraintMDD {
 
     // TODO : Memory Allocation
     private final HashMap<String, HashMap<String, PNode>> bindings = new HashMap<>();
+    private final HashMap<String, Integer> order = new HashMap<>();
     private SetOf<Node> currentNodesConstraint = Memory.SetOfNode();
     private SetOf<Node> nextNodesConstraint = Memory.SetOfNode();
     private final ArrayOf<Node> associates = Memory.ArrayOfNode(10);
@@ -28,6 +29,7 @@ public class ConstraintMDD {
         PNode root = PMemory.PNode();
         property.setName(name);
         root.addProperty(name, property);
+        order.put(name, numberOfConstraints);
         associates.set(1+(numberOfConstraints++), root);
         bindings.put(name, new HashMap<>());
     }
@@ -87,12 +89,8 @@ public class ConstraintMDD {
                 Node x1 = node.getX1();
                 for(int value : x1.getValues()) {
                     boolean addArcAndNode = true;
-                    int assoc = 1;
                     for(String propertyName : bindings.keySet()) {
-                        PNode xi = (PNode) node.getX(assoc++);
-                        if(xi == null) {
-                            System.out.println("dskldsl");
-                        }
+                        PNode xi = (PNode) node.getX(order.get(propertyName)+1);
                         NodeProperty property = xi.getProperty(propertyName);
                         if (!property.isDegenerate(value, i == mdd.size() - 1)) {
                             if (!xi.containsLabel(value)) {

@@ -74,7 +74,7 @@ public class PMemory {
         if(object == null){
             object = new PropertySequence(sequences, label, size);
             sequences.add(object);
-        }
+        } else object.init(size);
         object.prepare();
         return object;
     }
@@ -83,7 +83,7 @@ public class PMemory {
         if(object == null){
             object = new PropertySequence(sequences, label, size, true);
             sequences.add(object);
-        }
+        } else object.init(1);
         object.prepare();
         return object;
     }

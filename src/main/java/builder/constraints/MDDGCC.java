@@ -10,7 +10,6 @@ import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
-import structures.integers.MatrixOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 

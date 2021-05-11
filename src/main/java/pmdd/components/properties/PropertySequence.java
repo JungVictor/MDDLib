@@ -39,7 +39,12 @@ public class PropertySequence extends NodeProperty {
         super.setName(SEQ);
 
         this.values = Memory.ArrayOfTupleOfInt(size);
-        for(int i = 0; i < size; i++) values.get(i).set(0, i);
+        init(size);
+    }
+
+    public void init(int size){
+        this.values.setLength(size);
+        for(int i = 0; i < size; i++) values.set(i, Memory.TupleOfInt(i, 0));
     }
 
     @Override
