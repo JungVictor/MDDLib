@@ -4,6 +4,7 @@ import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
 import structures.integers.ArrayOfInt;
+import utils.Logger;
 
 import java.util.HashMap;
 
@@ -27,6 +28,7 @@ public class MDDAllDifferent {
         values.put(mdd.getRoot(), Vcopy);
 
         for(int i = 0; i < mdd.size() - 1; i++){
+            Logger.out.information("\rALLDIFF LAYER " + i);
             alldiff.clear();
             for(Node node : mdd.getLayer(i)) {
                 ArrayOfInt domain = values.get(node);

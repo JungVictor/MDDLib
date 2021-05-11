@@ -95,9 +95,9 @@ public class MDDGCC {
                         y = mdd.Node();
                         gcc.put(key, y);
                         nextValues.put(y, newDomain);
-                        mdd.addArcAndNode(x, j, y, i);
+                        mdd.addNode(y, i);
                     } else Memory.free(newDomain);
-
+                    mdd.addArc(x, j, y);
                 }
             }
             for(ArrayOfInt array : values.values()) Memory.free(array);

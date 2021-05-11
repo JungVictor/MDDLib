@@ -4,6 +4,7 @@
 # Maven
 target/
 *.iml
+pom.xml
 
 # MDDs
 *.mdd

@@ -1,34 +1,18 @@
-import builder.constraints.MDDAllDifferent;
-import builder.constraints.MDDGCC;
+import builder.MDDBuilder;
 import mdd.MDD;
-import mdd.operations.ConstraintOperation;
 import memory.Memory;
-import problems.AllDiff;
-import problems.AllDiffKN;
-import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
-import structures.integers.TupleOfInt;
 import utils.Logger;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        ArrayOfInt V = Memory.ArrayOfInt(20);
-        MapOf<Integer, TupleOfInt> couples = Memory.MapOfIntegerTupleOfInt();
+        ArrayOfInt V = Memory.ArrayOfInt(25);
+        for(int i = 0; i < V.length; i++) V.set(i,i);
 
-        for(int i = 0; i < 20; i++) {
-            V.set(i,i);
-            couples.put(i, Memory.TupleOfInt(0,10));
-        }
-
-        Logger.out.print("BEGIN");
-        MDDGCC.generate_(Memory.MDD(), 50, couples, V);
-        Logger.out.print("END");
-
-        Logger.out.print("BEGIN");
-        MDDGCC.generate(Memory.MDD(), 50, couples, V);
-        Logger.out.print("END");
+        MDD test = MDDBuilder.alldiff(Memory.MDD(), V, V.length);
+        Logger.out.print("\r"+test.nSolutions());
 
         /*
         //AllDiffKN kn = new AllDiffKN(4, 70);

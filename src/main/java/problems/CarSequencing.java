@@ -36,23 +36,24 @@ public class CarSequencing {
 
         MDD opts = Operation.intersection(Memory.MDD(), options);
 
-        // NEW METHOD
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         for(int v : data.getV()){
             int ncars = data.nCarsInConfig(v);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
+        // NEW METHOD
+        // MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
 
-        /*
+
         // OLD METHOD
-        ArrayOf<MDD> configs = configs();
-        MDD conf = Operation.intersection(Memory.MDD(), configs);
-        for(MDD config : configs) Memory.free(config);
-        Memory.free(configs);
+        //ArrayOf<MDD> configs = configs();
+        //MDD conf = Operation.intersection(Memory.MDD(), configs);
+        MDD conf = MDDGCC.generate(Memory.MDD(), data.nCars()+1, gcc, null);
+        //for(MDD config : configs) Memory.free(config);
+        //Memory.free(configs);
         MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
         Memory.free(conf);
-         */
+
 
         solution.reduce();
 
@@ -113,25 +114,29 @@ public class CarSequencing {
         Memory.free(new_option);
 
         Logger.out.information("\rCarSequencing : Adding GCC\n");
-        /*
-        // OLD METHOD
-        ArrayOf<MDD> configs = configs();
-        MDD conf = Operation.intersection(Memory.MDD(), configs);
-        for(MDD config : configs) Memory.free(config);
-        Memory.free(configs);
-        MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
-        Memory.free(conf);
-         */
 
 
-        // NEW METHOD
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
-        int i = 0;
         for(int v : data.getV()){
-            int ncars = data.nCarsInConfig(i++);
+            int ncars = data.nCarsInConfig(v);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
+        // NEW METHOD
         MDD result = MDDGCC.intersection(Memory.MDD(), newMDD, gcc);
+
+
+        /*
+        // OLD METHOD
+        //ArrayOf<MDD> configs = configs();
+        //MDD conf = Operation.intersection(Memory.MDD(), configs);
+        MDD conf = MDDGCC.generate(Memory.MDD(), data.nCars(), gcc, null);
+        //for(MDD config : configs) Memory.free(config);
+        //Memory.free(configs);
+        MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
+        Memory.free(conf);
+
+         */
+
 
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
