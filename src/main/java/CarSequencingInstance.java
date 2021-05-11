@@ -19,16 +19,34 @@ public class CarSequencingInstance {
     public static void main(String[] args) {
 
         // Default parameters
+        int mode = 0;
         int instance = 1;
         int[] options = new int[]{0, 1};
 
+        // Mode
+        if(args.length >= 1) {
+            switch (args[0]){
+                case "legacy":
+                    mode = 1;
+                    System.out.println("\rSOLVER : LEGACY");
+                    break;
+                case "constraint":
+                    mode = 2;
+                    System.out.println("\rSOLVER : FULL CONSTRAINT");
+                    break;
+                default:
+                    mode = 0;
+                    System.out.println("\rSOLVER : DEFAULT");
+            }
+        }
+
         // Instance number
-        if(args.length >= 1) instance = Integer.parseInt(args[0]);
+        if(args.length >= 2) instance = Integer.parseInt(args[1]);
 
         // Options
-        if(args.length > 1) {
-            options = new int[args.length - 1];
-            for(int i = 0; i < options.length; i++) options[i] = Integer.parseInt(args[i+1]);
+        if(args.length > 2) {
+            options = new int[args.length - 2];
+            for(int i = 0; i < options.length; i++) options[i] = Integer.parseInt(args[i+2]);
         }
 
         CarSequencing cs;
@@ -46,7 +64,7 @@ public class CarSequencingInstance {
                 cs = instance0(options);
         }
 
-        full(cs);
+        full(cs, mode);
     }
 
     //**************************************//
@@ -57,29 +75,41 @@ public class CarSequencingInstance {
      * Solve the CarSequencing problem.<br>
      * Begin with 2 options, then progressively add all options one by one
      */
-    public static void full(CarSequencing cs){
-
+    public static void full(CarSequencing cs, int mode){
         long clock = System.currentTimeMillis();
         Logger.out.print("Génération du MDDsol100 : en cours...\n");
-        MDD solution = cs.solve();
+        MDD solution = solve(cs, mode);
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
 
-        solution = cs.solve(solution, 2);
+        solution = solve(cs, mode, solution, 2);
         Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.nSolutions() + " arcs\n");
 
         if(solution.nodes() > 1) {
-            solution = cs.solve(solution, 3);
+            solution = solve(cs, mode, solution, 3);
             Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
         }
 
         if(solution.nodes() > 1) {
-            solution = cs.solve(solution, 4);
+            solution = solve(cs, mode, solution, 4);
             Logger.out.print("\rGénération du MDDsol100 : " + (System.currentTimeMillis() - clock) + "ms - " + solution.nodes() + " noeuds / " + solution.arcs() + " arcs\n");
         }
 
         double nSol = solution.nSolutions();
         if(nSol > 0) Logger.out.print("Finished : " + nSol + " solutions");
         else Logger.out.print("No solution !");
+    }
+
+    private static MDD solve(CarSequencing cs, int mode){
+        if(mode == 0) return cs.solve();
+        if(mode == 1) return cs.solve_legacy();
+        return cs.solve_constraint();
+
+    }
+
+    private static MDD solve(CarSequencing cs, int mode, MDD mdd, int opt){
+        if(mode == 0) return cs.solve(mdd, opt);
+        if(mode == 1) return cs.solve_legacy(mdd, opt);
+        return cs.solve_constraint(mdd, opt);
     }
 
     /**
