@@ -101,6 +101,14 @@ public class MapOf<K, V> implements MemoryObject, Iterable<K> {
         return map.containsKey(key);
     }
 
+    /**
+     * Get the size of the map
+     * @return The size of the map
+     */
+    public int size(){
+        return map.size();
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

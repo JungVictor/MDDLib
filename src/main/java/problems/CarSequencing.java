@@ -36,18 +36,23 @@ public class CarSequencing {
 
         MDD opts = Operation.intersection(Memory.MDD(), options);
 
+        // NEW METHOD
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         for(int v : data.getV()){
             int ncars = data.nCarsInConfig(v);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        //MDD solution = ConstraintOperation.gcc(PMemory.PMDD(), opts, gcc);
         MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
 
-        //ArrayOf<MDD> configs = configs();
-        //MDD conf = Operation.intersection(Memory.MDD(), configs);
-        //MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
-        //Memory.free(conf);
+        /*
+        // OLD METHOD
+        ArrayOf<MDD> configs = configs();
+        MDD conf = Operation.intersection(Memory.MDD(), configs);
+        for(MDD config : configs) Memory.free(config);
+        Memory.free(configs);
+        MDD solution = Operation.intersection(PMemory.PMDD(), opts, conf);
+        Memory.free(conf);
+         */
 
         solution.reduce();
 
@@ -57,6 +62,7 @@ public class CarSequencing {
 
         return solution;
     }
+
     public MDD solve_relaxed(){
         data.generate();
 
@@ -106,15 +112,27 @@ public class CarSequencing {
 
         Memory.free(new_option);
 
+        Logger.out.information("\rCarSequencing : Adding GCC\n");
+        /*
+        // OLD METHOD
+        ArrayOf<MDD> configs = configs();
+        MDD conf = Operation.intersection(Memory.MDD(), configs);
+        for(MDD config : configs) Memory.free(config);
+        Memory.free(configs);
+        MDD result = Operation.intersection(mdd.MDD(), conf, newMDD);
+        Memory.free(conf);
+         */
+
+
+        // NEW METHOD
         MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
         int i = 0;
         for(int v : data.getV()){
             int ncars = data.nCarsInConfig(i++);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        Logger.out.information("\rCarSequencing : Adding GCC\n");
-        //MDD result = ConstraintOperation.gcc(Memory.MDD(), newMDD, gcc);
         MDD result = MDDGCC.intersection(Memory.MDD(), newMDD, gcc);
+
 
         for(SetOf<Integer> set : values.values()) Memory.free(set);
         Memory.free(values);

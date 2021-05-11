@@ -14,6 +14,23 @@ public class Main {
 
     public static void main(String[] args) {
 
+        ArrayOfInt V = Memory.ArrayOfInt(20);
+        MapOf<Integer, TupleOfInt> couples = Memory.MapOfIntegerTupleOfInt();
+
+        for(int i = 0; i < 20; i++) {
+            V.set(i,i);
+            couples.put(i, Memory.TupleOfInt(0,10));
+        }
+
+        Logger.out.print("BEGIN");
+        MDDGCC.generate_(Memory.MDD(), 50, couples, V);
+        Logger.out.print("END");
+
+        Logger.out.print("BEGIN");
+        MDDGCC.generate(Memory.MDD(), 50, couples, V);
+        Logger.out.print("END");
+
+        /*
         //AllDiffKN kn = new AllDiffKN(4, 70);
         MDD sol = AllDiff.alldiff(9,9);
 
@@ -37,7 +54,7 @@ public class Main {
         Logger.out.information("BEGIN\n");
         solution = MDDAllDifferent.intersection(Memory.MDD(), sol, V);
         Logger.out.information("\rSTOP : " + (System.currentTimeMillis() - clock) + "ms " + solution.nSolutions() + "\n");
-
+        */
 
     }
 

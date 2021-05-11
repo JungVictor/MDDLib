@@ -6,8 +6,10 @@ import mdd.components.Node;
 import memory.Memory;
 import structures.Binder;
 import structures.generics.ArrayOf;
+import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 import structures.integers.MatrixOfInt;
+import structures.integers.TupleOfInt;
 
 public class MDDBuilder {
 
@@ -47,7 +49,7 @@ public class MDDBuilder {
     }
 
     /* GCC */
-    public static MDD gcc(MDD mdd, int n, MatrixOfInt couples, ArrayOfInt V){
+    public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, ArrayOfInt V){
         return MDDGCC.generate(mdd, n, couples, V);
     }
 

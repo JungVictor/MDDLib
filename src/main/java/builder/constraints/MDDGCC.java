@@ -20,7 +20,7 @@ public class MDDGCC {
 
     private MDDGCC(){}
 
-    public static MDD generate(MDD mdd, int n, MatrixOfInt couples, ArrayOfInt V){
+    public static MDD generate_(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, ArrayOfInt V){
         ArrayOfInt B = Memory.ArrayOfInt(2);
         B.set(0,0); B.set(1,1);
 
@@ -28,30 +28,34 @@ public class MDDGCC {
         int min, max;
 
         // If there is only one value constrained, then we perform the operation directly of the result MDD
-        if (couples.getHeight() == 1){
-            V0.clear(); V1.clear();
-            for(int v : V) if(v != couples.get(0, 0)) V0.add(v);
-            V1.add(couples.get(0, 0));
-            min = couples.get(0, 1);
-            if(couples.getLength() == 3) max = couples.get(0, 2);
-            else max = min;
-            MDDBuilder.sum(mdd, min, max, n, B);
-            mdd.replace(V0, V1);
+        if (couples.keySet().size() == 1){
+            for(int v : couples.keySet()) {
+                V0.clear(); V1.clear();
+                for(int v0 : V) V0.add(v0);
+                V0.remove(v);
+                V1.add(v);
+                min = couples.get(v).getFirst();
+                max = couples.get(v).getSecond();
+                MDDBuilder.sum(mdd, min, max, n, B);
+                mdd.replace(V0, V1);
+            }
         }
 
         // Else, we have to build all values' MDD and perform an intersection
         else {
-            ArrayOf<MDD> sums = Memory.ArrayOfMDD(couples.getHeight());
-            for (int i = 0; i < sums.length; i++) {
-                V0.clear();
-                V1.clear();
-                for (int v : V) if (v != couples.get(i, 0)) V0.add(v);
-                V1.add(couples.get(i, 0));
-                min = couples.get(i, 1);
-                if (couples.getLength() == 3) max = couples.get(i, 2);
-                else max = min;
-                sums.set(i, MDDBuilder.sum(mdd.MDD(), min, max, n, B));
-                sums.get(i).replace(V0, V1);
+            ArrayOf<MDD> sums = Memory.ArrayOfMDD(couples.size());
+            int p = 0;
+            V0.clear(); V1.clear();
+            for(int v : V) V0.add(v);
+            for(int v : couples.keySet()) {
+                V0.remove(v);
+                V1.add(v);
+                min = couples.get(v).getFirst();
+                max = couples.get(v).getSecond();
+                sums.set(p, MDDBuilder.sum(Memory.MDD(), min, max, n, B));
+                sums.get(p++).replace(V0, V1);
+                V0.add(v);
+                V1.remove(v);
             }
             Operation.intersection(mdd, sums);
             for(int i = 0; i < sums.length; i++) Memory.free(sums.get(i));
@@ -61,6 +65,50 @@ public class MDDGCC {
         Memory.free(V0);
         Memory.free(V1);
         Memory.free(B);
+        return mdd;
+    }
+
+    public static MDD generate(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, ArrayOfInt V){
+        mdd.setSize(n);
+
+        // TODO : allocation from memory
+        HashMap<Node, ArrayOfInt> values = new HashMap<>(),
+                nextValues = new HashMap<>(),
+                tmp;
+        HashMap<String, Node> gcc = new HashMap<>();
+
+        ArrayOfInt Vcopy = Memory.ArrayOfInt(couples.keySet().size());
+        values.put(mdd.getRoot(), Vcopy);
+
+        for(int i = 1; i < mdd.size(); i++){
+            Logger.out.information("\rLAYER " + i);
+            for(Node x : mdd.getLayer(i-1)) {
+                ArrayOfInt domain = values.get(x);
+                for(int j = 0; j < domain.length; j++){
+                    if(domain.get(j)+1 > couples.get(j).getSecond()) continue;
+                    if(i >= mdd.size() - 1 && domain.get(j)+1 < couples.get(j).getFirst()) continue;
+                    ArrayOfInt newDomain = domain(domain, j);
+                    String key = newDomain.toString();
+                    Node y = gcc.get(key);
+
+                    if(y == null) {
+                        y = mdd.Node();
+                        gcc.put(key, y);
+                        nextValues.put(y, newDomain);
+                        mdd.addArcAndNode(x, j, y, i);
+                    } else Memory.free(newDomain);
+
+                }
+            }
+            for(ArrayOfInt array : values.values()) Memory.free(array);
+            gcc.clear();
+            values.clear();
+            tmp = values;
+            values = nextValues;
+            nextValues = tmp;
+        }
+
+        mdd.reduce();
         return mdd;
     }
 
