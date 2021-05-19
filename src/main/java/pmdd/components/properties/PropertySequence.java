@@ -122,12 +122,8 @@ public class PropertySequence extends NodeProperty {
     //**************************************//
     //               CHECKERS               //
     //**************************************//
-    // isDegenerate
 
-    @Override
-    public boolean isDegenerate(int v) {
-        return false;
-    }
+    // NOTHING, TODO ?
 
 
     //**************************************//

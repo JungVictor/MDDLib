@@ -1,15 +1,21 @@
 package utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class Logger {
 
     private static final String[] RAM_UNITS = {"b", "kb", "mb"};
     public static final Logger out = new Logger();
 
     private boolean debug, verbose, information = true, normal = true, memory = true, time = true;
+    private boolean file_output = true;
     private String str, prestr;
 
     private final long timer;
     private final Runtime rt;
+    private PrintWriter writer;
 
     private Logger(){
         this.timer = System.currentTimeMillis();
@@ -40,6 +46,17 @@ public class Logger {
         this.time = time;
     }
 
+    public void setFileOutput(boolean file_output){
+        this.file_output = file_output;
+        if(file_output && writer == null) {
+            try {
+                writer = new PrintWriter(new FileWriter("log.txt"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void debug(Object object){
         if(debug) print("[DEBUG] ", object);
     }
@@ -59,7 +76,18 @@ public class Logger {
     private void print(String type, Object object){
         str = object.toString();
         adapt();
-        System.out.print(prestr + type + str);
+        str = ("\r"+prestr + type + str);
+        System.out.print(str);
+        if(file_output) {
+            try {
+                writer = new PrintWriter(new FileWriter("log.txt"));
+                writer.write(str);
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                writer.close();
+            }
+        }
     }
 
     private void adapt(){

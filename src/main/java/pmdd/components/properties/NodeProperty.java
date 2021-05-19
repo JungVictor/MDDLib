@@ -118,7 +118,7 @@ public abstract class NodeProperty implements MemoryObject {
      * You need to create the property in a way that it acts as a "checker".
      * @return true if the information is degenerate, false otherwise.
      */
-    public boolean isDegenerate(){
+    public boolean isValid(){
         return false;
     }
 
@@ -128,7 +128,7 @@ public abstract class NodeProperty implements MemoryObject {
      * @param v Value of the label
      * @return true if the information is degenerate after the transition, false otherwise.
      */
-    public boolean isDegenerate(int v){
+    public boolean isValid(int v){
         return false;
     }
 
@@ -139,8 +139,8 @@ public abstract class NodeProperty implements MemoryObject {
      * @param v Value of the label
      * @return true if the information is degenerate after the transition, false otherwise.
      */
-    public boolean isDegenerate(int v, boolean finalLayer){
-        return isDegenerate(v);
+    public boolean isValid(int v, int layer, int size){
+        return isValid(v);
     }
 
 

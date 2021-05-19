@@ -90,19 +90,19 @@ public class PropertySum extends NodeProperty {
     // isDegenerate
 
     @Override
-    public boolean isDegenerate() {
-        return value.getSecond() > max;
+    public boolean isValid() {
+        return value.getSecond() <= max;
     }
 
     @Override
-    public boolean isDegenerate(int v) {
-        return value.getSecond()+v > max;
+    public boolean isValid(int v) {
+        return value.getSecond()+v <= max;
     }
 
     @Override
-    public boolean isDegenerate(int v, boolean finalLayer) {
-        if(finalLayer) return value.getSecond()+v > max || value.getSecond()+v < min;
-        return isDegenerate(v);
+    public boolean isValid(int v, int layer, int size) {
+        if(layer == size) return value.getFirst()+v <= min && value.getSecond()+v <= max;
+        return isValid(v);
     }
 
 

@@ -64,18 +64,18 @@ public class PropertyAmong extends NodeProperty {
     // isDegenerate
 
     @Override
-    public boolean isDegenerate(){
-        if(depth < values.length) return n > max;
-        return n > max || n < min;
+    public boolean isValid(){
+        if(depth < values.length) return n <= max;
+        return min <= n && n <= max;
     }
 
     @Override
-    public boolean isDegenerate(int v){
+    public boolean isValid(int v, int layer, int size){
         int next = n;
         if(first) next--;
         if(V.contains(v)) next++;
-        if(depth+1 < values.length) return next > max;
-        return next > max || next < min;
+        if(depth+1 < values.length) return next <= max;
+        return min <= next && next <= max;
     }
 
 

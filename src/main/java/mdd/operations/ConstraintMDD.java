@@ -92,7 +92,7 @@ public class ConstraintMDD {
                     for(String propertyName : bindings.keySet()) {
                         PNode xi = (PNode) node.getX(order.get(propertyName)+1);
                         NodeProperty property = xi.getProperty(propertyName);
-                        if (!property.isDegenerate(value, i == mdd.size() - 1)) {
+                        if (property.isValid(value, i, mdd.size() - 1)) {
                             if (!xi.containsLabel(value)) {
                                 String hash = property.hashstr(value);
                                 PNode yi = bindings.get(propertyName).get(hash);

@@ -123,19 +123,20 @@ public class PropertyGCC extends NodeProperty {
     //**************************************//
     // isDegenerate
 
+    // TODO : Change implementation
     @Override
-    public boolean isDegenerate(int v) {
-        if(!bounds.contains(v)) return false;
-        return currentValues.get(v).getSecond()+1 > bounds.get(v).getSecond();
+    public boolean isValid(int v) {
+        if(bounds.contains(v)) return true;
+        return currentValues.get(v).getSecond()+1 <= bounds.get(v).getSecond();
     }
 
     @Override
-    public boolean isDegenerate(int v, boolean finalLayer){
+    public boolean isValid(int v, int layer, int size){
         if(!bounds.contains(v)) return false;
         TupleOfInt t1 = currentValues.get(v);
         TupleOfInt t2 = bounds.get(v);
-        if(finalLayer) return t1.getSecond() + 1 > t2.getSecond() || t1.getFirst() + 1 < t2.getFirst();
-        return t1.getSecond() + 1 > t2.getSecond();
+        if(size == layer) return t1.getSecond() + 1 <= t2.getSecond() && t1.getFirst() + 1 >= t2.getFirst();
+        return t1.getSecond() + 1 <= t2.getSecond();
     }
 
 

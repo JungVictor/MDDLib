@@ -114,7 +114,7 @@ public class ConstraintOperation {
                 Node x1 = node.getX1();
                 for(int value : x1.getValues()) {
                     NodeProperty property = x2.getProperty(propertyName);
-                    if(!property.isDegenerate(value, i == mdd.size()-1)) {
+                    if(property.isValid(value, i, mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
                             String hash = property.hashstr(value);
                             PNode y2 = bindings.get(hash);

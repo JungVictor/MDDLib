@@ -74,8 +74,8 @@ public class PropertyAllDiff extends NodeProperty {
     // isDegenerate
 
     @Override
-    public boolean isDegenerate(int v) {
-        return alldiff.contains(v);
+    public boolean isValid(int v, int layer, int size) {
+        return !alldiff.contains(v);
     }
 
 

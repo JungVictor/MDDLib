@@ -1,10 +1,14 @@
 package memory;
 
+import builder.constraints.parameters.ParametersAmong;
+import builder.constraints.parameters.ParametersGCC;
+import builder.constraints.parameters.ParametersSum;
+import builder.constraints.states.NodeState;
+import builder.constraints.states.StateAmong;
+import builder.constraints.states.StateGCC;
+import builder.constraints.states.StateSum;
 import mdd.MDD;
-import mdd.components.InArcs;
-import mdd.components.Layer;
-import mdd.components.Node;
-import mdd.components.OutArcs;
+import mdd.components.*;
 import mdd.operations.Pack;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
@@ -239,6 +243,81 @@ public class Memory {
 
 
     //**************************************//
+    //        STATES AND PARAMETERS         //
+    //**************************************//
+    private static final MemoryPool<NodeState> stateAmongPool = new MemoryPool<>();
+    public static StateAmong StateAmong(ParametersAmong constraint){
+        StateAmong object = (StateAmong) stateAmongPool.get();
+        if(object == null){
+            object = new StateAmong(stateAmongPool);
+            stateAmongPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint);
+        return object;
+    }
+
+    private static final MemoryPool<NodeState> stateGCCPool = new MemoryPool<>();
+    public static StateGCC StateGCC(ParametersGCC constraint){
+        StateGCC object = (StateGCC) stateGCCPool.get();
+        if(object == null){
+            object = new StateGCC(stateGCCPool);
+            stateGCCPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint);
+        return object;
+    }
+
+    private static final MemoryPool<NodeState> stateSumPool = new MemoryPool<>();
+    public static StateSum StateSum(ParametersSum constraint){
+        StateSum object = (StateSum) stateSumPool.get();
+        if(object == null){
+            object = new StateSum(stateSumPool);
+            stateSumPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint);
+        return object;
+    }
+
+    private static final MemoryPool<ParametersAmong> parametersAmongPool = new MemoryPool<>();
+    public static ParametersAmong ParametersAmong(int q, int min, int max, SetOf<Integer> V){
+        ParametersAmong object = parametersAmongPool.get();
+        if(object == null){
+            object = new ParametersAmong(parametersAmongPool);
+            parametersAmongPool.add(object);
+        }
+        object.prepare();
+        object.init(q, min, max, V);
+        return object;
+    }
+
+    private static final MemoryPool<ParametersGCC> parametersGCCPool = new MemoryPool<>();
+    public static ParametersGCC ParametersGCC(MapOf<Integer, TupleOfInt> gcc){
+        ParametersGCC object = parametersGCCPool.get();
+        if(object == null){
+            object = new ParametersGCC(parametersGCCPool);
+            parametersGCCPool.add(object);
+        }
+        object.prepare();
+        object.init(gcc);
+        return object;
+    }
+
+    private static final MemoryPool<ParametersSum> parametersSumPool = new MemoryPool<>();
+    public static ParametersSum ParametersSum(int min, int max, int vMin, int vMax){
+        ParametersSum object = parametersSumPool.get();
+        if(object == null){
+            object = new ParametersSum(parametersSumPool);
+            parametersSumPool.add(object);
+        }
+        object.prepare();
+        object.init(min, max, vMin, vMax);
+        return object;
+    }
+
+    //**************************************//
     //            ATOMIC OBJECTS            //
     //**************************************//
 
@@ -290,6 +369,17 @@ public class Memory {
         if(object == null){
             object = new Node(nodePool);
             nodePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<Node> sNodePool = new MemoryPool<>();
+    public static SNode SNode(){
+        SNode object = (SNode) sNodePool.get();
+        if(object == null){
+            object = new SNode(sNodePool);
+            sNodePool.add(object);
         }
         object.prepare();
         return object;
