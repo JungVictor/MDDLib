@@ -1,7 +1,15 @@
 package mdd.operations;
 
+import builder.constraints.parameters.ParametersAllDiff;
+import builder.constraints.parameters.ParametersAmong;
+import builder.constraints.parameters.ParametersGCC;
+import builder.constraints.parameters.ParametersSum;
+import builder.constraints.states.NodeState;
+import builder.constraints.states.StateAmong;
+import builder.constraints.states.StateGCC;
 import mdd.MDD;
 import mdd.components.Node;
+import mdd.components.SNode;
 import memory.Memory;
 import pmdd.components.PNode;
 import pmdd.components.properties.NodeProperty;
@@ -26,15 +34,16 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
     static public MDD allDiff(MDD result, MDD mdd){
-        PNode constraint = PMemory.PNode();
-        constraint.addProperty(NodeProperty.ALLDIFF, PMemory.PropertyAllDiff(mdd.getV()));
+        SNode constraint = Memory.SNode();
+        ParametersAllDiff parameters = Memory.ParametersAllDiff(mdd.getV());
+        constraint.setState(Memory.StateAllDiff(parameters));
 
         result.getRoot().associates(mdd.getRoot(), constraint);
 
-        intersection(result, mdd, constraint, NodeProperty.ALLDIFF);
+        intersection(result, mdd, constraint);
 
         Memory.free(constraint);
-
+        Memory.free(parameters);
         result.reduce();
         return result;
     }
@@ -46,12 +55,21 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max){
-        PNode constraint = PMemory.PNode();
-        constraint.addProperty(NodeProperty.SUM, PMemory.PropertySum(0, 0, min, max));
 
-        intersection(result, mdd, constraint, NodeProperty.SUM);
+        int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+        for(int v: mdd.getV()) {
+            if(v < vMin) vMin = v;
+            if(v > vMax) vMax = v;
+        }
+
+        SNode constraint = Memory.SNode();
+        ParametersSum parameters = Memory.ParametersSum(min, max, vMin, vMax);
+        constraint.setState(Memory.StateSum(parameters));
+
+        intersection(result, mdd, constraint);
 
         Memory.free(constraint);
+        Memory.free(parameters);
         result.reduce();
         return result;
     }
@@ -63,12 +81,16 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
     static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
-        PNode constraint = PMemory.PNode();
-        constraint.addProperty(NodeProperty.GCC, PMemory.PropertyGCC(maxValues));
+        SNode constraint = Memory.SNode();
+        ParametersGCC parameters = Memory.ParametersGCC(maxValues);
+        StateGCC state = Memory.StateGCC(parameters);
+        state.initV();
+        constraint.setState(state);
 
-        intersection(result, mdd, constraint, NodeProperty.GCC);
+        intersection(result, mdd, constraint);
 
         Memory.free(constraint);
+        Memory.free(parameters);
         result.reduce();
         return result;
     }
@@ -80,12 +102,14 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
     static public MDD sequence(MDD result, MDD mdd, int q, int min, int max){
-        PNode constraint = PMemory.PNode();
-        constraint.addProperty(NodeProperty.AMONG, PMemory.PropertyAmong(q, min, max, mdd.getV()));
+        SNode constraint = Memory.SNode();
+        ParametersAmong parameters = Memory.ParametersAmong(q, min, max, mdd.getV());
+        constraint.setState(Memory.StateAmong(parameters));
 
-        intersection(result, mdd, constraint, NodeProperty.AMONG);
+        intersection(result, mdd, constraint);
 
         Memory.free(constraint);
+        Memory.free(parameters);
         result.reduce();
         return result;
     }
@@ -97,12 +121,12 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      * @param propertyName The name of the property to propagate
      */
-    static private void intersection(MDD result, MDD mdd, PNode constraint, String propertyName){
+    static private void intersection(MDD result, MDD mdd, SNode constraint){
         result.setSize(mdd.size());
         result.getRoot().associates(mdd.getRoot(), constraint);
 
         Binder binder = Memory.Binder();
-        HashMap<String, PNode> bindings = new HashMap<>();
+        HashMap<String, SNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                     nextNodesConstraint = Memory.SetOfNode(),
                     tmp;
@@ -110,17 +134,17 @@ public class ConstraintOperation {
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
-                PNode x2 = (PNode) node.getX2();
+                SNode x2 = (SNode) node.getX2();
                 Node x1 = node.getX1();
                 for(int value : x1.getValues()) {
-                    NodeProperty property = x2.getProperty(propertyName);
-                    if(property.isValid(value, i, mdd.size()-1)) {
+                    NodeState state = x2.getState();
+                    if(state.isValid(value, i, mdd.size()-1)) {
                         if(!x2.containsLabel(value)) {
-                            String hash = property.hashstr(value);
-                            PNode y2 = bindings.get(hash);
+                            String hash = state.hash(value, i-1, mdd.size());
+                            SNode y2 = bindings.get(hash);
                             if (y2 == null) {
-                                y2 = PMemory.PNode();
-                                y2.addProperty(propertyName, property.createProperty(value));
+                                y2 = Memory.SNode();
+                                y2.setState(state.createState(value, i-1, mdd.size()));
                                 bindings.put(hash, y2);
                                 nextNodesConstraint.add(y2);
                             }

@@ -50,7 +50,8 @@ public class CarSequencing {
             int ncars = data.nCarsInConfig(v);
             gcc.put(v, Memory.TupleOfInt(ncars, ncars));
         }
-        MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
+        //MDD solution = MDDGCC.intersection(Memory.MDD(), opts, gcc);
+        MDD solution = ConstraintOperation.gcc(Memory.MDD(), opts, gcc);
         Memory.free(opts);
         solution.reduce();
 

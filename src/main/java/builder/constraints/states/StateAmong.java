@@ -42,7 +42,17 @@ public class StateAmong extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        return among.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        if(among.length > 0) {
+            for (int i = 1; i < among.length; i++) {
+                builder.append(among.get(i));
+                builder.append(", ");
+            }
+            builder.append(constraint.contains(label) ? 1 : 0);
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     //**************************************//

@@ -3,13 +3,17 @@ package builder.constraints.states;
 import builder.constraints.parameters.ParametersGCC;
 import memory.Memory;
 import memory.MemoryPool;
+import structures.generics.ListOf;
 import structures.generics.MapOf;
+import structures.integers.TupleOfInt;
+
+import java.util.Collections;
 
 public class StateGCC extends NodeState {
 
     // Private reference
     private MapOf<Integer, Integer> count;
-    private int minimum = 0;
+    private int minimum;
 
     // Shared references : constraint
     private ParametersGCC constraint;
@@ -20,7 +24,12 @@ public class StateGCC extends NodeState {
 
     public void init(ParametersGCC constraint){
         this.constraint = constraint;
+        this.minimum = constraint.minimum();
         this.count = Memory.MapOfIntegerInteger();
+    }
+
+    public void initV(){
+        for(int v : constraint.V()) count.put(v,0);
     }
 
     @Override
@@ -28,11 +37,14 @@ public class StateGCC extends NodeState {
         StateGCC state = Memory.StateGCC(constraint);
         state.minimum = minimum;
         for(int v : count) state.count.put(v, count.get(v));
-        if(constraint.contains(label)){
-            if(count.get(label) < constraint.min(label)) state.minimum--;
+        if(count.contains(label)){
             // If we are sure that, whatever the value, we satisfy the gcc, we remove the value
             // So we only add the value when we are not sure
-            else if(count.get(label) + size - layer - 1 > constraint.max(label)) {
+            if(count.get(label) + 1 >= constraint.min(label) && count.get(label) + size - layer <= constraint.max(label)) {
+                state.count.remove(label);
+            }
+            else {
+                if (count.get(label) < constraint.min(label)) state.minimum--;
                 state.count.put(label, state.count.get(label) + 1);
             }
         }
@@ -41,10 +53,10 @@ public class StateGCC extends NodeState {
 
     @Override
     public boolean isValid(int label, int layer, int size) {
-        int potential = size - label - 1;
+        int potential = size - layer + 1;
         int minimum = this.minimum;
 
-        if(!constraint.contains(label)) return minimum <= potential;
+        if(!count.contains(label)) return minimum <= potential;
         int value = count.get(label);
         if(value < constraint.min(label)) minimum--;
         return minimum <= potential && value+1 <= constraint.max(label);
@@ -52,7 +64,19 @@ public class StateGCC extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        return count.toString();
+        ListOf<Integer> integers = Memory.ListOfInteger();
+        integers.add(count.keySet());
+        Collections.sort(integers.getList());
+        StringBuilder builder = new StringBuilder();
+        for (int v : integers) {
+            builder.append(v);
+            builder.append(" -> ");
+            if(v != label) builder.append(count.get(v));
+            else builder.append(count.get(v)+1);
+            builder.append("; ");
+        }
+        Memory.free(integers);
+        return builder.toString();
     }
 
     //**************************************//

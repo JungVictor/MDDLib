@@ -5,10 +5,13 @@ import memory.MemoryPool;
 import structures.generics.MapOf;
 import structures.integers.TupleOfInt;
 
+import java.util.Set;
+
 public class ParametersGCC implements MemoryObject {
 
     // Not to free
     private MapOf<Integer, TupleOfInt> gcc;
+    private int minimum;
 
     // MemoryObject variables
     private final MemoryPool<ParametersGCC> pool;
@@ -21,6 +24,8 @@ public class ParametersGCC implements MemoryObject {
 
     public void init(MapOf<Integer, TupleOfInt> gcc){
         this.gcc = gcc;
+        this.minimum = 0;
+        for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
     }
 
     public boolean contains(int label){
@@ -35,6 +40,9 @@ public class ParametersGCC implements MemoryObject {
         return gcc.get(label).getSecond();
     }
 
+    public int minimum(){return minimum;}
+
+    public Set<Integer> V(){return gcc.keySet();}
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

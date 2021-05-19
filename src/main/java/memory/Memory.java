@@ -1,12 +1,10 @@
 package memory;
 
+import builder.constraints.parameters.ParametersAllDiff;
 import builder.constraints.parameters.ParametersAmong;
 import builder.constraints.parameters.ParametersGCC;
 import builder.constraints.parameters.ParametersSum;
-import builder.constraints.states.NodeState;
-import builder.constraints.states.StateAmong;
-import builder.constraints.states.StateGCC;
-import builder.constraints.states.StateSum;
+import builder.constraints.states.*;
 import mdd.MDD;
 import mdd.components.*;
 import mdd.operations.Pack;
@@ -281,6 +279,18 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<NodeState> stateAllDiffPool = new MemoryPool<>();
+    public static StateAllDiff StateAllDiff(ParametersAllDiff constraint){
+        StateAllDiff object = (StateAllDiff) stateAllDiffPool.get();
+        if(object == null){
+            object = new StateAllDiff(stateAllDiffPool);
+            stateAllDiffPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint);
+        return object;
+    }
+
     private static final MemoryPool<ParametersAmong> parametersAmongPool = new MemoryPool<>();
     public static ParametersAmong ParametersAmong(int q, int min, int max, SetOf<Integer> V){
         ParametersAmong object = parametersAmongPool.get();
@@ -314,6 +324,18 @@ public class Memory {
         }
         object.prepare();
         object.init(min, max, vMin, vMax);
+        return object;
+    }
+
+    private static final MemoryPool<ParametersAllDiff> parametersAllDiffPool = new MemoryPool<>();
+    public static ParametersAllDiff ParametersAllDiff(SetOf<Integer> V){
+        ParametersAllDiff object = parametersAllDiffPool.get();
+        if(object == null){
+            object = new ParametersAllDiff(parametersAllDiffPool);
+            parametersAllDiffPool.add(object);
+        }
+        object.prepare();
+        object.init(V);
         return object;
     }
 
