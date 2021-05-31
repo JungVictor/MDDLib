@@ -17,6 +17,10 @@ public class StateSum extends NodeState {
         this.constraint = constraint;
     }
 
+    public String toString(){
+        return Integer.toString(sum);
+    }
+
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSum state = Memory.StateSum(constraint);
@@ -26,17 +30,19 @@ public class StateSum extends NodeState {
 
     @Override
     public boolean isValid(int label, int layer, int size){
-        int minPotential = (size - layer) * constraint.vMin();
-        int maxPotential = (size - layer) * constraint.vMax();
+        int minPotential = sum + label + (size - layer) * constraint.vMin();
+        int maxPotential = sum + label + (size - layer) * constraint.vMax();
 
+
+        if(maxPotential < constraint.min() || constraint.max() < minPotential) return false;
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return true;
-        return constraint.min() <= sum + label && sum + label <= constraint.max();
+        return sum + label <= constraint.max();
     }
 
     @Override
     public String hash(int label, int layer, int size){
-        int minPotential = (size - layer) * constraint.vMin();
-        int maxPotential = (size - layer) * constraint.vMax();
+        int minPotential = sum + label + (size - layer) * constraint.vMin();
+        int maxPotential = sum + label + (size - layer) * constraint.vMax();
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
         return Integer.toString(sum + label);

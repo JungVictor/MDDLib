@@ -36,24 +36,24 @@ public class StateGCC extends NodeState {
     public NodeState createState(int label, int layer, int size) {
         StateGCC state = Memory.StateGCC(constraint);
         state.minimum = minimum;
-        for(int v : count) state.count.put(v, count.get(v));
-        if(count.contains(label)){
+        int potential = size - layer - 1;
+        for(int v : count) {
+            if(count.get(v) < constraint.min(v) || count.get(v) + potential > constraint.max(v)) state.count.put(v, count.get(v));
+        }
+        if(state.count.contains(label)){
+            if (count.get(label) < constraint.min(label)) state.minimum--;
             // If we are sure that, whatever the value, we satisfy the gcc, we remove the value
             // So we only add the value when we are not sure
-            if(count.get(label) + 1 >= constraint.min(label) && count.get(label) + size - layer <= constraint.max(label)) {
-                state.count.remove(label);
-            }
-            else {
-                if (count.get(label) < constraint.min(label)) state.minimum--;
-                state.count.put(label, state.count.get(label) + 1);
-            }
+            if(count.get(label) + 1 >= constraint.min(label) && count.get(label) + potential + 1 <= constraint.max(label)) state.count.remove(label);
+            else state.count.put(label, state.count.get(label) + 1);
+            //state.count.put(label, state.count.get(label) + 1);
         }
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size) {
-        int potential = size - layer + 1;
+        int potential = size - layer - 1;
         int minimum = this.minimum;
 
         if(!count.contains(label)) return minimum <= potential;
@@ -69,6 +69,8 @@ public class StateGCC extends NodeState {
         Collections.sort(integers.getList());
         StringBuilder builder = new StringBuilder();
         for (int v : integers) {
+            if(v == label && count.get(label) + size - layer <= constraint.max(label)) continue;
+            else if(count.get(v) >= constraint.min(v) && count.get(v) + (size-1) - layer <= constraint.max(v)) continue;
             builder.append(v);
             builder.append(" -> ");
             if(v != label) builder.append(count.get(v));

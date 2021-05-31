@@ -1,6 +1,7 @@
 package problems;
 
 import builder.MDDBuilder;
+import builder.constraints.ConstraintBuilder;
 import builder.constraints.MDDGCC;
 import mdd.MDD;
 import mdd.operations.ConstraintMDD;
@@ -121,9 +122,11 @@ public class CarSequencing {
     }
 
     private MDD option(int i, SetOf<Integer> V0, SetOf<Integer> V1){
+        SetOf<Integer> V = Memory.SetOfInteger();
         for(int v : data.getV()){
             if(data.isOptionInConfig(i, v)) V1.add(v);
             else V0.add(v);
+            V.add(v);
         }
 
         MDD seq = MDDBuilder.sequence(Memory.MDD(), data.seqSizeOption(i), 0, data.seqMaxOption(i), data.nCars());
@@ -133,6 +136,7 @@ public class CarSequencing {
 
         Memory.free(seq);
         Memory.free(sum);
+        Memory.free(V);
 
         return option;
     }

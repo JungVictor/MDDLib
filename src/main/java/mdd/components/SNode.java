@@ -28,7 +28,7 @@ public class SNode extends Node {
 
     @Override
     public void free(){
-        Memory.free(state);
+        if(state != null) Memory.free(state);
         state = null;
         super.free();
     }

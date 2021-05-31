@@ -57,7 +57,7 @@ public class ConstraintOperation {
     static public MDD sum(MDD result, MDD mdd, int min, int max){
 
         int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-        for(int v: mdd.getV()) {
+        for(int v : mdd.getV()) {
             if(v < vMin) vMin = v;
             if(v > vMax) vMax = v;
         }
@@ -131,6 +131,8 @@ public class ConstraintOperation {
                     nextNodesConstraint = Memory.SetOfNode(),
                     tmp;
 
+        int node_constraint = 0;
+
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
@@ -138,13 +140,14 @@ public class ConstraintOperation {
                 Node x1 = node.getX1();
                 for(int value : x1.getValues()) {
                     NodeState state = x2.getState();
-                    if(state.isValid(value, i, mdd.size()-1)) {
+                    if(state.isValid(value, i, mdd.size())) {
                         if(!x2.containsLabel(value)) {
-                            String hash = state.hash(value, i-1, mdd.size());
+                            String hash = state.hash(value, i, mdd.size());
                             SNode y2 = bindings.get(hash);
                             if (y2 == null) {
                                 y2 = Memory.SNode();
-                                y2.setState(state.createState(value, i-1, mdd.size()));
+                                node_constraint++;
+                                y2.setState(state.createState(value, i, mdd.size()));
                                 bindings.put(hash, y2);
                                 nextNodesConstraint.add(y2);
                             }
@@ -166,6 +169,8 @@ public class ConstraintOperation {
         Memory.free(currentNodesConstraint);
         Memory.free(nextNodesConstraint);
         Memory.free(binder);
+
+        Logger.out.information("\rNoeuds :" + node_constraint + "\n");
     }
 
 }

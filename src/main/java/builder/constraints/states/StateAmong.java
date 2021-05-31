@@ -35,13 +35,18 @@ public class StateAmong extends NodeState {
         int cpt = 0;
         for(int i = 1; i < constraint.q(); i++) cpt += among.get(i);
         if(constraint.contains(label)) cpt++;
-        int potential = constraint.q() - layer - 1;
+        int potential = constraint.q() - layer;
         if(potential < 0) potential = 0;
         return constraint.min() <= cpt + potential && cpt <= constraint.max();
     }
 
     @Override
     public String hash(int label, int layer, int size){
+        int r = size - layer;
+        int cpt = 0;
+        for(int i = r; i < constraint.q(); i++) cpt += among.get(i);
+        if(constraint.min() <= cpt && cpt + r <= constraint.max()) return "";
+
         StringBuilder builder = new StringBuilder();
         builder.append("[");
         if(among.length > 0) {

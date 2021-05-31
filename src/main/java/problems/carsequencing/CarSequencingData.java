@@ -124,6 +124,10 @@ public class CarSequencingData {
         return V.size();
     }
 
+    public int option(int i){
+        return enabledOptions.get(i);
+    }
+
     public int nConfigMin(int i){
         return nConfigMin[i];
     }
@@ -142,7 +146,7 @@ public class CarSequencingData {
     }
 
     public boolean isOptionInConfig(int option, int config){
-        return data.get(config).get(enabledOptions.get(option)+1) == 1;
+        return data.get(config).get(option+1) == 1;
     }
 
     public int nCarsInConfig(int config){
