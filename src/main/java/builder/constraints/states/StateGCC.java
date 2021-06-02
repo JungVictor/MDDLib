@@ -89,6 +89,7 @@ public class StateGCC extends NodeState {
     @Override
     public void free(){
         Memory.free(count);
+        this.constraint = null;
         super.free();
     }
 }

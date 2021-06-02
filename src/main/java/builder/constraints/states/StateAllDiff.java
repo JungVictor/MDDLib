@@ -51,6 +51,7 @@ public class StateAllDiff extends NodeState {
     @Override
     public void free(){
         Memory.free(alldiff);
+        this.constraint = null;
         super.free();
     }
 }

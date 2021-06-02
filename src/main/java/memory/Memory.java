@@ -1,9 +1,6 @@
 package memory;
 
-import builder.constraints.parameters.ParametersAllDiff;
-import builder.constraints.parameters.ParametersAmong;
-import builder.constraints.parameters.ParametersGCC;
-import builder.constraints.parameters.ParametersSum;
+import builder.constraints.parameters.*;
 import builder.constraints.states.*;
 import mdd.MDD;
 import mdd.components.*;
@@ -243,6 +240,7 @@ public class Memory {
     //**************************************//
     //        STATES AND PARAMETERS         //
     //**************************************//
+
     private static final MemoryPool<NodeState> stateAmongPool = new MemoryPool<>();
     public static StateAmong StateAmong(ParametersAmong constraint){
         StateAmong object = (StateAmong) stateAmongPool.get();
@@ -291,6 +289,18 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<NodeState> stateDiffPool = new MemoryPool<>();
+    public static StateDiff StateDiff(ParametersDiff constraint, int size){
+        StateDiff object = (StateDiff) stateDiffPool.get();
+        if(object == null){
+            object = new StateDiff(stateDiffPool);
+            stateDiffPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint, size);
+        return object;
+    }
+
     private static final MemoryPool<ParametersAmong> parametersAmongPool = new MemoryPool<>();
     public static ParametersAmong ParametersAmong(int q, int min, int max, SetOf<Integer> V){
         ParametersAmong object = parametersAmongPool.get();
@@ -336,6 +346,18 @@ public class Memory {
         }
         object.prepare();
         object.init(V);
+        return object;
+    }
+
+    private static final MemoryPool<ParametersDiff> parametersDiffPool = new MemoryPool<>();
+    public static ParametersDiff ParametersDiff(int length){
+        ParametersDiff object = parametersDiffPool.get();
+        if(object == null){
+            object = new ParametersDiff(parametersDiffPool);
+            parametersDiffPool.add(object);
+        }
+        object.prepare();
+        object.init(length);
         return object;
     }
 

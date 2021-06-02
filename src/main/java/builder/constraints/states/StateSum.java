@@ -48,4 +48,10 @@ public class StateSum extends NodeState {
         return Integer.toString(sum + label);
     }
 
+    @Override
+    public void free(){
+        super.free();
+        this.constraint = null;
+    }
+
 }

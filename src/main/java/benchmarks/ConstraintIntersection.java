@@ -30,16 +30,20 @@ public class ConstraintIntersection {
         construction_seq(15, 2, 8, 50, 2, 1);
     }
 
+
+
     private static void construction_sum(int min, int max, int size, int V){
         SetOf<Integer> domain = Memory.SetOfInteger();
         for(int i = 0; i < V; i++) domain.add(i);
         MDD sum = ConstraintBuilder.sum(Memory.MDD(), domain, min, max, size);
     }
+
     private static void construction_gcc(MapOf<Integer, TupleOfInt> tuples, int size, int D){
         SetOf<Integer> domain = Memory.SetOfInteger();
         for(int i = 0; i < D; i++) domain.add(i);
         MDD gcc = ConstraintBuilder.gcc(Memory.MDD(), domain, tuples, size);
     }
+
     private static void construction_seq(int q, int min, int max, int size, int D, int V){
         SetOf<Integer> domain = Memory.SetOfInteger(), values = Memory.SetOfInteger();
         for(int i = 0; i < D; i++) domain.add(i);
@@ -53,6 +57,7 @@ public class ConstraintIntersection {
         System.out.println(Operation.inclusion(seq, seq2));
         System.out.println(Operation.inclusion(seq2, seq));
     }
+
 
 
     private static void sum(MDD test, int min, int max){

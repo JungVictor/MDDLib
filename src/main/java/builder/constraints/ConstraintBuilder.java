@@ -1,6 +1,7 @@
 package builder.constraints;
 
 import builder.constraints.parameters.ParametersAmong;
+import builder.constraints.parameters.ParametersDiff;
 import builder.constraints.parameters.ParametersGCC;
 import builder.constraints.parameters.ParametersSum;
 import builder.constraints.states.NodeState;
@@ -63,8 +64,6 @@ public class ConstraintBuilder {
         Memory.free(nextNodesConstraint);
 
         Logger.out.information(node_constraint);
-
-        result.reduce();
         return result;
     }
 
@@ -123,6 +122,18 @@ public class ConstraintBuilder {
 
         Memory.free(parameters);
         result.reduce();
+        return result;
+    }
+
+    static public MDD diff(MDD result, SetOf<Integer> D, int length, int size){
+        SNode snode = Memory.SNode();
+        ParametersDiff parameters = Memory.ParametersDiff(length);
+        snode.setState(Memory.StateDiff(parameters, size+1));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+
         return result;
     }
 }

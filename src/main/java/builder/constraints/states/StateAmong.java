@@ -68,6 +68,7 @@ public class StateAmong extends NodeState {
     @Override
     public void free(){
         Memory.free(among);
+        this.constraint = null;
         super.free();
     }
 }

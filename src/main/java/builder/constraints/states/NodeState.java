@@ -16,8 +16,14 @@ public abstract class NodeState implements MemoryObject {
 
     public abstract NodeState createState(int label, int layer, int size);
 
-    public boolean isValid(int label, int layer, int size){
-        return true;
+    public abstract boolean isValid(int label, int layer, int size);
+
+    public boolean isValid(int label, int layer, int size, NodeState state){
+        return isValid(label, layer, size);
+    }
+
+    public NodeState merge(NodeState state, int label, int layer, int size) {
+        return null;
     }
 
     public abstract String hash(int label, int layer, int size);

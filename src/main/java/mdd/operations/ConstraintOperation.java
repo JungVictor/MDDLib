@@ -1,9 +1,6 @@
 package mdd.operations;
 
-import builder.constraints.parameters.ParametersAllDiff;
-import builder.constraints.parameters.ParametersAmong;
-import builder.constraints.parameters.ParametersGCC;
-import builder.constraints.parameters.ParametersSum;
+import builder.constraints.parameters.*;
 import builder.constraints.states.NodeState;
 import builder.constraints.states.StateAmong;
 import builder.constraints.states.StateGCC;
@@ -45,6 +42,30 @@ public class ConstraintOperation {
         Memory.free(constraint);
         Memory.free(parameters);
         result.reduce();
+        return result;
+    }
+
+    /**
+     * Perform the intersection operation between mdd and a diff constraint
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @param length The length between different values
+     * @return the MDD resulting from the intersection between mdd and the alldiff constraint
+     */
+    static public MDD diff(MDD result, MDD mdd, int length){
+        SNode constraint = Memory.SNode();
+        ParametersDiff parameters = Memory.ParametersDiff(length);
+        constraint.setState(Memory.StateDiff(parameters, mdd.size()));
+
+        result.setRoot(Memory.SNode());
+        ((SNode) result.getRoot()).setState(Memory.StateDiff(parameters, mdd.size()));
+        result.getRoot().associates(mdd.getRoot(), constraint);
+
+        intersection(result, mdd, constraint, true);
+
+        Memory.free(constraint);
+        Memory.free(parameters);
+        //result.reduce();
         return result;
     }
 
@@ -119,7 +140,6 @@ public class ConstraintOperation {
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
      * @param constraint The PNode containing the constraint (= root node of the constraint)
-     * @param propertyName The name of the property to propagate
      */
     static private void intersection(MDD result, MDD mdd, SNode constraint){
         result.setSize(mdd.size());
@@ -128,8 +148,8 @@ public class ConstraintOperation {
         Binder binder = Memory.Binder();
         HashMap<String, SNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
-                    nextNodesConstraint = Memory.SetOfNode(),
-                    tmp;
+                nextNodesConstraint = Memory.SetOfNode(),
+                tmp;
 
         int node_constraint = 0;
 
@@ -154,6 +174,75 @@ public class ConstraintOperation {
                             x2.addChild(value, y2);
                         }
                         Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
+                    }
+                }
+            }
+            for(Node node : currentNodesConstraint) Memory.free(node);
+            currentNodesConstraint.clear();
+            tmp = currentNodesConstraint;
+            currentNodesConstraint = nextNodesConstraint;
+            nextNodesConstraint = tmp;
+
+            binder.clear();
+            bindings.clear();
+        }
+        Memory.free(currentNodesConstraint);
+        Memory.free(nextNodesConstraint);
+        Memory.free(binder);
+
+        Logger.out.information("\rNoeuds :" + node_constraint + "\n");
+    }
+
+    /**
+     * Perform the intersection operation between the given mdd and the given constraint
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @param constraint The PNode containing the constraint (= root node of the constraint)
+     */
+    static private void intersection(MDD result, MDD mdd, SNode constraint, boolean carryState){
+        result.setSize(mdd.size());
+        result.getRoot().associates(mdd.getRoot(), constraint);
+
+        Binder binder = Memory.Binder();
+        HashMap<String, SNode> bindings = new HashMap<>();
+        SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
+                nextNodesConstraint = Memory.SetOfNode(),
+                tmp;
+
+        int node_constraint = 0;
+
+        for(int i = 1; i < mdd.size(); i++){
+            Logger.out.information("\rLAYER " + i);
+            for(Node node : result.getLayer(i-1)){
+                SNode x2 = (SNode) node.getX2();
+                SNode x1 = (SNode) node.getX1();
+
+                for(int value : x1.getValues()) {
+                    NodeState state = x2.getState();
+                    SNode y1 =  (SNode) x1.getChild(value);
+
+                    boolean isValid = carryState ?
+                            state.isValid(value, i, mdd.size(), y1.getState()) :
+                            state.isValid(value, i, mdd.size());
+
+                    if(isValid) {
+                        if(!x2.containsLabel(value)) {
+                            String hash = state.hash(value, i, mdd.size());
+                            SNode y2 = bindings.get(hash);
+                            if (y2 == null) {
+                                y2 = Memory.SNode();
+                                node_constraint++;
+                                y2.setState(state.createState(value, i, mdd.size()));
+                                bindings.put(hash, y2);
+                                nextNodesConstraint.add(y2);
+                            }
+                            x2.addChild(value, y2);
+                        }
+                        SNode y2 = (SNode) x2.getChild(value);
+                        SNode y = (SNode) Operation.addArcAndNode(result, node, y1, y2, value, i, binder);
+                        if(carryState) y.setState(y2.getState().merge(y1.getState(), value, i, mdd.size()));
+                        //else y.setState(y2.getState().copy());
+                        System.out.print("");
                     }
                 }
             }
