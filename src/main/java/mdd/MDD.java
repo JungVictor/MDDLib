@@ -432,6 +432,14 @@ public class MDD implements MemoryObject {
         if(getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
     }
 
+    public void removeChildless(){
+        SetOf<Node> childless = Memory.SetOfNode();
+        for(int i = size-2; i >= 0; i--) {
+            for(Node node : getLayer(i)) if(node.numberOfChildren() == 0) childless.add(node);
+            for(Node node : childless) removeNode(node, i);
+        }
+    }
+
     /**
      * Automatically set the terminal node
      */

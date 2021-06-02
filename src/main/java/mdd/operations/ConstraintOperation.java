@@ -52,7 +52,7 @@ public class ConstraintOperation {
      * @param length The length between different values
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
-    static public MDD diff(MDD result, MDD mdd, int length){
+    static public MDD diff(MDD result, MDD mdd, int length, boolean carry){
         SNode constraint = Memory.SNode();
         ParametersDiff parameters = Memory.ParametersDiff(length);
         constraint.setState(Memory.StateDiff(parameters, mdd.size()));
@@ -61,7 +61,7 @@ public class ConstraintOperation {
         ((SNode) result.getRoot()).setState(Memory.StateDiff(parameters, mdd.size()));
         result.getRoot().associates(mdd.getRoot(), constraint);
 
-        intersection(result, mdd, constraint, true);
+        intersection(result, mdd, constraint, carry);
 
         Memory.free(constraint);
         Memory.free(parameters);
@@ -215,15 +215,14 @@ public class ConstraintOperation {
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
                 SNode x2 = (SNode) node.getX2();
-                SNode x1 = (SNode) node.getX1();
+                Node x1 = node.getX1();
 
                 for(int value : x1.getValues()) {
                     NodeState state = x2.getState();
-                    SNode y1 =  (SNode) x1.getChild(value);
-
-                    boolean isValid = carryState ?
-                            state.isValid(value, i, mdd.size(), y1.getState()) :
-                            state.isValid(value, i, mdd.size());
+                    Node y1 = x1.getChild(value);
+                    boolean isValid;
+                    if(carryState) isValid = state.isValid(value, i, mdd.size(), ((SNode) y1).getState());
+                    else isValid = state.isValid(value, i, mdd.size());
 
                     if(isValid) {
                         if(!x2.containsLabel(value)) {
@@ -240,9 +239,8 @@ public class ConstraintOperation {
                         }
                         SNode y2 = (SNode) x2.getChild(value);
                         SNode y = (SNode) Operation.addArcAndNode(result, node, y1, y2, value, i, binder);
-                        if(carryState) y.setState(y2.getState().merge(y1.getState(), value, i, mdd.size()));
-                        //else y.setState(y2.getState().copy());
-                        System.out.print("");
+                        if(carryState) y.setState(y2.getState().merge(((SNode) y1).getState(), value, i, mdd.size()));
+                        else y.setState(y2.getState().copy());
                     }
                 }
             }
@@ -261,5 +259,7 @@ public class ConstraintOperation {
 
         Logger.out.information("\rNoeuds :" + node_constraint + "\n");
     }
+
+
 
 }

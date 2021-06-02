@@ -28,6 +28,10 @@ public abstract class NodeState implements MemoryObject {
 
     public abstract String hash(int label, int layer, int size);
 
+    public NodeState copy(){
+        return null;
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

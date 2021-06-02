@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>MDDLib</artifactId>
-    <version>CarSequencing</version>
+    <version>GolombRuler</version>
 
     <build>
         <plugins>
@@ -25,7 +25,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>CarSequencingInstance</mainClass>
+                            <mainClass>GolombRulerInstance</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
