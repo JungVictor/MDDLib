@@ -3,6 +3,7 @@ package builder.constraints.states;
 import builder.constraints.parameters.ParametersDiff;
 import memory.Memory;
 import memory.MemoryPool;
+import structures.generics.ArrayOf;
 import structures.generics.ListOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
@@ -11,12 +12,16 @@ import java.util.Collections;
 
 public class StateDiff extends NodeState {
 
+    private static int G_ID = 0;
+
     private ArrayOfInt values;
     private SetOf<Integer> diff;
     private ParametersDiff constraint;
+    private int identifier = -1;
 
     public StateDiff(MemoryPool<NodeState> pool) {
         super(pool);
+        this.identifier = G_ID++;
     }
 
     public void init(ParametersDiff constraint, int size){
@@ -66,6 +71,29 @@ public class StateDiff extends NodeState {
         return test.size() == 0;
     }
 
+    public boolean isValid(int label, int layer, int size, ArrayOf<NodeState> nodestates){
+        int value = Math.abs(values.get(0) - label);
+        if(diff.contains(value)) return false;
+        SetOf<Integer> test = Memory.SetOfInteger();
+        test.add(diff);
+        int n = diff.size();
+        for(NodeState nodeState : nodestates){
+            StateDiff state = (StateDiff) nodeState;
+            if(state.diff.contains(value)) {
+                Memory.free(test);
+                return false;
+            }
+            test.add(state.diff);
+            n += state.diff.size();
+            if(test.size() != n) {
+                Memory.free(test);
+                return false;
+            }
+        }
+        Memory.free(test);
+        return true;
+    }
+
     @Override
     public NodeState merge(NodeState state, int label, int layer, int size){
         StateDiff convert = (StateDiff) state;
@@ -85,6 +113,7 @@ public class StateDiff extends NodeState {
     @Override
     public String hash(int label, int layer, int size) {
         StringBuilder builder = new StringBuilder();
+        builder.append(identifier);
         builder.append("[");
 
         ListOf<Integer> integers = Memory.ListOfInteger();

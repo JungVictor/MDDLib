@@ -9,9 +9,7 @@ import builder.constraints.states.StateGCC;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.components.SNode;
-import mdd.operations.Operation;
 import memory.Memory;
-import structures.Binder;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.TupleOfInt;
@@ -78,6 +76,7 @@ public class ConstraintBuilder {
 
         return result;
     }
+
     static public MDD sequence(MDD result, int q, int min, int max, int size){
         SetOf<Integer> B = Memory.SetOfInteger(); B.add(0); B.add(1);
         SetOf<Integer> One = Memory.SetOfInteger(); One.add(1);

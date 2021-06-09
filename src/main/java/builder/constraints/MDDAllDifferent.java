@@ -83,7 +83,7 @@ public class MDDAllDifferent {
         Vcopy.copy(V);
         values.put(result.getRoot(), Vcopy);
 
-        result.getRoot().associates(mdd.getRoot(), null);
+        result.getRoot().associate(mdd.getRoot(), null);
 
         for(int i = 1; i < result.size(); i++){
             for(Node x : result.getLayer(i-1)) {
@@ -99,7 +99,7 @@ public class MDDAllDifferent {
                         alldiff.put(key, y);
                         nextValues.put(y, newDomain);
                         result.addNode(y,i);
-                        y.associates(x1.getChild(domain.get(j)), y);
+                        y.associate(x1.getChild(domain.get(j)), y);
                     } else {
                         Memory.free(newDomain);
                         y = alldiff.get(key);

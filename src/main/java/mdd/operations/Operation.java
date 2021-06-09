@@ -86,14 +86,14 @@ public class Operation {
         mdd1.clearAllAssociations();
         // Copy the first MDD until the first layer of intersection
         result.setSize(size);
-        mdd1.getRoot().associates(result.getRoot(), null);
+        mdd1.getRoot().associate(result.getRoot(), null);
         mdd1.copy(result, 0, 0, start);
 
         // Binding all nodes in layer start to the root of mdd2
         if(start > 0)
             for(Node node : mdd1.getLayer(start))
-                node.getX1().associates(node, mdd2.getRoot());
-        else result.getRoot().associates(mdd1.getRoot(), mdd2.getRoot());
+                node.getX1().associate(node, mdd2.getRoot());
+        else result.getRoot().associate(mdd1.getRoot(), mdd2.getRoot());
 
         // Normal intersection
         SetOf<Integer> V = Memory.SetOfInteger();
@@ -131,11 +131,11 @@ public class Operation {
             if(stop < mdd1.size()){
                 // mdd2 is contained in the intersection
                 // Therefore, we need to construct the rest of the mdd from mdd1
-                for(Node node : result.getLayer(stop-1)) node.getX1().associates(node, null);
+                for(Node node : result.getLayer(stop-1)) node.getX1().associate(node, null);
                 mdd1.copy(result, 0, stop-1, mdd1.size());
             } else if (stop >= mdd1.size()){
                 // We need to construct the rest of the mdd from mdd2
-                for(Node node : result.getLayer(stop-1)) node.getX2().associates(node, null);
+                for(Node node : result.getLayer(stop-1)) node.getX2().associate(node, null);
                 mdd2.copy(result, start, stop - start - 1, mdd2.size());
             }
         }
@@ -288,7 +288,7 @@ public class Operation {
         result.setSize(size);
         Binder binder = Memory.Binder();
 
-        result.getRoot().associates(root1, root2);
+        result.getRoot().associate(root1, root2);
 
         for(int i = 1; i < size; i++){
             Logger.out.information("\rLAYER " + i);
@@ -363,7 +363,7 @@ public class Operation {
         Node y;
         if(binder == null){
             y = x.Node();
-            y.associates(y1, y2);
+            y.associate(y1, y2);
             mdd.addNode(y, layer);
         } else {
             ArrayOf<Node> nodes = Memory.ArrayOfNode(2);
@@ -372,7 +372,7 @@ public class Operation {
             y = lastBinder.getLeaf();
             if (y == null) {
                 y = x.Node();
-                y.associates(y1, y2);
+                y.associate(y1, y2);
                 lastBinder.setLeaf(y);
                 mdd.addNode(y, layer);
             }
@@ -491,7 +491,7 @@ public class Operation {
 
 
         for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());
-        result.getRoot().associates(ys);
+        result.getRoot().associate(ys);
         int r = result.size();
 
         Logger.out.information("\rN-ARY Intersection ["+mdds.length+" MDDs]\n");
@@ -533,14 +533,14 @@ public class Operation {
         Node y;
         if(binder == null){
             y = Memory.Node();
-            y.associates(ys);
+            y.associate(ys);
             mdd.addNode(y, layer);
         } else {
             Binder lastBinder = binder.path(ys);
             y = lastBinder.getLeaf();
             if (y == null) {
                 y = mdd.Node();
-                y.associates(ys);
+                y.associate(ys);
                 lastBinder.setLeaf(y);
                 mdd.addNode(y, layer);
             }

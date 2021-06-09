@@ -112,12 +112,12 @@ public class MDD implements MemoryObject {
                     // Child node is not yet copied
                     if(copyChild == null) {
                         copyChild = copy.Node();
-                        child.associates(copyChild, null);
+                        child.associate(copyChild, null);
                         copy.addNode(copyChild, i+1+offset);
                     }
                     copy.addArc(copyNode, arc, copyChild);
                 }
-                original.associates(null, null);
+                original.associate(null, null);
             }
         }
         return copy;
@@ -131,7 +131,7 @@ public class MDD implements MemoryObject {
      * @return A copy of the current MDD from root to tt
      */
     public MDD copy(MDD copy, Node root, int offset){
-        getRoot().associates(root, null);
+        getRoot().associate(root, null);
         copy(copy, offset, 0, size());
         copy.setTT();
         return copy;

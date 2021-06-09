@@ -1,6 +1,5 @@
 package builder.constraints;
 
-import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.operations.Operation;
@@ -8,8 +7,6 @@ import memory.Memory;
 import structures.Binder;
 import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
-
-import java.util.HashMap;
 
 public class MDDSum {
 
@@ -64,7 +61,7 @@ public class MDDSum {
         Node root = Memory.Node();
         nodes.put(0, root);
         nodeValue.put(root, 0);
-        result.getRoot().associates(mdd.getRoot(), root);
+        result.getRoot().associate(mdd.getRoot(), root);
 
         for(int i = 1; i < result.size(); i++){
             for(Node x : result.getLayer(i-1)){

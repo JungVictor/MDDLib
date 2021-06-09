@@ -2,6 +2,8 @@ package builder.constraints.states;
 
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.generics.ArrayOf;
+import structures.generics.SetOf;
 
 public abstract class NodeState implements MemoryObject {
 
@@ -20,6 +22,9 @@ public abstract class NodeState implements MemoryObject {
 
     public boolean isValid(int label, int layer, int size, NodeState state){
         return isValid(label, layer, size);
+    }
+    public boolean isValid(int label, int layer, int size, ArrayOf<NodeState> states){
+        return false;
     }
 
     public NodeState merge(NodeState state, int label, int layer, int size) {

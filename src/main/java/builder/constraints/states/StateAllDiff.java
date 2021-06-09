@@ -19,7 +19,6 @@ public class StateAllDiff extends NodeState {
         this.constraint = constraint;
     }
 
-
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateAllDiff state = Memory.StateAllDiff(constraint);

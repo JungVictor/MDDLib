@@ -73,22 +73,26 @@ public class Node implements MemoryObject {
     //**************************************//
 
     /**
-     * Associates nodes to this node
+     * Associate nodes to this node
      * @param associations an array of nodes
      */
-    public void associates(ArrayOf<Node> associations){
+    public void associate(ArrayOf<Node> associations){
         if(this.associations.length() < associations.length()) this.associations.setLength(associations.length());
         for(int i = 0; i < associations.length(); i++) this.associations.set(i, associations.get(i));
     }
 
     /**
-     * Associates nodes to this node
+     * Associate nodes to this node
      * @param node1 The first node
      * @param node2 The second node
      */
-    public void associates(Node node1, Node node2){
+    public void associate(Node node1, Node node2){
         associations.set(0, node1);
         associations.set(1, node2);
+    }
+
+    public void associate(Node node, int position){
+        associations.set(position, node);
     }
 
 
@@ -220,6 +224,7 @@ public class Node implements MemoryObject {
         return children.contains(child);
     }
 
+
     //**************************************//
     //           NODE MANAGEMENT            //
     //**************************************//
@@ -247,6 +252,7 @@ public class Node implements MemoryObject {
     public void clearAssociations(){
         associations.clear();
     }
+
 
     //**************************************//
     //           ARCS MANAGEMENT            //
@@ -362,6 +368,7 @@ public class Node implements MemoryObject {
         Memory.free(children);
         children = new_children;
     }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

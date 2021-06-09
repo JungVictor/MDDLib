@@ -75,7 +75,7 @@ public class ConstraintMDD {
 
         associates.setLength(numberOfConstraints+1);
         associates.set(0, mdd.getRoot());
-        result.getRoot().associates(associates);
+        result.getRoot().associate(associates);
 
         ArrayOf<Node> yis = Memory.ArrayOfNode(numberOfConstraints+1);
 

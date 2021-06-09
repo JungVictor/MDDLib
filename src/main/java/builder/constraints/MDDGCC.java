@@ -128,7 +128,7 @@ public class MDDGCC {
 
         values.put(fakeroot, Vcopy);
 
-        result.getRoot().associates(mdd.getRoot(), fakeroot);
+        result.getRoot().associate(mdd.getRoot(), fakeroot);
 
         for(int i = 1; i < result.size(); i++){
             Logger.out.information("\rLAYER " + i);

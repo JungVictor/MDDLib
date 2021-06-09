@@ -2,12 +2,15 @@ package problems;
 
 import builder.MDDBuilder;
 import builder.constraints.ConstraintBuilder;
+import builder.constraints.parameters.ParametersDiff;
 import mdd.MDD;
 import mdd.components.Node;
+import mdd.components.SNode;
 import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
 import representation.MDDPrinter;
+import structures.generics.ArrayOf;
 import structures.generics.SetOf;
 import structures.integers.ArrayOfInt;
 
@@ -22,6 +25,19 @@ public class GolombRuler {
         }
         MDD tmp = MDDBuilder.gt(Memory.MDD(), size+1, V);
         MDD old = tmp;
+
+        ArrayOf<Node> nodes = Memory.ArrayOfNode(size-1);
+
+        for(int i = 1; i < size; i++){
+            SNode constraint = Memory.SNode();
+            ParametersDiff parameters = Memory.ParametersDiff(i);
+            constraint.setState(Memory.StateDiff(parameters, size+1));
+            nodes.set(i-1, constraint);
+        }
+
+        ConstraintOperation.intersection(result, tmp, nodes);
+
+        /*
         tmp = ConstraintOperation.diff(Memory.MDD(), tmp, 1, false);
         Memory.free(old);
         old = tmp;
@@ -33,6 +49,8 @@ public class GolombRuler {
             tmp.removeChildless();
         }
         ConstraintOperation.diff(result, tmp, size-1, true);
+
+         */
         result.reduce();
         return result;
     }
