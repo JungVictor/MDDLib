@@ -72,25 +72,22 @@ public class StateDiff extends NodeState {
     }
 
     public boolean isValid(int label, int layer, int size, ArrayOf<NodeState> nodestates){
-        int value = Math.abs(values.get(0) - label);
-        if(diff.contains(value)) return false;
-        SetOf<Integer> test = Memory.SetOfInteger();
-        test.add(diff);
-        int n = diff.size();
-        for(NodeState nodeState : nodestates){
-            StateDiff state = (StateDiff) nodeState;
-            if(state.diff.contains(value)) {
-                Memory.free(test);
-                return false;
-            }
-            test.add(state.diff);
-            n += state.diff.size();
-            if(test.size() != n) {
-                Memory.free(test);
-                return false;
+        ArrayOfInt values = Memory.ArrayOfInt(nodestates.length + 1);
+        values.set(0, Math.abs(this.values.get(0) - label));
+        for(int i = 0; i < nodestates.length; i++) {
+            StateDiff state = (StateDiff) nodestates.get(i);
+            if(layer <= state.constraint.length()) values.set(i+1, -1);
+            else values.set(i+1, Math.abs(state.values.get(0) - label));
+        }
+
+        for(int value : values){
+            if(diff.contains(value)) return false;
+            for(NodeState nodeState : nodestates) {
+                StateDiff state = (StateDiff) nodeState;
+                if(state.diff.contains(value)) return false;
             }
         }
-        Memory.free(test);
+
         return true;
     }
 

@@ -92,6 +92,12 @@ public class Node implements MemoryObject {
     }
 
     public void associate(Node node, int position){
+        if(position >= associations.length) {
+            ArrayOf<Node> associations = Memory.ArrayOfNode(position+1);
+            for(int i = 0; i < this.associations.length; i++) associations.set(i, this.associations.get(i));
+            Memory.free(this.associations);
+            this.associations = associations;
+        }
         associations.set(position, node);
     }
 
