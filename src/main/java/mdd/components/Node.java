@@ -381,10 +381,22 @@ public class Node implements MemoryObject {
     //**************************************//
     // Implementation of MemoryObject interface
 
-    @Override
-    public void prepare() {
+    protected void setChildren(OutArcs children){
+        this.children = children;
+    }
+
+    protected void setParents(InArcs parents){
+        this.parents = parents;
+    }
+
+    protected void allocateArcs(){
         children = Memory.OutArcs();
         parents = Memory.InArcs();
+    }
+
+    @Override
+    public void prepare() {
+        allocateArcs();
         associations = Memory.ArrayOfNode(2);
     }
 

@@ -2,6 +2,10 @@ package memory;
 
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
+import costmdd.CostMDD;
+import costmdd.components.CostNode;
+import costmdd.components.InCostArcs;
+import costmdd.components.OutCostArcs;
 import mdd.MDD;
 import mdd.components.*;
 import mdd.operations.Pack;
@@ -429,12 +433,34 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<Node> costNodePool = new MemoryPool<>();
+    public static CostNode CostNode(){
+        CostNode object = (CostNode) costNodePool.get();
+        if(object == null){
+            object = new CostNode(costNodePool);
+            costNodePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     private static final MemoryPool<InArcs> inArcsPool = new MemoryPool<>();
     public static InArcs InArcs(){
         InArcs object = inArcsPool.get();
         if(object == null){
             object = new InArcs(inArcsPool);
             inArcsPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+    private static final MemoryPool<InArcs> inCostArcsPool = new MemoryPool<>();
+    public static InCostArcs InCostArcs(){
+        InCostArcs object = (InCostArcs) inCostArcsPool.get();
+        if(object == null){
+            object = new InCostArcs(inCostArcsPool);
+            inCostArcsPool.add(object);
         }
         object.prepare();
         return object;
@@ -451,6 +477,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<OutArcs> outCostArcsPool = new MemoryPool<>();
+    public static OutCostArcs OutCostArcs(){
+        OutCostArcs object = (OutCostArcs) outCostArcsPool.get();
+        if(object == null){
+            object = new OutCostArcs(outCostArcsPool);
+            outCostArcsPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     public static final MemoryPool<MDD> mddPool = new MemoryPool<>();
     public static MDD MDD(){
         return MDD(Node());
@@ -460,6 +497,19 @@ public class Memory {
         if(object == null){
             object = new MDD(mddPool);
             mddPool.add(object);
+        }
+        object.prepare();
+        object.setRoot(node);
+        return object;
+    }
+
+    public static final MemoryPool<MDD> costMddPool = new MemoryPool<>();
+    public static CostMDD CostMDD(){return CostMDD(CostNode());}
+    public static CostMDD CostMDD(Node node){
+        CostMDD object = (CostMDD) costMddPool.get();
+        if(object == null){
+            object = new CostMDD(costMddPool);
+            costMddPool.add(object);
         }
         object.prepare();
         object.setRoot(node);

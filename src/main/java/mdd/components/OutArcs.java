@@ -63,6 +63,10 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
         this.arcs.put(label, node);
     }
 
+    public boolean containsLabel(int label){
+        return this.values.contains(label);
+    }
+
     /**
      * Get the node associated with the given label
      * @param label Label of the arc
@@ -156,7 +160,7 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
      * Add a value to the set of values and sort the set in increasing order.
      * @param value Value to add
      */
-    private void addValueAndSort(int value){
+    public void addValueAndSort(int value){
         values.add(value);
         Collections.sort(values);
     }
