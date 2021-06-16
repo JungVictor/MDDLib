@@ -1,10 +1,8 @@
 package builder.constraints;
 
-import builder.constraints.parameters.ParametersAmong;
-import builder.constraints.parameters.ParametersDiff;
-import builder.constraints.parameters.ParametersGCC;
-import builder.constraints.parameters.ParametersSum;
+import builder.constraints.parameters.*;
 import builder.constraints.states.NodeState;
+import builder.constraints.states.StateAllDiff;
 import builder.constraints.states.StateGCC;
 import mdd.MDD;
 import mdd.components.Node;
@@ -74,6 +72,7 @@ public class ConstraintBuilder {
 
         Memory.free(parameters);
 
+        result.reduce();
         return result;
     }
 
@@ -89,6 +88,8 @@ public class ConstraintBuilder {
         Memory.free(parameters);
         Memory.free(B);
         Memory.free(One);
+
+        result.reduce();
 
         return result;
     }
@@ -106,7 +107,7 @@ public class ConstraintBuilder {
         build(result, snode, V, size);
 
         Memory.free(parameters);
-
+        result.reduce();
         return result;
     }
 
@@ -116,6 +117,18 @@ public class ConstraintBuilder {
         StateGCC state = Memory.StateGCC(parameters);
         state.initV();
         constraint.setState(state);
+
+        build(result, constraint, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    static public MDD allDiff(MDD result, SetOf<Integer> D, SetOf<Integer> V, int size){
+        SNode constraint = Memory.SNode();
+        ParametersAllDiff parameters = Memory.ParametersAllDiff(V);
+        constraint.setState(Memory.StateAllDiff(parameters));
 
         build(result, constraint, D, size);
 

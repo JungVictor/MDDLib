@@ -76,7 +76,6 @@ public class MDD implements MemoryObject {
         return Memory.Node();
     }
 
-
     /**
      * @return a MDD the same type as the current MDD, with the same Node type as the root for default Node
      */

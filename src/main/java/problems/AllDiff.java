@@ -45,8 +45,8 @@ public class AllDiff {
         return result;
     }
     public static MDD alldiff(int groupsize, int ngroups){
-        ArrayOfInt V = Memory.ArrayOfInt(groupsize);
-        for(int i = 0; i < V.length; i++) V.set(i,i);
+        SetOf<Integer> V = Memory.SetOfInteger();
+        for(int i = 0; i < groupsize; i++) V.add(i);
         MDD alldiff = MDDBuilder.alldiff(Memory.MDD(), V, groupsize);
         MDD result = generate(alldiff, groupsize, ngroups);
         Memory.free(alldiff);

@@ -65,7 +65,6 @@ public class MDDAllDifferent {
         return mdd;
     }
 
-
     public static MDD intersection(MDD result, MDD mdd, ArrayOfInt V){
         return intersection(result, mdd, V, null);
     }

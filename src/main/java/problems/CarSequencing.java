@@ -8,9 +8,9 @@ import mdd.operations.ConstraintMDD;
 import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
+import memory.Binary;
 import pmdd.memory.PMemory;
 import problems.carsequencing.CarSequencingData;
-import representation.MDDPrinter;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -122,21 +122,19 @@ public class CarSequencing {
     }
 
     private MDD option(int i, SetOf<Integer> V0, SetOf<Integer> V1){
-        SetOf<Integer> V = Memory.SetOfInteger();
         for(int v : data.getV()){
             if(data.isOptionInConfig(i, v)) V1.add(v);
             else V0.add(v);
-            V.add(v);
         }
 
         MDD seq = MDDBuilder.sequence(Memory.MDD(), data.seqSizeOption(i), 0, data.seqMaxOption(i), data.nCars());
-        MDD sum = MDDBuilder.sum(Memory.MDD(), data.nCarsWithOption(i), data.nCars());
+        MDD sum = ConstraintBuilder.sum(Memory.MDD(), Binary.Set(), data.nCarsWithOption(i), data.nCarsWithOption(i), data.nCars());
+
         MDD option = Operation.intersection(seq, sum);
         option.replace(V0, V1);
 
         Memory.free(seq);
         Memory.free(sum);
-        Memory.free(V);
 
         return option;
     }
@@ -348,17 +346,13 @@ public class CarSequencing {
             else V0.add(v);
         }
 
-        ArrayOfInt B = Memory.ArrayOfInt(2);
-        B.set(0,0); B.set(1,1);
-
         MDD seq = MDDBuilder.sequence(Memory.MDD(), data.seqSizeOption(idx), 0, data.seqMaxOption(idx), data.nCarsRelaxed());
-        MDD sum = MDDBuilder.sum(Memory.MDD(), data.nOptionMin(idx), data.nOptionMax(idx), data.nCarsRelaxed(), B);
+        MDD sum = MDDBuilder.sum(Memory.MDD(), data.nOptionMin(idx), data.nOptionMax(idx), data.nCarsRelaxed(), Binary.Set());
         MDD option = Operation.intersection(seq, sum);
         option.replace(V0, V1);
 
         Memory.free(seq);
         Memory.free(sum);
-        Memory.free(B);
 
         return option;
     }
@@ -370,11 +364,8 @@ public class CarSequencing {
             else V0.add(data.getV().get(i));
         }
 
-        ArrayOfInt B = Memory.ArrayOfInt(2);
-        B.set(0,0); B.set(1,1);
-        MDD config = MDDBuilder.sum(Memory.MDD(), data.nConfigMin(idx), data.nConfigMax(idx), data.nCars(), B);
+        MDD config = MDDBuilder.sum(Memory.MDD(), data.nConfigMin(idx), data.nConfigMax(idx), data.nCars(), Binary.Set());
         config.replace(V0, V1);
-        Memory.free(B);
         return config;
     }
 

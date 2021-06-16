@@ -22,12 +22,14 @@ public class AllDiffKN {
 
     public MDD solve(MDD mdd){
 
-        ArrayOfInt initial_domain = Memory.ArrayOfInt(K + K + 1);
+        SetOf<Integer> initial_domain = Memory.SetOfInteger();
+        SetOf<Integer> tokens = Memory.SetOfInteger();
         // The initial domain and mapping
-        initial_domain.setLength(K+1+K);
-        for (int i = 0; i <= K+K; i++) initial_domain.set(i, i);
-        ArrayOfInt tokens = Memory.ArrayOfInt(initial_domain.length - 1);
-        for (int i = 0; i < tokens.length; i++) tokens.set(i, K + K + i + 1);
+        for (int i = 0; i <= K+K; i++) {
+            initial_domain.add(i);
+            tokens.add(i);
+        }
+        for (int i = 0; i < K+K; i++) tokens.add(K + K + i + 1);
 
         MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
 

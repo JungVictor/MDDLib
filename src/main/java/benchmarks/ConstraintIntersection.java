@@ -3,6 +3,7 @@ package benchmarks;
 import builder.MDDBuilder;
 import builder.constraints.ConstraintBuilder;
 import builder.constraints.MDDAllDifferent;
+import builder.constraints.MDDGCC;
 import mdd.MDD;
 import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
@@ -25,17 +26,23 @@ public class ConstraintIntersection {
         MapOf<Integer, TupleOfInt> tuples = Memory.MapOfIntegerTupleOfInt();
         for(int i = 0; i < 5; i++) tuples.put(i, Memory.TupleOfInt(2, 8));
 
-        //construction_sum(124, 480, 200, 14);
+
+        construction_sum(64, 64, 100, 2);
         //construction_gcc(tuples, 30, 10);
-        construction_seq(15, 2, 8, 50, 2, 1);
+        //construction_seq(15, 2, 8, 50, 2, 1);
     }
-
-
 
     private static void construction_sum(int min, int max, int size, int V){
         SetOf<Integer> domain = Memory.SetOfInteger();
         for(int i = 0; i < V; i++) domain.add(i);
         MDD sum = ConstraintBuilder.sum(Memory.MDD(), domain, min, max, size);
+        MDD sum2 = MDDBuilder.sum(Memory.MDD(), min, max, size, domain);
+
+        System.out.println(sum.size() == sum2.size());
+        System.out.println(sum.nodes() == sum2.nodes());
+        System.out.println(sum.arcs() == sum2.arcs());
+        System.out.println(Operation.inclusion(sum2, sum));
+        System.out.println(Operation.inclusion(sum, sum2));
     }
 
     private static void construction_gcc(MapOf<Integer, TupleOfInt> tuples, int size, int D){
@@ -61,9 +68,8 @@ public class ConstraintIntersection {
 
 
     private static void sum(MDD test, int min, int max){
-        ArrayOfInt V = Memory.ArrayOfInt(test.getV().size());
-        int i = 0;
-        for(int v : test.getV()) V.set(i++, v);
+        SetOf<Integer> V = Memory.SetOfInteger();
+        for(int v : test.getV()) V.add(v);
 
         MDD result1, result2;
 
@@ -101,7 +107,7 @@ public class ConstraintIntersection {
         result = PMemory.PMDD();
 
         Logger.out.information("BEGIN\n");
-        MDD sum = MDDBuilder.alldiff(Memory.MDD(), V, test.size());
+        MDD sum = MDDAllDifferent.generate(Memory.MDD(), V, test.size());
         Operation.intersection(result, test, sum);
         Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
     }
@@ -122,7 +128,7 @@ public class ConstraintIntersection {
         result = PMemory.PMDD();
 
         Logger.out.information("BEGIN\n");
-        MDD sum = MDDBuilder.gcc(Memory.MDD(), test.size(), tuples, V);
+        MDD sum = MDDGCC.generate(Memory.MDD(), test.size(), tuples, V);
         Operation.intersection(result, test, sum);
         Logger.out.information("STOP : " + result.nSolutions() + " solutions\n");
     }

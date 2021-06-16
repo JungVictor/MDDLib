@@ -4,6 +4,7 @@ import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.operations.Operation;
+import memory.Binary;
 import memory.Memory;
 import structures.Binder;
 import structures.generics.ArrayOf;
@@ -20,9 +21,6 @@ public class MDDGCC {
     private MDDGCC(){}
 
     public static MDD generate_(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, ArrayOfInt V){
-        ArrayOfInt B = Memory.ArrayOfInt(2);
-        B.set(0,0); B.set(1,1);
-
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
         int min, max;
 
@@ -35,7 +33,7 @@ public class MDDGCC {
                 V1.add(v);
                 min = couples.get(v).getFirst();
                 max = couples.get(v).getSecond();
-                MDDBuilder.sum(mdd, min, max, n, B);
+                MDDBuilder.sum(mdd, min, max, n, Binary.Set());
                 mdd.replace(V0, V1);
             }
         }
@@ -51,7 +49,7 @@ public class MDDGCC {
                 V1.add(v);
                 min = couples.get(v).getFirst();
                 max = couples.get(v).getSecond();
-                sums.set(p, MDDBuilder.sum(Memory.MDD(), min, max, n, B));
+                sums.set(p, MDDBuilder.sum(Memory.MDD(), min, max, n, Binary.Set()));
                 sums.get(p++).replace(V0, V1);
                 V0.add(v);
                 V1.remove(v);
@@ -63,7 +61,6 @@ public class MDDGCC {
 
         Memory.free(V0);
         Memory.free(V1);
-        Memory.free(B);
         return mdd;
     }
 

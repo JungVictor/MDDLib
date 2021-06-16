@@ -15,6 +15,7 @@ public class StateSum extends NodeState {
 
     public void init(ParametersSum constraint){
         this.constraint = constraint;
+        this.sum = 0;
     }
 
     public String toString(){
@@ -30,8 +31,8 @@ public class StateSum extends NodeState {
 
     @Override
     public boolean isValid(int label, int layer, int size){
-        int minPotential = sum + label + (size - layer) * constraint.vMin();
-        int maxPotential = sum + label + (size - layer) * constraint.vMax();
+        int minPotential = sum + label + (size - layer - 1) * constraint.vMin();
+        int maxPotential = sum + label + (size - layer - 1) * constraint.vMax();
 
 
         if(maxPotential < constraint.min() || constraint.max() < minPotential) return false;
@@ -41,8 +42,8 @@ public class StateSum extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        int minPotential = sum + label + (size - layer) * constraint.vMin();
-        int maxPotential = sum + label + (size - layer) * constraint.vMax();
+        int minPotential = sum + label + (size - layer - 1) * constraint.vMin();
+        int maxPotential = sum + label + (size - layer - 1) * constraint.vMax();
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
         return Integer.toString(sum + label);
