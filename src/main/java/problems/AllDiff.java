@@ -66,7 +66,7 @@ public class AllDiff {
                         int value = child.getRandomParentValue(random);
                         if(!parent.containsLabel(value)) {
                             cpt++;
-                            mdd.addArc(parent, value, child);
+                            mdd.addArc(parent, value, child, i);
                         }
                     }
                 }

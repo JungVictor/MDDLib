@@ -7,6 +7,7 @@ import mdd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
 import structures.Binder;
+import structures.Domains;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -33,7 +34,7 @@ public class MDDBuilder {
         return ConstraintBuilder.sum(mdd, Binary.Set(), min, max, q);
         //return MDDAmong.generate(mdd, q, min, max);
     }
-    public static MDD among(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int q, int min, int max){
+    public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max){
         return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q);
     }
 
@@ -68,14 +69,20 @@ public class MDDBuilder {
 
         return mdd;
     }
-    public static MDD sequence(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int q, int min, int max, int size){
+    public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
         return ConstraintBuilder.sequence(mdd, D, V, q, min, max, size);
     }
 
     /* SUM */
+    public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D){
+        return ConstraintBuilder.sum(mdd, D, s_min, s_max, n);
+        //return MDDSum.generate(mdd, s_min, s_max, n, V);
+    }
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, SetOf<Integer> V){
         return ConstraintBuilder.sum(mdd, V, s_min, s_max, n);
-        //return MDDSum.generate(mdd, s_min, s_max, n, V);
+    }
+    public static MDD sum(MDD mdd, int s, int n, Domains D){
+        return ConstraintBuilder.sum(mdd, D, s, s, n);
     }
     public static MDD sum(MDD mdd, int s, int n, SetOf<Integer> V){
         return ConstraintBuilder.sum(mdd, V, s, s, n);
@@ -85,16 +92,16 @@ public class MDDBuilder {
     }
 
     /* GCC */
-    public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, SetOf<Integer> D){
+    public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D){
         return ConstraintBuilder.gcc(mdd, D, couples, n);
     }
 
     /* ALL DIFF */
     public static MDD alldiff(MDD mdd, SetOf<Integer> V, int size){
-        return ConstraintBuilder.allDiff(mdd, V, V, size);
+        return ConstraintBuilder.allDiff(mdd, V, size);
         //return MDDAllDifferent.generate(mdd, V, size);
     }
-    public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
+    public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size){
         return ConstraintBuilder.allDiff(mdd, D, V, size);
         //return MDDAllDifferent.generate(mdd, V, C, size);
     }

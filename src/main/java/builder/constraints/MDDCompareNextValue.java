@@ -37,7 +37,7 @@ public class MDDCompareNextValue {
                             values.put(nextNode, v);
                             result.addNode(nextNode, i);
                         }
-                        result.addArc(node, v, nextNode);
+                        result.addArc(node, v, nextNode, i-1);
                     }
                 }
             }

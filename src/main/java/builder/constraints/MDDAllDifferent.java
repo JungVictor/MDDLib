@@ -45,7 +45,7 @@ public class MDDAllDifferent {
                         Memory.free(newDomain);
                         newNode = alldiff.get(key);
                     }
-                    mdd.addArc(node, domain.get(j), newNode);
+                    mdd.addArc(node, domain.get(j), newNode, i);
                 }
                 if(C != null && C.length > 0) {
                     ArrayOfInt copyDomain = Memory.ArrayOfInt(domain.length);
@@ -55,7 +55,7 @@ public class MDDAllDifferent {
                     alldiff.put(key, newNode);
                     values.put(newNode, copyDomain);
                     mdd.addNode(newNode, i+1);
-                    for(int c : C) mdd.addArc(node, c, newNode);
+                    for(int c : C) mdd.addArc(node, c, newNode, i);
                 }
                 Memory.free(values.get(node));
                 values.remove(node);
@@ -103,7 +103,7 @@ public class MDDAllDifferent {
                         Memory.free(newDomain);
                         y = alldiff.get(key);
                     }
-                    result.addArc(x, domain.get(j), y);
+                    result.addArc(x, domain.get(j), y, i-1);
                 }
                 if(C != null && C.length > 0) {
                     ArrayOfInt copyDomain = Memory.ArrayOfInt(domain.length);
@@ -112,7 +112,7 @@ public class MDDAllDifferent {
                     Node y = result.Node();
                     alldiff.put(key, y);
                     nextValues.put(y, copyDomain);
-                    for(int c : C) if(x1.containsLabel(c)) result.addArc(x, c, y);
+                    for(int c : C) if(x1.containsLabel(c)) result.addArc(x, c, y, i-1);
                 }
             }
             alldiff.clear();

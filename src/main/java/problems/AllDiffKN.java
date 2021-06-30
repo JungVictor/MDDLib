@@ -31,7 +31,8 @@ public class AllDiffKN {
         }
         for (int i = 0; i < K+K; i++) tokens.add(K + K + i + 1);
 
-        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
+        //MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
+        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), null, tokens,  K+K+1);
 
 
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
@@ -86,8 +87,8 @@ public class AllDiffKN {
             Node next = domains.Node();
             domains.addNode(next, i+1);
             for(int j = 0; j <= K; j++) {
-                if(i-j >= 0) domains.addArc(current, i-j, next);
-                if(j+i < n) domains.addArc(current, j+i, next);
+                if(i-j >= 0) domains.addArc(current, i-j, next, i);
+                if(j+i < n) domains.addArc(current, j+i, next, i);
             }
             current = next;
         }

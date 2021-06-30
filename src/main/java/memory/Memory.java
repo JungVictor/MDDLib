@@ -9,6 +9,7 @@ import costmdd.components.OutCostArcs;
 import mdd.MDD;
 import mdd.components.*;
 import mdd.operations.Pack;
+import structures.Domains;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
@@ -330,7 +331,7 @@ public class Memory {
     }
 
     private static final MemoryPool<ParametersSum> parametersSumPool = new MemoryPool<>();
-    public static ParametersSum ParametersSum(int min, int max, int vMin, int vMax){
+    public static ParametersSum ParametersSum(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax){
         ParametersSum object = parametersSumPool.get();
         if(object == null){
             object = new ParametersSum(parametersSumPool);
@@ -368,6 +369,17 @@ public class Memory {
     //**************************************//
     //            ATOMIC OBJECTS            //
     //**************************************//
+
+    private static final MemoryPool<Domains> domainsPool = new MemoryPool<>();
+    public static Domains Domains(){
+        Domains object = domainsPool.get();
+        if(object == null){
+            object = new Domains(domainsPool);
+            domainsPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
 
     private static final MemoryPool<TupleOfInt> tupleOfIntPool = new MemoryPool<>();
     public static TupleOfInt TupleOfInt(){

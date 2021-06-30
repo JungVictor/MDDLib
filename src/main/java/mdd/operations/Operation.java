@@ -3,6 +3,7 @@ package mdd.operations;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
+import structures.Domains;
 import structures.booleans.ArrayOfBoolean;
 import structures.generics.ArrayOf;
 import structures.Binder;
@@ -100,13 +101,13 @@ public class Operation {
         Binder binder = Memory.Binder();
 
         // Construction of V
-        V.add(mdd1.getV());
-        V.intersect(mdd2.getV());
+        // V.add(mdd1.getV());
+        // V.intersect(mdd2.getV());
 
         for(int i = start+1; i < stop; i++){
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
-                for(int v : V){
+                for(int v : mdd1.getDomain(i-1)){
                     boolean a1 = x1.containsLabel(v), a2 = a1;
                     if(x2 != x1) a2 = x2.containsLabel(v);
                     if(apply(a1, a2, Operator.INTERSECTION, i == stop - 1)) {
@@ -223,13 +224,13 @@ public class Operation {
         if(mdd2.size() > mdd1.size()) return false;
 
         // Construction of V
-        SetOf<Integer> V = Memory.SetOfInteger();
-        V.add(mdd1.getV()); V.intersect(mdd2.getV());
+        Domains D = Memory.Domains();
+        D.union(mdd1.getDomains()); D.intersect(mdd2.getDomains());
 
-        if(V.size() == 0) return false;
+        for(int i = 0; i < D.size(); i++) if(D.domain(i).size() == 0) return false;
 
-        boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), V);
-        Memory.free(V);
+        boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), D);
+        Memory.free(D);
         return result;
     }
 
@@ -239,12 +240,12 @@ public class Operation {
      * @param root1 The first root
      * @param root2 The second root
      * @param size The size of both sub-MDDs
-     * @param V The set of values to check
+     * @param D The domains of the variables
      * @return true if there is an inclusion, false otherwise
      */
-    public static boolean inclusion(Node root1, Node root2, int size, SetOf<Integer> V){
+    public static boolean inclusion(Node root1, Node root2, int size, Domains D){
         MDD inclusion = Memory.MDD();
-        boolean result = perform(inclusion, root1, root2, size, V, Operator.INCLUSION) != null;
+        boolean result = perform(inclusion, root1, root2, size, D, Operator.INCLUSION) != null;
         Memory.free(inclusion);
         return result;
     }
@@ -280,11 +281,11 @@ public class Operation {
      * @param root1 The root node of the first MDD
      * @param root2 The root node of the second MDD
      * @param size The size of the MDD result
-     * @param V The set of values to consider during the operation
+     * @param D The domains of the variables
      * @param OP The type of operation
      * @return The MDD resulting from the operation
      */
-    private static MDD perform(MDD result, Node root1, Node root2, int size, SetOf<Integer> V, Operator OP){
+    private static MDD perform(MDD result, Node root1, Node root2, int size, Domains D, Operator OP){
         result.setSize(size);
         Binder binder = Memory.Binder();
 
@@ -294,7 +295,7 @@ public class Operation {
             Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
-                for(int v : V){
+                for(int v : D.domain(i-1)){
                     boolean a1 = x1.containsLabel(v), a2 = a1;
                     if(x2 != x1) a2 = x2.containsLabel(v);
                     if(apply(a1, a2, OP, i == size - 1)) {
@@ -325,13 +326,13 @@ public class Operation {
     private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
         result.setSize(mdd1.size());
         // Construction of V
-        SetOf<Integer> V = Memory.SetOfInteger();
-        V.add(mdd1.getV());
-        if(OP == Operator.INTERSECTION) V.intersect(mdd2.getV());
-        else V.add(mdd2.getV());
+        Domains D = Memory.Domains();
+        D.union(mdd1.getDomains());
+        if(OP == Operator.INTERSECTION) D.intersect(mdd2.getDomains());
+        else D.union(mdd2.getDomains());
 
-        perform(result, mdd1.getRoot(), mdd2.getRoot(), mdd1.size(), V, OP);
-        Memory.free(V);
+        perform(result, mdd1.getRoot(), mdd2.getRoot(), mdd1.size(), D, OP);
+        Memory.free(D);
         return result;
     }
 
@@ -378,7 +379,7 @@ public class Operation {
             }
             Memory.free(nodes);
         }
-        mdd.addArc(x, label, y);
+        mdd.addArc(x, label, y, layer-1);
         return y;
     }
 
@@ -476,7 +477,7 @@ public class Operation {
         ArrayOf<Node> ys = Memory.ArrayOfNode(mdds.length());
         ArrayOfBoolean a = Memory.ArrayOfBoolean(mdds.length());
         Binder binder = Memory.Binder();
-        SetOf<Integer> V = Memory.SetOfInteger();
+        Domains D = Memory.Domains();
         //
 
         if(OP != Operator.INTERSECTION && OP != Operator.UNION) {
@@ -485,9 +486,9 @@ public class Operation {
         result.setSize(mdds.get(0).size());
 
         // Construction of V
-        V.add(mdds.get(0).getV());
-        if(OP == Operator.INTERSECTION) for(int i = 1; i < mdds.length(); i++) V.intersect(mdds.get(i).getV());
-        else for(int i = 1; i < mdds.length(); i++) V.add(mdds.get(i).getV());
+        D.union(mdds.get(0).getDomains());
+        if(OP == Operator.INTERSECTION) for(int i = 1; i < mdds.length(); i++) D.intersect(mdds.get(i).getDomains());
+        else for(int i = 1; i < mdds.length(); i++) D.union(mdds.get(i).getDomains());
 
 
         for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());
@@ -499,7 +500,7 @@ public class Operation {
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
                 ArrayOf<Node> xs = x.getAssociations();
-                for(int v : V){
+                for(int v : D.domain(i-1)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
@@ -514,7 +515,7 @@ public class Operation {
         Memory.free(ys);
         Memory.free(a);
         Memory.free(binder);
-        Memory.free(V);
+        Memory.free(D);
 
         result.reduce();
         return result;
@@ -545,7 +546,7 @@ public class Operation {
                 mdd.addNode(y, layer);
             }
         }
-        mdd.addArc(x, label, y);
+        mdd.addArc(x, label, y, layer-1);
     }
 
 }

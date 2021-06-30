@@ -16,7 +16,7 @@ public class MDDUniversal {
         for(int i = 1; i < size+1; i++){
             next = mdd.Node();
             mdd.addNode(next, i);
-            for(int v : V) mdd.addArc(current, v, next);
+            for(int v : V) mdd.addArc(current, v, next, i-1);
             current = next;
         }
 

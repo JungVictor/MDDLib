@@ -93,7 +93,7 @@ public class MDDGCC {
                         nextValues.put(y, newDomain);
                         mdd.addNode(y, i);
                     } else Memory.free(newDomain);
-                    mdd.addArc(x, j, y);
+                    mdd.addArc(x, j, y, i-1);
                 }
             }
             for(ArrayOfInt array : values.values()) Memory.free(array);

@@ -7,6 +7,7 @@ import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
 import representation.MDDVisitor;
+import structures.Domains;
 import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -33,7 +34,7 @@ public class MDD implements MemoryObject {
     private int size;
 
     // Domain of the MDD
-    private final SetOf<Integer> V = Memory.SetOfInteger();
+    private final Domains D = new Domains(null);
 
     //**************************************//
     //           INITIALISATION             //
@@ -114,7 +115,7 @@ public class MDD implements MemoryObject {
                         child.associate(copyChild, null);
                         copy.addNode(copyChild, i+1+offset);
                     }
-                    copy.addArc(copyNode, arc, copyChild);
+                    copy.addArc(copyNode, arc, copyChild, i+offset);
                 }
                 original.associate(null, null);
             }
@@ -184,10 +185,9 @@ public class MDD implements MemoryObject {
         for(int i = start; i < stop - 1; i++){
             for(Node node : getLayer(i)) {
                 node.replace(mapping, setV);
+                this.D.domain(i).add(setV);
             }
         }
-        this.V.clear();
-        this.V.add(setV);
         Memory.free(setV);
     }
 
@@ -225,7 +225,7 @@ public class MDD implements MemoryObject {
 
     public void clear(){
         for(int i = 1; i < size; i++) getLayer(i).freeAllNodes();
-        V.clear();
+        D.clear();
         this.tt = null;
     }
 
@@ -270,8 +270,12 @@ public class MDD implements MemoryObject {
      * Get the set of all values that are in the MDD
      * @return The set of all values that are in the MDD
      */
-    public SetOf<Integer> getV(){
-        return V;
+    public Domains getDomains(){
+        return D;
+    }
+
+    public SetOf<Integer> getDomain(int index){
+        return D.domain(index);
     }
 
     /**
@@ -332,8 +336,8 @@ public class MDD implements MemoryObject {
      * Add a value to the set of values that are in the MDD
      * @param v the value
      */
-    public void addValue(int v){
-        V.add(v);
+    public void addValue(int v, int layer){
+        D.put(layer, v);
     }
 
 
@@ -383,10 +387,10 @@ public class MDD implements MemoryObject {
      * @param value The value of the arc's label
      * @param destination The destination node (child)
      */
-    public void addArc(Node source, int value, Node destination){
+    public void addArc(Node source, int value, Node destination, int layer){
         source.addChild(value, destination);
         destination.addParent(value, source);
-        addValue(value);
+        addValue(value, layer);
     }
 
     /**
@@ -409,7 +413,7 @@ public class MDD implements MemoryObject {
      * @param layer The layer of the MDD where the node destination will be added
      */
     public void addArcAndNode(Node source, int value, Node destination, int layer){
-        addArc(source, value, destination);
+        addArc(source, value, destination, layer-1);
         addNode(destination, layer);
     }
 
@@ -428,7 +432,10 @@ public class MDD implements MemoryObject {
         }
 
         // Merge similar nodes
+        SetOf<Integer> V = Memory.SetOfInteger();
+        D.fillWithValues(V);
         if(getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
+        Memory.free(V);
     }
 
     public void removeChildless(){
@@ -478,7 +485,7 @@ public class MDD implements MemoryObject {
         Memory.free(root);
         prepare();
         L.clear();
-        V.clear();
+        D.clear();
         this.root = null;
         this.tt = null;
         this.pool.free(this, ID);

@@ -16,6 +16,11 @@ public class Main {
 
     public static void main(String[] args) {
 
+        SetOf<Integer> V = Memory.SetOfInteger();
+        for(int i = 0; i < 5; i++) V.add(i);
+
+        MDDBuilder.sum(Memory.MDD(), 10, 3, V).accept(new MDDPrinter());
+
         int size = 100;
 
         PMDD seq = PMemory.PMDD();

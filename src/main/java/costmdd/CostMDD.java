@@ -53,10 +53,10 @@ public class CostMDD extends MDD {
      * @param destination The destination node (child)
      * @param cost Cost of the arc
      */
-    public void addArc(Node source, int value, Node destination, int cost){
+    public void addArc(Node source, int value, Node destination, int cost, int layer){
         ((CostNode) source).addChild(value, destination, cost);
         ((CostNode) destination).addParent(value, source, cost);
-        addValue(value);
+        addValue(value, layer);
     }
 
     /**
@@ -69,7 +69,7 @@ public class CostMDD extends MDD {
      * @param layer The layer of the MDD where the node destination will be added
      */
     public void addArcAndNode(Node source, int value, Node destination, int cost, int layer){
-        addArc(source, value, destination, cost);
+        addArc(source, value, destination, cost, layer);
         addNode(destination, layer);
     }
 

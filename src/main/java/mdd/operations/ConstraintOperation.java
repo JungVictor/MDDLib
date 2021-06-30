@@ -11,6 +11,7 @@ import structures.Binder;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.integers.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 
@@ -27,9 +28,9 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
-    static public MDD allDiff(MDD result, MDD mdd){
+    static public MDD allDiff(MDD result, MDD mdd, SetOf<Integer> V){
         SNode constraint = Memory.SNode();
-        ParametersAllDiff parameters = Memory.ParametersAllDiff(mdd.getV());
+        ParametersAllDiff parameters = Memory.ParametersAllDiff(V);
         constraint.setState(Memory.StateAllDiff(parameters));
 
         result.getRoot().associate(mdd.getRoot(), constraint);
@@ -74,14 +75,25 @@ public class ConstraintOperation {
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max){
 
-        int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-        for(int v : mdd.getV()) {
-            if(v < vMin) vMin = v;
-            if(v > vMax) vMax = v;
+        ArrayOfInt minValues = Memory.ArrayOfInt(mdd.size());
+        ArrayOfInt maxValues = Memory.ArrayOfInt(mdd.size());
+
+        for(int i = mdd.size() - 1; i >= 0; i--){
+            int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            for(int v : mdd.getDomain(i)) {
+                if(v < vMin) vMin = v;
+                if(v > vMax) vMax = v;
+            }
+            if(i < mdd.size() - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
         }
 
         SNode constraint = Memory.SNode();
-        ParametersSum parameters = Memory.ParametersSum(min, max, vMin, vMax);
+        ParametersSum parameters = Memory.ParametersSum(min, max, minValues, maxValues);
         constraint.setState(Memory.StateSum(parameters));
 
         intersection(result, mdd, constraint);
@@ -119,9 +131,9 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
-    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max){
+    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max, SetOf<Integer> V){
         SNode constraint = Memory.SNode();
-        ParametersAmong parameters = Memory.ParametersAmong(q, min, max, mdd.getV());
+        ParametersAmong parameters = Memory.ParametersAmong(q, min, max, V);
         constraint.setState(Memory.StateAmong(parameters));
 
         intersection(result, mdd, constraint);

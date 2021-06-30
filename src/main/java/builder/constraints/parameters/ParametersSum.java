@@ -2,6 +2,7 @@ package builder.constraints.parameters;
 
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.integers.ArrayOfInt;
 
 public class ParametersSum implements MemoryObject {
 
@@ -12,13 +13,13 @@ public class ParametersSum implements MemoryObject {
 
     // References, must not be free or cleaned by the object
     private int min, max;
-    private int vMin, vMax;
+    private ArrayOfInt vMin, vMax;
 
     public ParametersSum(MemoryPool<ParametersSum> pool){
         this.pool = pool;
     }
 
-    public void init(int min, int max, int vMin, int vMax){
+    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -27,8 +28,8 @@ public class ParametersSum implements MemoryObject {
 
     public int min(){return min;}
     public int max(){return max;}
-    public int vMin(){return vMin;}
-    public int vMax(){return vMax;}
+    public int vMin(int i){return vMin.get(i);}
+    public int vMax(int i){return vMax.get(i);}
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
