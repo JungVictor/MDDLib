@@ -5,11 +5,8 @@ import mdd.MDD;
 import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Memory;
-import representation.MDDPrinter;
-import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
 
 public class AllDiffKN {
 
@@ -24,6 +21,7 @@ public class AllDiffKN {
 
         SetOf<Integer> initial_domain = Memory.SetOfInteger();
         SetOf<Integer> tokens = Memory.SetOfInteger();
+
         // The initial domain and mapping
         for (int i = 0; i <= K+K; i++) {
             initial_domain.add(i);
@@ -31,9 +29,7 @@ public class AllDiffKN {
         }
         for (int i = 0; i < K+K; i++) tokens.add(K + K + i + 1);
 
-        //MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
-        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), null, tokens,  K+K+1);
-
+        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
 
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
         for(int i = 0; i < K*4+1; i++) mapping.put(i, Memory.SetOfInteger());

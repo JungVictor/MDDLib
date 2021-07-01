@@ -105,6 +105,17 @@ public class MDDBuilder {
         return ConstraintBuilder.allDiff(mdd, D, V, size);
         //return MDDAllDifferent.generate(mdd, V, C, size);
     }
+    public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
+        Domains domains = Memory.Domains();
+        for(int i = 0; i < size; i++){
+            domains.add(i);
+            for(int v : D) domains.put(i, v);
+        }
+        MDD result = ConstraintBuilder.allDiff(mdd, domains, V, size);
+        Memory.free(domains);
+        return result;
+        //return MDDAllDifferent.generate(mdd, V, C, size);
+    }
 
 
     /* LT / LEQ / GT / GEQ / EQ / NEQ */
