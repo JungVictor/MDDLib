@@ -33,7 +33,7 @@ public class Domains implements MemoryObject {
         domains.get(index).remove(value);
     }
 
-    public SetOf<Integer> domain(int index){
+    public SetOf<Integer> get(int index){
         return domains.get(index);
     }
 
@@ -51,17 +51,17 @@ public class Domains implements MemoryObject {
     }
 
     public void union(Domains D){
-        for(int i = 0; i < domains.size(); i++) domains.get(i).add(D.domain(i));
+        for(int i = 0; i < domains.size(); i++) domains.get(i).add(D.get(i));
         if(D.domains.size() > domains.size()) {
             for(int i = domains.size(); i < D.domains.size(); i++) {
                 add(i);
-                domains.get(i).add(D.domain(i));
+                domains.get(i).add(D.get(i));
             }
         }
     }
 
     public void intersect(Domains D){
-        for(int i = 0; i < domains.size(); i++) domains.get(i).intersect(D.domain(i));
+        for(int i = 0; i < domains.size(); i++) domains.get(i).intersect(D.get(i));
     }
 
     public void fillWithValues(SetOf<Integer> V){

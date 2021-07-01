@@ -227,7 +227,7 @@ public class Operation {
         Domains D = Memory.Domains();
         D.union(mdd1.getDomains()); D.intersect(mdd2.getDomains());
 
-        for(int i = 0; i < D.size(); i++) if(D.domain(i).size() == 0) return false;
+        for(int i = 0; i < D.size(); i++) if(D.get(i).size() == 0) return false;
 
         boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), D);
         Memory.free(D);
@@ -295,7 +295,7 @@ public class Operation {
             Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
-                for(int v : D.domain(i-1)){
+                for(int v : D.get(i-1)){
                     boolean a1 = x1.containsLabel(v), a2 = a1;
                     if(x2 != x1) a2 = x2.containsLabel(v);
                     if(apply(a1, a2, OP, i == size - 1)) {
@@ -500,7 +500,7 @@ public class Operation {
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
                 ArrayOf<Node> xs = x.getAssociations();
-                for(int v : D.domain(i-1)){
+                for(int v : D.get(i-1)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));

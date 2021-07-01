@@ -2,12 +2,10 @@ package builder.constraints;
 
 import builder.constraints.parameters.*;
 import builder.constraints.states.NodeState;
-import builder.constraints.states.StateAllDiff;
 import builder.constraints.states.StateGCC;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.components.SNode;
-import memory.Binary;
 import memory.Memory;
 import structures.Domains;
 import structures.generics.MapOf;
@@ -34,7 +32,7 @@ public class ConstraintBuilder {
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
                 SNode x = (SNode) node;
-                for(int value : D.domain(i-1)) {
+                for(int value : D.get(i-1)) {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
@@ -105,9 +103,9 @@ public class ConstraintBuilder {
         ArrayOfInt minValues = Memory.ArrayOfInt(size);
         ArrayOfInt maxValues = Memory.ArrayOfInt(size);
 
-        for(int i = size - 1; i >= 0; i--){
+        for(int i = size - 2; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-            for(int v : D.domain(i)) {
+            for(int v : D.get(i)) {
                 if(v < vMin) vMin = v;
                 if(v > vMax) vMax = v;
             }
@@ -131,7 +129,7 @@ public class ConstraintBuilder {
         Domains D = Memory.Domains();
         for(int i = 0; i < size; i++) {
             D.add(i);
-            D.domain(i).add(V);
+            D.get(i).add(V);
         }
         sum(result, D, min, max, size);
         Memory.free(D);
@@ -167,7 +165,7 @@ public class ConstraintBuilder {
         Domains D = Memory.Domains();
         for(int i = 0; i < size; i++) {
             D.add(i);
-            D.domain(i).add(V);
+            D.get(i).add(V);
         }
         allDiff(result, D, V, size);
         Memory.free(D);

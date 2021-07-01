@@ -4,7 +4,6 @@ import builder.MDDBuilder;
 import builder.constraints.ConstraintBuilder;
 import builder.constraints.MDDGCC;
 import mdd.MDD;
-import mdd.operations.ConstraintMDD;
 import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
@@ -14,14 +13,12 @@ import problems.carsequencing.CarSequencingData;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 
 public class CarSequencing {
 
     private final CarSequencingData data;
-    private final ConstraintMDD constraint = new ConstraintMDD();
 
     public CarSequencing(int[] min, int[] max, int[][] options, int... enabledOptions){
         data = new CarSequencingData(min, max, options, enabledOptions);
@@ -137,95 +134,6 @@ public class CarSequencing {
         Memory.free(sum);
 
         return option;
-    }
-
-
-    //**************************************//
-    //        SOLVE FULL CONSTRAINT         //
-    //**************************************//
-
-    public MDD solve_constraint(){
-        data.generate();
-        MDD opts = options_constraint();
-
-        MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
-        for(int v : data.getV()){
-            int ncars = data.nCarsInConfig(v);
-            gcc.put(v, Memory.TupleOfInt(ncars, ncars));
-        }
-        constraint.gcc(gcc);
-        MDD solution = constraint.intersection(Memory.MDD(), opts);
-        constraint.clear();
-        solution.reduce();
-
-        Memory.free(opts);
-
-        return solution;
-    }
-
-    public MDD solve_constraint(MDD mdd, int option){
-        // The mdd is a relaxed solution
-        SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
-
-        MapOf<Integer, Integer> old_bindings = Memory.MapOfIntegerInteger(), bindings = data.getBinding();
-        for(int key : bindings) old_bindings.put(key, bindings.get(key));
-
-        data.addOptions(option);
-        data.generate();
-
-        MapOf<Integer, SetOf<Integer>> values = Memory.MapOfIntegerSetOfInteger();
-        for(int key : bindings){
-            if(!values.contains(old_bindings.get(key))) values.put(old_bindings.get(key), Memory.SetOfInteger());
-            values.get(old_bindings.get(key)).add(bindings.get(key));
-        }
-
-        Logger.out.information("\rReplacing values...");
-        mdd.replace(values);
-        Logger.out.information("\rReplacing values done");
-
-        constraint.clear();
-        option_constraint(data.nOptions()-1);
-
-
-        MapOf<Integer, TupleOfInt> gcc = Memory.MapOfIntegerTupleOfInt();
-        for(int v : data.getV()){
-            int ncars = data.nCarsInConfig(v);
-            gcc.put(v, Memory.TupleOfInt(ncars, ncars));
-        }
-
-        constraint.gcc(gcc);
-        Logger.out.information("\rCarSequencing : Intersections\n");
-        MDD result = constraint.intersection(Memory.MDD(), mdd);
-
-        for(SetOf<Integer> set : values.values()) Memory.free(set);
-        Memory.free(values);
-        Memory.free(V0);
-        Memory.free(V1);
-        Memory.free(mdd);
-        Memory.free(old_bindings);
-
-        return result;
-    }
-
-    private MDD options_constraint(){
-        SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
-        MDD opt = option(0, V0, V1);
-        for(int i = 0; i < data.nOptions(); i++) option_constraint(i);
-        Memory.free(V0);
-        Memory.free(V1);
-
-        return opt;
-    }
-
-    private void option_constraint(int i){
-        SetOf<Integer> V1 = Memory.SetOfInteger();
-        for(int v : data.getV()) if(data.isOptionInConfig(i, v)) V1.add(v);
-
-        MapOf<Integer, TupleOfInt> count = Memory.MapOfIntegerTupleOfInt();
-        for(int v : V1) count.put(v, Memory.TupleOfInt(0, data.nCarsWithOption(i)));
-
-        constraint.sequence("seq"+i, data.seqSizeOption(i), 0, data.seqMaxOption(i), V1);
-        constraint.gcc("count"+i, count);
     }
 
 

@@ -101,15 +101,13 @@ public class CarSequencingInstance {
 
     private static MDD solve(CarSequencing cs, int mode){
         if(mode == 0) return cs.solve();
-        if(mode == 1) return cs.solve_legacy();
-        return cs.solve_constraint();
+        return cs.solve_legacy();
 
     }
 
     private static MDD solve(CarSequencing cs, int mode, MDD mdd, int opt){
         if(mode == 0) return cs.solve(mdd, opt);
-        if(mode == 1) return cs.solve_legacy(mdd, opt);
-        return cs.solve_constraint(mdd, opt);
+        return cs.solve_legacy(mdd, opt);
     }
 
     /**

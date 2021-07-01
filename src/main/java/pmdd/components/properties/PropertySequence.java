@@ -6,7 +6,6 @@ import pmdd.memory.PMemory;
 import structures.generics.ArrayOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.MatrixOfInt;
 import structures.integers.TupleOfInt;
 
 /**
@@ -16,8 +15,6 @@ import structures.integers.TupleOfInt;
  * We take into account values passed as parameters.
  */
 public class PropertySequence extends NodeProperty {
-
-    // TODO : hash
 
     private PropertySequence accumulator;
     private final ArrayOf<TupleOfInt> values;

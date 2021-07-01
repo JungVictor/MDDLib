@@ -185,7 +185,7 @@ public class MDD implements MemoryObject {
         for(int i = start; i < stop - 1; i++){
             for(Node node : getLayer(i)) {
                 node.replace(mapping, setV);
-                this.D.domain(i).add(setV);
+                this.D.get(i).add(setV);
             }
         }
         Memory.free(setV);
@@ -275,7 +275,7 @@ public class MDD implements MemoryObject {
     }
 
     public SetOf<Integer> getDomain(int index){
-        return D.domain(index);
+        return D.get(index);
     }
 
     /**
@@ -302,7 +302,7 @@ public class MDD implements MemoryObject {
      * Get the number of solutions represented by the MDD
      * @return The number of solutions represented by the MDD
      */
-    public double nSolutions(){
+    public long nSolutions(){
         clearS();
         if(tt == null) return 0;
         root.s = 1;
