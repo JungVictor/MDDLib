@@ -305,6 +305,20 @@ public class Memory {
         object.init(constraint, size);
         return object;
     }
+    
+    
+    private static final MemoryPool<NodeState> stateSubsetPool = new MemoryPool<>();
+    public static StateSubset StateSubset(ParametersSubset constraint, int ID){
+        StateSubset object = (StateSubset) stateSubsetPool.get();
+        if(object == null){
+            object = new StateSubset(stateSubsetPool);
+            stateSubsetPool.add(object);
+        }
+        object.prepare();
+        object.init(constraint, ID);
+        return object;
+    }
+    
 
     private static final MemoryPool<ParametersAmong> parametersAmongPool = new MemoryPool<>();
     public static ParametersAmong ParametersAmong(int q, int min, int max, SetOf<Integer> V){
