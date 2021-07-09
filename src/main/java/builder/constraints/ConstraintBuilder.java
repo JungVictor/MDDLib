@@ -63,6 +63,23 @@ public class ConstraintBuilder {
         Logger.out.information(node_constraint);
         return result;
     }
+    
+    
+    static public MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
+        D.add(-1);
+        SNode snode = Memory.SNode();
+        ParametersSubset parameters = new ParametersSubset(null);
+        parameters.init(letters, D.size());
+        snode.setState(Memory.StateSubset(parameters, 0));
+
+        build(result, snode, D, letters.length);
+
+        //Memory.free(parameters);
+
+        result.reduce();
+        return result;
+    }
+    
 
     static public MDD sequence(MDD result, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
         SNode snode = Memory.SNode();
