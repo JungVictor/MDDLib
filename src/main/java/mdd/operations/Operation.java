@@ -305,7 +305,11 @@ public class Operation {
                 }
             }
             if(result.getLayer(i).size() == 0) {
+                binder.clear();
+                Memory.free(binder);
                 if (OP == Operator.INCLUSION) return null;
+                result.setSize(i);
+                result.reduce();
                 return result;
             }
             binder.clear();
