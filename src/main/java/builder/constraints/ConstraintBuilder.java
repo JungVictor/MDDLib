@@ -72,7 +72,13 @@ public class ConstraintBuilder {
         parameters.init(letters, D.size());
         snode.setState(Memory.StateSubset(parameters, 0));
 
-        build(result, snode, D, letters.length);
+        Domains domains = Memory.Domains();
+        for(int i = 0; i < letters.length; i++) {
+            domains.add(i);
+            for(int v : D) domains.put(i, v);
+        }
+
+        build(result, snode, domains, letters.length);
 
         //Memory.free(parameters);
 

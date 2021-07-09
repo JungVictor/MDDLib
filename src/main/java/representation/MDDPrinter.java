@@ -11,8 +11,13 @@ public class MDDPrinter implements MDDVisitor {
 
     private int node_number, layer_number;
     private final HashMap<Node, String> names = new HashMap<>();
+    private boolean intAsChar = false;
 
     public MDDPrinter(){}
+
+    public MDDPrinter(boolean intAsChar){
+        this.intAsChar = intAsChar;
+    }
 
     @Override
     public void visit(Node node) {
@@ -41,7 +46,12 @@ public class MDDPrinter implements MDDVisitor {
         for(int value : children) {
             Node node = children.get(value);
             if(!names.containsKey(node)) names.put(node, "node"+(node_number++));
-            System.out.print("("+value+", " + names.get(node)+") ");
+            if(intAsChar) {
+                if (value >= 0) System.out.print("(" + ((char) value) + ", " + names.get(node) + ") ");
+                else System.out.print("( , " + names.get(node) + ") ");
+            }
+            else System.out.print("("+value+", " + names.get(node)+") ");
+
         }
         System.out.println();
     }
