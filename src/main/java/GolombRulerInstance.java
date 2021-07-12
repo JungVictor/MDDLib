@@ -2,15 +2,17 @@ import mdd.MDD;
 import memory.Memory;
 import problems.GolombRuler;
 import representation.MDDPrinter;
+import utils.ArgumentParser;
 
 public class GolombRulerInstance {
 
     public static void main(String[] args) {
-        int domain = 85;
-        int size = 12;
 
-        if(args.length >= 1) domain = Integer.parseInt(args[0]);
-        if(args.length >= 2) size = Integer.parseInt(args[1]);
+        ArgumentParser parser = new ArgumentParser("-domain", "85", "-size", "12");
+        parser.read(args);
+
+        int domain = Integer.parseInt(parser.get("-domain"));
+        int size = Integer.parseInt(parser.get("-size"));
 
         MDD result = GolombRuler.generate(Memory.MDD(), domain, size);
         result.accept(new MDDPrinter());

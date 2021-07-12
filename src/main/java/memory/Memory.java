@@ -318,7 +318,19 @@ public class Memory {
         object.init(constraint, ID);
         return object;
     }
-    
+
+
+    private static final MemoryPool<ParametersSubset> parametersSubsetPool = new MemoryPool<>();
+    public static ParametersSubset ParametersSubset(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+        ParametersSubset object = parametersSubsetPool.get();
+        if(object == null){
+            object = new ParametersSubset(parametersSubsetPool);
+            parametersSubsetPool.add(object);
+        }
+        object.prepare();
+        object.init(word, alphabetSize, maxSequenceSize);
+        return object;
+    }
 
     private static final MemoryPool<ParametersAmong> parametersAmongPool = new MemoryPool<>();
     public static ParametersAmong ParametersAmong(int q, int min, int max, SetOf<Integer> V){
@@ -549,6 +561,19 @@ public class Memory {
             object = new Layer(layerPool);
             layerPool.add(object);
         }
+        object.prepare();
+        return object;
+    }
+
+
+    private static final MemoryPool<ParametersSubset.SubsetData> subsetDataPool = new MemoryPool<>();
+    public static ParametersSubset.SubsetData SubsetData(int position, ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+        ParametersSubset.SubsetData object = subsetDataPool.get();
+        if(object == null){
+            object = new ParametersSubset.SubsetData(subsetDataPool);
+            subsetDataPool.add(object);
+        }
+        object.init(position, word, alphabetSize, maxSequenceSize);
         object.prepare();
         return object;
     }

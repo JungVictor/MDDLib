@@ -1,22 +1,22 @@
-import builder.MDDBuilder;
 import mdd.MDD;
 import memory.Memory;
 import problems.LCS;
 import representation.MDDPrinter;
 import structures.generics.SetOf;
+import utils.ArgumentParser;
 
 import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args) {
-        String alphabet = "ABCDEFGH";
-        int nWords = 100;
-        int wSize = 50;
 
-        if(args.length > 0) alphabet = args[0];
-        if(args.length > 1) nWords = Integer.parseInt(args[1]);
-        if(args.length > 2) wSize = Integer.parseInt(args[2]);
+        ArgumentParser parser = new ArgumentParser("-alphabet", "ABCD", "-nwords", "1000", "-wsize", "100");
+        parser.read(args);
+
+        String alphabet = parser.get("-alphabet");
+        int nWords = Integer.parseInt(parser.get("-nwords"));
+        int wSize  = Integer.parseInt(parser.get("-wsize"));
 
         // ==================================================
         Random random = new Random();

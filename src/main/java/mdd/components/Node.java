@@ -29,7 +29,7 @@ public class Node implements MemoryObject {
     private int ID = -1;
     //
 
-    public long s = 0;
+    public double s = 0;
     private OutArcs children;
     private InArcs parents;
     private ArrayOf<Node> associations;

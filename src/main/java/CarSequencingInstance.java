@@ -2,6 +2,7 @@ import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
 import problems.CarSequencing;
+import utils.ArgumentParser;
 import utils.Logger;
 
 public class CarSequencingInstance {
@@ -19,35 +20,39 @@ public class CarSequencingInstance {
     public static void main(String[] args) {
 
         // Default parameters
-        int mode = 0;
-        int instance = 1;
-        int[] options = new int[]{0, 1};
+        ArgumentParser parser = new ArgumentParser("-mode", "default", "-instance", "1", "-options", "0 1");
+        parser.read(args);
 
         // Mode
-        if(args.length >= 1) {
-            switch (args[0]){
-                case "legacy":
-                    mode = 1;
-                    System.out.println("\rSOLVER : LEGACY");
-                    break;
-                case "constraint":
-                    mode = 2;
-                    System.out.println("\rSOLVER : FULL CONSTRAINT");
-                    break;
-                default:
-                    mode = 0;
-                    System.out.println("\rSOLVER : DEFAULT");
-            }
+        int mode;
+        switch (parser.get("-mode")) {
+            case "legacy":
+                mode = 1;
+                System.out.println("\rSOLVER : LEGACY");
+                break;
+            case "constraint":
+                mode = 2;
+                System.out.println("\rSOLVER : FULL CONSTRAINT");
+                break;
+            default:
+                mode = 0;
+                System.out.println("\rSOLVER : DEFAULT");
         }
+
 
         // Instance number
-        if(args.length >= 2) instance = Integer.parseInt(args[1]);
+        int instance = Integer.parseInt(parser.get("-instance"));
 
         // Options
-        if(args.length > 2) {
-            options = new int[args.length - 2];
-            for(int i = 0; i < options.length; i++) options[i] = Integer.parseInt(args[i+2]);
+        String[] opts = parser.get("-options").split(" ");
+        System.out.print("OPTIONS : ");
+        int[] options = new int[opts.length];
+        for(int i = 0; i < options.length; i++) {
+            System.out.print(opts[i]);
+            System.out.print(" ");
+            options[i] = Integer.parseInt(opts[i]);
         }
+        System.out.println();
 
         CarSequencing cs;
         switch (instance) {
@@ -160,7 +165,7 @@ public class CarSequencingInstance {
      * @return Problem 4/72  (Regin & Puget #1)
      */
     private static CarSequencing instance0(int... options){
-        information("Problem 4/72  (Regin & Puget #1)", 100, 5, 22, 1);
+        information("INSTANCE 0 : Problem 4/72  (Regin & Puget #1)", 100, 5, 22, 1);
         return  new CarSequencing(
                 new int[]{1, 2, 1, 2, 1},
                 new int[]{2, 3, 3, 5, 5},
@@ -204,7 +209,7 @@ public class CarSequencingInstance {
      * @return Problem 19/71  (Regin & Puget #4)
      */
     private static CarSequencing instance1(int... options){
-        information("Problem 19/71  (Regin & Puget #4)", 100, 5, 23, 0);
+        information("INSTANCE 1 : Problem 19/71  (Regin & Puget #4)", 100, 5, 23, 0);
         return  new CarSequencing(
                 new int[]{1, 2, 1, 2, 1},
                 new int[]{2, 3, 3, 5, 5},
@@ -249,7 +254,7 @@ public class CarSequencingInstance {
      * @return Problem 60-07
      */
     private static CarSequencing instance2(int... options){
-        information("Problem 60-07", 200, 5, 21, -1);
+        information("INSTANCE 2 : Problem 60-07", 200, 5, 21, -1);
         return  new CarSequencing(
                 new int[]{1, 2, 1, 2, 1},
                 new int[]{2, 3, 3, 5, 5},
@@ -292,7 +297,7 @@ public class CarSequencingInstance {
      * @return Problem 60-02
      */
     private static CarSequencing instance3(int... options){
-        information("Problem 60-02", 200, 5, 17, -1);
+        information("INSTANCE 3 : Problem 60-02", 200, 5, 17, -1);
         return  new CarSequencing(
                 new int[]{1, 2, 1, 2, 1},
                 new int[]{2, 3, 3, 5, 5},

@@ -68,8 +68,7 @@ public class ConstraintBuilder {
     static public MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
         D.add(-1);
         SNode snode = Memory.SNode();
-        ParametersSubset parameters = new ParametersSubset(null);
-        parameters.init(letters, D.size());
+        ParametersSubset parameters = Memory.ParametersSubset(letters, D.size(), letters.length);
         snode.setState(Memory.StateSubset(parameters, 0));
 
         Domains domains = Memory.Domains();
@@ -80,7 +79,7 @@ public class ConstraintBuilder {
 
         build(result, snode, domains, letters.length);
 
-        //Memory.free(parameters);
+        Memory.free(parameters);
 
         result.reduce();
         return result;

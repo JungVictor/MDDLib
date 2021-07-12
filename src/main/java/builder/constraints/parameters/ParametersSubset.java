@@ -1,7 +1,9 @@
 package builder.constraints.parameters;
 
+import memory.Memory;
 import memory.MemoryObject;
 import memory.MemoryPool;
+import structures.generics.MapOf;
 import structures.integers.ArrayOfInt;
 
 import java.util.ArrayList;
@@ -15,22 +17,20 @@ public class ParametersSubset implements MemoryObject {
     private int ID = -1;
     //
 
-    ArrayList<SubsetData> datas;
+    private final ArrayList<SubsetData> datas = new ArrayList<>();
 
     public ParametersSubset(MemoryPool<ParametersSubset> pool) {
         this.pool = pool;
     }
 
-    public void init(ArrayOfInt word, int alphabetSize){
-        datas = new ArrayList<>(word.length+1);
+    public void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
         for(int i = 0; i < word.length+1; i++){
-            datas.add(i, new SubsetData());
-            datas.get(i).init(i, word, alphabetSize);
+            datas.add(i, Memory.SubsetData(i, word, alphabetSize, maxSequenceSize));
         }
     }
 
     public boolean isIn(int ID, int label){
-        return datas.get(ID).next.containsKey(label);
+        return datas.get(ID).next.contains(label);
     }
 
     public int getNext(int ID, int label){
@@ -45,47 +45,55 @@ public class ParametersSubset implements MemoryObject {
     }
 
     @Override
-    public void prepare() {
-
-    }
+    public void prepare() {}
 
     @Override
     public void setID(int ID) {
-
+        this.ID = ID;
     }
 
     @Override
     public void free() {
-
+        for(SubsetData data : datas) Memory.free(data);
+        datas.clear();
+        this.pool.free(this, ID);
     }
 
 
-    private class SubsetData implements MemoryObject {
+    public static class SubsetData implements MemoryObject {
 
-        HashMap<Integer, Integer> next = new HashMap<>();
+        // MemoryObject variables
+        private final MemoryPool<SubsetData> pool;
+        private int ID = -1;
+        //
 
-        public void init(int position, ArrayOfInt word, int alphabetSize){
-            this.next = new HashMap<>();
-            for(int i = position; i < word.length; i++){
-                if(!next.containsKey(word.get(i))) next.put(word.get(i), i+1);
+        private MapOf<Integer, Integer> next;
+
+        public SubsetData(MemoryPool<SubsetData> pool) {
+            this.pool = pool;
+        }
+
+        public void init(int position, ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+            this.next = Memory.MapOfIntegerInteger();
+            for(int i = position; i < maxSequenceSize; i++){
+                if(!next.contains(word.get(i))) next.put(word.get(i), i+1);
                 if(next.size() == alphabetSize) break;
             }
             next.put(-1,-1);
         }
 
         @Override
-        public void prepare() {
-
-        }
+        public void prepare() {}
 
         @Override
         public void setID(int ID) {
-
+            this.ID = ID;
         }
 
         @Override
         public void free() {
-
+            Memory.free(next);
+            this.pool.free(this, ID);
         }
     }
 

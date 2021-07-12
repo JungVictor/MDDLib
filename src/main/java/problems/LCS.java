@@ -25,6 +25,7 @@ public class LCS {
             for (int j = 0; j < words[0].length(); j++) letters.set(j, words[i].charAt(j));
 
             MDD word = ConstraintBuilder.subset(Memory.MDD(), letters, D);
+            Logger.out.information(word.nSolutions() + "\n");
             result = Operation.intersection(result, word);
             Memory.free(tmp);
             Memory.free(word);
@@ -38,7 +39,7 @@ public class LCS {
 
     private static void reduce(MDD result){
         int size = result.size() - 1;
-        while (result.getLayer(size).size() == 1) size--;
+        while (result.getLayer(size).size() == 1 && size > 0) size--;
         result.setSize(size+2);
     }
 

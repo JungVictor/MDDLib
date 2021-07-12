@@ -302,7 +302,7 @@ public class MDD implements MemoryObject {
      * Get the number of solutions represented by the MDD
      * @return The number of solutions represented by the MDD
      */
-    public long nSolutions(){
+    public double nSolutions(){
         clearS();
         if(tt == null) return 0;
         root.s = 1;
