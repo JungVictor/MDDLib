@@ -31,7 +31,7 @@ public class Main {
 
         int gamma = 80;
         int precision = 2;
-        int n = 11;
+        int n = 8;
         Domains domains = generateData(90, 100, 1, n);
         testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
         testBigInteger2(gamma, precision, n, domains);
