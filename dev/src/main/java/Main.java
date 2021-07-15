@@ -1,11 +1,14 @@
 import builder.MDDBuilder;
 import confidence.MyMDDBuilder;
 import confidence.MyMemory;
+import confidence.structures.PrimeFactorization;
 import mdd.MDD;
 import memory.Memory;
+import memory.MemoryPool;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.SetOf;
+import structures.integers.ArrayOfInt;
 import utils.Logger;
 
 import java.math.BigInteger;
@@ -19,7 +22,6 @@ public class Main {
 
         //testBigInteger1(printer);
 
-
         /*
         int gamma = 9000;
         int precision = 4;
@@ -29,13 +31,14 @@ public class Main {
         testBigInteger2(gamma, precision, n, domains);
          */
 
+        /*
         int gamma = 80;
         int precision = 2;
         int n = 7;
         Domains domains = generateData(90, 100, 1, n);
         testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
         testBigInteger2(gamma, precision, n, domains);
-
+         */
 
         /*
         double x = 0;
@@ -53,12 +56,12 @@ public class Main {
 
          */
 
-
-
-
-
-
         //testLog1(printer);
+
+
+        for(int i = 2; i <= 1000; i++){
+            System.out.println(i + " : " + new PrimeFactorization(i));
+        }
 
 
     }
