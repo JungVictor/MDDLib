@@ -8,11 +8,17 @@ import structures.Domains;
 import structures.generics.SetOf;
 import utils.Logger;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class Main {
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
         MDDPrinter printer = new MDDPrinter();
 
         //testSum1(printer);
@@ -56,10 +62,27 @@ public class Main {
         //testLog1(printer);
 
 
-        for(int i = 2; i <= 1000; i++){
-            System.out.println(i + " : " + new PrimeFactorization(i));
-        }
-
+        PrimeFactorization t1 = new PrimeFactorization(999999);
+        System.out.println("t1 : " + t1);
+        System.out.println("Log10 : " + t1.toLog10());
+        PrimeFactorization t2 = new PrimeFactorization(181712);
+        System.out.println("t2 : " + t2);
+        System.out.println("Log10 : " + t2.toLog10());
+        PrimeFactorization t3 = new PrimeFactorization(386547);
+        System.out.println("t3 : " + t3);
+        System.out.println("Log10 : " + t3.toLog10());
+        PrimeFactorization t4 = new PrimeFactorization(168767);
+        System.out.println("t4 : " + t4);
+        System.out.println("Log10 : " + t4.toLog10());
+        PrimeFactorization t5 = new PrimeFactorization(168768);
+        System.out.println("t5 : " + t5);
+        System.out.println("Log10 : " + t5.toLog10());
+        PrimeFactorization t6 = new PrimeFactorization(435162);
+        System.out.println("t6 : " + t6);
+        System.out.println("Log10 : " + t6.toLog10());
+        PrimeFactorization t7 = t1.multiply(t2).multiply(t3).multiply(t4).multiply(t5).multiply(t6);
+        System.out.println("t7 : " + t7);
+        System.out.println("Log10 : " + t7.toLog10());
 
     }
 
