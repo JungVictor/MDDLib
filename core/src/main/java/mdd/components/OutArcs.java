@@ -216,7 +216,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

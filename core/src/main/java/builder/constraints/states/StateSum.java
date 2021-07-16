@@ -99,7 +99,7 @@ public class StateSum extends NodeState {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

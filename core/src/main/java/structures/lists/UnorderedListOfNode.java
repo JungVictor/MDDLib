@@ -82,7 +82,7 @@ public class UnorderedListOfNode extends UnorderedListOf<Node> {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

@@ -216,7 +216,7 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

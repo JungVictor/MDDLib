@@ -175,7 +175,7 @@ public class Layer implements Allocable, Iterable<Node> {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

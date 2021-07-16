@@ -216,7 +216,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

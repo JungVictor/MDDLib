@@ -209,7 +209,7 @@ public class Pack implements Allocable {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

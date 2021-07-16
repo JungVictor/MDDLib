@@ -140,7 +140,7 @@ public class Binder implements Allocable {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

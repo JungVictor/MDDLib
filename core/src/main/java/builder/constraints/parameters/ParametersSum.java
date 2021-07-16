@@ -81,7 +81,7 @@ public class ParametersSum implements Allocable {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

@@ -93,7 +93,7 @@ public class ParametersGCC implements Allocable {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

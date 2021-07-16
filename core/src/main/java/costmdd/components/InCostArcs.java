@@ -77,7 +77,7 @@ public class InCostArcs extends InArcs {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

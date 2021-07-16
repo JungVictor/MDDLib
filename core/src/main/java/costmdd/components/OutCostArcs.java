@@ -68,7 +68,7 @@ public class OutCostArcs extends OutArcs {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

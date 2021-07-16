@@ -180,7 +180,7 @@ public class UnorderedListOfInt implements Allocable, Iterable<Integer> {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

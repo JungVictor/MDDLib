@@ -79,7 +79,7 @@ public class SNode extends Node {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

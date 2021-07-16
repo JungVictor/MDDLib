@@ -136,7 +136,7 @@ public class PMDD extends MDD {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

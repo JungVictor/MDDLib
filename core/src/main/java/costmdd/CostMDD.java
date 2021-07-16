@@ -114,7 +114,7 @@ public class CostMDD extends MDD {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

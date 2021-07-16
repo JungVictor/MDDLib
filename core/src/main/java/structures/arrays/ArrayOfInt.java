@@ -216,7 +216,7 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

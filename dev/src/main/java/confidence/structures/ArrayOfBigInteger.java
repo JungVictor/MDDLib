@@ -75,7 +75,7 @@ public class ArrayOfBigInteger extends ArrayOf<BigInteger> {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

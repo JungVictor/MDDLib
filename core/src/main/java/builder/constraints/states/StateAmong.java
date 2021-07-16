@@ -112,7 +112,7 @@ public class StateAmong extends NodeState {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

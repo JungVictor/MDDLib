@@ -152,7 +152,7 @@ public class InArcs implements Allocable, Iterable<Integer> {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

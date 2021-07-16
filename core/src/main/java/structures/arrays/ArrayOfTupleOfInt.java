@@ -73,7 +73,7 @@ public class ArrayOfTupleOfInt extends ArrayOf<TupleOfInt> {
         }
 
         Allocator(){
-            this(16);
+            this(10);
         }
 
         @Override

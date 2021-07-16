@@ -105,7 +105,7 @@ public class StateMul extends NodeState {
         }
 
         Allocator(){
-            this(16);
+            super.init();
         }
 
         @Override

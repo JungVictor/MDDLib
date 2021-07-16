@@ -34,6 +34,10 @@ public abstract class AllocatorOf<T extends Allocable> {
         inactiveIndices = new StackOfInt(capacity);
     }
 
+    final protected void init(){
+        init(16);
+    }
+
     /**
      * Get the element located at the given index.
      * @param index Index of the wanted element
@@ -53,7 +57,7 @@ public abstract class AllocatorOf<T extends Allocable> {
      */
     final public T allocate(){
         if(inactiveIndices.isEmpty()) {
-            if(size >= capacity()) expand();
+            if(size == elements.length) expand();
             return createObject(size++);
         }
         return get(inactiveIndices.pop());
@@ -79,7 +83,7 @@ public abstract class AllocatorOf<T extends Allocable> {
      * Expand the size of the allocator.
      */
     private void expand() {
-        T[] e = arrayCreation(size + 1 + size / 3);
+        T[] e = arrayCreation(size + size);
         System.arraycopy(elements, 0, e, 0, size);
         elements = e;
     }
