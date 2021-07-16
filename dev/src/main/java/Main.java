@@ -1,14 +1,11 @@
 import builder.MDDBuilder;
 import confidence.MyMDDBuilder;
-import confidence.MyMemory;
 import confidence.structures.PrimeFactorization;
 import mdd.MDD;
 import memory.Memory;
-import memory.MemoryPool;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
 import utils.Logger;
 
 import java.math.BigInteger;
@@ -75,7 +72,7 @@ public class Main {
      * @return n random domains
      */
     public static Domains generateRandomData(int precision, int n, int domainsAverageSize, double probaMin){
-        Domains domains = MyMemory.Domains();
+        Domains domains = Domains.create();
 
         int max = (int) Math.pow(10, precision);
         double proportion = domainsAverageSize / ((1 - probaMin) * max);
@@ -95,7 +92,7 @@ public class Main {
     }
 
     public static Domains generateData(int min, int max, int step, int n){
-        Domains domains = MyMemory.Domains();
+        Domains domains = Domains.create();
 
         for(int i = 0; i < n; i++){
             int count = 0;
@@ -110,7 +107,7 @@ public class Main {
     public static void testSum1(MDDPrinter printer){
         SetOf<Integer> V = Memory.SetOfInteger();
         for(int i = 0; i < 2; i++) V.add(i);
-        MDD sum = MDDBuilder.sum(Memory.MDD(), 1, 3, 4, V);
+        MDD sum = MDDBuilder.sum(MDD.create(), 1, 3, 4, V);
 
         sum.accept(printer);
     }
@@ -118,14 +115,14 @@ public class Main {
     public static void testMul1(MDDPrinter printer, int n){
         BigInteger min = BigInteger.valueOf(2);
         BigInteger max = BigInteger.valueOf(8);
-        Domains domains = MyMemory.Domains();
+        Domains domains = Domains.create();
 
         for(int i = 0; i < n; i++){
             domains.put(i, 1);
             domains.put(i, 2);
         }
 
-        MDD mul = MyMDDBuilder.mul(MyMemory.MDD(), min, max, n, domains);
+        MDD mul = MyMDDBuilder.mul(MDD.create(), min, max, n, domains);
         mul.accept(printer);
     }
 
@@ -133,7 +130,7 @@ public class Main {
         int gamma = 70;
         int precision = 2;
         int n = 4;
-        Domains domains = MyMemory.Domains();
+        Domains domains = Domains.create();
 
         domains.put(0, 80);
         domains.put(0, 90);
@@ -151,7 +148,7 @@ public class Main {
         domains.put(3, 98);
         domains.put(3, 99);
 
-        MDD confidence = MyMDDBuilder.confidence(MyMemory.MDD(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         confidence.accept(printer);
     }
 
@@ -164,7 +161,7 @@ public class Main {
         Logger.out.information("Gamma = " + gamma + "\n");
 
         time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MyMemory.MDD(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
         Logger.out.information("\nNombre de noeuds : " + confidence.nodes() + "\n");
@@ -177,7 +174,7 @@ public class Main {
         double gamma = 0.7;
         int precision = 2;
         int n = 4;
-        Domains domains = MyMemory.Domains();
+        Domains domains = Domains.create();
 
         domains.put(0, 80);
         domains.put(0, 90);
@@ -195,7 +192,7 @@ public class Main {
         domains.put(3, 98);
         domains.put(3, 99);
 
-        MDD confidence = MyMDDBuilder.confidence(MyMemory.MDD(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         confidence.accept(printer);
     }
 
@@ -207,7 +204,7 @@ public class Main {
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MyMemory.MDD(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
         System.out.println("\nNombre de noeuds : " + confidence.nodes());

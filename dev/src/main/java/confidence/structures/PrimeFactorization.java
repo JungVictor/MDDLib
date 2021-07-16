@@ -1,8 +1,8 @@
 package confidence.structures;
 
 import memory.Memory;
-import structures.generics.ListOf;
 import structures.generics.MapOf;
+import structures.lists.ListOfInt;
 
 /**
  * <b>Class which represent a integer by its decomposition into prime numbers</b><br>
@@ -12,7 +12,7 @@ public class PrimeFactorization {
 
 
     // Static attributes
-    private static ListOf<Integer> primeNumbers = Memory.ListOfInteger(); // List of prime number until maxNumberKnown
+    private static ListOfInt primeNumbers = ListOfInt.create(); // List of prime number until maxNumberKnown
     private static int maxNumberKnown = 1; // Important to initialize to 1
 
 
