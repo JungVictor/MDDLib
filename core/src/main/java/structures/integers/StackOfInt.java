@@ -1,6 +1,7 @@
 package structures.integers;
 
-import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
  * <b>Stack structure to store primitive type int.</b> <br>
@@ -9,9 +10,9 @@ import java.util.Arrays;
 public class StackOfInt {
 
     // The proper array
-    private int[] array;
+    private AtomicIntegerArray array;
     // The index of the last element
-    private int pointer = -1;
+    private final AtomicInteger pointer = new AtomicInteger(-1);
 
 
     //**************************************//
@@ -19,12 +20,12 @@ public class StackOfInt {
     //**************************************//
 
     public StackOfInt(int initial_capacity){
-        this.array = new int[initial_capacity];
+        this.array = new AtomicIntegerArray(initial_capacity);
     }
 
     @Override
     public String toString(){
-        return Arrays.toString(array);
+        return array.toString();
     }
 
     //**************************************//
@@ -38,8 +39,8 @@ public class StackOfInt {
      * @param element int
      */
     public void push(int element){
-        if(pointer+1 == array.length) expand(array.length + array.length / 3);
-        array[++pointer] = element;
+        if(pointer.get()+1 == array.length()) expand(array.length() + array.length() / 3);
+        array.set(pointer.incrementAndGet(), element);
     }
 
     /**
@@ -47,7 +48,7 @@ public class StackOfInt {
      * @return last element pushed into the stack
      */
     public int pop(){
-        return array[pointer--];
+        return array.get(pointer.getAndDecrement());
     }
 
     /**
@@ -55,7 +56,7 @@ public class StackOfInt {
      * @return true if the stack is empty, false otherwise
      */
     public boolean isEmpty(){
-        return pointer == -1;
+        return pointer.get() == -1;
     }
 
     /**
@@ -63,7 +64,7 @@ public class StackOfInt {
      * @return The number of elements in the stack
      */
     public int size(){
-        return pointer+1;
+        return pointer.get()+1;
     }
 
     /**
@@ -71,8 +72,8 @@ public class StackOfInt {
      * @param new_capacity The new capacity of the stack
      */
     private void expand(int new_capacity){
-        int[] nArray = new int[new_capacity];
-        System.arraycopy(array, 0, nArray, 0, array.length);
+        AtomicIntegerArray nArray = new AtomicIntegerArray(new_capacity);
+        for(int i = 0; i < array.length(); i++) nArray.set(i, array.get(i));
         array = nArray;
     }
 

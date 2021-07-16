@@ -35,7 +35,7 @@ public abstract class AllocatorOf<T extends Allocable> {
     }
 
     final protected void init(){
-        init(16);
+        init(10);
     }
 
     /**

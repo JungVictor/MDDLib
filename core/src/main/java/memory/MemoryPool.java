@@ -2,6 +2,8 @@ package memory;
 
 import structures.integers.StackOfInt;
 
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
 /**
  * <b>The MemoryPool is the structure that contains all objects in the pool of memory.</b>
  * It is implemented using an array to stock the objects, and a stack to stock the indices of free objects,
@@ -14,7 +16,7 @@ public class MemoryPool<E extends MemoryObject> {
     public static int objects = 0;
 
     // The array
-    private E[] pool;
+    private volatile AtomicReferenceArray<E> pool;
     // The Stack of free indices (= the index of a free object)
     private final StackOfInt freeIndices;
     // The last value in the array and the size of the array
@@ -24,9 +26,8 @@ public class MemoryPool<E extends MemoryObject> {
     //           INITIALISATION             //
     //**************************************//
 
-    @SuppressWarnings("unchecked")
     public MemoryPool(int capacity){
-        pool = (E[]) new MemoryObject[capacity];
+        pool = new AtomicReferenceArray<>(capacity);
         freeIndices = new StackOfInt(capacity);
     }
 
@@ -50,8 +51,8 @@ public class MemoryPool<E extends MemoryObject> {
     public E get(){
         if(freeIndices.isEmpty()) return null;
         int index = freeIndices.pop();
-        E object = pool[index];
-        pool[index] = null;
+        E object = pool.get(index);
+        pool.set(index, null);
         return object;
     }
 
@@ -61,7 +62,7 @@ public class MemoryPool<E extends MemoryObject> {
      */
     public synchronized void add(E element){
         objects++;
-        if(size == pool.length) expand();
+        if(size == pool.length()) expand();
         element.setID(size++);
     }
 
@@ -70,19 +71,18 @@ public class MemoryPool<E extends MemoryObject> {
      * @param position The position of the object to free.
      */
     public void free(E object, int position){
-        if(pool[position] == null) {
+        if(pool.get(position) == null) {
             freeIndices.push(position);
-            pool[position] = object;
+            pool.set(position, object);
         }
     }
 
     /**
      * Expand the capacity of the pool
      */
-    @SuppressWarnings("unchecked")
     private void expand(){
-        E[] arr = (E[]) new MemoryObject[pool.length + pool.length];
-        System.arraycopy(pool, 0, arr, 0, pool.length);
+        AtomicReferenceArray<E> arr = new AtomicReferenceArray<>(pool.length() + pool.length());
+        for(int i = 0; i < pool.length(); i++) arr.set(i, pool.get(i));
         pool = arr;
     }
 
