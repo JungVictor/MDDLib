@@ -85,8 +85,8 @@ public class PrimeFactorization {
      * @param max An integer
      */
     public static void setPrimeNumbers(int max){
-
         try {
+            // To avoid unnecessary computation, prime numbers are safe in a file
             File file = new File("primeNumbers.txt");
 
             if (!file.exists()) {
@@ -106,8 +106,9 @@ public class PrimeFactorization {
             br.close();
 
             maxNumberKnown = Math.max(last, 1);
-
             int oldMax = maxNumberKnown;
+
+            // The algorithm compute prime numbers from the bigger prime number known...
             if(oldMax < max) {
                 for (int i = oldMax + 1; i <= max; i++) {
                     boolean isPrimeNumber = true;
@@ -120,6 +121,7 @@ public class PrimeFactorization {
                 }
                 maxNumberKnown = max;
 
+                // ...and add them in the file
                 StringBuilder builder = new StringBuilder();
                 for(int e : primeNumbers){
                     builder.append(e);
@@ -132,8 +134,6 @@ public class PrimeFactorization {
                 bw.write(content);
                 bw.close();
             }
-
-
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -5,6 +5,7 @@
 target/
 
 log.txt
+primeNumbers.txt
 
 # MDDs
 *.mdd
