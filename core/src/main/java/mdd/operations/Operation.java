@@ -4,9 +4,10 @@ import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
 import structures.Domains;
-import structures.booleans.ArrayOfBoolean;
-import structures.generics.ArrayOf;
 import structures.Binder;
+import structures.arrays.ArrayOfBoolean;
+import structures.arrays.ArrayOfMDD;
+import structures.arrays.ArrayOfNode;
 import structures.generics.SetOf;
 import utils.Logger;
 
@@ -24,7 +25,7 @@ public class Operation {
     //**************************************//
 
     public static MDD negation(MDD mdd){
-        MDD universal = Memory.MDD();
+        MDD universal = MDD.create();
         return minus(universal, mdd);
     }
 
@@ -98,7 +99,7 @@ public class Operation {
 
         // Normal intersection
         SetOf<Integer> V = Memory.SetOfInteger();
-        Binder binder = Memory.Binder();
+        Binder binder = Binder.create();
 
         // Construction of V
         // V.add(mdd1.getV());
@@ -224,7 +225,7 @@ public class Operation {
         if(mdd2.size() > mdd1.size()) return false;
 
         // Construction of V
-        Domains D = Memory.Domains();
+        Domains D = Domains.create();
         D.union(mdd1.getDomains()); D.intersect(mdd2.getDomains());
 
         for(int i = 0; i < D.size(); i++) if(D.get(i).size() == 0) return false;
@@ -244,7 +245,7 @@ public class Operation {
      * @return true if there is an inclusion, false otherwise
      */
     public static boolean inclusion(Node root1, Node root2, int size, Domains D){
-        MDD inclusion = Memory.MDD();
+        MDD inclusion = MDD.create();
         boolean result = perform(inclusion, root1, root2, size, D, Operator.INCLUSION) != null;
         Memory.free(inclusion);
         return result;
@@ -287,7 +288,7 @@ public class Operation {
      */
     private static MDD perform(MDD result, Node root1, Node root2, int size, Domains D, Operator OP){
         result.setSize(size);
-        Binder binder = Memory.Binder();
+        Binder binder = Binder.create();
 
         result.getRoot().associate(root1, root2);
 
@@ -330,7 +331,7 @@ public class Operation {
     private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
         result.setSize(mdd1.size());
         // Construction of V
-        Domains D = Memory.Domains();
+        Domains D = Domains.create();
         D.union(mdd1.getDomains());
         if(OP == Operator.INTERSECTION) D.intersect(mdd2.getDomains());
         else D.union(mdd2.getDomains());
@@ -371,7 +372,7 @@ public class Operation {
             y.associate(y1, y2);
             mdd.addNode(y, layer);
         } else {
-            ArrayOf<Node> nodes = Memory.ArrayOfNode(2);
+            ArrayOfNode nodes = ArrayOfNode.create(2);
             nodes.set(0, y1); nodes.set(1, y2);
             Binder lastBinder = binder.path(nodes);
             y = lastBinder.getLeaf();
@@ -399,7 +400,7 @@ public class Operation {
      * @param mdds The array of all MDDs
      * @return The concatenation of all the MDDs
      */
-    public static MDD concatenate(ArrayOf<MDD> mdds){
+    public static MDD concatenate(ArrayOfMDD mdds){
         MDD result = mdds.get(0).copy();
         for(int i = 1; i < mdds.length(); i++){
             result.setSize(result.size() + mdds.get(i).size() - 1);
@@ -414,7 +415,7 @@ public class Operation {
      * @param mdds The array of all MDDs
      * @return the union of all the MDDs.
      */
-    public static MDD union(ArrayOf<MDD> mdds){
+    public static MDD union(ArrayOfMDD mdds){
         return perform(mdds, Operator.UNION);
     }
 
@@ -424,7 +425,7 @@ public class Operation {
      * @param mdds The array of all MDDs
      * @return the intersection of all the MDDs.
      */
-    public static MDD intersection(ArrayOf<MDD> mdds){
+    public static MDD intersection(ArrayOfMDD mdds){
         return perform(mdds, Operator.INTERSECTION);
     }
 
@@ -434,7 +435,7 @@ public class Operation {
      * @param mdds The array of all MDDs
      * @return the intersection of all the MDDs.
      */
-    public static MDD intersection(MDD result, ArrayOf<MDD> mdds){
+    public static MDD intersection(MDD result, ArrayOfMDD mdds){
         if(mdds.length == 1) return mdds.get(0).copy(result);
         return perform(result, mdds, Operator.INTERSECTION);
     }
@@ -464,7 +465,7 @@ public class Operation {
      * @param OP Type of operation (union, intersection, ...)
      * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
      */
-    private static MDD perform(ArrayOf<MDD> mdds, Operator OP){
+    private static MDD perform(ArrayOfMDD mdds, Operator OP){
         return perform(mdds.get(0).MDD(), mdds, OP);
     }
 
@@ -475,13 +476,13 @@ public class Operation {
      * @param OP Type of operation (union, intersection, ...)
      * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
      */
-    private static MDD perform(MDD result, ArrayOf<MDD> mdds, Operator OP){
+    private static MDD perform(MDD result, ArrayOfMDD mdds, Operator OP){
 
         // Allocations : Need to be free
-        ArrayOf<Node> ys = Memory.ArrayOfNode(mdds.length());
-        ArrayOfBoolean a = Memory.ArrayOfBoolean(mdds.length());
-        Binder binder = Memory.Binder();
-        Domains D = Memory.Domains();
+        ArrayOfNode ys = ArrayOfNode.create(mdds.length());
+        ArrayOfBoolean a = ArrayOfBoolean.create(mdds.length());
+        Binder binder = Binder.create();
+        Domains D = Domains.create();
         //
 
         if(OP != Operator.INTERSECTION && OP != Operator.UNION) {
@@ -503,7 +504,7 @@ public class Operation {
         for(int i = 1; i < r; i++){
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
-                ArrayOf<Node> xs = x.getAssociations();
+                ArrayOfNode xs = x.getAssociations();
                 for(int v : D.get(i-1)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
@@ -534,10 +535,10 @@ public class Operation {
      * @param layer index of the layer where the node will be added
      * @param binder The binder
      */
-    public static void addArcAndNode(MDD mdd, Node x, ArrayOf<Node> ys, int label, int layer, Binder binder){
+    public static void addArcAndNode(MDD mdd, Node x, ArrayOfNode ys, int label, int layer, Binder binder){
         Node y;
         if(binder == null){
-            y = Memory.Node();
+            y = Node.create();
             y.associate(ys);
             mdd.addNode(y, layer);
         } else {

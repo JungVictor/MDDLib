@@ -3,10 +3,10 @@ package pmdd.components.properties;
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
-import structures.generics.ArrayOf;
+import structures.integers.TupleOfInt;
+import structures.arrays.ArrayOfTupleOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.TupleOfInt;
 
 /**
  * SEQUENCE CONSTRAINT
@@ -17,7 +17,7 @@ import structures.integers.TupleOfInt;
 public class PropertySequence extends NodeProperty {
 
     private PropertySequence accumulator;
-    private final ArrayOf<TupleOfInt> values;
+    private final ArrayOfTupleOfInt values;
     private final SetOf<Integer> label = Memory.SetOfInteger();
 
 
@@ -35,13 +35,13 @@ public class PropertySequence extends NodeProperty {
         for(int j : label) this.label.add(j);
         super.setName(SEQ);
 
-        this.values = Memory.ArrayOfTupleOfInt(size);
+        this.values = ArrayOfTupleOfInt.create(size);
         init(size);
     }
 
     public void init(int size){
         this.values.setLength(size);
-        for(int i = 0; i < size; i++) values.set(i, Memory.TupleOfInt(i, 0));
+        for(int i = 0; i < size; i++) values.set(i, TupleOfInt.create(i, 0));
     }
 
     @Override

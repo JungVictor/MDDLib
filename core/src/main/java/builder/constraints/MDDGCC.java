@@ -7,10 +7,10 @@ import mdd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
 import structures.Binder;
-import structures.generics.ArrayOf;
+import structures.arrays.ArrayOfMDD;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 
@@ -40,7 +40,7 @@ public class MDDGCC {
 
         // Else, we have to build all values' MDD and perform an intersection
         else {
-            ArrayOf<MDD> sums = Memory.ArrayOfMDD(couples.size());
+            ArrayOfMDD sums = ArrayOfMDD.create(couples.size());
             int p = 0;
             V0.clear(); V1.clear();
             for(int v : V) V0.add(v);
@@ -49,7 +49,7 @@ public class MDDGCC {
                 V1.add(v);
                 min = couples.get(v).getFirst();
                 max = couples.get(v).getSecond();
-                sums.set(p, MDDBuilder.sum(Memory.MDD(), min, max, n, Binary.Set()));
+                sums.set(p, MDDBuilder.sum(MDD.create(), min, max, n, Binary.Set()));
                 sums.get(p++).replace(V0, V1);
                 V0.add(v);
                 V1.remove(v);
@@ -73,7 +73,7 @@ public class MDDGCC {
                 tmp;
         HashMap<String, Node> gcc = new HashMap<>();
 
-        ArrayOfInt Vcopy = Memory.ArrayOfInt(couples.keySet().size());
+        ArrayOfInt Vcopy = ArrayOfInt.create(couples.keySet().size());
         values.put(mdd.getRoot(), Vcopy);
 
         for(int i = 1; i < mdd.size(); i++){
@@ -111,7 +111,7 @@ public class MDDGCC {
     public static MDD intersection(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> couples){
         result.setSize(mdd.size());
 
-        Binder binder = Memory.Binder();
+        Binder binder = Binder.create();
 
         // TODO : allocation from memory
         HashMap<Node, ArrayOfInt> values = new HashMap<>(),
@@ -119,9 +119,9 @@ public class MDDGCC {
                 tmp;
         HashMap<String, Node> gcc = new HashMap<>();
 
-        Node fakeroot = Memory.Node();
+        Node fakeroot = Node.create();
 
-        ArrayOfInt Vcopy = Memory.ArrayOfInt(couples.keySet().size());
+        ArrayOfInt Vcopy = ArrayOfInt.create(couples.keySet().size());
 
         values.put(fakeroot, Vcopy);
 
@@ -171,7 +171,7 @@ public class MDDGCC {
     }
 
     private static ArrayOfInt domain(ArrayOfInt V, int value){
-        ArrayOfInt domain = Memory.ArrayOfInt(V.length);
+        ArrayOfInt domain = ArrayOfInt.create(V.length);
         domain.copy(V);
         domain.set(value, domain.get(value)+1);
         return domain;

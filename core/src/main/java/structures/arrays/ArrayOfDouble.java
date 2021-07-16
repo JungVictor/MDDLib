@@ -1,35 +1,49 @@
-package structures.integers;
+package structures.arrays;
 
-
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 
 import java.util.Iterator;
 
 /**
  * <b>Class to symbolize an array of int.</b> <br>
- * Similar to the ArrayOf class, this one is specifically for the primitive type int. Works similarly.
+ * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
  */
-public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
+public class ArrayOfDouble implements Iterable<Double>, Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<ArrayOfInt> pool;
-    private int ID = -1;
-    //
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
-    private int[] array;
+    private double[] array;
     public int length;
-    private final ArrayOfIntIterator iterator = new ArrayOfIntIterator();
+    private final SuccessionOfDoubleIterator iterator = new SuccessionOfDoubleIterator();
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public ArrayOfInt(MemoryPool<ArrayOfInt> pool, int capacity){
-        this.pool = pool;
-        this.array = new int[capacity];
+    public ArrayOfDouble(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    public void init(int capacity){
+        this.array = new double[capacity];
         this.length = capacity;
+    }
+
+    /**
+     * Create a SuccessionOfDouble with specified capacity.
+     * The object is managed by the allocator.
+     * @param capacity Capacity of the array
+     * @return A SuccessionOfDouble with given capacity
+     */
+    public static ArrayOfDouble create(int capacity){
+        ArrayOfDouble object = allocator().allocate();
+        object.init(capacity);
+        return object;
     }
 
 
@@ -37,6 +51,14 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     //          SPECIAL FUNCTIONS           //
     //**************************************//
     // toString
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
 
     @Override
     public String toString(){
@@ -67,7 +89,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * @param position Position in the array
      * @param value Value of the element
      */
-    public void set(int position, int value){
+    public void set(int position, double value){
         array[position] = value;
     }
 
@@ -76,7 +98,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * @param position Position of the element
      * @return the value of the element at the specified position
      */
-    public int get(int position){
+    public double get(int position){
         return array[position];
     }
 
@@ -102,7 +124,7 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * @param length The length of the array
      */
     public void setLength(int length){
-        if(length > array.length) this.array = new int[length];
+        if(length > array.length) this.array = new double[length];
         this.length = length;
     }
 
@@ -111,8 +133,8 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(int[] array){
-        if(array.length > this.array.length) this.array = new int[array.length];
+    public void copy(double[] array){
+        if(array.length > this.array.length) this.array = new double[array.length];
         System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -122,8 +144,8 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(ArrayOfInt array){
-        if(array.length > this.array.length) this.array = new int[array.length];
+    public void copy(ArrayOfDouble array){
+        if(array.length > this.array.length) this.array = new double[array.length];
         System.arraycopy(array.array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -133,29 +155,26 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
      * @param value The value to check
      * @return true if the value is contained in the array, false otherwise
      */
-    public boolean contains(int value){
-        for(int v : this) if(v == value) return true;
+    public boolean contains(double value){
+        for(double v : this) if(v == value) return true;
         return false;
     }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex() {
+        return allocatedIndex;
     }
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void free(){
-        pool.free(this, ID);
+    public void free() {
+        for(int i = 0; i < length; i++) array[i] = 0;
+        allocator().free(this);
     }
 
 
@@ -165,12 +184,12 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
     // Implementation of Iterable<Integer> interface
 
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<Double> iterator() {
         iterator.i = 0;
         return iterator;
     }
 
-    private class ArrayOfIntIterator implements Iterator<Integer> {
+    private class SuccessionOfDoubleIterator implements Iterator<Double> {
         private int i = 0;
 
         @Override
@@ -179,8 +198,35 @@ public class ArrayOfInt implements Iterable<Integer>, MemoryObject {
         }
 
         @Override
-        public Integer next() {
+        public Double next() {
             return array[i++];
+        }
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ArrayOfDouble> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ArrayOfDouble[] arrayCreation(int capacity) {
+            return new ArrayOfDouble[capacity];
+        }
+
+        @Override
+        protected ArrayOfDouble createObject(int index) {
+            return new ArrayOfDouble(index);
         }
     }
 }

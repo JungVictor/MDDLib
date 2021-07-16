@@ -32,7 +32,7 @@ public class PropertySum extends NodeProperty {
      * @param max absolute max value
      */
     public void setValue(int v1, int v2, int min, int max){
-        this.value = Memory.TupleOfInt();
+        this.value = TupleOfInt.create();
         this.value.set(v1, v2);
         this.min = min;
         this.max = max;
@@ -136,6 +136,6 @@ public class PropertySum extends NodeProperty {
     @Override
     public void prepare(){
         super.prepare();
-        this.value = Memory.TupleOfInt();
+        this.value = TupleOfInt.create();
     }
 }

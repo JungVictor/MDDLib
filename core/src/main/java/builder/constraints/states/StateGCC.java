@@ -1,14 +1,14 @@
 package builder.constraints.states;
 
 import builder.constraints.parameters.ParametersGCC;
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import structures.generics.ListOf;
 import structures.generics.MapOf;
-
-import java.util.Collections;
+import structures.lists.ListOfInt;
 
 public class StateGCC extends NodeState {
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     // Private reference
     private MapOf<Integer, Integer> count;
@@ -17,8 +17,13 @@ public class StateGCC extends NodeState {
     // Shared references : constraint
     private ParametersGCC constraint;
 
-    public StateGCC(MemoryPool<NodeState> pool) {
-        super(pool);
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    public StateGCC(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     public void init(ParametersGCC constraint){
@@ -31,9 +36,31 @@ public class StateGCC extends NodeState {
         for(int v : constraint.V()) count.put(v,0);
     }
 
+    /**
+     * Create a StateGCC with specified parameters.
+     * The object is managed by the allocator.
+     * @param constraint Parameters of the constraint
+     * @return A StateGCC with given parameters
+     */
+    public static StateGCC create(ParametersGCC constraint){
+        StateGCC object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    //**************************************//
+
     @Override
     public NodeState createState(int label, int layer, int size) {
-        StateGCC state = Memory.StateGCC(constraint);
+        StateGCC state = StateGCC.create(constraint);
         state.minimum = minimum;
         int potential = size - layer - 1;
         for(int v : count) {
@@ -63,9 +90,9 @@ public class StateGCC extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        ListOf<Integer> integers = Memory.ListOfInteger();
+        ListOfInt integers = ListOfInt.create();
         integers.add(count.keySet());
-        Collections.sort(integers.getList());
+        integers.sort();
         StringBuilder builder = new StringBuilder();
         for (int v : integers) {
             if(v == label && count.get(label) + size - layer <= constraint.max(label)) continue;
@@ -89,6 +116,32 @@ public class StateGCC extends NodeState {
     public void free(){
         Memory.free(count);
         this.constraint = null;
-        super.free();
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the StateGCC type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<StateGCC> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected StateGCC[] arrayCreation(int capacity) {
+            return new StateGCC[capacity];
+        }
+
+        @Override
+        protected StateGCC createObject(int index) {
+            return new StateGCC(index);
+        }
     }
 }

@@ -3,14 +3,12 @@ package mdd;
 import mdd.components.Layer;
 import mdd.components.Node;
 import mdd.operations.Pack;
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.*;
 import representation.MDDVisitor;
 import structures.Domains;
-import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.lists.ListOfLayer;
 
 import java.util.Random;
 
@@ -18,30 +16,53 @@ import java.util.Random;
  * <b>The class representing the MDD.</b> <br>
  * Contains a root node that is not null, a set of layers and a tt node if the MDD has been reduce.
  */
-public class MDD implements MemoryObject {
+public class MDD implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<MDD> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
+
 
     // Root node
     private Node root;
     private Node tt;
 
     // Layers
-    private final ListOf<Layer> L = Memory.ListOfLayer();
+    private final ListOfLayer L = ListOfLayer.create();
     private int size;
 
     // Domain of the MDD
-    private final Domains D = new Domains(null);
+    private final Domains D = Domains.create();
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public MDD(MemoryPool<MDD> pool){
-        this.pool = pool;
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static MDD create(Node root){
+        MDD mdd = allocator().allocate();
+        mdd.setRoot(root);
+        return mdd;
+    }
+
+    public static MDD create(){
+        MDD mdd = allocator().allocate();
+        mdd.setRoot(mdd.Node());
+        return mdd;
+    }
+
+    protected MDD(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+        L.add(Layer.create());
     }
 
     /**
@@ -49,9 +70,9 @@ public class MDD implements MemoryObject {
      * @param root
      */
     public void setRoot(Node root){
-        L.get(0).freeAllNodes();
-        this.root = root;
-        L.get(0).add(root);
+        L.get(0).freeAllNodes();    // remove the current root
+        this.root = root;           // set the pointer
+        L.get(0).add(root);         // add the new root
     }
 
     //**************************************//
@@ -74,7 +95,7 @@ public class MDD implements MemoryObject {
      */
     public Node Node(){
         if(root != null) return root.Node();
-        return Memory.Node();
+        return Node.create();
     }
 
     /**
@@ -88,7 +109,7 @@ public class MDD implements MemoryObject {
      * @return a MDD the same type as the current MDD with the given node as a root
      */
     public MDD MDD(Node root){
-        return Memory.MDD(root);
+        return create(root);
     }
 
     /**
@@ -223,6 +244,12 @@ public class MDD implements MemoryObject {
         return path;
     }
 
+    /**
+     * Clear the MDD without freeing it.
+     * That is, remove and free all nodes from the layers,
+     * clear the domains and set the tt's pointer to null.
+     * The layers are kept.
+     */
     public void clear(){
         for(int i = 1; i < size; i++) getLayer(i).freeAllNodes();
         D.clear();
@@ -303,7 +330,8 @@ public class MDD implements MemoryObject {
      * @return The number of solutions represented by the MDD
      */
     public double nSolutions(){
-        clearS();
+        // Initialize the count of solution of each node to 0
+        for(int i = 0; i < size; i++) for(Node x : getLayer(i)) x.s = 0;
         if(tt == null) return 0;
         root.s = 1;
         for(int i = 0; i < size; i++){
@@ -312,10 +340,6 @@ public class MDD implements MemoryObject {
             }
         }
         return tt.s;
-    }
-
-    private void clearS(){
-        for(int i = 0; i < size; i++) for(Node x : getLayer(i)) x.s = 0;
     }
 
     //**************************************//
@@ -328,13 +352,14 @@ public class MDD implements MemoryObject {
      * @param size The size of the MDD
      */
     public void setSize(int size){
-        if(this.L.size() < size) for(int i = 0, diff = size - L.size(); i < diff; i++) L.add(Memory.Layer());
+        if(this.L.size() < size) for(int i = 0, diff = size - L.size(); i < diff; i++) L.add(Layer.create());
         this.size = size;
     }
 
     /**
      * Add a value to the set of values that are in the MDD
      * @param v the value
+     * @param layer the number of the layer
      */
     public void addValue(int v, int layer){
         D.put(layer, v);
@@ -438,6 +463,11 @@ public class MDD implements MemoryObject {
         Memory.free(V);
     }
 
+    /**
+     * Remove all nodes from the MDD that do not have a child.
+     * This can be used as a pre-reduce operation to remove nodes
+     * from a MDD to free some memory, typically during an operation.
+     */
     public void removeChildless(){
         SetOf<Node> childless = Memory.SetOfNode();
         for(int i = size-2; i >= 0; i--) {
@@ -447,7 +477,7 @@ public class MDD implements MemoryObject {
     }
 
     /**
-     * Automatically set the terminal node
+     * Automatically set the terminal node.
      */
     private void setTT(){
         if(getLayer(size - 1).size() == 1) this.tt = getLayer(size - 1).getNode();
@@ -467,13 +497,8 @@ public class MDD implements MemoryObject {
     // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-        L.add(Memory.Layer());
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
@@ -483,11 +508,42 @@ public class MDD implements MemoryObject {
             Memory.free(getLayer(i));
         }
         Memory.free(root);
-        prepare();
         L.clear();
+        L.add(Layer.create());
         D.clear();
         this.root = null;
         this.tt = null;
-        this.pool.free(this, ID);
+        dealloc();
     }
+
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the MDD type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<MDD> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected MDD[] arrayCreation(int capacity) {
+            return new MDD[capacity];
+        }
+
+        @Override
+        protected MDD createObject(int index) {
+            return new MDD(index);
+        }
+    }
+
 }

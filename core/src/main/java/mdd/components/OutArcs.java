@@ -1,6 +1,7 @@
 package mdd.components;
 
-import memory.MemoryObject;
+import memory.Allocable;
+import memory.AllocatorOf;
 import memory.MemoryPool;
 import representation.MDDVisitor;
 
@@ -14,13 +15,13 @@ import java.util.Iterator;
  * The out-going arcs (OutArcs) is represented using a simple map binding integer to node,
  * as the MDD is determinist by default (i.e. can only have one children with a specific label).
  */
-public class OutArcs implements MemoryObject, Iterable<Integer> {
+public class OutArcs implements Allocable, Iterable<Integer> {
 
-
-    // MemoryObject variables
-    private final MemoryPool<OutArcs> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
 
     private final HashMap<Integer, Node> arcs = new HashMap<>();
@@ -31,8 +32,16 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     //           INITIALISATION             //
     //**************************************//
 
-    public OutArcs(MemoryPool<OutArcs> pool){
-        this.pool = pool;
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static OutArcs create(){
+        return allocator().allocate();
+    }
+
+    protected OutArcs(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
 
@@ -178,26 +187,48 @@ public class OutArcs implements MemoryObject, Iterable<Integer> {
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
 
-    @Override
-    public void prepare() {
-        arcs.clear();
-        values.clear();
+    protected void dealloc(){
+        allocator().free(this);
     }
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         arcs.clear();
         values.clear();
-        this.pool.free(this, ID);
+        dealloc();
     }
 
+    /**
+     * <b>The allocator that is in charge of the OutArcs type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<OutArcs> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected OutArcs[] arrayCreation(int capacity) {
+            return new OutArcs[capacity];
+        }
+
+        @Override
+        protected OutArcs createObject(int index) {
+            return new OutArcs(index);
+        }
+    }
 
     //**************************************//
     //               ITERATOR               //

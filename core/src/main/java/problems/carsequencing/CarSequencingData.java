@@ -1,8 +1,9 @@
 package problems.carsequencing;
 
 import memory.Memory;
-import structures.generics.ListOf;
 import structures.generics.MapOf;
+import structures.lists.ListOfInt;
+import structures.lists.UnorderedListOfInt;
 
 public class CarSequencingData {
 
@@ -11,19 +12,19 @@ public class CarSequencingData {
     private int[] nConfigMin, nConfigMax, nOptionsMin, nOptionsMax;
     private int nCars, nCarsRelaxed;
 
-    private MapOf<Integer, ListOf<Integer>> data;
-    private ListOf<Integer> enabledOptions;
-    private ListOf<Integer> V;
+    private MapOf<Integer, ListOfInt> data;
+    private ListOfInt enabledOptions;
+    private UnorderedListOfInt V;
     private MapOf<Integer, Integer> binding;
 
     public CarSequencingData(int[] max, int[] size, int[][] options, int... enabledOptions){
         this.size = size;
         this.max = max;
         this.options = options;
-        this.enabledOptions = Memory.ListOfInteger();
+        this.enabledOptions = ListOfInt.create();
         for(int option : enabledOptions) this.enabledOptions.add(option);
-        V = Memory.ListOfInteger();
-        data = Memory.MapOfIntegerListOfInteger();
+        V = UnorderedListOfInt.create();
+        data = new MapOf<>(null);
         binding = Memory.MapOfIntegerInteger();
 
         for(int[] opt : options) nCars += opt[0];
@@ -49,7 +50,7 @@ public class CarSequencingData {
             }
             if(!V.contains(value)) {
                 V.add(value);
-                data.put(value, Memory.ListOfInteger());
+                data.put(value, ListOfInt.create());
                 data.get(value).add(0);
                 for(int j = 0; j < enabledOptions.size(); j++)
                     data.get(value).add(options[i][enabledOptions.get(j)+1]);
@@ -141,7 +142,7 @@ public class CarSequencingData {
         return nOptionsMax[i];
     }
 
-    public ListOf<Integer> getV(){
+    public UnorderedListOfInt getV(){
         return V;
     }
 

@@ -1,16 +1,24 @@
 package builder.constraints.states;
 
+import builder.constraints.parameters.ParametersAmong;
 import builder.constraints.parameters.ParametersSum;
+import memory.AllocatorOf;
 import memory.Memory;
 import memory.MemoryPool;
 
 public class StateSum extends NodeState {
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     private int sum;
     private ParametersSum constraint;
 
-    public StateSum(MemoryPool<NodeState> pool) {
-        super(pool);
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    public StateSum(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     public void init(ParametersSum constraint){
@@ -18,13 +26,36 @@ public class StateSum extends NodeState {
         this.sum = 0;
     }
 
+    /**
+     * Create a StateSum with specified parameters.
+     * The object is managed by the allocator.
+     * @param constraint Parameters of the constraint
+     * @return A StateSum with given parameters
+     */
+    public static StateSum create(ParametersSum constraint){
+        StateSum object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    //**************************************//
+
+
     public String toString(){
         return Integer.toString(sum);
     }
 
     @Override
     public NodeState createState(int label, int layer, int size) {
-        StateSum state = Memory.StateSum(constraint);
+        StateSum state = StateSum.create(constraint);
         state.sum = sum + label;
         return state;
     }
@@ -51,8 +82,35 @@ public class StateSum extends NodeState {
 
     @Override
     public void free(){
-        super.free();
         this.constraint = null;
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the StateSum type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<StateSum> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected StateSum[] arrayCreation(int capacity) {
+            return new StateSum[capacity];
+        }
+
+        @Override
+        protected StateSum createObject(int index) {
+            return new StateSum(index);
+        }
     }
 
 }

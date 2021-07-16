@@ -1,8 +1,8 @@
 package mdd.components;
 
+import memory.Allocable;
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
 import representation.MDDVisitor;
 import structures.generics.SetOf;
 
@@ -13,12 +13,14 @@ import java.util.Iterator;
  * The Layer is the structure used to stock and manage nodes.
  * As a layer is implemented using a Set, there is no notion of order. However, the notion of order in a layer is not important.
  */
-public class Layer implements MemoryObject, Iterable<Node> {
+public class Layer implements Allocable, Iterable<Node> {
 
-    // MemoryObject variables
-    private final MemoryPool<Layer> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
+
 
     private SetOf<Node> nodes;
 
@@ -27,10 +29,19 @@ public class Layer implements MemoryObject, Iterable<Node> {
     //           INITIALISATION             //
     //**************************************//
 
-    public Layer(MemoryPool<Layer> pool){
-        this.pool = pool;
+    private static Allocator allocator(){
+        return localStorage.get();
     }
 
+    private Layer(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    public static Layer create(){
+        Layer layer = allocator().allocate();
+        layer.prepare();
+        return layer;
+    }
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //
@@ -128,20 +139,20 @@ public class Layer implements MemoryObject, Iterable<Node> {
     //**************************************//
     // Implementation of MemoryObject interface
 
-    @Override
-    public void prepare() {
+
+    private void prepare() {
         nodes = Memory.SetOfNode();
     }
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         Memory.free(nodes);
-        this.pool.free(this, ID);
+        allocator().free(this);
     }
 
     public void freeAllNodes(){
@@ -150,6 +161,32 @@ public class Layer implements MemoryObject, Iterable<Node> {
             Memory.free(node);
         }
         nodes.clear();
+    }
+
+    /**
+     * <b>The allocator that is in charge of the Layer type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<Layer> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected Layer[] arrayCreation(int capacity) {
+            return new Layer[capacity];
+        }
+
+        @Override
+        protected Layer createObject(int index) {
+            return new Layer(index);
+        }
     }
 
     //**************************************//

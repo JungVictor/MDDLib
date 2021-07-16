@@ -2,10 +2,9 @@ package pmdd;
 
 import mdd.MDD;
 import mdd.components.Node;
-import memory.MemoryPool;
+import memory.AllocatorOf;
 import pmdd.components.PNode;
 import pmdd.components.properties.NodeProperty;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
 import java.util.InputMismatchException;
@@ -17,12 +16,32 @@ import java.util.InputMismatchException;
  */
 public class PMDD extends MDD {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public PMDD(MemoryPool<MDD> pool) {
-        super(pool);
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static PMDD create(Node root){
+        PMDD mdd = allocator().allocate();
+        mdd.setRoot(root);
+        return mdd;
+    }
+
+    public static PMDD create(){
+        PMDD mdd = allocator().allocate();
+        mdd.setRoot(mdd.Node());
+        return mdd;
+    }
+
+    protected PMDD(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     @Override
@@ -34,7 +53,7 @@ public class PMDD extends MDD {
     @Override
     public Node Node(){
         if(getRoot() != null) return getRoot().Node();
-        return PMemory.PNode();
+        return PNode.create();
     }
 
     @Override
@@ -44,7 +63,7 @@ public class PMDD extends MDD {
 
     @Override
     public MDD MDD(Node root){
-        return PMemory.PMDD(root);
+        return create(root);
     }
 
 
@@ -95,4 +114,39 @@ public class PMDD extends MDD {
         return ((PNode) getTt()).getProperty(propertyName);
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+
+    @Override
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the PMDD type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PMDD> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected PMDD[] arrayCreation(int capacity) {
+            return new PMDD[capacity];
+        }
+
+        @Override
+        protected PMDD createObject(int index) {
+            return new PMDD(index);
+        }
+    }
 }

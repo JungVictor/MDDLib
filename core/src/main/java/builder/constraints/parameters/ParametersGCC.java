@@ -1,25 +1,38 @@
 package builder.constraints.parameters;
 
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 import structures.generics.MapOf;
 import structures.integers.TupleOfInt;
 
 import java.util.Set;
 
-public class ParametersGCC implements MemoryObject {
+public class ParametersGCC implements Allocable {
+
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     // Not to free
     private MapOf<Integer, TupleOfInt> gcc;
     private int minimum;
 
-    // MemoryObject variables
-    private final MemoryPool<ParametersGCC> pool;
-    private int ID = -1;
-    //
 
-    public ParametersGCC(MemoryPool<ParametersGCC> pool){
-        this.pool = pool;
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public ParametersGCC(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
     public void init(MapOf<Integer, TupleOfInt> gcc){
@@ -27,6 +40,14 @@ public class ParametersGCC implements MemoryObject {
         this.minimum = 0;
         for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
     }
+
+    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc){
+        ParametersGCC object = allocator().allocate();
+        object.init(gcc);
+        return object;
+    }
+
+    //**************************************//
 
     public boolean contains(int label){
         return gcc.contains(label);
@@ -44,24 +65,46 @@ public class ParametersGCC implements MemoryObject {
 
     public Set<Integer> V(){return gcc.keySet();}
 
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
-        this.pool.free(this, this.ID);
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the ParametersGCC type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ParametersGCC> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ParametersGCC[] arrayCreation(int capacity) {
+            return new ParametersGCC[capacity];
+        }
+
+        @Override
+        protected ParametersGCC createObject(int index) {
+            return new ParametersGCC(index);
+        }
     }
 
 }

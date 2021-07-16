@@ -1,18 +1,33 @@
 package confidence.states;
 
 import builder.constraints.states.NodeState;
-import memory.MemoryPool;
+import memory.AllocatorOf;
 import confidence.MyMemory;
 import confidence.parameters.ParametersMul;
 
 import java.math.BigInteger;
 
 public class StateMul extends NodeState {
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
     private BigInteger mul;
     private ParametersMul constraint;
 
-    public StateMul(MemoryPool<NodeState> pool) {
-        super(pool);
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    private StateMul(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     public void init(ParametersMul constraint){
@@ -20,13 +35,22 @@ public class StateMul extends NodeState {
         this.mul = BigInteger.ONE;
     }
 
+    public static StateMul create(ParametersMul constraint){
+        StateMul object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
     public String toString(){
         return mul.toString();
     }
 
+    //**************************************//
+
+
     @Override
     public NodeState createState(int label, int layer, int size) {
-        StateMul state = MyMemory.StateMul(constraint);
+        StateMul state = StateMul.create(constraint);
         BigInteger bigIntLabel = BigInteger.valueOf(label);
         state.mul = mul.multiply(bigIntLabel);
         return state;
@@ -65,7 +89,33 @@ public class StateMul extends NodeState {
 
     @Override
     public void free(){
-        super.free();
         this.constraint = null;
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the StateMul type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<StateMul> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected StateMul[] arrayCreation(int capacity) {
+            return new StateMul[capacity];
+        }
+
+        @Override
+        protected StateMul createObject(int index) {
+            return new StateMul(index);
+        }
     }
 }

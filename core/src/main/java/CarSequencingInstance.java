@@ -140,7 +140,7 @@ public class CarSequencingInstance {
         MDD solution = sol100.copy();
         prev = solution;
         for(int i = 1; i < 10; i++){
-            solution = Operation.intersection(Memory.MDD(), solution, sol100, i, sol100.size(), sol100.size());
+            solution = Operation.intersection(MDD.create(), solution, sol100, i, sol100.size(), sol100.size());
             Memory.free(prev);
             prev = solution;
         }

@@ -1,35 +1,49 @@
-package structures.floats;
+package structures.arrays;
 
-
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 
 import java.util.Iterator;
 
 /**
  * <b>Class to symbolize an array of int.</b> <br>
- * Similar to the ArrayOf class, this one is specifically for the primitive type int. Works similarly.
+ * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
  */
-public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
+public class ArrayOfInt implements Iterable<Integer>, Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<ArrayOfFloat> pool;
-    private int ID = -1;
-    //
+    // Thread safe allocator
+    private final static ThreadLocal<ArrayOfInt.Allocator> localStorage = ThreadLocal.withInitial(ArrayOfInt.Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
-    private float[] array;
+    private int[] array;
     public int length;
-    private final ArrayOfFloatIterator iterator = new ArrayOfFloatIterator();
+    private final SuccessionOfIntIterator iterator = new SuccessionOfIntIterator();
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public ArrayOfFloat(MemoryPool<ArrayOfFloat> pool, int capacity){
-        this.pool = pool;
-        this.array = new float[capacity];
+    public ArrayOfInt(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    public void init(int capacity){
+        this.array = new int[capacity];
         this.length = capacity;
+    }
+
+    /**
+     * Create an SuccessionOfInt with specified capacity.
+     * The object is managed by the allocator.
+     * @param capacity Capacity of the array
+     * @return An SuccessionOfInt with given capacity
+     */
+    public static ArrayOfInt create(int capacity){
+        ArrayOfInt object = allocator().allocate();
+        object.init(capacity);
+        return object;
     }
 
 
@@ -37,6 +51,14 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
     //          SPECIAL FUNCTIONS           //
     //**************************************//
     // toString
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static ArrayOfInt.Allocator allocator(){
+        return localStorage.get();
+    }
 
     @Override
     public String toString(){
@@ -67,7 +89,7 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * @param position Position in the array
      * @param value Value of the element
      */
-    public void set(int position, float value){
+    public void set(int position, int value){
         array[position] = value;
     }
 
@@ -76,7 +98,7 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * @param position Position of the element
      * @return the value of the element at the specified position
      */
-    public float get(int position){
+    public int get(int position){
         return array[position];
     }
 
@@ -102,7 +124,7 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * @param length The length of the array
      */
     public void setLength(int length){
-        if(length > array.length) this.array = new float[length];
+        if(length > array.length) this.array = new int[length];
         this.length = length;
     }
 
@@ -111,8 +133,8 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(float[] array){
-        if(array.length > this.array.length) this.array = new float[array.length];
+    public void copy(int[] array){
+        if(array.length > this.array.length) this.array = new int[array.length];
         System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -122,8 +144,8 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(ArrayOfFloat array){
-        if(array.length > this.array.length) this.array = new float[array.length];
+    public void copy(ArrayOfInt array){
+        if(array.length > this.array.length) this.array = new int[array.length];
         System.arraycopy(array.array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -134,28 +156,25 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
      * @return true if the value is contained in the array, false otherwise
      */
     public boolean contains(int value){
-        for(float v : this) if(v == value) return true;
+        for(int v : this) if(v == value) return true;
         return false;
     }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex() {
+        return allocatedIndex;
     }
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void free(){
-        pool.free(this, ID);
+    public void free() {
+        for(int i = 0; i < length; i++) array[i] = 0;
+        allocator().free(this);
     }
 
 
@@ -165,12 +184,12 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
     // Implementation of Iterable<Integer> interface
 
     @Override
-    public Iterator<Float> iterator() {
+    public Iterator<Integer> iterator() {
         iterator.i = 0;
         return iterator;
     }
 
-    private class ArrayOfFloatIterator implements Iterator<Float> {
+    private class SuccessionOfIntIterator implements Iterator<Integer> {
         private int i = 0;
 
         @Override
@@ -179,8 +198,35 @@ public class ArrayOfFloat implements Iterable<Float>, MemoryObject {
         }
 
         @Override
-        public Float next() {
+        public Integer next() {
             return array[i++];
+        }
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ArrayOfInt> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ArrayOfInt[] arrayCreation(int capacity) {
+            return new ArrayOfInt[capacity];
+        }
+
+        @Override
+        protected ArrayOfInt createObject(int index) {
+            return new ArrayOfInt(index);
         }
     }
 }

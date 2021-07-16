@@ -3,19 +3,38 @@ package costmdd;
 import costmdd.components.CostNode;
 import mdd.MDD;
 import mdd.components.Node;
-import memory.Memory;
-import memory.MemoryPool;
+import memory.AllocatorOf;
 
 import java.util.InputMismatchException;
 
 public class CostMDD extends MDD {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public CostMDD(MemoryPool<MDD> pool) {
-        super(pool);
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static MDD create(Node root){
+        MDD mdd = allocator().allocate();
+        mdd.setRoot(root);
+        return mdd;
+    }
+
+    public static MDD create(){
+        MDD mdd = allocator().allocate();
+        mdd.setRoot(mdd.Node());
+        return mdd;
+    }
+
+    protected CostMDD(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     @Override
@@ -27,7 +46,7 @@ public class CostMDD extends MDD {
     @Override
     public Node Node(){
         if(getRoot() != null) return getRoot().Node();
-        return Memory.CostNode();
+        return CostNode.create();
     }
 
     @Override
@@ -37,7 +56,7 @@ public class CostMDD extends MDD {
 
     @Override
     public MDD MDD(Node root){
-        return Memory.CostMDD(root);
+        return create(root);
     }
 
 
@@ -71,6 +90,42 @@ public class CostMDD extends MDD {
     public void addArcAndNode(Node source, int value, Node destination, int cost, int layer){
         addArc(source, value, destination, cost, layer);
         addNode(destination, layer);
+    }
+
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+
+    @Override
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the CostMDD type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<CostMDD> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected CostMDD[] arrayCreation(int capacity) {
+            return new CostMDD[capacity];
+        }
+
+        @Override
+        protected CostMDD createObject(int index) {
+            return new CostMDD(index);
+        }
     }
 
 }

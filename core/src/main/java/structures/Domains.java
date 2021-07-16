@@ -1,24 +1,48 @@
 package structures;
 
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.*;
 import structures.generics.SetOf;
 
 import java.util.ArrayList;
 
-public class Domains implements MemoryObject {
+public class Domains implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<Domains> pool;
-    private int ID;
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Allocated index
+    private final int allocatedIndex;
     //
 
     private final ArrayList<SetOf<Integer>> domains = new ArrayList<>();
 
-    public Domains(MemoryPool<Domains> pool) {
-        this.pool = pool;
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+    private Domains(int allocatedIndex) {
+        this.allocatedIndex = allocatedIndex;
     }
+
+    /**
+     * Create an Domains.
+     * The object is managed by the allocator.
+     * @return A Domains.
+     */
+    public static Domains create(){
+        return allocator().allocate();
+    }
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    //**************************************//
+    //             OPERATIONS               //
+    //**************************************//
 
     public void add(int index){
         domains.add(index, Memory.SetOfInteger());
@@ -68,17 +92,47 @@ public class Domains implements MemoryObject {
         for(SetOf<Integer> values : domains) V.add(values);
     }
 
-    @Override
-    public void prepare() {}
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex() {
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         clear();
-        this.pool.free(this, ID);
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the Domains type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<Domains> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected Domains[] arrayCreation(int capacity) {
+            return new Domains[capacity];
+        }
+
+        @Override
+        protected Domains createObject(int index) {
+            return new Domains(index);
+        }
     }
 }

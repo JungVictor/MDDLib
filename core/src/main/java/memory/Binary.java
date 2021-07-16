@@ -1,7 +1,7 @@
 package memory;
 
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 
 public class Binary {
 
@@ -11,7 +11,7 @@ public class Binary {
     private final SetOf<Integer> SET_BINARY;
 
     private Binary(){
-        ARRAY_BINARY = Memory.ArrayOfInt(2);
+        ARRAY_BINARY = ArrayOfInt.create(2);
         ARRAY_BINARY.set(0,0); ARRAY_BINARY.set(1,1);
 
         SET_BINARY = Memory.SetOfInteger();

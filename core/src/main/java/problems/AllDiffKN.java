@@ -76,7 +76,7 @@ public class AllDiffKN {
     }
 
     private MDD domains(int n){
-        MDD domains = Memory.MDD();
+        MDD domains = MDD.create();
         domains.setSize(n+1);
         Node current = domains.getRoot();
         for(int i = 0; i < domains.size() - 1; i++){

@@ -8,7 +8,7 @@ import memory.Memory;
 import structures.Domains;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import structures.integers.TupleOfInt;
 
 public class MDDBuilder {
@@ -18,7 +18,7 @@ public class MDDBuilder {
         return MDDUniversal.generate(mdd, V, size);
     }
     public static MDD universal(MDD mdd, int V, int size){
-        ArrayOfInt values = Memory.ArrayOfInt(V);
+        ArrayOfInt values = ArrayOfInt.create(V);
         for(int i = 0; i < values.length; i++) values.set(i,i);
         MDD universal = MDDUniversal.generate(mdd, values, size);
         Memory.free(values);
@@ -102,7 +102,7 @@ public class MDDBuilder {
         //return MDDAllDifferent.generate(mdd, V, C, size);
     }
     public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
-        Domains domains = Memory.Domains();
+        Domains domains = Domains.create();
         for(int i = 0; i < size; i++){
             domains.add(i);
             for(int v : D) domains.put(i, v);

@@ -1,36 +1,35 @@
 package mdd.operations;
 
-
 import mdd.components.Layer;
 import mdd.components.Node;
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
-import structures.generics.ListOf;
+import memory.*;
 import structures.generics.SetOf;
+import structures.lists.UnorderedListOfInt;
+import structures.lists.ListOfLayer;
+import structures.lists.UnorderedListOfNode;
 
 import java.util.*;
 
 /**
  * <b>Structure of Pack used when performing the reduce operation on MDD.</b>
  */
-public class Pack implements MemoryObject {
+public class Pack implements Allocable {
 
-    static private final HashMap<Integer, ListOf<Node>> Va = new HashMap<>();
-    static private final HashMap<Node, ListOf<Node>> Na = new HashMap<>();
-    static private final ListOf<Node> Nlist = Memory.ListOfNode();
-    static private final ListOf<Integer> Vlist = Memory.ListOfInteger();
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
+
+    static private final HashMap<Integer, UnorderedListOfNode> Va = new HashMap<>();
+    static private final HashMap<Node, UnorderedListOfNode> Na = new HashMap<>();
+    static private final UnorderedListOfNode Nlist = UnorderedListOfNode.create();
+    static private final UnorderedListOfInt Vlist = UnorderedListOfInt.create();
     static private final Queue<Pack> Q = new LinkedList<>();
     static private final ArrayList<Node> M = new ArrayList<>();
-    static private ListOf<Layer> LAYERS;
+    static private ListOfLayer LAYERS;
 
     private int pos, l;
-    private final ListOf<Node> nodes = Memory.ListOfNode();
-
-    // MemoryObject variables
-    private final MemoryPool<Pack> pool;
-    private int ID;
-    //
+    private final UnorderedListOfNode nodes = UnorderedListOfNode.create();
 
 
     //**************************************//
@@ -38,8 +37,16 @@ public class Pack implements MemoryObject {
     //**************************************//
     // init             || add
 
-    public Pack(MemoryPool<Pack> pool){
-        this.pool = pool;
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public Pack(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
     /**
@@ -65,11 +72,17 @@ public class Pack implements MemoryObject {
         if(L != null) for(Node node : L) nodes.add(node);
     }
 
+    public static Pack create(int pos, int l, Layer L){
+        Pack object = allocator().allocate();
+        object.init(pos, l, L);
+        return object;
+    }
+
     /**
      * Add all nodes to the pack
      * @param nodes Collection of nodes
      */
-    public void add(ListOf<Node> nodes){
+    public void add(UnorderedListOfNode nodes){
         this.nodes.add(nodes);
     }
 
@@ -86,9 +99,9 @@ public class Pack implements MemoryObject {
      * @param size Size of the MDD
      * @param V Values to consider when performing reduction
      */
-    static public void pReduce(ListOf<Layer> L, int size, SetOf<Integer> V){
+    static public void pReduce(ListOfLayer L, int size, SetOf<Integer> V){
         Va.clear();
-        for(int v : V) Va.put(v, Memory.ListOfNode());
+        for(int v : V) Va.put(v, UnorderedListOfNode.create());
         Na.clear();
         Vlist.clear();
         Nlist.clear();
@@ -97,8 +110,8 @@ public class Pack implements MemoryObject {
             reduceLayer(L.get(i), i);
         }
 
-        for(ListOf<Node> nodes : Va.values()) Memory.free(nodes);
-        for(ListOf<Node> nodes : Na.values()) Memory.free(nodes);
+        for(UnorderedListOfNode nodes : Va.values()) Memory.free(nodes);
+        for(UnorderedListOfNode nodes : Na.values()) Memory.free(nodes);
         LAYERS = null;
     }
 
@@ -108,11 +121,11 @@ public class Pack implements MemoryObject {
      * @param i Depth of the layer
      */
     static private void reduceLayer(Layer L, int i){
-        ListOf<Node> removed = Memory.ListOfNode();
+        UnorderedListOfNode removed = UnorderedListOfNode.create();
         for(Node node : L) if(node.numberOfChildren() == 0) removed.add(node);
         for(Node node : removed) L.removeAndFree(node);
         Memory.free(removed);
-        Pack p = Memory.Pack(0, i, L);
+        Pack p = Pack.create(0, i, L);
 
         Q.clear();
         reducePack(p);
@@ -139,18 +152,18 @@ public class Pack implements MemoryObject {
         for(int v : Vlist){
             for(Node x : Va.get(v)){
                 Node y = x.getChildByIndex(i);
-                if(!Na.containsKey(y)) Na.put(y, Memory.ListOfNode());
+                if(!Na.containsKey(y)) Na.put(y, UnorderedListOfNode.create());
                 if(Na.get(y).size() == 0) Nlist.add(x.getChild(v));
                 Na.get(y).add(x);
             }
             Va.get(v).clear();
             for(Node y : Nlist){
                 if(Na.get(y).size() > 1){
-                    Pack p2 = Memory.Pack(i+1, p.l, null);
+                    Pack p2 = Pack.create(i+1, p.l, null);
                     M.clear();
                     for(Node x : Na.get(y)) if(x.numberOfChildren() == i+1) M.add(x);
                     if(M.size() > 0) {
-                        for (Node x : M) Na.get(y).remove(x);
+                        for (Node x : M) Na.get(y).removeElement(x);
                         Node ALPHA = M.get(0);
                         for (int m = 1; m < M.size(); m++) {
                             M.get(m).replaceReferencesBy(ALPHA);
@@ -168,25 +181,46 @@ public class Pack implements MemoryObject {
     }
 
 
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         nodes.clear();
-        pool.free(this, ID);
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the Pack type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<Pack> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected Pack[] arrayCreation(int capacity) {
+            return new Pack[capacity];
+        }
+
+        @Override
+        protected Pack createObject(int index) {
+            return new Pack(index);
+        }
     }
 }
 

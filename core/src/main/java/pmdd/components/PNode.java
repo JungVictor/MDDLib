@@ -1,10 +1,9 @@
 package pmdd.components;
 
 import mdd.components.Node;
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
 import pmdd.components.properties.NodeProperty;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
 /**
@@ -13,20 +12,33 @@ import structures.generics.MapOf;
  */
 public class PNode extends Node {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
     private final MapOf<String, NodeProperty> properties = new MapOf<>(null);
 
-    public PNode(MemoryPool<Node> pool) {
-        super(pool);
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    private static Allocator allocator(){
+        return localStorage.get();
     }
 
-    @Override
-    public NodeType getNodeType(){
-        return NodeType.PROPERTY_NODE;
+    public static PNode create(){
+        PNode node = allocator().allocate();
+        node.prepare();
+        return node;
+    }
+
+    public PNode(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     @Override
     public Node Node(){
-        return PMemory.PNode();
+        return create();
     }
 
     //**************************************//
@@ -105,6 +117,11 @@ public class PNode extends Node {
     // Implementation of MemoryObject interface
 
     @Override
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
+    @Override
     public void prepare(){
         super.prepare();
         properties.clear();
@@ -112,8 +129,34 @@ public class PNode extends Node {
 
     @Override
     public void free(){
-        super.free();
         clearProperties();
+        super.free();
+    }
+
+    /**
+     * <b>The allocator that is in charge of the PNode type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PNode> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected PNode[] arrayCreation(int capacity) {
+            return new PNode[capacity];
+        }
+
+        @Override
+        protected PNode createObject(int index) {
+            return new PNode(index);
+        }
     }
 
 }

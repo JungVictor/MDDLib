@@ -4,7 +4,7 @@ import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
 import structures.generics.MapOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 
 public class MDDCompareNextValue {
 

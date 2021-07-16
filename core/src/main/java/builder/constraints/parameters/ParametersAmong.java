@@ -1,22 +1,34 @@
 package builder.constraints.parameters;
 
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 import structures.generics.SetOf;
 
-public class ParametersAmong implements MemoryObject {
+public class ParametersAmong implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<ParametersAmong> pool;
-    private int ID = -1;
-    //
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     // References, must not be free or cleaned by the object
     private int q, min, max;
     private SetOf<Integer> V;
 
-    public ParametersAmong(MemoryPool<ParametersAmong> pool){
-        this.pool = pool;
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+    public ParametersAmong(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
     public void init(int q, int min, int max, SetOf<Integer> V){
@@ -26,6 +38,14 @@ public class ParametersAmong implements MemoryObject {
         this.V = V;
     }
 
+    public static ParametersAmong create(int q, int min, int max, SetOf<Integer> V){
+        ParametersAmong object = allocator().allocate();
+        object.init(q, min, max, V);
+        return object;
+    }
+
+    //**************************************//
+
     public int q(){return q;}
     public int min(){return min;}
     public int max(){return max;}
@@ -34,25 +54,46 @@ public class ParametersAmong implements MemoryObject {
         return V.contains(label);
     }
 
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
-        this.V = null;
-        this.pool.free(this, this.ID);
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the ParametersAmong type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ParametersAmong> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ParametersAmong[] arrayCreation(int capacity) {
+            return new ParametersAmong[capacity];
+        }
+
+        @Override
+        protected ParametersAmong createObject(int index) {
+            return new ParametersAmong(index);
+        }
     }
 
 }

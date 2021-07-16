@@ -1,10 +1,8 @@
 package mdd.components;
 
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.*;
 import representation.MDDVisitor;
-import structures.generics.ArrayOf;
+import structures.arrays.ArrayOfNode;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 
@@ -18,29 +16,36 @@ import java.util.Random;
  * Furthermore, you can associate other node to a given node, which is
  * notably useful during operations such as intersection or union.
  */
-public class Node implements MemoryObject {
+public class Node implements Allocable {
 
-    public enum NodeType {
-        SIMPLE_NODE, PROPERTY_NODE
-    }
-
-    // MemoryObject variables
-    private final MemoryPool<Node> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     public double s = 0;
     private OutArcs children;
     private InArcs parents;
-    private ArrayOf<Node> associations;
+    private ArrayOfNode associations;
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public Node(MemoryPool<Node> pool) {
-        this.pool = pool;
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static Node create(){
+        Node node = allocator().allocate();
+        node.prepare();
+        return node;
+    }
+
+    protected Node(int allocatedIndex) {
+        this.allocatedIndex = allocatedIndex;
     }
 
 
@@ -57,15 +62,11 @@ public class Node implements MemoryObject {
         children.accept(visitor);
     }
 
-    public NodeType getNodeType(){
-        return NodeType.SIMPLE_NODE;
-    }
-
     /**
      * @return a Node the same type as this node.
      */
     public Node Node(){
-        return Memory.Node();
+        return Node.create();
     }
 
     //**************************************//
@@ -76,7 +77,7 @@ public class Node implements MemoryObject {
      * Associate nodes to this node
      * @param associations an array of nodes
      */
-    public void associate(ArrayOf<Node> associations){
+    public void associate(ArrayOfNode associations){
         if(this.associations.length() < associations.length()) this.associations.setLength(associations.length());
         for(int i = 0; i < associations.length(); i++) this.associations.set(i, associations.get(i));
     }
@@ -93,7 +94,7 @@ public class Node implements MemoryObject {
 
     public void associate(Node node, int position){
         if(position >= associations.length) {
-            ArrayOf<Node> associations = Memory.ArrayOfNode(position+1);
+            ArrayOfNode associations = ArrayOfNode.create(position + 1);
             for(int i = 0; i < this.associations.length; i++) associations.set(i, this.associations.get(i));
             Memory.free(this.associations);
             this.associations = associations;
@@ -110,7 +111,7 @@ public class Node implements MemoryObject {
      * Get all the nodes associated with this node
      * @return All the nodes associated with this node
      */
-    public ArrayOf<Node> getAssociations(){
+    public ArrayOfNode getAssociations(){
         return associations;
     }
 
@@ -353,7 +354,7 @@ public class Node implements MemoryObject {
      * @param added The set to store all the newly added labels (memory management)
      */
     public void replace(MapOf<Integer, SetOf<Integer>> mapping, SetOf<Integer> added){
-        OutArcs new_children = Memory.OutArcs();
+        OutArcs new_children = OutArcs.create();
         for(int v : getValues()) getChild(v).removeParent(v, this);
 
         for(int v : getValues()) {
@@ -390,19 +391,26 @@ public class Node implements MemoryObject {
     }
 
     protected void allocateArcs(){
-        children = Memory.OutArcs();
-        parents = Memory.InArcs();
+        children = OutArcs.create();
+        parents = InArcs.create();
     }
 
-    @Override
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
     public void prepare() {
         allocateArcs();
-        associations = Memory.ArrayOfNode(2);
+        associations = ArrayOfNode.create(2);
     }
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
@@ -411,6 +419,33 @@ public class Node implements MemoryObject {
         Memory.free(parents);
         Memory.free(associations);
         s = 0;
-        this.pool.free(this, ID);
+        dealloc();
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the Node type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<Node> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected Node[] arrayCreation(int capacity) {
+            return new Node[capacity];
+        }
+
+        @Override
+        protected Node createObject(int index) {
+            return new Node(index);
+        }
     }
 }

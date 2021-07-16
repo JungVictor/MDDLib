@@ -1,44 +1,31 @@
-package structures.generics;
+package structures.arrays;
 
-
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-/**
- * <b>Class to symbolize an array of something.</b> <br>
- * Why not simply use the basic array in Java ? Because this one is made to be reused,
- * thus reducing memory consumption and creation of objects.
- * Apart from set/get functions, this is used like a regular array (iterator / .length... )
- * @param <E> The type of object you want to store in the array
- */
-public class ArrayOf<E> implements Iterable<E>, MemoryObject {
+public abstract class ArrayOf<E> implements Iterable<E>, Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<ArrayOf<E>> pool;
-    private int ID = -1;
-    //
-
-    // The proper array
-    private E[] array;
+    // Index in Memory
+    private final int allocatedIndex;
     // Length of the array. The actual size of the array might be greater.
     public int length;
     // Iterator
-    private final ArrayOfIterator iterator = new ArrayOfIterator();
+    private final SuccessionOfIterator iterator = new SuccessionOfIterator();
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    @SuppressWarnings("unchecked")
-    public ArrayOf(MemoryPool<ArrayOf<E>> pool, int i){
-        this.pool = pool;
-        this.array = (E[]) new Object[10];
-        setLength(i);
+    public ArrayOf(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
+    public void init(int capacity){
+        if(array() == null || size() < capacity) arrayAllocation(capacity);
+        this.length = capacity;
+    }
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //
@@ -47,9 +34,15 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
     @Override
     public String toString(){
-        return Arrays.toString(array);
+        return Arrays.toString(array());
     }
 
+    protected abstract E[] array();
+
+    @Override
+    public int allocatedIndex() {
+        return allocatedIndex;
+    }
 
     //**************************************//
     //          ARRAY MANAGEMENT            //
@@ -65,7 +58,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
      * @param value Value of the element
      */
     public void set(int position, E value){
-        array[position] = value;
+        array()[position] = value;
     }
 
     /**
@@ -74,7 +67,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
      * @return the value of the element at the specified position
      */
     public E get(int position){
-        return array[position];
+        return array()[position];
     }
 
     /**
@@ -85,23 +78,31 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
         return length;
     }
 
+    protected abstract int size();
+
     /**
      * Clear the array.
      * That is to say, put all its elements to null and its size to 0.
      */
     public void clear(){
-        Arrays.fill(array, null);
+        Arrays.fill(array(), null);
         length = 0;
     }
+
+    /**
+     * Create an array of given capacity.
+     * This is the array that will be returned by the function array()
+     * @param capacity The capacity of the array
+     */
+    protected abstract void arrayAllocation(int capacity);
 
     /**
      * Set the length of the array. Similar to new E[length].
      * Create internally a new array if the current one isn't long enough.
      * @param length The length of the array
      */
-    @SuppressWarnings("unchecked")
     public void setLength(int length){
-        if(length > array.length) this.array = (E[]) new Object[length];
+        if(length > array().length) arrayAllocation(length);
         this.length = length;
     }
 
@@ -110,31 +111,10 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    @SuppressWarnings("unchecked")
     public void copy(ArrayOf<E> array){
-        if(array.length > this.array.length) this.array = (E[]) new Object[array.length];
-        System.arraycopy(array.array, 0, this.array, 0, array.length);
+        if(array.length > this.array().length) arrayAllocation(array.length);
+        System.arraycopy(array.array(), 0, this.array(), 0, array.length);
         this.length = array.length;
-    }
-
-
-    //**************************************//
-    //           MEMORY FUNCTIONS           //
-    //**************************************//
-    // Implementation of MemoryObject interface
-
-    @Override
-    public void prepare() {}
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    @Override
-    public void free(){
-        for(int i = 0; i < array.length; i++) array[i] = null;
-        pool.free(this, ID);
     }
 
 
@@ -149,7 +129,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
         return iterator;
     }
 
-    private class ArrayOfIterator implements Iterator<E> {
+    private class SuccessionOfIterator implements Iterator<E> {
         private int i = 0;
 
         @Override
@@ -159,7 +139,7 @@ public class ArrayOf<E> implements Iterable<E>, MemoryObject {
 
         @Override
         public E next() {
-            return array[i++];
+            return array()[i++];
         }
     }
 }

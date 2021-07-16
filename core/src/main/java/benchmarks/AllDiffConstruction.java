@@ -1,8 +1,8 @@
 package benchmarks;
 
 import builder.constraints.MDDAllDifferent;
-import memory.Memory;
-import structures.integers.ArrayOfInt;
+import mdd.MDD;
+import structures.arrays.ArrayOfInt;
 import utils.Logger;
 
 public class AllDiffConstruction {
@@ -12,16 +12,16 @@ public class AllDiffConstruction {
         ArrayOfInt V;
         if(args.length > 1) {
             size = Integer.parseInt(args[0]);
-            V = Memory.ArrayOfInt(args.length - 1);
+            V = ArrayOfInt.create(args.length - 1);
             for(int i = 0; i < V.length; i++) V.set(i, Integer.parseInt(args[i+1]));
         } else {
             if(args.length == 1) size = Integer.parseInt(args[0]);
-            V = Memory.ArrayOfInt(size);
+            V = ArrayOfInt.create(size);
             for(int i = 0; i < size; i++) V.set(i,i);
         }
 
         Logger.out.information("SIZE : " + size + ", V = " + V + "\n");
-        MDDAllDifferent.generate(Memory.MDD(), V, size);
+        MDDAllDifferent.generate(MDD.create(), V, size);
         Logger.out.information("END");
     }
 

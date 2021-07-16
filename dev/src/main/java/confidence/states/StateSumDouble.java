@@ -1,17 +1,33 @@
 package confidence.states;
 
 import builder.constraints.states.NodeState;
+import memory.AllocatorOf;
 import memory.MemoryPool;
 import confidence.MyMemory;
 import confidence.parameters.ParametersSumDouble;
 
 public class StateSumDouble extends NodeState {
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     private double sum;
     private ParametersSumDouble constraint;
 
-    public StateSumDouble(MemoryPool<NodeState> pool) {
-        super(pool);
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    private StateSumDouble(int allocatedIndex) {
+        super(allocatedIndex);
     }
 
     public void init(ParametersSumDouble constraint){
@@ -19,13 +35,21 @@ public class StateSumDouble extends NodeState {
         this.sum = 0;
     }
 
+    public static StateSumDouble create(ParametersSumDouble constraint){
+        StateSumDouble object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
     public String toString(){
         return Double.toString(sum);
     }
 
+    //**************************************//
+
     @Override
     public NodeState createState(int label, int layer, int size) {
-        StateSumDouble state = MyMemory.StateSumDouble(constraint);
+        StateSumDouble state = StateSumDouble.create(constraint);
         state.sum = sum + constraint.mapDouble(label);
         return state;
     }
@@ -62,8 +86,34 @@ public class StateSumDouble extends NodeState {
 
     @Override
     public void free(){
-        super.free();
         this.constraint = null;
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the StateSumDouble type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<StateSumDouble> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected StateSumDouble[] arrayCreation(int capacity) {
+            return new StateSumDouble[capacity];
+        }
+
+        @Override
+        protected StateSumDouble createObject(int index) {
+            return new StateSumDouble(index);
+        }
     }
 
 }

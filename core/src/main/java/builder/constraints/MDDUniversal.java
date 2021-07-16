@@ -2,7 +2,7 @@ package builder.constraints;
 
 import mdd.MDD;
 import mdd.components.Node;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 
 public class MDDUniversal {
 

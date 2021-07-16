@@ -3,7 +3,7 @@ package builder.constraints;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import utils.Logger;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class MDDAllDifferent {
         HashMap<Node, ArrayOfInt> values = new HashMap<>();
         HashMap<String, Node> alldiff = new HashMap<>();
 
-        ArrayOfInt Vcopy = Memory.ArrayOfInt(V.length);
+        ArrayOfInt Vcopy = ArrayOfInt.create(V.length);
         Vcopy.copy(V);
         values.put(mdd.getRoot(), Vcopy);
 
@@ -48,7 +48,7 @@ public class MDDAllDifferent {
                     mdd.addArc(node, domain.get(j), newNode, i);
                 }
                 if(C != null && C.length > 0) {
-                    ArrayOfInt copyDomain = Memory.ArrayOfInt(domain.length);
+                    ArrayOfInt copyDomain = ArrayOfInt.create(domain.length);
                     copyDomain.copy(domain);
                     String key = copyDomain.toString();
                     Node newNode = mdd.Node();
@@ -78,7 +78,7 @@ public class MDDAllDifferent {
                                       tmp;
         HashMap<String, Node> alldiff = new HashMap<>();
 
-        ArrayOfInt Vcopy = Memory.ArrayOfInt(V.length);
+        ArrayOfInt Vcopy = ArrayOfInt.create(V.length);
         Vcopy.copy(V);
         values.put(result.getRoot(), Vcopy);
 
@@ -106,7 +106,7 @@ public class MDDAllDifferent {
                     result.addArc(x, domain.get(j), y, i-1);
                 }
                 if(C != null && C.length > 0) {
-                    ArrayOfInt copyDomain = Memory.ArrayOfInt(domain.length);
+                    ArrayOfInt copyDomain = ArrayOfInt.create(domain.length);
                     copyDomain.copy(domain);
                     String key = copyDomain.toString();
                     Node y = result.Node();
@@ -134,7 +134,7 @@ public class MDDAllDifferent {
     }
 
     private static ArrayOfInt domain(ArrayOfInt V, int value){
-        ArrayOfInt domain = Memory.ArrayOfInt(V.length - 1);
+        ArrayOfInt domain = ArrayOfInt.create(V.length - 1);
         int i = 0;
         for(int v : V) if(v != value) domain.set(i++, v);
         return domain;

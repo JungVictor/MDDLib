@@ -59,6 +59,14 @@ public class StackOfInt {
     }
 
     /**
+     * Get the size of the stack
+     * @return The number of elements in the stack
+     */
+    public int size(){
+        return pointer+1;
+    }
+
+    /**
      * Increase the capacity of the stack
      * @param new_capacity The new capacity of the stack
      */

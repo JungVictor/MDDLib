@@ -6,23 +6,23 @@ import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Memory;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import utils.Logger;
 
 public class LCS {
 
     public static MDD solve(String[] words, SetOf<Integer> D){
 
-        ArrayOfInt letters = Memory.ArrayOfInt(words[0].length());
+        ArrayOfInt letters = ArrayOfInt.create(words[0].length());
         for (int j = 0; j < words[0].length(); j++) letters.set(j, words[0].charAt(j));
 
-        MDD result = ConstraintBuilder.subset(Memory.MDD(), letters, D);
+        MDD result = ConstraintBuilder.subset(MDD.create(), letters, D);
         MDD tmp = result;
         for(int i = 1; i < words.length; i++) {
             Logger.out.information(i+" " + (result.size()-1) + "\n");
             for (int j = 0; j < words[0].length(); j++) letters.set(j, words[i].charAt(j));
 
-            MDD word = ConstraintBuilder.subset(Memory.MDD(), letters, D);
+            MDD word = ConstraintBuilder.subset(MDD.create(), letters, D);
             Logger.out.information(word.nSolutions() + "\n");
             result = Operation.intersection(result, word);
             Memory.free(tmp);

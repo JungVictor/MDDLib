@@ -1,8 +1,6 @@
 package mdd.components;
 
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.*;
 import structures.generics.SetOf;
 
 import java.util.Collection;
@@ -15,12 +13,13 @@ import java.util.Random;
  * The in-going arcs (InArcs) is represented using a Map, binding the labels of the arcs to the parents node.
  * As a node can have multiple parents having the same label, the map is actually binding an integer to a set of nodes.
  */
-public class InArcs implements MemoryObject, Iterable<Integer> {
+public class InArcs implements Allocable, Iterable<Integer> {
 
-    // MemoryObject variables
-    private final MemoryPool<InArcs> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     private final HashMap<Integer, SetOf<Node>> arcs = new HashMap<>();
 
@@ -28,8 +27,16 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
     //           INITIALISATION             //
     //**************************************//
 
-    public InArcs(MemoryPool<InArcs> pool){
-        this.pool = pool;
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static InArcs create(){
+        return allocator().allocate();
+    }
+
+    protected InArcs(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
 
@@ -116,23 +123,48 @@ public class InArcs implements MemoryObject, Iterable<Integer> {
     //**************************************//
     // Implementation of MemoryObject interface
 
-    @Override
-    public void prepare() {
-        arcs.clear();
+
+    public void dealloc() {
+        allocator().free(this);
     }
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         for(int value : arcs.keySet()) Memory.free(arcs.get(value));
         arcs.clear();
-        this.pool.free(this, ID);
+        dealloc();
     }
 
+    /**
+     * <b>The allocator that is in charge of the InArcs type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<InArcs> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected InArcs[] arrayCreation(int capacity) {
+            return new InArcs[capacity];
+        }
+
+        @Override
+        protected InArcs createObject(int index) {
+            return new InArcs(index);
+        }
+    }
 
 
     //**************************************//

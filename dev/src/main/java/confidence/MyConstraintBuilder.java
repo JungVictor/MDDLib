@@ -1,23 +1,26 @@
 package confidence;
 
 import builder.constraints.ConstraintBuilder;
+import confidence.states.StateMul;
+import confidence.states.StateSumDouble;
+import confidence.structures.ArrayOfBigInteger;
 import mdd.MDD;
 import mdd.components.SNode;
 import memory.Memory;
 import confidence.parameters.ParametersMul;
 import confidence.parameters.ParametersSumDouble;
 import structures.Domains;
-import structures.generics.ArrayOf;
 import structures.generics.MapOf;
+import structures.arrays.ArrayOfDouble;
 
 import java.math.BigInteger;
 
 public class MyConstraintBuilder extends ConstraintBuilder {
 
     public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size){
-        SNode snode = MyMemory.SNode();
-        ArrayOf<BigInteger> minValues = MyMemory.ArrayOfBigInteger(size);
-        ArrayOf<BigInteger> maxValues = MyMemory.ArrayOfBigInteger(size);
+        SNode snode = SNode.create();
+        ArrayOfBigInteger minValues = ArrayOfBigInteger.create(size);
+        ArrayOfBigInteger maxValues = ArrayOfBigInteger.create(size);
 
         //Important d'initialiser la dernière valeur du tableau à 1
         minValues.set(size-1, BigInteger.valueOf(1));
@@ -50,8 +53,8 @@ public class MyConstraintBuilder extends ConstraintBuilder {
             maxValues.set(i, vMax);
         }
 
-        ParametersMul parameters = MyMemory.ParametersMul(min, max, minValues, maxValues);
-        snode.setState(MyMemory.StateMul(parameters));
+        ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues);
+        snode.setState(StateMul.create(parameters));
 
         build(result, snode, D, size);
 
@@ -61,9 +64,9 @@ public class MyConstraintBuilder extends ConstraintBuilder {
     }
 
     static public MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble,int precision, int size){
-        SNode snode = MyMemory.SNode();
-        ArrayOf<Double> minValues = MyMemory.ArrayOfDouble(size);
-        ArrayOf<Double> maxValues = MyMemory.ArrayOfDouble(size);
+        SNode snode = SNode.create();
+        ArrayOfDouble minValues = ArrayOfDouble.create(size);
+        ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
         //Important d'initialiser la dernière valeur du tableau à 0
         minValues.set(size-1, 0.0);
@@ -83,8 +86,8 @@ public class MyConstraintBuilder extends ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = MyMemory.ParametersSumDouble(min, max, minValues, maxValues, mapDouble, precision);
-        snode.setState(MyMemory.StateSumDouble(parameters));
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, precision);
+        snode.setState(StateSumDouble.create(parameters));
 
         build(result, snode, D, size, true);
 

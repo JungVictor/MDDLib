@@ -3,11 +3,9 @@ package pmdd.components.properties;
 import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
-import structures.generics.ListOf;
 import structures.generics.MapOf;
 import structures.integers.TupleOfInt;
-
-import java.util.Collections;
+import structures.lists.ListOfInt;
 
 /**
  * GLOBAL CARDINALITY CONSTRAINT
@@ -40,16 +38,16 @@ public class PropertyGCC extends NodeProperty {
         for(int value : bounds) {
             val = bounds.get(value).getSecond();
             this.bounds.put(value, bounds.get(value));
-            this.currentValues.put(value, Memory.TupleOfInt());
+            this.currentValues.put(value, TupleOfInt.create());
             if(val > BASE) BASE = val;
         }
     }
 
     @Override
     public String toString(){
-        ListOf<Integer> integers = Memory.ListOfInteger();
+        ListOfInt integers = ListOfInt.create();
         integers.add(currentValues.keySet());
-        Collections.sort(integers.getList());
+        integers.sort();
         StringBuilder builder = new StringBuilder();
         for (int v : integers) {
             builder.append(v);
@@ -80,12 +78,7 @@ public class PropertyGCC extends NodeProperty {
     @Override
     public NodeProperty createProperty(int value) {
         PropertyGCC next = PMemory.PropertyGCC(bounds);
-        TupleOfInt tuple;
-        for(int v : currentValues){
-            tuple = currentValues.get(v);
-            next.currentValues.put(v, Memory.TupleOfInt(tuple.getFirst(), tuple.getSecond()));
-        }
-
+        for(int v : currentValues) next.currentValues.put(v, TupleOfInt.create(currentValues.get(v)));
         if(bounds.contains(value)) next.currentValues.get(value).incr(1,1);
         return next;
     }
@@ -168,16 +161,16 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public String hashstr(int value){
-        ListOf<Integer> integers = Memory.ListOfInteger();
+        ListOfInt integers = ListOfInt.create();
         integers.add(currentValues.keySet());
-        Collections.sort(integers.getList());
+        integers.sort();
         StringBuilder builder = new StringBuilder();
         for (int v : integers) {
             builder.append(v);
             builder.append(" -> ");
             if(v != value) builder.append(currentValues.get(v));
             else {
-                TupleOfInt tmp = Memory.TupleOfInt(currentValues.get(v));
+                TupleOfInt tmp = TupleOfInt.create(currentValues.get(v));
                 tmp.incr(1,1);
                 builder.append(tmp);
                 Memory.free(tmp);

@@ -1,30 +1,49 @@
-package structures.doubles;
+package structures.arrays;
 
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 
 import java.util.Iterator;
 
-public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
+/**
+ * <b>Class to symbolize an array of int.</b> <br>
+ * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
+ */
+public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<ArrayOfDouble> pool;
-    private int ID = -1;
-    //
+    // Thread safe allocator
+    private final static ThreadLocal<ArrayOfBoolean.Allocator> localStorage = ThreadLocal.withInitial(ArrayOfBoolean.Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
-    private double[] array;
+    private boolean[] array;
     public int length;
-    private final ArrayOfDoubleIterator iterator = new ArrayOfDoubleIterator();
+    private final SuccessionOfBooleanIterator iterator = new SuccessionOfBooleanIterator();
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public ArrayOfDouble(MemoryPool<ArrayOfDouble> pool, int capacity){
-        this.pool = pool;
-        this.array = new double[capacity];
+    public ArrayOfBoolean(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    public void init(int capacity){
+        this.array = new boolean[capacity];
         this.length = capacity;
+    }
+
+    /**
+     * Create an SuccessionOfInt with specified capacity.
+     * The object is managed by the allocator.
+     * @param capacity Capacity of the array
+     * @return An SuccessionOfInt with given capacity
+     */
+    public static ArrayOfBoolean create(int capacity){
+        ArrayOfBoolean object = allocator().allocate();
+        object.init(capacity);
+        return object;
     }
 
 
@@ -32,6 +51,14 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
     //          SPECIAL FUNCTIONS           //
     //**************************************//
     // toString
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static ArrayOfBoolean.Allocator allocator(){
+        return localStorage.get();
+    }
 
     @Override
     public String toString(){
@@ -62,7 +89,7 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * @param position Position in the array
      * @param value Value of the element
      */
-    public void set(int position, float value){
+    public void set(int position, boolean value){
         array[position] = value;
     }
 
@@ -71,7 +98,7 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * @param position Position of the element
      * @return the value of the element at the specified position
      */
-    public double get(int position){
+    public boolean get(int position){
         return array[position];
     }
 
@@ -97,7 +124,7 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * @param length The length of the array
      */
     public void setLength(int length){
-        if(length > array.length) this.array = new double[length];
+        if(length > array.length) this.array = new boolean[length];
         this.length = length;
     }
 
@@ -106,8 +133,8 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(double[] array){
-        if(array.length > this.array.length) this.array = new double[array.length];
+    public void copy(boolean[] array){
+        if(array.length > this.array.length) this.array = new boolean[array.length];
         System.arraycopy(array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -117,8 +144,8 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(ArrayOfDouble array){
-        if(array.length > this.array.length) this.array = new double[array.length];
+    public void copy(ArrayOfBoolean array){
+        if(array.length > this.array.length) this.array = new boolean[array.length];
         System.arraycopy(array.array, 0, this.array, 0, array.length);
         this.length = array.length;
     }
@@ -128,29 +155,26 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
      * @param value The value to check
      * @return true if the value is contained in the array, false otherwise
      */
-    public boolean contains(int value){
-        for(double v : this) if(v == value) return true;
+    public boolean contains(boolean value){
+        for(boolean v : this) if(v == value) return true;
         return false;
     }
+
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex() {
+        return allocatedIndex;
     }
 
     @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void free(){
-        pool.free(this, ID);
+    public void free() {
+        for(int i = 0; i < length; i++) array[i] = false;
+        allocator().free(this);
     }
 
 
@@ -160,12 +184,12 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
     // Implementation of Iterable<Integer> interface
 
     @Override
-    public Iterator<Double> iterator() {
+    public Iterator<Boolean> iterator() {
         iterator.i = 0;
         return iterator;
     }
 
-    private class ArrayOfDoubleIterator implements Iterator<Double> {
+    private class SuccessionOfBooleanIterator implements Iterator<Boolean> {
         private int i = 0;
 
         @Override
@@ -174,8 +198,35 @@ public class ArrayOfDouble implements Iterable<Double>, MemoryObject {
         }
 
         @Override
-        public Double next() {
+        public Boolean next() {
             return array[i++];
+        }
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ArrayOfBoolean> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ArrayOfBoolean[] arrayCreation(int capacity) {
+            return new ArrayOfBoolean[capacity];
+        }
+
+        @Override
+        protected ArrayOfBoolean createObject(int index) {
+            return new ArrayOfBoolean(index);
         }
     }
 }

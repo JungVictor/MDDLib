@@ -1,32 +1,51 @@
 package builder.constraints.parameters;
 
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.*;
 import structures.generics.MapOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 
 import java.util.ArrayList;
 
-public class ParametersSubset implements MemoryObject {
+public class ParametersSubset implements Allocable {
 
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
-    // MemoryObject variables
-    private final MemoryPool<ParametersSubset> pool;
-    private int ID = -1;
-    //
 
     private final ArrayList<SubsetData> datas = new ArrayList<>();
 
-    public ParametersSubset(MemoryPool<ParametersSubset> pool) {
-        this.pool = pool;
+
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    private ParametersSubset(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
     public void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
         for(int i = 0; i < word.length+1; i++){
-            datas.add(i, Memory.SubsetData(i, word, alphabetSize, maxSequenceSize));
+            datas.add(i, SubsetData.create(i, word, alphabetSize, maxSequenceSize));
         }
     }
+
+    public static ParametersSubset create(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+        ParametersSubset object = allocator().allocate();
+        object.init(word, alphabetSize, maxSequenceSize);
+        return object;
+    }
+
+    //**************************************//
 
     public boolean isIn(int ID, int label){
         return datas.get(ID).next.contains(label);
@@ -43,33 +62,76 @@ public class ParametersSubset implements MemoryObject {
         return datas.get(ID).next.size() == 0;
     }
 
-    @Override
-    public void prepare() {}
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of MemoryObject interface
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
-        for(SubsetData data : datas) Memory.free(data);
-        datas.clear();
-        this.pool.free(this, ID);
+        allocator().free(this);
     }
 
 
-    public static class SubsetData implements MemoryObject {
+    /**
+     * <b>The allocator that is in charge of the ParametersSubset type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<ParametersSubset> {
 
-        // MemoryObject variables
-        private final MemoryPool<SubsetData> pool;
-        private int ID = -1;
-        //
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected ParametersSubset[] arrayCreation(int capacity) {
+            return new ParametersSubset[capacity];
+        }
+
+        @Override
+        protected ParametersSubset createObject(int index) {
+            return new ParametersSubset(index);
+        }
+    }
+
+
+    //**************************************//
+    //              SUBSET DATA             //
+    //**************************************//
+
+    public static class SubsetData implements Allocable {
+
+        // Thread safe allocator
+        private final static ThreadLocal<SubsetData.Allocator> localStorage = ThreadLocal.withInitial(SubsetData.Allocator::new);
+        // Index in Memory
+        private final int allocatedIndex;
 
         private MapOf<Integer, Integer> next;
 
-        public SubsetData(MemoryPool<SubsetData> pool) {
-            this.pool = pool;
+        //**************************************//
+        //           INITIALISATION             //
+        //**************************************//
+
+        /**
+         * Get the allocator. Thread safe.
+         * @return The allocator.
+         */
+        private static SubsetData.Allocator allocator(){
+            return localStorage.get();
+        }
+
+        public SubsetData(int allocatedIndex) {
+            this.allocatedIndex = allocatedIndex;
         }
 
         public void init(int position, ArrayOfInt word, int alphabetSize, int maxSequenceSize){
@@ -81,18 +143,52 @@ public class ParametersSubset implements MemoryObject {
             next.put(-1,-1);
         }
 
-        @Override
-        public void prepare() {}
+        public static SubsetData create(int position, ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+            SubsetData data = allocator().allocate();
+            data.init(position, word, alphabetSize, maxSequenceSize);
+            return data;
+        }
+
+        //**************************************//
+        //           MEMORY FUNCTIONS           //
+        //**************************************//
+        // Implementation of MemoryObject interface
 
         @Override
-        public void setID(int ID) {
-            this.ID = ID;
+        public int allocatedIndex(){
+            return allocatedIndex;
         }
 
         @Override
         public void free() {
             Memory.free(next);
-            this.pool.free(this, ID);
+            allocator().free(this);
+        }
+
+        /**
+         * <b>The allocator that is in charge of the SubsetData type.</b><br>
+         * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+         * can be change if needed (might improve/decrease performance and/or memory usage).
+         */
+        static final class Allocator extends AllocatorOf<SubsetData> {
+
+            Allocator(int capacity) {
+                super.init(capacity);
+            }
+
+            Allocator(){
+                this(16);
+            }
+
+            @Override
+            protected SubsetData[] arrayCreation(int capacity) {
+                return new SubsetData[capacity];
+            }
+
+            @Override
+            protected SubsetData createObject(int index) {
+                return new SubsetData(index);
+            }
         }
     }
 

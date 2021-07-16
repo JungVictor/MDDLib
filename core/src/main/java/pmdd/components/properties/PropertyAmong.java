@@ -4,7 +4,7 @@ import memory.Memory;
 import memory.MemoryPool;
 import pmdd.memory.PMemory;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 
 public class PropertyAmong extends NodeProperty {
 
@@ -34,7 +34,7 @@ public class PropertyAmong extends NodeProperty {
         this.max = max;
         this.n = 0;
         first = false;
-        this.values = Memory.ArrayOfInt(q);
+        this.values = ArrayOfInt.create(q);
         this.V = V;
         this.depth = 0;
     }

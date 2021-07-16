@@ -1,17 +1,17 @@
 package structures.integers;
 
-import memory.MemoryObject;
-import memory.MemoryPool;
+import memory.Allocable;
+import memory.AllocatorOf;
 
 /**
  * <b>The class representing a tuple of int.</b>
  */
-public class TupleOfInt implements MemoryObject {
+public class TupleOfInt implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<TupleOfInt> pool;
-    private int ID = -1;
-    //
+    // Thread safe allocator
+    private final static ThreadLocal<TupleOfInt.Allocator> localStorage = ThreadLocal.withInitial(TupleOfInt.Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     private int e1, e2;
 
@@ -20,10 +20,40 @@ public class TupleOfInt implements MemoryObject {
     //           INITIALISATION             //
     //**************************************//
 
-    public TupleOfInt(MemoryPool<TupleOfInt> pool){
-        this.pool = pool;
+    public TupleOfInt(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
+    /**
+     * Create a TupleOfInt with specified values.
+     * The object is managed by the allocator.
+     * @param e1 Value of the first element
+     * @param e2 Value of the second element
+     * @return A TupleOfInt with given capacity
+     */
+    public static TupleOfInt create(int e1, int e2){
+        TupleOfInt object = allocator().allocate();
+        object.set(e1, e2);
+        return object;
+    }
+
+    /**
+     * Create a TupleOfInt by copying another TupleOfInt
+     * @param tuple Tuple to copy
+     * @return A TupleOfInt with same values
+     */
+    public static TupleOfInt create(TupleOfInt tuple){
+        return create(tuple.getFirst(), tuple.getSecond());
+    }
+
+    /**
+     * Create a TupleOfInt with values (0,0).
+     * The object is managed by the allocator.
+     * @return A TupleOfInt with given capacity
+     */
+    public static TupleOfInt create(){
+        return create(0,0);
+    }
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //
@@ -35,6 +65,9 @@ public class TupleOfInt implements MemoryObject {
         return "["+e1+", " + e2 + "]";
     }
 
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
 
     //**************************************//
     //          TUPLE MANAGEMENT            //
@@ -99,18 +132,35 @@ public class TupleOfInt implements MemoryObject {
     // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-        e1 = 0;
-        e2 = 0;
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
-        this.pool.free(this, ID);
+        allocator().free(this);
     }
+
+
+    static final class Allocator extends AllocatorOf<TupleOfInt> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected TupleOfInt[] arrayCreation(int capacity) {
+            return new TupleOfInt[capacity];
+        }
+
+        @Override
+        protected TupleOfInt createObject(int index) {
+            return new TupleOfInt(index);
+        }
+    }
+
 }

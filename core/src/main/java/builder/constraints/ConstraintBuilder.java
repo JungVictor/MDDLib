@@ -1,8 +1,7 @@
 package builder.constraints;
 
 import builder.constraints.parameters.*;
-import builder.constraints.states.NodeState;
-import builder.constraints.states.StateGCC;
+import builder.constraints.states.*;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.components.SNode;
@@ -10,7 +9,7 @@ import memory.Memory;
 import structures.Domains;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
 
@@ -42,7 +41,7 @@ public class ConstraintBuilder {
                             String hash = state.hash(value, i, result.size());
                             SNode y = bindings.get(hash);
                             if (y == null) {
-                                y = Memory.SNode();
+                                y = SNode.create();
                                 y.setState(state.createState(value, i, result.size()));
                                 bindings.put(hash, y);
                                 nextNodesConstraint.add(y);
@@ -66,14 +65,14 @@ public class ConstraintBuilder {
         Logger.out.information(node_constraint);
         return result;
     }
-    
+
     public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
         D.add(-1);
-        SNode snode = Memory.SNode();
-        ParametersSubset parameters = Memory.ParametersSubset(letters, D.size(), letters.length);
-        snode.setState(Memory.StateSubset(parameters, 0));
+        SNode snode = SNode.create();
+        ParametersSubset parameters = ParametersSubset.create(letters, D.size(), letters.length);
+        snode.setState(StateSubset.create(parameters, 0));
 
-        Domains domains = Memory.Domains();
+        Domains domains = Domains.create();
         for(int i = 0; i < letters.length; i++) {
             domains.add(i);
             for(int v : D) domains.put(i, v);
@@ -88,9 +87,9 @@ public class ConstraintBuilder {
     }
 
     public static MDD sequence(MDD result, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
-        SNode snode = Memory.SNode();
-        ParametersAmong parameters = Memory.ParametersAmong(q, min, max, V);
-        snode.setState(Memory.StateAmong(parameters));
+        SNode snode = SNode.create();
+        ParametersAmong parameters = ParametersAmong.create(q, min, max, V);
+        snode.setState(StateAmong.create(parameters));
 
         build(result, snode, D, size);
 
@@ -100,15 +99,15 @@ public class ConstraintBuilder {
         return result;
     }
     public static MDD sequence(MDD result, int q, int min, int max, int size){
-        Domains B = Memory.Domains();
+        Domains B = Domains.create();
         for(int i = 0; i < size; i++) {
             B.add(i);
             B.put(i, 0); B.put(i, 1);
         }
         SetOf<Integer> One = Memory.SetOfInteger(); One.add(1);
-        SNode snode = Memory.SNode();
-        ParametersAmong parameters = Memory.ParametersAmong(q, min, max, One);
-        snode.setState(Memory.StateAmong(parameters));
+        SNode snode = SNode.create();
+        ParametersAmong parameters = ParametersAmong.create(q, min, max, One);
+        snode.setState(StateAmong.create(parameters));
 
         build(result, snode, B, size);
 
@@ -122,9 +121,9 @@ public class ConstraintBuilder {
     }
 
     public static MDD sum(MDD result, Domains D, int min, int max, int size){
-        SNode snode = Memory.SNode();
-        ArrayOfInt minValues = Memory.ArrayOfInt(size);
-        ArrayOfInt maxValues = Memory.ArrayOfInt(size);
+        SNode snode = SNode.create();
+        ArrayOfInt minValues = ArrayOfInt.create(size);
+        ArrayOfInt maxValues = ArrayOfInt.create(size);
 
         for(int i = size - 2; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
@@ -139,8 +138,8 @@ public class ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSum parameters = Memory.ParametersSum(min, max, minValues, maxValues);
-        snode.setState(Memory.StateSum(parameters));
+        ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues);
+        snode.setState(StateSum.create(parameters));
 
         build(result, snode, D, size);
 
@@ -149,7 +148,7 @@ public class ConstraintBuilder {
         return result;
     }
     public static MDD sum(MDD result, SetOf<Integer> V, int min, int max, int size){
-        Domains D = Memory.Domains();
+        Domains D = Domains.create();
         for(int i = 0; i < size; i++) {
             D.add(i);
             D.get(i).add(V);
@@ -160,9 +159,9 @@ public class ConstraintBuilder {
     }
 
     public static MDD gcc(MDD result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size){
-        SNode constraint = Memory.SNode();
-        ParametersGCC parameters = Memory.ParametersGCC(maxValues);
-        StateGCC state = Memory.StateGCC(parameters);
+        SNode constraint = SNode.create();
+        ParametersGCC parameters = ParametersGCC.create(maxValues);
+        StateGCC state = StateGCC.create(parameters);
         state.initV();
         constraint.setState(state);
 
@@ -174,9 +173,9 @@ public class ConstraintBuilder {
     }
 
     public static MDD allDiff(MDD result, Domains D, SetOf<Integer> V, int size){
-        SNode constraint = Memory.SNode();
-        ParametersAllDiff parameters = Memory.ParametersAllDiff(V);
-        constraint.setState(Memory.StateAllDiff(parameters));
+        SNode constraint = SNode.create();
+        ParametersAllDiff parameters = ParametersAllDiff.create(V);
+        constraint.setState(StateAllDiff.create(parameters));
 
         build(result, constraint, D, size);
 
@@ -185,25 +184,13 @@ public class ConstraintBuilder {
         return result;
     }
     public static MDD allDiff(MDD result, SetOf<Integer> V, int size){
-        Domains D = Memory.Domains();
+        Domains D = Domains.create();
         for(int i = 0; i < size; i++) {
             D.add(i);
             D.get(i).add(V);
         }
         allDiff(result, D, V, size);
         Memory.free(D);
-        return result;
-    }
-
-    public static MDD diff(MDD result, Domains D, int length, int size){
-        SNode snode = Memory.SNode();
-        ParametersDiff parameters = Memory.ParametersDiff(length);
-        snode.setState(Memory.StateDiff(parameters, size+1));
-
-        build(result, snode, D, size);
-
-        Memory.free(parameters);
-
         return result;
     }
 }

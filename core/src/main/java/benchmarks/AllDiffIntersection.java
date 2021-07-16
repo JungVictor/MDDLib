@@ -2,9 +2,8 @@ package benchmarks;
 
 import builder.constraints.MDDAllDifferent;
 import mdd.MDD;
-import memory.Memory;
 import problems.AllDiff;
-import structures.integers.ArrayOfInt;
+import structures.arrays.ArrayOfInt;
 import utils.Logger;
 
 public class AllDiffIntersection {
@@ -20,7 +19,7 @@ public class AllDiffIntersection {
 
         long clock, memory, tmp_clock, tmp_mem;
         MDD test, result;
-        ArrayOfInt values = Memory.ArrayOfInt(100);
+        ArrayOfInt values = ArrayOfInt.create(100);
 
         Logger.out.setInformation(false);
         Logger.out.setNormal(true);
@@ -42,7 +41,7 @@ public class AllDiffIntersection {
                 memory = memory();
 
                 //ConstraintOperation.allDiff(test);
-                result = MDDAllDifferent.intersection(Memory.MDD(), test, values);
+                result = MDDAllDifferent.intersection(MDD.create(), test, values);
 
                 tmp_clock = time();
                 tmp_mem = memory();

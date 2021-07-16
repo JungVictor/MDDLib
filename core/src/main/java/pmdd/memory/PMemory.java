@@ -1,10 +1,6 @@
 package pmdd.memory;
 
-import mdd.MDD;
-import mdd.components.Node;
 import memory.MemoryPool;
-import pmdd.PMDD;
-import pmdd.components.PNode;
 import pmdd.components.properties.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -13,32 +9,6 @@ import structures.integers.TupleOfInt;
 public class PMemory {
 
     private PMemory(){}
-
-    private static final MemoryPool<MDD> pmdds = new MemoryPool<>();
-    public static PMDD PMDD(){
-        return PMDD(PNode());
-    }
-    public static PMDD PMDD(Node node){
-        PMDD object = (PMDD) pmdds.get();
-        if(object == null){
-            object = new PMDD(pmdds);
-            pmdds.add(object);
-        }
-        object.prepare();
-        object.setRoot(node);
-        return object;
-    }
-
-    private static final MemoryPool<Node> pnodes = new MemoryPool<>();
-    public static PNode PNode(){
-        PNode object = (PNode) pnodes.get();
-        if(object == null){
-            object = new PNode(pnodes);
-            pnodes.add(object);
-        }
-        object.prepare();
-        return object;
-    }
 
     private static final MemoryPool<NodeProperty> gccs = new MemoryPool<>();
     public static PropertyGCC PropertyGCC(MapOf<Integer, TupleOfInt> max){

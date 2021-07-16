@@ -1,10 +1,8 @@
 package structures;
 
 import mdd.components.Node;
-import memory.Memory;
-import memory.MemoryObject;
-import memory.MemoryPool;
-import structures.generics.ArrayOf;
+import memory.*;
+import structures.arrays.ArrayOfNode;
 import structures.generics.MapOf;
 
 /**
@@ -13,11 +11,12 @@ import structures.generics.MapOf;
  * that would be the result of the combination of the two nodes.<br>
  * This is useful when you do not want to create many nodes that represent the same couple.
  */
-public class Binder implements MemoryObject {
+public class Binder implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<Binder> pool;
-    private int ID;
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Allocated index
+    private final int allocatedIndex;
     //
 
     private final MapOf<Node, Binder> reduction = new MapOf<>(null);
@@ -27,10 +26,26 @@ public class Binder implements MemoryObject {
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
-    // init
 
-    public Binder(MemoryPool<Binder> pool){
-        this.pool = pool;
+    private Binder(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    /**
+     * Create an Binder.
+     * The object is managed by the allocator.
+     * @return A Binder.
+     */
+    public static Binder create(){
+        return allocator().allocate();
+    }
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
     }
 
 
@@ -46,11 +61,11 @@ public class Binder implements MemoryObject {
      * @param nodes Nodes to add to the structure
      * @return The last Binder added to the general structure.
      */
-    public Binder path(ArrayOf<Node> nodes){
+    public Binder path(ArrayOfNode nodes){
         if(isLeaf(nodes.length)) return this;
         else if(reduction.get(nodes.get(depth)) != null) return reduction.get(nodes.get(depth)).path(nodes);
         else {
-            Binder next = Memory.Binder();
+            Binder next = Binder.create();
             next.depth = depth + 1;
             reduction.put(nodes.get(depth), next);
             return next.path(nodes);
@@ -78,7 +93,9 @@ public class Binder implements MemoryObject {
      */
     public void clear(){
         for(Binder l : reduction.values()) Memory.free(l);
-        prepare();
+        this.reduction.clear();
+        this.leaf = null;
+        this.depth = 0;
     }
 
     /**
@@ -97,21 +114,43 @@ public class Binder implements MemoryObject {
     // Implementation of MemoryObject interface
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex() {
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
         for(Binder l : reduction.values()) Memory.free(l);
-        prepare();
-        pool.free(this, ID);
-    }
-
-    @Override
-    public void prepare(){
         this.reduction.clear();
         this.leaf = null;
         this.depth = 0;
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the Binder type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<Binder> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            this(16);
+        }
+
+        @Override
+        protected Binder[] arrayCreation(int capacity) {
+            return new Binder[capacity];
+        }
+
+        @Override
+        protected Binder createObject(int index) {
+            return new Binder(index);
+        }
     }
 }
