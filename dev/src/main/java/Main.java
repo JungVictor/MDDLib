@@ -24,6 +24,8 @@ public class Main {
         //testSum1(printer);
 
         //testBigInteger1(printer);
+        //testPrimeFactorization1(printer);
+        //testLog1(printer);
 
         /*
         int gamma = 9000;
@@ -34,14 +36,15 @@ public class Main {
         testBigInteger2(gamma, precision, n, domains);
          */
 
-        /*
+
         int gamma = 80;
         int precision = 2;
-        int n = 7;
+        int n = 3;
         Domains domains = generateData(90, 100, 1, n);
         testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
+        testPrimeFactorization2(gamma, precision, n, domains);
         testBigInteger2(gamma, precision, n, domains);
-         */
+
 
         /*
         double x = 0;
@@ -59,30 +62,7 @@ public class Main {
 
          */
 
-        //testLog1(printer);
 
-
-        PrimeFactorization t1 = PrimeFactorization.create(999999);
-        System.out.println("t1 : " + t1);
-        System.out.println("Log10 : " + t1.toLog10());
-        PrimeFactorization t2 = PrimeFactorization.create(181712);
-        System.out.println("t2 : " + t2);
-        System.out.println("Log10 : " + t2.toLog10());
-        PrimeFactorization t3 = PrimeFactorization.create(386547);
-        System.out.println("t3 : " + t3);
-        System.out.println("Log10 : " + t3.toLog10());
-        PrimeFactorization t4 = PrimeFactorization.create(168767);
-        System.out.println("t4 : " + t4);
-        System.out.println("Log10 : " + t4.toLog10());
-        PrimeFactorization t5 = PrimeFactorization.create(168768);
-        System.out.println("t5 : " + t5);
-        System.out.println("Log10 : " + t5.toLog10());
-        PrimeFactorization t6 = PrimeFactorization.create(435162);
-        System.out.println("t6 : " + t6);
-        System.out.println("Log10 : " + t6.toLog10());
-        PrimeFactorization t7 = t1.multiply(t2).multiply(t3).multiply(t4).multiply(t5).multiply(t6);
-        System.out.println("t7 : " + t7);
-        System.out.println("Log10 : " + t7.toLog10());
 
     }
 
@@ -185,6 +165,50 @@ public class Main {
 
         time1 = System.currentTimeMillis();
         MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        time2 = System.currentTimeMillis();
+
+        Logger.out.information("\nNombre de noeuds : " + confidence.nodes() + "\n");
+        System.out.println("Nombre d'arcs : " + confidence.arcs());
+        System.out.println("Nombre de solutions : " + confidence.nSolutions());
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+    }
+
+    public static void testPrimeFactorization1(MDDPrinter printer){
+        int gamma = 70;
+        int precision = 2;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
+        confidence.accept(printer);
+    }
+
+    public static void testPrimeFactorization2(int gamma, int precision, int n, Domains domains){
+
+        long time1;
+        long time2;
+
+        Logger.out.information("Test avec PrimeFactorization\n");
+        Logger.out.information("Gamma = " + gamma + "\n");
+
+        time1 = System.currentTimeMillis();
+        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
         Logger.out.information("\nNombre de noeuds : " + confidence.nodes() + "\n");

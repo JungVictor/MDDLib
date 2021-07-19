@@ -76,9 +76,9 @@ public class PrimeFactorization implements Allocable {
         }
     }
 
-    public static PrimeFactorization create(int max){
+    public static PrimeFactorization create(int n){
         PrimeFactorization object = allocator().allocate();
-        object.init(max);
+        object.init(n);
         return object;
     }
 

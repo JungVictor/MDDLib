@@ -1,4 +1,4 @@
-package confidence.structures;
+package confidence.structures.arrays;
 
 import memory.AllocatorOf;
 import structures.arrays.ArrayOf;

@@ -1,9 +1,13 @@
 package confidence;
 
 import builder.constraints.ConstraintBuilder;
+import confidence.parameters.ParametersMulPF;
 import confidence.states.StateMul;
+import confidence.states.StateMulPF;
 import confidence.states.StateSumDouble;
-import confidence.structures.ArrayOfBigInteger;
+import confidence.structures.PrimeFactorization;
+import confidence.structures.arrays.ArrayOfBigInteger;
+import confidence.structures.arrays.ArrayOfPrimeFactorization;
 import mdd.MDD;
 import mdd.components.SNode;
 import memory.Memory;
@@ -55,6 +59,52 @@ public class MyConstraintBuilder extends ConstraintBuilder {
 
         ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues);
         snode.setState(StateMul.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static MDD mulPF(MDD result, Domains D, PrimeFactorization min, PrimeFactorization max, int size){
+        SNode snode = SNode.create();
+        ArrayOfPrimeFactorization minValues = ArrayOfPrimeFactorization.create(size);
+        ArrayOfPrimeFactorization maxValues = ArrayOfPrimeFactorization.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 1
+        minValues.set(size-1, PrimeFactorization.create(1));
+        maxValues.set(size-1, PrimeFactorization.create(1));
+
+        for(int i = size - 2; i >= 0; i--){
+            //On initialise pour ne pas avoir de souci avec les conditions dans la boucle
+            PrimeFactorization vMin = PrimeFactorization.create(1);
+            PrimeFactorization vMax = PrimeFactorization.create(1);
+            boolean firstIteration = true;
+            for(int v : D.get(i+1)) {
+                PrimeFactorization bigIntV = PrimeFactorization.create(v);
+
+                if (firstIteration){
+                    vMin = bigIntV;
+                    vMax = bigIntV;
+                    firstIteration = false;
+                } else {
+                    if(bigIntV.toLog10() < vMin.toLog10()) vMin = bigIntV;
+                    if(bigIntV.toLog10() > vMax.toLog10()) vMax = bigIntV;
+                }
+
+            }
+
+            if(i < size - 1) {
+                vMin = vMin.multiply(minValues.get(i+1));
+                vMax = vMax.multiply(maxValues.get(i+1));
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+
+        ParametersMulPF parameters = ParametersMulPF.create(min, max, minValues, maxValues);
+        snode.setState(StateMulPF.create(parameters));
 
         build(result, snode, D, size);
 

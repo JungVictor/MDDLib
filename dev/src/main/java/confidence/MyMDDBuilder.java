@@ -1,6 +1,7 @@
 package confidence;
 
 import builder.MDDBuilder;
+import confidence.structures.PrimeFactorization;
 import mdd.MDD;
 import structures.Domains;
 import structures.generics.MapOf;
@@ -25,6 +26,12 @@ public class MyMDDBuilder extends MDDBuilder {
         return MyConstraintBuilder.mul(mdd, D, m_min, m_max, n);
     }
 
+    public static MDD mulPF(MDD mdd, PrimeFactorization m_min, PrimeFactorization m_max, int n, Domains D){
+        return MyConstraintBuilder.mulPF(mdd, D, m_min, m_max, n);
+    }
+
+
+
     public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int precision, int size, Domains D){
         return MyConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, precision, size);
     }
@@ -42,6 +49,21 @@ public class MyMDDBuilder extends MDDBuilder {
         }
 
         return mul(mdd, bigIntGamma, m_max, n, D);
+    }
+
+    public static MDD confidencePF(MDD mdd, int gamma, int precision, int n, Domains D){
+        int step = (int) Math.pow(10, precision);
+        PrimeFactorization primeFactStep = PrimeFactorization.create(step);
+
+        PrimeFactorization primeFactGamma = PrimeFactorization.create(gamma);
+        PrimeFactorization m_max = primeFactStep;
+
+        for (int i = 0; i < n-1; i++){
+            primeFactGamma = primeFactGamma.multiply(primeFactStep);
+            m_max = m_max.multiply(primeFactStep);
+        }
+
+        return mulPF(mdd, primeFactGamma, m_max, n, D);
     }
 
     public static MDD confidence(MDD mdd, double gamma, int precision, int n, Domains D){

@@ -1,17 +1,16 @@
 package confidence.states;
 
 import builder.constraints.states.NodeState;
+import confidence.parameters.ParametersMulPF;
+import confidence.structures.PrimeFactorization;
 import memory.AllocatorOf;
-import confidence.parameters.ParametersMul;
 
-import java.math.BigInteger;
-
-public class StateMul extends NodeState {
+public class StateMulPF extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private BigInteger mul;
-    private ParametersMul constraint;
+    private PrimeFactorization mul;
+    private ParametersMulPF constraint;
 
     //**************************************//
     //           INITIALISATION             //
@@ -25,17 +24,17 @@ public class StateMul extends NodeState {
         return localStorage.get();
     }
 
-    private StateMul(int allocatedIndex) {
+    private StateMulPF(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    public void init(ParametersMul constraint){
+    public void init(ParametersMulPF constraint){
         this.constraint = constraint;
-        this.mul = BigInteger.ONE;
+        this.mul = PrimeFactorization.create(1);
     }
 
-    public static StateMul create(ParametersMul constraint){
-        StateMul object = allocator().allocate();
+    public static StateMulPF create(ParametersMulPF constraint){
+        StateMulPF object = allocator().allocate();
         object.init(constraint);
         return object;
     }
@@ -49,38 +48,38 @@ public class StateMul extends NodeState {
 
     @Override
     public NodeState createState(int label, int layer, int size) {
-        StateMul state = StateMul.create(constraint);
-        BigInteger bigIntLabel = BigInteger.valueOf(label);
-        state.mul = mul.multiply(bigIntLabel);
+        StateMulPF state = StateMulPF.create(constraint);
+        PrimeFactorization primeFactLabel = PrimeFactorization.create(label);
+        state.mul = mul.multiply(primeFactLabel);
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
-        BigInteger bigIntLabel = BigInteger.valueOf(label);
-        BigInteger newMul = mul.multiply(bigIntLabel);
+        PrimeFactorization primefactLabel = PrimeFactorization.create(label);
+        PrimeFactorization newMul = mul.multiply(primefactLabel);
 
         //Lignes à revoir pour l'ordre dans lequel les multiplications sont faites
-        BigInteger minPotential = newMul.multiply(constraint.vMin(layer-1));
-        BigInteger maxPotential = newMul.multiply(constraint.vMax(layer-1));
+        PrimeFactorization minPotential = newMul.multiply(constraint.vMin(layer-1));
+        PrimeFactorization maxPotential = newMul.multiply(constraint.vMax(layer-1));
 
         //Si l'intervalle [minPotential, maxPotential] intersection [constraint.min(), constraint.max] est vide
-        if(maxPotential.compareTo(constraint.min()) < 0 || constraint.max().compareTo(minPotential) < 0 ) return false;
+        if(maxPotential.toLog10() < constraint.min().toLog10() || constraint.max().toLog10() < minPotential.toLog10()) return false;
         //Si l'intervalle [minPotential, maxPotential] est inclus dans l'intervalle [constraint.min(), constraint.max]
-        if(constraint.min().compareTo(minPotential) <= 0 && maxPotential.compareTo(constraint.max()) <= 0) return true;
+        if(constraint.min().toLog10() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max().toLog10()) return true;
 
-        return newMul.compareTo(constraint.max()) <= 0;
+        return newMul.toLog10() <= constraint.max().toLog10();
     }
 
     @Override
     public String hash(int label, int layer, int size){
-        BigInteger bigIntLabel = BigInteger.valueOf(label);
-        BigInteger newMul = mul.multiply(bigIntLabel);
+        PrimeFactorization primeFactLabel = PrimeFactorization.create(label);
+        PrimeFactorization newMul = mul.multiply(primeFactLabel);
 
-        BigInteger minPotential = newMul.multiply(constraint.vMin(layer-1));
-        BigInteger maxPotential = newMul.multiply(constraint.vMax(layer-1));
+        PrimeFactorization minPotential = newMul.multiply(constraint.vMin(layer-1));
+        PrimeFactorization maxPotential = newMul.multiply(constraint.vMax(layer-1));
 
-        if(constraint.min().compareTo(minPotential) <= 0 && maxPotential.compareTo(constraint.max()) <= 0) return "";
+        if(constraint.min().toLog10() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max().toLog10()) return "";
         return newMul.toString();
     }
 
@@ -95,7 +94,7 @@ public class StateMul extends NodeState {
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<StateMul> {
+    static final class Allocator extends AllocatorOf<StateMulPF> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -106,13 +105,13 @@ public class StateMul extends NodeState {
         }
 
         @Override
-        protected StateMul[] arrayCreation(int capacity) {
-            return new StateMul[capacity];
+        protected StateMulPF[] arrayCreation(int capacity) {
+            return new StateMulPF[capacity];
         }
 
         @Override
-        protected StateMul createObject(int index) {
-            return new StateMul(index);
+        protected StateMulPF createObject(int index) {
+            return new StateMulPF(index);
         }
     }
 }
