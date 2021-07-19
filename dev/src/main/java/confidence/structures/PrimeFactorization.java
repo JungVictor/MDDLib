@@ -1,7 +1,8 @@
 package confidence.structures;
 
-import memory.Memory;
-import structures.generics.MapOf;
+import confidence.parameters.ParametersMul;
+import memory.Allocable;
+import memory.AllocatorOf;
 import structures.lists.ListOfInt;
 
 import java.io.*;
@@ -12,8 +13,12 @@ import java.util.LinkedHashMap;
  * <b>Class which represent a integer by its decomposition into prime numbers</b><br>
  * This class helps to compress big integer to take less space in the memory, and potentially improve multiplication or equality performance.
  */
-public class PrimeFactorization {
+public class PrimeFactorization implements Allocable {
 
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     // Static attributes
     private static ListOfInt primeNumbers = ListOfInt.create(); // List of prime number until maxNumberKnown
@@ -24,8 +29,23 @@ public class PrimeFactorization {
     private LinkedHashMap<Integer, Integer> decomposition = new LinkedHashMap<>(); // The representation by decomposition into prime numbers
 
 
-    // Constructor
-    public PrimeFactorization(int n){
+    //**************************************//
+    //           INITIALISATION             //
+    //**************************************//
+
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    private PrimeFactorization(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
+    }
+
+    public void init(int n){
         if(n < 1) throw new IllegalArgumentException("n must be greater than 0, given n = " + n);
 
         // 1 is representing by an empty LinkedHashMap
@@ -54,6 +74,12 @@ public class PrimeFactorization {
             // If there is no decomposition with these prime numbers then n is a prime number
             if (decomposition.size() == 0) decomposition.put(n, 1);
         }
+    }
+
+    public static PrimeFactorization create(int max){
+        PrimeFactorization object = allocator().allocate();
+        object.init(max);
+        return object;
     }
 
 
@@ -143,7 +169,7 @@ public class PrimeFactorization {
 
     // Methods
     public PrimeFactorization multiply(PrimeFactorization other){
-        PrimeFactorization result = new PrimeFactorization(1);
+        PrimeFactorization result = create(1);
 
         Iterator<Integer> iteratorI = this.decomposition.keySet().iterator();
         Iterator<Integer> iteratorJ = other.decomposition.keySet().iterator();
@@ -196,14 +222,54 @@ public class PrimeFactorization {
         return result;
     }
 
+    public PrimeFactorization copy(){
+        PrimeFactorization result = new PrimeFactorization(1);
+        for(int k : this.decomposition.keySet()) result.decomposition.put(k, this.decomposition.get(k));
+        return result;
+    }
+
     @Override
     public String toString(){
         return decomposition.toString();
     }
 
-    /*
-    TODO :
-    Methods :
-    Copy
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+
+
+    @Override
+    public int allocatedIndex(){
+        return allocatedIndex;
+    }
+
+    @Override
+    public void free() {
+        this.decomposition.clear();
+        allocator().free(this);
+    }
+
+    /**
+     * <b>The allocator that is in charge of the PrimeFactorization type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
      */
+    static final class Allocator extends AllocatorOf<PrimeFactorization> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PrimeFactorization[] arrayCreation(int capacity) { return new PrimeFactorization[capacity]; }
+
+        @Override
+        protected PrimeFactorization createObject(int index) {
+            return new PrimeFactorization(index);
+        }
+    }
 }

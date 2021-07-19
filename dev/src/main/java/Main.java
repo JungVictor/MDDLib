@@ -62,22 +62,22 @@ public class Main {
         //testLog1(printer);
 
 
-        PrimeFactorization t1 = new PrimeFactorization(999999);
+        PrimeFactorization t1 = PrimeFactorization.create(999999);
         System.out.println("t1 : " + t1);
         System.out.println("Log10 : " + t1.toLog10());
-        PrimeFactorization t2 = new PrimeFactorization(181712);
+        PrimeFactorization t2 = PrimeFactorization.create(181712);
         System.out.println("t2 : " + t2);
         System.out.println("Log10 : " + t2.toLog10());
-        PrimeFactorization t3 = new PrimeFactorization(386547);
+        PrimeFactorization t3 = PrimeFactorization.create(386547);
         System.out.println("t3 : " + t3);
         System.out.println("Log10 : " + t3.toLog10());
-        PrimeFactorization t4 = new PrimeFactorization(168767);
+        PrimeFactorization t4 = PrimeFactorization.create(168767);
         System.out.println("t4 : " + t4);
         System.out.println("Log10 : " + t4.toLog10());
-        PrimeFactorization t5 = new PrimeFactorization(168768);
+        PrimeFactorization t5 = PrimeFactorization.create(168768);
         System.out.println("t5 : " + t5);
         System.out.println("Log10 : " + t5.toLog10());
-        PrimeFactorization t6 = new PrimeFactorization(435162);
+        PrimeFactorization t6 = PrimeFactorization.create(435162);
         System.out.println("t6 : " + t6);
         System.out.println("Log10 : " + t6.toLog10());
         PrimeFactorization t7 = t1.multiply(t2).multiply(t3).multiply(t4).multiply(t5).multiply(t6);
