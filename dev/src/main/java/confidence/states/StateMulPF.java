@@ -49,43 +49,53 @@ public class StateMulPF extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateMulPF state = StateMulPF.create(constraint);
-        PrimeFactorization primeFactLabel = PrimeFactorization.create(label);
-        state.mul = mul.multiply(primeFactLabel);
+        state.mul = mul.multiply(constraint.mapPrimeFact(label));
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
-        PrimeFactorization primefactLabel = PrimeFactorization.create(label);
-        PrimeFactorization newMul = mul.multiply(primefactLabel);
+        PrimeFactorization newMul = mul.multiply(constraint.mapPrimeFact(label));
 
         //Lignes à revoir pour l'ordre dans lequel les multiplications sont faites
         PrimeFactorization minPotential = newMul.multiply(constraint.vMin(layer-1));
         PrimeFactorization maxPotential = newMul.multiply(constraint.vMax(layer-1));
 
         //Si l'intervalle [minPotential, maxPotential] intersection [constraint.min(), constraint.max] est vide
-        if(maxPotential.toLog10() < constraint.min().toLog10() || constraint.max().toLog10() < minPotential.toLog10()) return false;
+        if(maxPotential.toLog10() < constraint.min() || constraint.max() < minPotential.toLog10()) return false;
         //Si l'intervalle [minPotential, maxPotential] est inclus dans l'intervalle [constraint.min(), constraint.max]
-        if(constraint.min().toLog10() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max().toLog10()) return true;
+        if(constraint.min() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max()) return true;
 
-        return newMul.toLog10() <= constraint.max().toLog10();
+        boolean result = newMul.toLog10() <= constraint.max();
+
+        newMul.free();
+        minPotential.free();
+        maxPotential.free();
+
+        return result;
     }
 
     @Override
     public String hash(int label, int layer, int size){
-        PrimeFactorization primeFactLabel = PrimeFactorization.create(label);
-        PrimeFactorization newMul = mul.multiply(primeFactLabel);
+        PrimeFactorization newMul = mul.multiply(constraint.mapPrimeFact(label));
 
         PrimeFactorization minPotential = newMul.multiply(constraint.vMin(layer-1));
         PrimeFactorization maxPotential = newMul.multiply(constraint.vMax(layer-1));
 
-        if(constraint.min().toLog10() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max().toLog10()) return "";
-        return newMul.toString();
+        if(constraint.min() <= minPotential.toLog10() && maxPotential.toLog10() <= constraint.max()) return "";
+        String result = newMul.toString();
+
+        newMul.free();
+        minPotential.free();
+        maxPotential.free();
+
+        return result;
     }
 
     @Override
     public void free(){
         this.constraint = null;
+        this.mul.free();
         allocator().free(this);
     }
 

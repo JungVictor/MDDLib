@@ -59,8 +59,7 @@ public class PrimeFactorization implements Allocable {
             int i = 0;
             int primeNumber = 2;
 
-            // While all the prime numbers until maxToCheck are not check
-            while (primeNumber <= maxToCheck && i < primeNumbers.size()) {
+            while (tmp != 1 && i < primeNumbers.size()) {
 
                 primeNumber = primeNumbers.get(i);
 
@@ -123,10 +122,12 @@ public class PrimeFactorization implements Allocable {
             BufferedReader br = new BufferedReader(fr);
             String primeNumber = br.readLine();
             int last = -1;
+            int count = 0;
 
             while(primeNumber != null){
+                count++;
                 last = Integer.parseInt(primeNumber);
-                primeNumbers.add(last);
+                if(count > primeNumbers.size()) { primeNumbers.add(last); }
                 primeNumber = br.readLine();
             }
             br.close();

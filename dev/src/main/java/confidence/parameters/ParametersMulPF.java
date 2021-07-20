@@ -4,6 +4,7 @@ import confidence.structures.PrimeFactorization;
 import confidence.structures.arrays.ArrayOfPrimeFactorization;
 import memory.Allocable;
 import memory.AllocatorOf;
+import structures.generics.MapOf;
 
 
 public class ParametersMulPF implements Allocable {
@@ -14,8 +15,9 @@ public class ParametersMulPF implements Allocable {
 
 
     // References, must not be free or cleaned by the object
-    private PrimeFactorization min, max;
+    private double min, max;
     private ArrayOfPrimeFactorization vMin, vMax;
+    private MapOf<Integer, PrimeFactorization> mapPrimeFact;
 
     //**************************************//
     //           INITIALISATION             //
@@ -33,25 +35,27 @@ public class ParametersMulPF implements Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(PrimeFactorization min, PrimeFactorization max, ArrayOfPrimeFactorization vMin, ArrayOfPrimeFactorization vMax){
+    public void init(double min, double max, ArrayOfPrimeFactorization vMin, ArrayOfPrimeFactorization vMax, MapOf<Integer, PrimeFactorization> mapPrimeFact){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
+        this.mapPrimeFact = mapPrimeFact;
     }
 
-    public static ParametersMulPF create(PrimeFactorization min, PrimeFactorization max, ArrayOfPrimeFactorization vMin, ArrayOfPrimeFactorization vMax){
+    public static ParametersMulPF create(double min, double max, ArrayOfPrimeFactorization vMin, ArrayOfPrimeFactorization vMax, MapOf<Integer, PrimeFactorization> mapPrimeFact){
         ParametersMulPF object = allocator().allocate();
-        object.init(min, max, vMin, vMax);
+        object.init(min, max, vMin, vMax, mapPrimeFact);
         return object;
     }
 
     //**************************************//
 
-    public PrimeFactorization min(){return min;}
-    public PrimeFactorization max(){return max;}
+    public double min(){return min;}
+    public double max(){return max;}
     public PrimeFactorization vMin(int i){return vMin.get(i);}
     public PrimeFactorization vMax(int i){return vMax.get(i);}
+    public PrimeFactorization mapPrimeFact(int i){return mapPrimeFact.get(i);}
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

@@ -28,22 +28,27 @@ public class Main {
         //testLog1(printer);
 
         /*
-        int gamma = 9000;
-        int precision = 4;
+        int gamma = 900;
+        int precision = 3;
         int n = 25;
         Domains domains = generateRandomData(precision, n, 10, 0.97);
         testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
         testBigInteger2(gamma, precision, n, domains);
-         */
-
-
-        int gamma = 80;
-        int precision = 2;
-        int n = 3;
-        Domains domains = generateData(90, 100, 1, n);
-        testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
         testPrimeFactorization2(gamma, precision, n, domains);
+        */
+
+
+
+        /*
+        int gamma = 80000;
+        int precision = 5;
+        int n = 100;
+        Domains domains = generateData(90000, 100000, 2000, n);
+        testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
         testBigInteger2(gamma, precision, n, domains);
+        testPrimeFactorization2(gamma, precision, n, domains);
+        */
+
 
 
         /*
@@ -161,16 +166,17 @@ public class Main {
         long time2;
 
         Logger.out.information("Test avec BigInteger\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
+        System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
         MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
-        Logger.out.information("\nNombre de noeuds : " + confidence.nodes() + "\n");
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
     }
 
     public static void testPrimeFactorization1(MDDPrinter printer){
@@ -205,16 +211,17 @@ public class Main {
         long time2;
 
         Logger.out.information("Test avec PrimeFactorization\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
+        System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
         MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
-        Logger.out.information("\nNombre de noeuds : " + confidence.nodes() + "\n");
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
     }
 
     public static void testLog1(MDDPrinter printer){
@@ -247,17 +254,18 @@ public class Main {
         long time1;
         long time2;
 
-        System.out.println("\nTest avec le logarithme");
+        Logger.out.information("Test avec le logarithme\n");
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
         MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
         time2 = System.currentTimeMillis();
 
+        Logger.out.information("");
         System.out.println("\nNombre de noeuds : " + confidence.nodes());
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
     }
 
 }

@@ -26,11 +26,10 @@ public class MyMDDBuilder extends MDDBuilder {
         return MyConstraintBuilder.mul(mdd, D, m_min, m_max, n);
     }
 
-    public static MDD mulPF(MDD mdd, PrimeFactorization m_min, PrimeFactorization m_max, int n, Domains D){
-        return MyConstraintBuilder.mulPF(mdd, D, m_min, m_max, n);
+    public static MDD mulPF(MDD mdd, PrimeFactorization m_min, PrimeFactorization m_max, MapOf<Integer, PrimeFactorization> mapPrimeFact, int n, Domains D){
+
+        return MyConstraintBuilder.mulPF(mdd, D, m_min.toLog10(), m_max.toLog10(), mapPrimeFact, n);
     }
-
-
 
     public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int precision, int size, Domains D){
         return MyConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, precision, size);
@@ -52,6 +51,12 @@ public class MyMDDBuilder extends MDDBuilder {
     }
 
     public static MDD confidencePF(MDD mdd, int gamma, int precision, int n, Domains D){
+        MapOf<Integer, PrimeFactorization> mapPrimeFact = MyMemory.MapOfIntegerPrimefactorization();
+        for(int i = 0; i < n; i++){
+            for(int v : D.get(i)){
+                if(!mapPrimeFact.contains(v)){ mapPrimeFact.put(v, PrimeFactorization.create(v)); };
+            }
+        }
         int step = (int) Math.pow(10, precision);
         PrimeFactorization primeFactStep = PrimeFactorization.create(step);
 
@@ -63,7 +68,7 @@ public class MyMDDBuilder extends MDDBuilder {
             m_max = m_max.multiply(primeFactStep);
         }
 
-        return mulPF(mdd, primeFactGamma, m_max, n, D);
+        return mulPF(mdd, primeFactGamma, m_max, mapPrimeFact, n, D);
     }
 
     public static MDD confidence(MDD mdd, double gamma, int precision, int n, Domains D){

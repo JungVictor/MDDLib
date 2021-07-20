@@ -67,7 +67,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         return result;
     }
 
-    public static MDD mulPF(MDD result, Domains D, PrimeFactorization min, PrimeFactorization max, int size){
+    public static MDD mulPF(MDD result, Domains D, double min, double max, MapOf<Integer, PrimeFactorization> mapPrimeFact, int size){
         SNode snode = SNode.create();
         ArrayOfPrimeFactorization minValues = ArrayOfPrimeFactorization.create(size);
         ArrayOfPrimeFactorization maxValues = ArrayOfPrimeFactorization.create(size);
@@ -81,16 +81,18 @@ public class MyConstraintBuilder extends ConstraintBuilder {
             PrimeFactorization vMin = PrimeFactorization.create(1);
             PrimeFactorization vMax = PrimeFactorization.create(1);
             boolean firstIteration = true;
+
+            PrimeFactorization primeFactV;
             for(int v : D.get(i+1)) {
-                PrimeFactorization bigIntV = PrimeFactorization.create(v);
+                primeFactV = mapPrimeFact.get(v);
 
                 if (firstIteration){
-                    vMin = bigIntV;
-                    vMax = bigIntV;
+                    vMin = primeFactV;
+                    vMax = primeFactV;
                     firstIteration = false;
                 } else {
-                    if(bigIntV.toLog10() < vMin.toLog10()) vMin = bigIntV;
-                    if(bigIntV.toLog10() > vMax.toLog10()) vMax = bigIntV;
+                    if(primeFactV.toLog10() < vMin.toLog10()) vMin = primeFactV;
+                    if(primeFactV.toLog10() > vMax.toLog10()) vMax = primeFactV;
                 }
 
             }
@@ -103,7 +105,8 @@ public class MyConstraintBuilder extends ConstraintBuilder {
             maxValues.set(i, vMax);
         }
 
-        ParametersMulPF parameters = ParametersMulPF.create(min, max, minValues, maxValues);
+
+        ParametersMulPF parameters = ParametersMulPF.create(min, max, minValues, maxValues, mapPrimeFact);
         snode.setState(StateMulPF.create(parameters));
 
         build(result, snode, D, size);
@@ -113,7 +116,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         return result;
     }
 
-    static public MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble,int precision, int size){
+    static public MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int precision, int size){
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
