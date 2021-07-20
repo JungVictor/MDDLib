@@ -71,15 +71,15 @@ public class MyMDDBuilder extends MDDBuilder {
         return mulPF(mdd, primeFactGamma, m_max, mapPrimeFact, n, D);
     }
 
-    public static MDD confidence(MDD mdd, double gamma, int precision, int n, Domains D){
+    public static strictfp MDD confidence(MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)){
-                mapLog.put(v, -1 * Math.log10(v * Math.pow(10, -precision)));
+                mapLog.put(v, -1 * Math.log(v * Math.pow(10, -precision)));
             }
         }
-        double s_max = -1 * Math.log10(gamma);
+        double s_max = -1 * Math.log(gamma);
 
-        return sumDouble(mdd, 0, s_max, mapLog, precision + 2, n, D);
+        return sumDouble(mdd, 0, s_max, mapLog, precision + epsilon, n, D);
     }
 }

@@ -32,24 +32,28 @@ public class Main {
         int precision = 3;
         int n = 25;
         Domains domains = generateRandomData(precision, n, 10, 0.97);
-        testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
+        testLog2((double)gamma * Math.pow(10, -precision), precision, 2, n, domains);
         testBigInteger2(gamma, precision, n, domains);
         testPrimeFactorization2(gamma, precision, n, domains);
-        */
-
-
+         */
 
         /*
-        int gamma = 80000;
-        int precision = 5;
-        int n = 100;
-        Domains domains = generateData(90000, 100000, 2000, n);
-        testLog2((double)gamma * Math.pow(10, -precision), precision, n, domains);
+        int gamma = 80;
+        int precision = 2;
+        int n = 50;
+        Domains domains = generateData(90, 100, 1, n);
+        testLog2((double)gamma * Math.pow(10, -precision), precision, 2,  n, domains);
         testBigInteger2(gamma, precision, n, domains);
         testPrimeFactorization2(gamma, precision, n, domains);
         */
 
-
+        int gamma = 9000;
+        int precision = 4;
+        int n = 15;
+        Domains domains = generateRandomData(precision, n, 10, 0.95);
+        for(int i = 0; i < 6; i++){
+            testLog2((double)gamma * Math.pow(10, -precision), precision, i, n, domains);
+        }
 
         /*
         double x = 0;
@@ -67,33 +71,29 @@ public class Main {
 
          */
 
-
-
     }
 
     /**
      * <b>Randomly generate a defined number of domains</b><br>
      * @param precision The number of decimal to take in account
      * @param n The number of domains
-     * @param domainsAverageSize The average size of domains
+     * @param size The size of domains
      * @param probaMin The minimal probability wanted in the domain
      * @return n random domains
      */
-    public static Domains generateRandomData(int precision, int n, int domainsAverageSize, double probaMin){
+    public static Domains generateRandomData(int precision, int n, int size, double probaMin){
         Domains domains = Domains.create();
 
         int max = (int) Math.pow(10, precision);
-        double proportion = domainsAverageSize / ((1 - probaMin) * max);
 
         for(int i = 0; i < n; i++){
-            int count = 0;
-            for(int j = (int) (max * probaMin) ; j <= max; j++){
-                if(Math.random() <= proportion) {
-                    domains.put(i, j);
-                    count++;
-                }
+            int j = 0;
+            while (j < size){
+                int value = (int) (max * (probaMin + (Math.random() * (1 - probaMin))));
+                domains.put(i, value);
+                j = domains.get(i).size();
             }
-            System.out.println("Nombre de valeur dans le domaine " + i + " : " + count);
+            System.out.println("Domain " + i + " : " + domains.get(i));
         }
 
         return domains;
@@ -227,6 +227,7 @@ public class Main {
     public static void testLog1(MDDPrinter printer){
         double gamma = 0.7;
         int precision = 2;
+        int epsilon = 2;
         int n = 4;
         Domains domains = Domains.create();
 
@@ -246,11 +247,11 @@ public class Main {
         domains.put(3, 98);
         domains.put(3, 99);
 
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, epsilon, precision, n, domains);
         confidence.accept(printer);
     }
 
-    public static void testLog2(double gamma, int precision, int n, Domains domains){
+    public static void testLog2(double gamma, int precision, int epsilon, int n, Domains domains){
         long time1;
         long time2;
 
@@ -258,7 +259,7 @@ public class Main {
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
         time2 = System.currentTimeMillis();
 
         Logger.out.information("");

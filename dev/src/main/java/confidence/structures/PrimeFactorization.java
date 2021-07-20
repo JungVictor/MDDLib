@@ -1,6 +1,5 @@
 package confidence.structures;
 
-import confidence.parameters.ParametersMul;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.lists.ListOfInt;
@@ -231,7 +230,15 @@ public class PrimeFactorization implements Allocable {
 
     @Override
     public String toString(){
-        return decomposition.toString();
+        StringBuilder builder = new StringBuilder();
+        for(int k : decomposition.keySet()) {
+            builder.append(k);
+            builder.append(":");
+            builder.append(decomposition.get(k));
+            builder.append(",");
+
+        }
+        return builder.toString();
     }
 
     //**************************************//

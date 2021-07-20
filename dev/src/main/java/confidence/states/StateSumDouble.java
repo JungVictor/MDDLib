@@ -6,7 +6,7 @@ import memory.MemoryPool;
 import confidence.MyMemory;
 import confidence.parameters.ParametersSumDouble;
 
-public class StateSumDouble extends NodeState {
+public strictfp class StateSumDouble extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 

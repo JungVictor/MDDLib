@@ -116,7 +116,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         return result;
     }
 
-    static public MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int precision, int size){
+    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int precision, int size){
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
