@@ -127,7 +127,7 @@ public class ConstraintBuilder {
 
         for(int i = size - 2; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-            for(int v : D.get(i)) {
+            for(int v : D.get(i+1)) {
                 if(v < vMin) vMin = v;
                 if(v > vMax) vMax = v;
             }

@@ -204,6 +204,7 @@ public class MDD implements Allocable {
     public void replace(MapOf<Integer, SetOf<Integer>> mapping, int start, int stop){
         SetOf<Integer> setV = Memory.SetOfInteger();
         for(int i = start; i < stop - 1; i++){
+            this.D.get(i).clear();
             for(Node node : getLayer(i)) {
                 node.replace(mapping, setV);
                 this.D.get(i).add(setV);

@@ -90,6 +90,7 @@ public class StateGCC extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
+        size += 1;
         ListOfInt integers = ListOfInt.create();
         integers.add(count.keySet());
         integers.sort();

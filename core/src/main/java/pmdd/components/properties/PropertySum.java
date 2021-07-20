@@ -13,7 +13,7 @@ import structures.integers.TupleOfInt;
 public class PropertySum extends NodeProperty {
 
     private TupleOfInt value;
-    private int min, max;
+    private MapOf<Integer, Integer> bindings;
 
     //**************************************//
     //           INITIALISATION             //
@@ -28,14 +28,14 @@ public class PropertySum extends NodeProperty {
      * Set the current values of the property and the minimum and maximum values
      * @param v1 current min value
      * @param v2 current max value
-     * @param min absolute min value
-     * @param max absolute max value
      */
-    public void setValue(int v1, int v2, int min, int max){
+    public void setValue(int v1, int v2){
         this.value = TupleOfInt.create();
         this.value.set(v1, v2);
-        this.min = min;
-        this.max = max;
+    }
+
+    public void setBindings(MapOf<Integer, Integer> bindings){
+        this.bindings = bindings;
     }
 
     @Override
@@ -51,7 +51,10 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public MapOf getData(){
-        return null;
+        MapOf<Integer, Integer> data = Memory.MapOfIntegerInteger();
+        data.put(0, value.getFirst());
+        data.put(1, value.getSecond());
+        return data;
     }
 
 
@@ -62,12 +65,13 @@ public class PropertySum extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int val) {
-        NodeProperty next = PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, min, max);
-        return next;
+        if(bindings != null) val = bindings.get(val);
+        return PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, bindings);
     }
 
     @Override
     public void mergeWithProperty(int val, NodeProperty nodeProperty){
+        if(bindings != null) val = bindings.get(val);
         PropertySum property = (PropertySum) nodeProperty;
         property.value.setFirst(Math.min(value.getFirst()+val, property.value.getFirst()));
         property.value.setSecond(Math.max(value.getSecond()+val, property.value.getSecond()));
@@ -85,44 +89,6 @@ public class PropertySum extends NodeProperty {
 
 
     //**************************************//
-    //               CHECKERS               //
-    //**************************************//
-    // isDegenerate
-
-    @Override
-    public boolean isValid() {
-        return value.getSecond() <= max;
-    }
-
-    @Override
-    public boolean isValid(int v) {
-        return value.getSecond()+v <= max;
-    }
-
-    @Override
-    public boolean isValid(int v, int layer, int size) {
-        if(layer == size) return value.getFirst()+v <= min && value.getSecond()+v <= max;
-        return isValid(v);
-    }
-
-
-    //**************************************//
-    //           HASH FUNCTIONS             //
-    //**************************************//
-    // hash
-
-    @Override
-    public int hash(){
-        return value.getFirst();
-    }
-
-    @Override
-    public int hash(int value){
-        return this.value.getFirst()+value;
-    }
-
-
-    //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
@@ -130,6 +96,7 @@ public class PropertySum extends NodeProperty {
     @Override
     public void free(){
         Memory.free(value);
+        this.bindings = null;
         super.free();
     }
 
