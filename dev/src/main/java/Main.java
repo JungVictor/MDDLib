@@ -24,7 +24,7 @@ public class Main {
 
         ArgumentParser parser = new ArgumentParser(
                 "-gamma", "9000", "-precision", "4", "-n", "15",
-                "-p", "0.95", "-size", "10", "-eps", "6");
+                "-p", "0.95", "-size", "10", "-eps", "6", "-zebi");
         parser.read(args);
 
         //testSum1(printer);
