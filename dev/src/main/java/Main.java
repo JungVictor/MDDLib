@@ -1,4 +1,5 @@
 import builder.MDDBuilder;
+import confidence.MyConstraintOperation;
 import confidence.MyMDDBuilder;
 import confidence.structures.PrimeFactorization;
 import mdd.MDD;
@@ -20,11 +21,10 @@ import java.util.LinkedHashMap;
 public class Main {
 
     public static void main(String args[]) {
-        MDDPrinter printer = new MDDPrinter();
 
         ArgumentParser parser = new ArgumentParser(
                 "-gamma", "9000", "-precision", "4", "-n", "15",
-                "-p", "0.95", "-size", "10", "-eps", "6", "-zebi");
+                "-p", "0.95", "-size", "10", "-eps", "6");
         parser.read(args);
 
         //testSum1(printer);
@@ -33,15 +33,21 @@ public class Main {
         //testPrimeFactorization1(printer);
         //testLog1(printer);
 
-        /*
-        int gamma = 900;
-        int precision = 3;
-        int n = 25;
-        Domains domains = generateRandomData(precision, n, 10, 0.97);
-        testLog2((double)gamma * Math.pow(10, -precision), precision, 2, n, domains);
+        int gamma = Integer.parseInt(parser.get("-gamma"));
+        int precision = Integer.parseInt(parser.get("-precision"));
+        int n = Integer.parseInt(parser.get("-n"));
+        int epsilon = Integer.parseInt(parser.get("-eps"));
+        Domains domains = generateRandomData(precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
+        MDD previous = null;
+        MDD tmp = previous;
+        for(int i = 0; i < epsilon; i++){
+            previous = testLog2(previous,(double)gamma * Math.pow(10, -precision), precision, i, n, domains);
+            if(tmp != null) Memory.free(tmp);
+            tmp = previous;
+        }
         testBigInteger2(gamma, precision, n, domains);
         testPrimeFactorization2(gamma, precision, n, domains);
-         */
+
 
         /*
         int gamma = 80;
@@ -52,15 +58,6 @@ public class Main {
         testBigInteger2(gamma, precision, n, domains);
         testPrimeFactorization2(gamma, precision, n, domains);
         */
-
-        int gamma = Integer.parseInt(parser.get("-gamma"));
-        int precision = Integer.parseInt(parser.get("-precision"));
-        int n = Integer.parseInt(parser.get("-n"));
-        int epsilon = Integer.parseInt(parser.get("-eps"));
-        Domains domains = generateRandomData(precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
-        for(int i = 0; i < epsilon; i++){
-            testLog2((double)gamma * Math.pow(10, -precision), precision, i, n, domains);
-        }
 
         /*
         double x = 0;
@@ -184,6 +181,7 @@ public class Main {
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+        Memory.free(confidence);
     }
 
     public static void testPrimeFactorization1(MDDPrinter printer){
@@ -229,6 +227,7 @@ public class Main {
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+        Memory.free(confidence);
     }
 
     public static void testLog1(MDDPrinter printer){
@@ -258,7 +257,7 @@ public class Main {
         confidence.accept(printer);
     }
 
-    public static void testLog2(double gamma, int precision, int epsilon, int n, Domains domains){
+    public static MDD testLog2(MDD previous, double gamma, int precision, int epsilon, int n, Domains domains){
         long time1;
         long time2;
 
@@ -266,7 +265,11 @@ public class Main {
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
+        MDD confidence = MDD.create();
+
+        if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
+        else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
+
         time2 = System.currentTimeMillis();
 
         Logger.out.information("");
@@ -274,6 +277,8 @@ public class Main {
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+
+        return confidence;
     }
 
 }

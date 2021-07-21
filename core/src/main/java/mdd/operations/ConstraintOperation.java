@@ -124,7 +124,7 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
-    static private void intersection(MDD result, MDD mdd, SNode constraint){
+    static protected void intersection(MDD result, MDD mdd, SNode constraint){
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
 

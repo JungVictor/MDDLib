@@ -7,6 +7,7 @@ import structures.generics.SetOf;
 import structures.lists.UnorderedListOfInt;
 import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfNode;
+import utils.Logger;
 
 import java.util.*;
 
@@ -107,6 +108,7 @@ public class Pack implements Allocable {
         Nlist.clear();
         LAYERS = L;
         for(int i = size-2; i > 0; i--) {
+            Logger.out.information("\rReducing layer : " + i);
             reduceLayer(L.get(i), i);
         }
 
