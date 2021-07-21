@@ -1,8 +1,10 @@
 package confidence;
 
+import confidence.properties.PropertySumDouble;
 import confidence.structures.PrimeFactorization;
 import memory.Memory;
 import memory.MemoryPool;
+import pmdd.components.properties.NodeProperty;
 import structures.generics.MapOf;
 
 public class MyMemory extends Memory {
@@ -31,6 +33,25 @@ public class MyMemory extends Memory {
         }
         object.prepare();
         return object;
+    }
+
+    private static final MemoryPool<NodeProperty> mapOfPropertySumDouble = new MemoryPool<>();
+    public static PropertySumDouble PropertySumDouble(double v1, double v2, MapOf<Integer, Double> bindings){
+        PropertySumDouble object = (PropertySumDouble) mapOfPropertySumDouble.get();
+        if(object == null){
+            object = new PropertySumDouble(mapOfPropertySumDouble);
+            mapOfPropertySumDouble.add(object);
+        }
+        object.prepare();
+        object.setValue(v1, v2);
+        object.setBindings(bindings);
+        return object;
+    }
+    public static PropertySumDouble PropertySumDouble(double v1, double v2) {
+        return PropertySumDouble(v1, v2, null);
+    }
+    public static PropertySumDouble PropertySumDouble(){
+        return PropertySumDouble(0,0,null);
     }
 
 }

@@ -1,11 +1,15 @@
 import builder.MDDBuilder;
 import confidence.MyConstraintOperation;
 import confidence.MyMDDBuilder;
+import confidence.MyMemory;
+import confidence.properties.PropertySumDouble;
 import confidence.structures.PrimeFactorization;
 import mdd.MDD;
 import memory.Memory;
+import pmdd.PMDD;
 import representation.MDDPrinter;
 import structures.Domains;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import utils.ArgumentParser;
 import utils.Logger;
@@ -181,6 +185,13 @@ public class Main {
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+
+        confidence.clearAllAssociations();
+        PMDD test = PMDD.create();
+        confidence.copy(test);
+
+
+
         Memory.free(confidence);
     }
 
@@ -265,7 +276,10 @@ public class Main {
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
-        MDD confidence = MDD.create();
+        MDD confidence;
+
+        if(previous != null) confidence = PMDD.create();
+        else confidence = MDD.create();
 
         if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
         else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
@@ -276,9 +290,28 @@ public class Main {
         System.out.println("\nNombre de noeuds : " + confidence.nodes());
         System.out.println("Nombre d'arcs : " + confidence.arcs());
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+
+        if(previous != null) {
+            PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, logs(domains, n, precision));
+            ((PMDD) confidence).addRootProperty("confidence", confidenceProperty);
+            MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) ((PMDD) confidence).propagateProperties().get("confidence").getResult().getData();
+            double borne_inf = (1 - ranges.get(1)) * 100;
+            double borne_sup = (1 - ranges.get(0)) * 100;
+            System.out.println("CONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
+        }
+
+        System.out.println();
 
         return confidence;
+    }
+
+    private static MapOf<Integer, Double> logs(Domains D, int n, int precision){
+        MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
+        for(int i = 0; i < n; i++){
+            for(int v : D.get(i)) mapLog.put(v, -1 * Math.log(v * Math.pow(10, -precision)));
+        }
+        return mapLog;
     }
 
 }

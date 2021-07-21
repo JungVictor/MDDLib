@@ -173,7 +173,7 @@ public class ConstraintOperation {
         Memory.free(nextNodesConstraint);
         Memory.free(binder);
 
-        Logger.out.information("\rNoeuds :" + node_constraint + "\n");
+        Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
     }
 
 }
