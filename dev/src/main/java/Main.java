@@ -6,6 +6,7 @@ import memory.Memory;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.SetOf;
+import utils.ArgumentParser;
 import utils.Logger;
 
 import java.io.BufferedWriter;
@@ -20,6 +21,11 @@ public class Main {
 
     public static void main(String args[]) {
         MDDPrinter printer = new MDDPrinter();
+
+        ArgumentParser parser = new ArgumentParser(
+                "-gamma", "9000", "-precision", "4", "-n", "15",
+                "-p", "0.95", "-size", "10", "-eps", "6");
+        parser.read(args);
 
         //testSum1(printer);
 
@@ -47,11 +53,12 @@ public class Main {
         testPrimeFactorization2(gamma, precision, n, domains);
         */
 
-        int gamma = 9000;
-        int precision = 4;
-        int n = 15;
-        Domains domains = generateRandomData(precision, n, 10, 0.95);
-        for(int i = 0; i < 6; i++){
+        int gamma = Integer.parseInt(parser.get("-gamma"));
+        int precision = Integer.parseInt(parser.get("-precision"));
+        int n = Integer.parseInt(parser.get("-n"));
+        int epsilon = Integer.parseInt(parser.get("-eps"));
+        Domains domains = generateRandomData(precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
+        for(int i = 0; i < epsilon; i++){
             testLog2((double)gamma * Math.pow(10, -precision), precision, i, n, domains);
         }
 
