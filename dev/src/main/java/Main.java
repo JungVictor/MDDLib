@@ -296,8 +296,8 @@ public class Main {
             PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, logs(domains, n, precision));
             ((PMDD) confidence).addRootProperty("confidence", confidenceProperty);
             MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) ((PMDD) confidence).propagateProperties().get("confidence").getResult().getData();
-            double borne_inf = (1 - ranges.get(1)) * 100;
-            double borne_sup = (1 - ranges.get(0)) * 100;
+            double borne_sup = Math.exp(ranges.get(1));
+            double borne_inf = Math.exp(ranges.get(0));
             System.out.println("CONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
         }
 
@@ -309,7 +309,7 @@ public class Main {
     private static MapOf<Integer, Double> logs(Domains D, int n, int precision){
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
-            for(int v : D.get(i)) mapLog.put(v, -1 * Math.log(v * Math.pow(10, -precision)));
+            for(int v : D.get(i)) mapLog.put(v, Math.log(v * Math.pow(10, -precision)));
         }
         return mapLog;
     }
