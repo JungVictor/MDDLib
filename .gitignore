@@ -3,6 +3,7 @@
 
 # Maven
 target/
+*.iml
 
 log.txt
 primeNumbers.txt
