@@ -4,7 +4,6 @@ import confidence.MyMDDBuilder;
 import confidence.MyMemory;
 import confidence.properties.PropertySumDouble;
 import mdd.MDD;
-import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
 import representation.MDDPrinter;
@@ -33,7 +32,7 @@ public class Main {
         int epsilon = Integer.parseInt(parser.get("-eps"));
         int size = Integer.parseInt(parser.get("-size"));
         float p = Float.parseFloat(parser.get("-p"));
-        String dataFile = "dev/src/main/resources\\" + parser.get("-dataFile");
+        String dataFile = "data/\\" + parser.get("-dataFile");
         boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
 
         if(generateRandom) generateRandomData(dataFile, precision, n, size, p);
@@ -42,7 +41,17 @@ public class Main {
         MDD previous = null;
         MDD tmp = previous;
         for(int i = 0; i < epsilon; i++){
-            previous = testLog2(previous,(double)gamma * Math.pow(10, -precision), precision, i, n, domains);
+            previous = testLog2(null,(double)gamma * Math.pow(10, -precision), precision, i, n, domains);
+
+            /* Check the difference between two MDDs
+            if(tmp != null) {
+                MDD test = Operation.minus(previous, Operation.intersection(previous, tmp));
+                System.out.println("\nSOLUTIONS = " + test.nSolutions());
+                test.accept(new MDDPrinter());
+                Memory.free(test);
+            }
+            SAFE TO DELETE, TESTING PURPOSES */
+
             if(tmp != null) Memory.free(tmp);
             tmp = previous;
         }

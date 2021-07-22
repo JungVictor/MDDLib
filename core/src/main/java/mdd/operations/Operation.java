@@ -214,7 +214,6 @@ public class Operation {
     // --------- //
     // INCLUSION //
     // --------- //
-
     /**
      * Check if mdd2 is included in mdd1.
      * @param mdd1 The first MDD
@@ -299,7 +298,7 @@ public class Operation {
                 for(int v : D.get(i-1)){
                     boolean a1 = x1.containsLabel(v), a2 = a1;
                     if(x2 != x1) a2 = x2.containsLabel(v);
-                    if(apply(a1, a2, OP, i == size - 1)) {
+                    if(apply(a1, a2, OP, i == size - 2)) {
                         addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);
                     }
                     else if(OP == Operator.INCLUSION && a1) return null;
