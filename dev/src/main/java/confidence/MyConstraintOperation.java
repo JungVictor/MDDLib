@@ -1,7 +1,5 @@
 package confidence;
 
-import builder.constraints.parameters.ParametersSum;
-import builder.constraints.states.StateSum;
 import confidence.parameters.ParametersSumDouble;
 import confidence.states.StateSumDouble;
 import mdd.MDD;
@@ -10,7 +8,6 @@ import mdd.operations.ConstraintOperation;
 import memory.Memory;
 import structures.Domains;
 import structures.arrays.ArrayOfDouble;
-import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 
 public class MyConstraintOperation extends ConstraintOperation {
@@ -60,7 +57,7 @@ public class MyConstraintOperation extends ConstraintOperation {
         ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, precision);
         snode.setState(StateSumDouble.create(parameters));
 
-        intersection(result, mdd, snode);
+        intersection(result, mdd, snode, true);
 
         Memory.free(snode);
         Memory.free(parameters);

@@ -3,8 +3,8 @@ import confidence.MyConstraintOperation;
 import confidence.MyMDDBuilder;
 import confidence.MyMemory;
 import confidence.properties.PropertySumDouble;
-import confidence.structures.PrimeFactorization;
 import mdd.MDD;
+import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
 import representation.MDDPrinter;
@@ -16,8 +16,6 @@ import utils.Logger;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 public class Main {
 
