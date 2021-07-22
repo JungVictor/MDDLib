@@ -10,7 +10,7 @@ public class Logger {
     public static final Logger out = new Logger();
 
     private boolean debug, verbose, information = true, normal = true, memory = true, time = true;
-    private boolean file_output = true;
+    private boolean file_output = false;
     private String str, prestr;
 
     private final long timer;

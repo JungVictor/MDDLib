@@ -33,19 +33,12 @@ public class Main {
         int precision = Integer.parseInt(parser.get("-precision"));
         int n = Integer.parseInt(parser.get("-n"));
         int epsilon = Integer.parseInt(parser.get("-eps"));
-        String dataFile = "data\\" + parser.get("-dataFile");
+        int size = Integer.parseInt(parser.get("-size"));
+        float p = Float.parseFloat(parser.get("-p"));
+        String dataFile = "dev/src/main/resources\\" + parser.get("-dataFile");
         boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
-        if(generateRandom) {
-            generateRandomData(dataFile, precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
-        }
 
-        //testSum1(printer);
-
-        //testBigInteger1(printer);
-        //testPrimeFactorization1(printer);
-        //testLog1(printer);
-
-
+        if(generateRandom) generateRandomData(dataFile, precision, n, size, p);
         Domains domains = getData(dataFile);
 
         MDD previous = null;
@@ -115,9 +108,7 @@ public class Main {
         try {
             File file = new File(fileName);
 
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+            if (!file.exists()) file.createNewFile();
 
             StringBuilder builder = new StringBuilder();
             for(int i = 0; i < domains.size(); i++){
@@ -180,6 +171,7 @@ public class Main {
             br.close();
         } catch (IOException e){
             e.printStackTrace();
+            return null;
         }
         return domains;
     }
@@ -332,10 +324,7 @@ public class Main {
         System.out.println("Gamma = " + gamma);
 
         time1 = System.currentTimeMillis();
-        MDD confidence;
-
-        if(previous != null) confidence = PMDD.create();
-        else confidence = MDD.create();
+        MDD confidence = MDD.create();
 
         if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
         else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
@@ -348,26 +337,32 @@ public class Main {
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
 
-        if(previous != null) {
-            PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, logs(domains, n, precision));
-            ((PMDD) confidence).addRootProperty("confidence", confidenceProperty);
-            MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) ((PMDD) confidence).propagateProperties().get("confidence").getResult().getData();
-            double borne_sup = Math.exp(ranges.get(1));
-            double borne_inf = Math.exp(ranges.get(0));
-            System.out.println("CONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
-        }
+        precision(confidence, domains, n, precision);
 
         System.out.println();
 
         return confidence;
     }
 
-    private static MapOf<Integer, Double> logs(Domains D, int n, int precision){
+    @SuppressWarnings("unchecked")
+    private static void precision(MDD result, Domains D, int n, int precision){
+        PMDD confidence = PMDD.create();
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)) mapLog.put(v, Math.log(v * Math.pow(10, -precision)));
         }
-        return mapLog;
+        result.clearAllAssociations();
+        result.copy(confidence);
+
+        PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
+        confidence.addRootProperty("confidence", confidenceProperty);
+        MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties().get("confidence").getData();
+        double borne_sup = Math.exp(ranges.get(1));
+        double borne_inf = Math.exp(ranges.get(0));
+        System.out.println("CONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
+
+        Memory.free(confidence);
+        Memory.free(mapLog);
     }
 
 }
