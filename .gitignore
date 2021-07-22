@@ -5,8 +5,7 @@
 target/
 *.iml
 
-log.txt
-primeNumbers.txt
+*.txt
 
 # MDDs
 *.mdd

@@ -14,10 +14,7 @@ import structures.generics.SetOf;
 import utils.ArgumentParser;
 import utils.Logger;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,9 +24,20 @@ public class Main {
     public static void main(String args[]) {
 
         ArgumentParser parser = new ArgumentParser(
-                "-gamma", "9000", "-precision", "4", "-n", "15",
-                "-p", "0.95", "-size", "10", "-eps", "6");
+                "-gamma", "9000", "-precision", "4", "-n", "10",
+                "-p", "0.95", "-size", "10", "-eps", "5", "-dataFile", "tmp.txt",
+                "-generateRandom", "false");
         parser.read(args);
+
+        int gamma = Integer.parseInt(parser.get("-gamma"));
+        int precision = Integer.parseInt(parser.get("-precision"));
+        int n = Integer.parseInt(parser.get("-n"));
+        int epsilon = Integer.parseInt(parser.get("-eps"));
+        String dataFile = "data\\" + parser.get("-dataFile");
+        boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
+        if(generateRandom) {
+            generateRandomData(dataFile, precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
+        }
 
         //testSum1(printer);
 
@@ -37,11 +45,9 @@ public class Main {
         //testPrimeFactorization1(printer);
         //testLog1(printer);
 
-        int gamma = Integer.parseInt(parser.get("-gamma"));
-        int precision = Integer.parseInt(parser.get("-precision"));
-        int n = Integer.parseInt(parser.get("-n"));
-        int epsilon = Integer.parseInt(parser.get("-eps"));
-        Domains domains = generateRandomData(precision, n, Integer.parseInt(parser.get("-size")), Float.parseFloat(parser.get("-p")));
+
+        Domains domains = getData(dataFile);
+
         MDD previous = null;
         MDD tmp = previous;
         for(int i = 0; i < epsilon; i++){
@@ -49,8 +55,11 @@ public class Main {
             if(tmp != null) Memory.free(tmp);
             tmp = previous;
         }
-        testBigInteger2(gamma, precision, n, domains);
-        testPrimeFactorization2(gamma, precision, n, domains);
+
+
+
+        //testBigInteger2(gamma, precision, n, domains);
+        //testPrimeFactorization2(gamma, precision, n, domains);
 
 
         /*
@@ -89,7 +98,7 @@ public class Main {
      * @param probaMin The minimal probability wanted in the domain
      * @return n random domains
      */
-    public static Domains generateRandomData(int precision, int n, int size, double probaMin){
+    public static Domains generateRandomData(String fileName, int precision, int n, int size, double probaMin){
         Domains domains = Domains.create();
 
         int max = (int) Math.pow(10, precision);
@@ -101,7 +110,28 @@ public class Main {
                 domains.put(i, value);
                 j = domains.get(i).size();
             }
-            System.out.println("Domain " + i + " : " + domains.get(i));
+        }
+
+        try {
+            File file = new File(fileName);
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i < domains.size(); i++){
+                builder.append(domains.get(i));
+                builder.append("\n");
+            }
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(builder.toString());
+            bw.close();
+
+        } catch (IOException e){
+            e.printStackTrace();
         }
 
         return domains;
@@ -126,6 +156,32 @@ public class Main {
         MDD sum = MDDBuilder.sum(MDD.create(), 1, 3, 4, V);
 
         sum.accept(printer);
+    }
+
+    public static Domains getData(String fileName){
+        Domains domains = Domains.create();
+        try{
+            File file = new File(fileName);
+            FileReader fr = new FileReader(file.getAbsoluteFile());
+            BufferedReader br = new BufferedReader(fr);
+            String domain = br.readLine();
+
+            int count = 0;
+
+            while(domain != null){
+                String delims = "[\\[\\], ]+";
+                String[] numbers = domain.split(delims);
+                for(int i = 0; i < numbers.length-1; i++) {
+                    domains.put(count, Integer.parseInt(numbers[i+1]));
+                }
+                domain = br.readLine();
+                count++;
+            }
+            br.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return domains;
     }
 
     public static void testMul1(MDDPrinter printer, int n){
