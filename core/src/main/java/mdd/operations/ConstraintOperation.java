@@ -125,55 +125,7 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
     static protected void intersection(MDD result, MDD mdd, SNode constraint){
-        result.setSize(mdd.size());
-        result.getRoot().associate(mdd.getRoot(), constraint);
-
-        Binder binder = Binder.create();
-        HashMap<String, SNode> bindings = new HashMap<>();
-        SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
-                nextNodesConstraint = Memory.SetOfNode(),
-                tmp;
-
-        int node_constraint = 0;
-
-        for(int i = 1; i < mdd.size(); i++){
-            Logger.out.information("\rLAYER " + i);
-            for(Node node : result.getLayer(i-1)){
-                SNode x2 = (SNode) node.getX2();
-                Node x1 = node.getX1();
-                for(int value : x1.getValues()) {
-                    NodeState state = x2.getState();
-                    if(state.isValid(value, i, mdd.size())) {
-                        if(!x2.containsLabel(value)) {
-                            String hash = state.hash(value, i, mdd.size());
-                            SNode y2 = bindings.get(hash);
-                            if (y2 == null) {
-                                y2 = SNode.create();
-                                node_constraint++;
-                                y2.setState(state.createState(value, i, mdd.size()));
-                                bindings.put(hash, y2);
-                                nextNodesConstraint.add(y2);
-                            }
-                            x2.addChild(value, y2);
-                        }
-                        Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
-                    }
-                }
-            }
-            for(Node node : currentNodesConstraint) Memory.free(node);
-            currentNodesConstraint.clear();
-            tmp = currentNodesConstraint;
-            currentNodesConstraint = nextNodesConstraint;
-            nextNodesConstraint = tmp;
-
-            binder.clear();
-            bindings.clear();
-        }
-        Memory.free(currentNodesConstraint);
-        Memory.free(nextNodesConstraint);
-        Memory.free(binder);
-
-        Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
+        intersection(result, mdd, constraint, false);
     }
 
     /**
