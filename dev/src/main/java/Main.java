@@ -3,6 +3,8 @@ import confidence.MyConstraintOperation;
 import confidence.MyMDDBuilder;
 import confidence.MyMemory;
 import confidence.properties.PropertySumDouble;
+import confidence.utils.ConfidenceDomainsGenerator;
+import confidence.utils.DomainsManagements;
 import mdd.MDD;
 import memory.Memory;
 import pmdd.PMDD;
@@ -32,11 +34,11 @@ public class Main {
         int epsilon = Integer.parseInt(parser.get("-eps"));
         int size = Integer.parseInt(parser.get("-size"));
         float p = Float.parseFloat(parser.get("-p"));
-        String dataFile = "data/" + parser.get("-dataFile");
+        String dataFile = parser.get("-dataFile");
         boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
 
-        if(generateRandom) generateRandomData(dataFile, precision, n, size, p);
-        Domains domains = getData(dataFile);
+        if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
+        Domains domains = DomainsManagements.getDomains(dataFile);
 
         MDD previous = null;
         MDD tmp = previous;
@@ -90,99 +92,12 @@ public class Main {
 
     }
 
-    /**
-     * <b>Randomly generate a defined number of domains</b><br>
-     * @param precision The number of decimal to take in account
-     * @param n The number of domains
-     * @param size The size of domains
-     * @param probaMin The minimal probability wanted in the domain
-     * @return n random domains
-     */
-    public static Domains generateRandomData(String fileName, int precision, int n, int size, double probaMin){
-        Domains domains = Domains.create();
-
-        int max = (int) Math.pow(10, precision);
-
-        for(int i = 0; i < n; i++){
-            int j = 0;
-            while (j < size){
-                int value = (int) (max * (probaMin + (Math.random() * (1 - probaMin))));
-                domains.put(i, value);
-                j = domains.get(i).size();
-            }
-        }
-
-        try {
-            File file = new File(fileName);
-
-            if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
-
-            if (!file.exists()) file.createNewFile();
-
-            StringBuilder builder = new StringBuilder();
-            for(int i = 0; i < domains.size(); i++){
-                builder.append(domains.get(i));
-                builder.append("\n");
-            }
-
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(builder.toString());
-            bw.close();
-
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        return domains;
-    }
-
-    public static Domains generateData(int min, int max, int step, int n){
-        Domains domains = Domains.create();
-
-        for(int i = 0; i < n; i++){
-            int count = 0;
-            for(int j = min; j <= max; j+= step){
-                domains.put(i, j);
-            }
-        }
-
-        return domains;
-    }
-
     public static void testSum1(MDDPrinter printer){
         SetOf<Integer> V = Memory.SetOfInteger();
         for(int i = 0; i < 2; i++) V.add(i);
         MDD sum = MDDBuilder.sum(MDD.create(), 1, 3, 4, V);
 
         sum.accept(printer);
-    }
-
-    public static Domains getData(String fileName){
-        Domains domains = Domains.create();
-        try{
-            File file = new File(fileName);
-            FileReader fr = new FileReader(file.getAbsoluteFile());
-            BufferedReader br = new BufferedReader(fr);
-            String domain = br.readLine();
-
-            int count = 0;
-
-            while(domain != null){
-                String delims = "[\\[\\], ]+";
-                String[] numbers = domain.split(delims);
-                for(int i = 0; i < numbers.length-1; i++) {
-                    domains.put(count, Integer.parseInt(numbers[i+1]));
-                }
-                domain = br.readLine();
-                count++;
-            }
-            br.close();
-        } catch (IOException e){
-            e.printStackTrace();
-            return null;
-        }
-        return domains;
     }
 
     public static void testMul1(MDDPrinter printer, int n){
