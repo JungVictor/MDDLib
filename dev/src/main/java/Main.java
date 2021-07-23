@@ -32,7 +32,7 @@ public class Main {
         int epsilon = Integer.parseInt(parser.get("-eps"));
         int size = Integer.parseInt(parser.get("-size"));
         float p = Float.parseFloat(parser.get("-p"));
-        String dataFile = "data/\\" + parser.get("-dataFile");
+        String dataFile = "data/" + parser.get("-dataFile");
         boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
 
         if(generateRandom) generateRandomData(dataFile, precision, n, size, p);
@@ -114,6 +114,8 @@ public class Main {
 
         try {
             File file = new File(fileName);
+
+            if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
 
             if (!file.exists()) file.createNewFile();
 
