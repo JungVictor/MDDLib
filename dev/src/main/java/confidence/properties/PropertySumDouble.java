@@ -7,7 +7,7 @@ import pmdd.components.properties.NodeProperty;
 import structures.generics.MapOf;
 import structures.integers.TupleOfDouble;
 
-public class PropertySumDouble extends NodeProperty {
+public strictfp class PropertySumDouble extends NodeProperty {
 
     private TupleOfDouble value;
     private MapOf<Integer, Double> bindings;

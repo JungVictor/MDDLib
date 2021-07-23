@@ -331,6 +331,7 @@ public class MDD implements Allocable {
      * @return The number of solutions represented by the MDD
      */
     public double nSolutions(){
+        if(tt == root) return 0;
         // Initialize the count of solution of each node to 0
         for(int i = 0; i < size; i++) for(Node x : getLayer(i)) x.s = 0;
         if(tt == null) return 0;
@@ -460,7 +461,7 @@ public class MDD implements Allocable {
         // Merge similar nodes
         SetOf<Integer> V = Memory.SetOfInteger();
         D.fillWithValues(V);
-        if(getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
+        if(size > 1 && getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
         Memory.free(V);
     }
 

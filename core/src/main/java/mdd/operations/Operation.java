@@ -295,11 +295,15 @@ public class Operation {
             Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
+                Node x1c, x2c;
                 for(int v : D.get(i-1)){
-                    boolean a1 = x1.containsLabel(v), a2 = a1;
-                    if(x2 != x1) a2 = x2.containsLabel(v);
-                    if(apply(a1, a2, OP, i == size - 2)) {
-                        addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);
+                    boolean a1, a2;
+                    a1 = x1 != null && x1.containsLabel(v);
+                    a2 = x2 != null && x2.containsLabel(v);
+                    if(apply(a1, a2, OP, i == size - 1)) {
+                        x1c = x1 == null ? null : x1.getChild(v);
+                        x2c = x2 == null ? null : x2.getChild(v);
+                        addArcAndNode(result, x, x1c, x2c, v, i, binder);
                     }
                     else if(OP == Operator.INCLUSION && a1) return null;
                 }
@@ -308,7 +312,7 @@ public class Operation {
                 binder.clear();
                 Memory.free(binder);
                 if (OP == Operator.INCLUSION) return null;
-                result.setSize(i);
+                if (OP != Operator.MINUS) result.setSize(i);
                 result.reduce();
                 return result;
             }
@@ -362,9 +366,6 @@ public class Operation {
      * @param binder The binder
      */
     public static Node addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){
-        if(y1 == null) y1 = y2;
-        else if(y2 == null) y2 = y1;
-
         Node y;
         if(binder == null){
             y = x.Node();
