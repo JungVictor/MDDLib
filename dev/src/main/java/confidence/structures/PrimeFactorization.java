@@ -7,6 +7,7 @@ import structures.lists.ListOfInt;
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * <b>Class which represent a integer by its decomposition into prime numbers</b><br>
@@ -25,8 +26,8 @@ public class PrimeFactorization implements Allocable {
 
 
     // Attributes
-    private LinkedHashMap<Integer, Integer> decomposition = new LinkedHashMap<>(); // The representation by decomposition into prime numbers
-
+    private ListOfInt factor = ListOfInt.create();
+    private ListOfInt exponent = ListOfInt.create();
 
     //**************************************//
     //           INITIALISATION             //
@@ -47,7 +48,7 @@ public class PrimeFactorization implements Allocable {
     public void init(int n){
         if(n < 1) throw new IllegalArgumentException("n must be greater than 0, given n = " + n);
 
-        // 1 is representing by an empty LinkedHashMap
+        // 1 is representing by two empty list
         if(n != 1) {
             int tmp = n;
 
@@ -63,14 +64,25 @@ public class PrimeFactorization implements Allocable {
                 primeNumber = primeNumbers.get(i);
 
                 if (tmp % primeNumber == 0) {
-                    if (!decomposition.containsKey(primeNumber)) decomposition.put(primeNumber, 1);
-                    else decomposition.put(primeNumber, decomposition.get(primeNumber) + 1);
+                    //Si on a aucune valeur dans les listes ou que l'on divise par un nouveau nombre premier
+                    if(factor.size() == 0 || factor.get(factor.size()-1) != primeNumber){
+                        factor.add(primeNumber);
+                        exponent.add(1);
+                    }
+                    //Si on continue de diviser par le même nombre premier
+                    else{
+                        exponent.set(exponent.size()-1, exponent.get(exponent.size()-1)+1);
+                    }
+
                     tmp /= primeNumber;
                 } else i++;
             }
 
             // If there is no decomposition with these prime numbers then n is a prime number
-            if (decomposition.size() == 0) decomposition.put(n, 1);
+            if (factor.size() == 0){
+                factor.add(n);
+                exponent.add(1);
+            }
         }
     }
 
@@ -171,40 +183,40 @@ public class PrimeFactorization implements Allocable {
     public PrimeFactorization multiply(PrimeFactorization other){
         PrimeFactorization result = create(1);
 
-        Iterator<Integer> iteratorI = this.decomposition.keySet().iterator();
-        Iterator<Integer> iteratorJ = other.decomposition.keySet().iterator();
-
-        int i = -1;
-        int j = -1;
-        if(iteratorI.hasNext()) i = iteratorI.next();
-        if(iteratorJ.hasNext()) j = iteratorJ.next();
+        int i = 0;
+        int j = 0;
 
         // While neither of the end of iteratorI or iteratorJ is reached
-        while(i != -1 || j != -1){
+        while(i < this.factor.size() || j < other.factor.size()){
 
-            // If the end of iteratorI is reached
-            if(i == -1){
-                result.decomposition.put(j, other.decomposition.get(j));
-                j = iteratorNext(iteratorJ);
+            // If the end of this is reached
+            if(i >= factor.size()){
+                result.factor.add(other.factor.get(j));
+                result.exponent.add(other.exponent.get(j));
+                j++;
             }
-            // If the end of iteratorJ is reached
-            else if(j == -1){
-                result.decomposition.put(i, this.decomposition.get(i));
-                i = iteratorNext(iteratorI);
+            // If the end of other is reached
+            else if(j >= other.factor.size()){
+                result.factor.add(this.factor.get(i));
+                result.exponent.add(this.exponent.get(i));
+                i++;
             }
             else {
-                if(i < j){
-                    result.decomposition.put(i, this.decomposition.get(i));
-                    i = iteratorNext(iteratorI);
+                if(this.factor.get(i) < other.factor.get(j)){
+                    result.factor.add(this.factor.get(i));
+                    result.exponent.add(this.exponent.get(i));
+                    i++;
                 }
-                else if(j < i){
-                    result.decomposition.put(j, other.decomposition.get(j));
-                    j = iteratorNext(iteratorJ);
+                else if(other.factor.get(j) < this.factor.get(i)){
+                    result.factor.add(other.factor.get(j));
+                    result.exponent.add(other.exponent.get(j));
+                    j++;
                 }
                 else {
-                    result.decomposition.put(i, this.decomposition.get(i) + other.decomposition.get(j));
-                    i = iteratorNext(iteratorI);
-                    j = iteratorNext(iteratorJ);
+                    result.factor.add(this.factor.get(i));
+                    result.exponent.add(this.exponent.get(i) + other.exponent.get(j));
+                    i++;
+                    j++;
                 }
             }
         }
@@ -218,23 +230,28 @@ public class PrimeFactorization implements Allocable {
 
     public double toLog10(){
         double result = 0;
-        for(int k : decomposition.keySet()) result += Math.log10(k) * decomposition.get(k);
+        for(int i = 0; i < factor.size(); i++){
+            result += Math.log10(factor.get(i)) * exponent.get(i);
+        }
         return result;
     }
 
     public PrimeFactorization copy(){
         PrimeFactorization result = new PrimeFactorization(1);
-        for(int k : this.decomposition.keySet()) result.decomposition.put(k, this.decomposition.get(k));
+        for(int i = 0; i < factor.size(); i++){
+            result.factor.add(this.factor.get(i));
+            result.exponent.add(this.exponent.get(i));
+        }
         return result;
     }
 
     @Override
     public String toString(){
         StringBuilder builder = new StringBuilder();
-        for(int k : decomposition.keySet()) {
-            builder.append(k);
+        for(int i = 0; i < factor.size(); i++) {
+            builder.append(factor.get(i));
             builder.append(":");
-            builder.append(decomposition.get(k));
+            builder.append(exponent.get(i));
             builder.append(",");
 
         }
@@ -253,7 +270,8 @@ public class PrimeFactorization implements Allocable {
 
     @Override
     public void free() {
-        this.decomposition.clear();
+        this.factor.clear();
+        this.exponent.clear();
         allocator().free(this);
     }
 

@@ -1,5 +1,6 @@
 import confidence.ConfidenceTests;
 import confidence.utils.ConfidenceDomainsGenerator;
+import confidence.utils.DomainsManagements;
 import structures.Domains;
 import utils.ArgumentParser;
 
@@ -22,10 +23,10 @@ public class Main {
         String dataFile = parser.get("-dataFile");
         boolean generateRandom = Boolean.parseBoolean(parser.get("-generateRandom"));
 
-        /*
-        if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
-        Domains domains = DomainsManagements.getDomains(dataFile);
 
+        if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
+        //Domains domains = DomainsManagements.getDomains(dataFile);
+        /*
         MDD previous = null;
         MDD tmp = previous;
         for(int i = 0; i < epsilon; i++){
@@ -50,12 +51,13 @@ public class Main {
         //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
         //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
 
-
-
-        Domains domains = ConfidenceDomainsGenerator.generateData(90, 100, 1, n);
+        int min = 9 * ((int) Math.pow(10, precision-1));
+        int max = (int) Math.pow(10, precision);
+        int step = (int) Math.pow(10, precision-2);
+        Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
         //ConfidenceTests.testLog2((double)gamma * Math.pow(10, -precision), precision, 2,  n, domains);
-        //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
-        ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
+        ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
+        //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
 
 
     }
