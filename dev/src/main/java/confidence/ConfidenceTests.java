@@ -3,6 +3,7 @@ package confidence;
 import builder.MDDBuilder;
 import confidence.properties.PropertySumDouble;
 import mdd.MDD;
+import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
 import representation.MDDPrinter;
@@ -184,12 +185,58 @@ public class ConfidenceTests {
         System.out.println("Nombre de solutions : " + confidence.nSolutions());
         System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
 
-        precision(confidence, domains, n, precision);
+        //precision(confidence, domains, n, precision);
 
         System.out.println();
 
         return confidence;
     }
+
+    public static void testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
+        MDD result = null;
+        MDD confidence, extract = null;
+        MDD tmp = null;
+        for (int i = 0; i < epsilon; i++) {
+            confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
+
+            extract = extract(confidence, domains, n, precision, gamma);
+            if (extract.nSolutions() == 0) {
+                Memory.free(extract);
+                if(result == null) result = confidence;
+                else if(confidence.nSolutions() > 0) Operation.union(result, confidence);
+                break;
+            }
+
+            if(result == null) result = Operation.minus(confidence, extract);
+            else result = Operation.union(result, Operation.minus(confidence, extract));
+
+            if(tmp != null) Memory.free(tmp);
+            Memory.free(confidence);
+            tmp = extract;
+        }
+
+
+        int nNodes = 0;
+        int nArcs = 0;
+        double nSol = 0;
+
+        if(result != null) {
+            result.reduce();
+            nNodes = result.nodes();
+            nArcs = result.arcs();
+            nSol = result.nSolutions();
+            precision(result, domains, n, precision);
+        }
+
+        Logger.out.information("");
+        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
+        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
+        Logger.out.information("\r\nNombre de solutions : " + nSol);
+
+        System.out.println();
+    }
+
+
 
     @SuppressWarnings("unchecked")
     private static void precision(MDD result, Domains D, int n, int precision){
@@ -203,12 +250,41 @@ public class ConfidenceTests {
 
         PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
         confidence.addRootProperty("confidence", confidenceProperty);
-        MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties().get("confidence").getData();
+        MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties(false).get("confidence").getData();
         double borne_sup = Math.exp(ranges.get(1));
         double borne_inf = Math.exp(ranges.get(0));
-        System.out.println("CONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
+        System.out.println("\rCONFIDENCE = ["+borne_inf+", " + borne_sup + "]");
 
         Memory.free(confidence);
         Memory.free(mapLog);
     }
+
+    /**
+     * Extract all potentially false solutions from the MDD
+     * @param result The set of all solutions
+     * @param D Domains
+     * @param n Size of solution
+     * @param precision Precision of the solution
+     * @param gamma The threshold
+     * @return All nodes and arcs that belongs to a false solution
+     */
+    private static MDD extract(MDD result, Domains D, int n, int precision, double gamma){
+        PMDD confidence = PMDD.create();
+        MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
+        for(int i = 0; i < n; i++){
+            for(int v : D.get(i)) mapLog.put(v, Math.log(v * Math.pow(10, -precision)));
+        }
+        result.clearAllAssociations();
+        result.copy(confidence);
+
+        PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
+        confidence.addRootProperty("confidence", confidenceProperty);
+        confidence.propagateProperties(false);
+
+        MDD extract = ConstraintPruning.prune(confidence, "confidence", mapLog, Math.log(gamma * Math.pow(10, -precision)));
+        Memory.free(mapLog);
+        Memory.free(confidence);
+        return extract;
+    }
+
 }

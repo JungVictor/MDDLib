@@ -26,7 +26,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
 
     private final HashMap<Integer, Node> arcs = new HashMap<>();
     private final ArrayList<Integer> values = new ArrayList<>();
-
+    private final HashMap<Integer, Integer> marked = new HashMap<>();
 
     //**************************************//
     //           INITIALISATION             //
@@ -61,6 +61,19 @@ public class OutArcs implements Allocable, Iterable<Integer> {
     //**************************************//
     //           ARCS MANAGEMENT            //
     //**************************************//
+
+    public void mark(int label, int value) {
+        marked.put(label, value);
+    }
+
+    public int getMark(int label){
+        if(marked.containsKey(label)) return marked.get(label);
+        return 0;
+    }
+
+    public void unmark(){
+        marked.clear();
+    }
 
     /**
      * Associate a node with the given label
@@ -201,6 +214,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
     public void free() {
         arcs.clear();
         values.clear();
+        marked.clear();
         dealloc();
     }
 

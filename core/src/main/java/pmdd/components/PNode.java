@@ -107,7 +107,7 @@ public class PNode extends Node {
      * Free them from memory
      */
     public void clearProperties(){
-        for(String property : properties) Memory.free(properties.get(property));
+        for(String property : properties) if(properties.get(property) != null) Memory.free(properties.get(property));
         properties.clear();
     }
 

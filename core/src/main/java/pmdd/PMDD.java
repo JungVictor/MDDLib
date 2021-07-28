@@ -76,10 +76,14 @@ public class PMDD extends MDD {
      * @return The map of name -> property of the tt node after the propagation
      */
     public MapOf<String, NodeProperty> propagateProperties(){
+        return propagateProperties(true);
+    }
+
+    public MapOf<String, NodeProperty> propagateProperties(boolean clean) {
         for(int i = 0; i < size() - 1; i++){
             for(Node node : getLayer(i)) {
                 ((PNode) node).transferProperties();
-                ((PNode) node).clearProperties();
+                if(clean) ((PNode) node).clearProperties();
             }
         }
         return ((PNode) getTt()).getProperties();
