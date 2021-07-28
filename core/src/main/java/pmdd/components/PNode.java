@@ -18,6 +18,10 @@ public class PNode extends Node {
 
     private final MapOf<String, NodeProperty> properties = new MapOf<>(null);
 
+    // Pruning
+    // TODO : replace by TupleOfDouble ?
+    public double[] value = {1, 0};
+
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
@@ -107,7 +111,7 @@ public class PNode extends Node {
      * Free them from memory
      */
     public void clearProperties(){
-        for(String property : properties) if(properties.get(property) != null) Memory.free(properties.get(property));
+        for(String property : properties) Memory.free(properties.get(property));
         properties.clear();
     }
 
@@ -130,6 +134,8 @@ public class PNode extends Node {
     @Override
     public void free(){
         clearProperties();
+        value[0] = 1;
+        value[1] = 0;
         super.free();
     }
 

@@ -40,6 +40,13 @@ public strictfp class PropertySumDouble extends NodeProperty {
         return value.toString();
     }
 
+    @Override
+    public boolean equals(Object object){
+        if(!(object instanceof PropertySumDouble)) return false;
+        PropertySumDouble prop = (PropertySumDouble) object;
+        return prop.value.getFirst() == value.getFirst() && prop.value.getSecond() == value.getSecond();
+    }
+
 
     //**************************************//
     //             RAW RESULTS              //

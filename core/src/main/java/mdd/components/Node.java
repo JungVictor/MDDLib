@@ -29,10 +29,6 @@ public class Node implements Allocable {
     private InArcs parents;
     private ArrayOfNode associations;
 
-    // Pruning
-    public boolean marked, updated;
-    public double[] value = {1, 0};
-
 
     //**************************************//
     //           INITIALISATION             //
@@ -422,8 +418,6 @@ public class Node implements Allocable {
         Memory.free(children);
         Memory.free(parents);
         Memory.free(associations);
-        value[0] = 1;
-        value[1] = 0;
         s = 0;
         dealloc();
     }
