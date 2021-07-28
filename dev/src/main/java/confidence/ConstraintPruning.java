@@ -13,7 +13,7 @@ import structures.generics.SetOf;
 
 import java.util.LinkedList;
 
-public class ConstraintPruning {
+public strictfp class ConstraintPruning {
 
     private static final LinkedList<PNode> toUpdate = new LinkedList<>();
     private static final LinkedList<PNode> Q = new LinkedList<>();

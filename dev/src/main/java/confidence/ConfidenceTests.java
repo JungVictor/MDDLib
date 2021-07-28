@@ -195,7 +195,7 @@ public class ConfidenceTests {
     public static void testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
         MDD confidence, extract = null;
-        MDD tmp = null;
+        MDD tmp = null, tmp_res = null;
         for (int i = 0; i < epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
 
@@ -203,16 +203,27 @@ public class ConfidenceTests {
             if (extract.nSolutions() == 0) {
                 Memory.free(extract);
                 if(result == null) result = confidence;
-                else if(confidence.nSolutions() > 0) Operation.union(result, confidence);
+                else if(confidence.nSolutions() > 0) {
+                    result = Operation.union(result, confidence);
+                    Memory.free(tmp_res);
+                }
                 break;
             }
 
             if(result == null) result = Operation.minus(confidence, extract);
-            else result = Operation.union(result, Operation.minus(confidence, extract));
+            else {
+                MDD difference =  Operation.minus(confidence, extract);
+                result = Operation.union(result, difference);
+                Memory.free(difference);
+            }
 
-            if(tmp != null) Memory.free(tmp);
+            if(tmp != null) {
+                Memory.free(tmp);
+                Memory.free(tmp_res);
+            }
             Memory.free(confidence);
             tmp = extract;
+            tmp_res = result;
         }
 
 
