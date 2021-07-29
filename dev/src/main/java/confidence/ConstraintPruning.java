@@ -10,6 +10,7 @@ import pmdd.components.PNode;
 import pmdd.components.properties.NodeProperty;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import utils.Logger;
 
 import java.util.LinkedList;
 
@@ -17,6 +18,72 @@ public strictfp class ConstraintPruning {
 
     private static final LinkedList<PNode> toUpdate = new LinkedList<>();
     private static final LinkedList<PNode> Q = new LinkedList<>();
+
+    /**
+     * Take a confidence constraint's MDD and extract all arcs and nodes leading to a
+     * false solution.
+     * Build and return the MDD containing said arcs and nodes.
+     * This function is iterative, and check a node at most once. Useful when you know
+     * that the structure of the MDD does not allow purely bad arcs.
+     * @param mdd Confidence Constraint's MDD
+     * @param propertyName The name of the property ("confidence" by default)
+     * @param values The binding (int label -> double value)
+     * @param min The lower threshold of the constraint
+     * @return The MDD containing arcs and nodes leading to a false solution
+     */
+    @SuppressWarnings("unchecked")
+    public static MDD iterative_prune(PMDD mdd, String propertyName, MapOf<Integer, Double> values, double min) {
+
+        // Initialisation. SUM neutral = [0, 0]
+        PNode tt = (PNode) mdd.getTt();
+        tt.value[0] = 0;
+        tt.value[1] = 0;
+
+        // While there are node left to check
+        for(int layer = mdd.size() - 1; layer >= 0; layer--) {
+            for (Node current : mdd.getLayer(layer)) {
+
+                PNode node = (PNode) current;
+                //if(!node.isMarked()) continue;
+
+                // For all its in-going arcs
+                for (int label : node.getParents().values()) {
+                    // Transform the label into its value (default : log)
+                    double value = values.get(label);
+                    // For every parent corresponding to an in-going arc of current label
+                    for (Node parent : node.getParents().get(label)) {
+
+                        // Get the property of the parent
+                        PNode source = (PNode) parent;
+                        MapOf<Integer, Double> property = (MapOf<Integer, Double>) source.getProperty(propertyName).getData();
+
+                        // Compute the sum stocked in the node
+                        // It is the equivalent of virtually swapping node's layers...
+                        // But only for suspects values !
+                        double vInf = node.value[0] + value;
+                        double vSup = node.value[1] + value;
+
+                        // If the value obtained by the lower bound is below the threshold
+                        if (property.get(0) + vInf < min) {
+                            // We mark the arc as suspect, update its value if necessary and push it to the queue
+                            markArc(source, label, node, 1);
+                            source.value[0] = Math.min(source.value[0], vInf);
+                            source.value[1] = Math.max(source.value[1], vSup);
+
+                            // If the value obtained by the lower bound is ABOVE the threshold, then everything is fine
+                        } else markArc(source, label, node, 0);
+                    }
+                }
+            }
+        }
+
+        // Create the MDD corresponding to all marked arcs of the main MDD
+        Logger.out.information("\rCreating Marked MDD");
+        PMDD marked = PMDD.create();
+        createMDD(mdd, marked);
+        marked.reduce();
+        return marked;
+    }
 
     /**
      * Take a confidence constraint's MDD and extract all arcs and nodes leading to a

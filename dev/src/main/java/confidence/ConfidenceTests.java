@@ -169,7 +169,8 @@ public strictfp class ConfidenceTests {
         long time2;
 
         Logger.out.information("Test avec le logarithme\n");
-        System.out.println("Gamma = " + gamma);
+        Logger.out.information("Epsilon = " + epsilon + "\n");
+        Logger.out.information("Gamma = " + gamma + "\n");
 
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
@@ -215,13 +216,16 @@ public strictfp class ConfidenceTests {
             if(i == epsilon) {
                 if(result == null) result = confidence;
                 else {
+                    Logger.out.information("\rBuilding the union... ");
                     result = Operation.union(result, confidence);
                     Memory.free(confidence);
                 }
             } else {
+                Logger.out.information("\rBuilding the difference... ");
                 if (result == null) result = Operation.minus(confidence, extract);
                 else {
                     MDD difference = Operation.minus(confidence, extract);
+                    Logger.out.information("\rBuilding the union... ");
                     result = Operation.union(result, difference);
                     Memory.free(difference);
                 }
@@ -289,6 +293,7 @@ public strictfp class ConfidenceTests {
      * @return All nodes and arcs that belongs to a false solution
      */
     private static MDD extract(MDD result, Domains D, int n, int precision, double gamma){
+        Logger.out.information("\rExtracting... ");
         PMDD confidence = PMDD.create();
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
@@ -301,7 +306,7 @@ public strictfp class ConfidenceTests {
         confidence.addRootProperty("confidence", confidenceProperty);
         confidence.propagateProperties(false);
 
-        MDD extract = ConstraintPruning.prune(confidence, "confidence", mapLog, Math.log(gamma * Math.pow(10, -precision)));
+        MDD extract = ConstraintPruning.iterative_prune(confidence, "confidence", mapLog, Math.log(gamma * Math.pow(10, -precision)));
         Memory.free(mapLog);
         Memory.free(confidence);
         return extract;
