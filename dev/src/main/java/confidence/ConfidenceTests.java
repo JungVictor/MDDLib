@@ -14,7 +14,7 @@ import utils.Logger;
 
 import java.math.BigInteger;
 
-public class ConfidenceTests {
+public strictfp class ConfidenceTests {
 
     public static void testSum1(MDDPrinter printer){
         SetOf<Integer> V = Memory.SetOfInteger();
@@ -196,11 +196,13 @@ public class ConfidenceTests {
         MDD result = null;
         MDD confidence, extract = null;
         MDD tmp = null, tmp_res = null;
-        for (int i = 0; i < epsilon; i++) {
+        for (int i = 0; i <= epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
 
-            extract = extract(confidence, domains, n, precision, gamma);
-            if (extract.nSolutions() == 0) {
+            if(i == epsilon) extract = null;
+            else extract = extract(confidence, domains, n, precision, gamma);
+
+            if (extract != null && extract.nSolutions() == 0) {
                 Memory.free(extract);
                 if(result == null) result = confidence;
                 else if(confidence.nSolutions() > 0) {
@@ -210,29 +212,36 @@ public class ConfidenceTests {
                 break;
             }
 
-            if(result == null) result = Operation.minus(confidence, extract);
-            else {
-                MDD difference =  Operation.minus(confidence, extract);
-                result = Operation.union(result, difference);
-                Memory.free(difference);
+            if(i == epsilon) {
+                if(result == null) result = confidence;
+                else {
+                    result = Operation.union(result, confidence);
+                    Memory.free(confidence);
+                }
+            } else {
+                if (result == null) result = Operation.minus(confidence, extract);
+                else {
+                    MDD difference = Operation.minus(confidence, extract);
+                    result = Operation.union(result, difference);
+                    Memory.free(difference);
+                }
+                Memory.free(confidence);
             }
 
             if(tmp != null) {
                 Memory.free(tmp);
                 Memory.free(tmp_res);
             }
-            Memory.free(confidence);
+
             tmp = extract;
             tmp_res = result;
         }
-
 
         int nNodes = 0;
         int nArcs = 0;
         double nSol = 0;
 
         if(result != null) {
-            result.reduce();
             nNodes = result.nodes();
             nArcs = result.arcs();
             nSol = result.nSolutions();
