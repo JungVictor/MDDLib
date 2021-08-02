@@ -303,8 +303,8 @@ public strictfp class ConfidenceTests {
         result.copy(confidence);
 
         PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
-        confidence.addRootProperty("confidence", confidenceProperty);
-        confidence.propagateProperties(false);
+        confidence.addTtProperty("confidence", confidenceProperty);
+        confidence.reversePropagateProperties(false);
 
         MDD extract = ConstraintPruning.iterative_prune(confidence, "confidence", mapLog, Math.log(gamma * Math.pow(10, -precision)));
         Memory.free(mapLog);

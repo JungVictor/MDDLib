@@ -63,6 +63,22 @@ public class PNode extends Node {
     }
 
     /**
+     * Transfer all properties to all parents
+     */
+    public void reverseTransferProperties(){
+        for(String property : properties.keySet()) {
+            for (Integer label : getParents()) {
+                for (Node p : getParents().get(label)) {
+                    PNode parent = (PNode) p;
+                    if (parent.hasProperty(property))
+                        getProperty(property).mergeWithProperty(label, parent.getProperty(property));
+                    else parent.addProperty(property, getProperty(property).createProperty(label));
+                }
+            }
+        }
+    }
+
+    /**
      * Get the map of name -> property.
      * @return The map of all properties tied to their name
      */

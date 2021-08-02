@@ -72,13 +72,23 @@ public class PMDD extends MDD {
     //**************************************//
 
     /**
-     * Propagate all properties from the root node through the MDD
+     * <b>TOPDOWN PROPAGATION</b><br/>
+     * Propagate all properties from the root node through the MDD to the tt node
+     * Clean all allocated properties during the run
      * @return The map of name -> property of the tt node after the propagation
      */
     public MapOf<String, NodeProperty> propagateProperties(){
         return propagateProperties(true);
     }
 
+    /**
+     * <b>TOPDOWN PROPAGATION</b><br/>
+     * Propagate all properties from the root node through the MDD to the tt node
+     * If clean is true, then the properties are cleaned after the propagation.
+     * Otherwise, nodes keep the properties even after the end of the algorithm.
+     * @param clean True if the properties must be free during the run, false otherwise.
+     * @return The map of name -> property of the tt node after the propagation
+     */
     public MapOf<String, NodeProperty> propagateProperties(boolean clean) {
         for(int i = 0; i < size() - 1; i++){
             for(Node node : getLayer(i)) {
@@ -90,12 +100,49 @@ public class PMDD extends MDD {
     }
 
     /**
+     * <b>BOTTOMUP PROPAGATION</b><br/>
+     * Propagate all properties from the tt node through the MDD to the root node.
+     * @return The map of name -> property of the root node after the propagation
+     */
+    public MapOf<String, NodeProperty> reversePropagateProperties() {
+        return reversePropagateProperties(true);
+    }
+
+    /**
+     * <b>BOTTOMUP PROPAGATION</b><br/>
+     * Propagate all properties from the tt node through the MDD to the root node.
+     * If clean is true, then the properties are cleaned after the propagation.
+     * Otherwise, nodes keep the properties even after the end of the algorithm.
+     * @param clean True if the properties must be free during the run, false otherwise.
+     * @return The map of name -> property of the root node after the propagation
+     */
+    public MapOf<String, NodeProperty> reversePropagateProperties(boolean clean) {
+        for(int i = size() - 1; i > 0; i--){
+            for(Node node : getLayer(i)) {
+                ((PNode) node).reverseTransferProperties();
+                if(clean) ((PNode) node).clearProperties();
+            }
+        }
+        return ((PNode) getRoot()).getProperties();
+    }
+
+
+    /**
      * Add a property to the root node.
      * @param propertyName The name of the property
      * @param property The property to add
      */
     public void addRootProperty(String propertyName, NodeProperty property){
         ((PNode) getRoot()).addProperty(propertyName, property);
+    }
+
+    /**
+     * Add a property to the true terminal (tt) node.
+     * @param propertyName The name of the property
+     * @param property The property to add
+     */
+    public void addTtProperty(String propertyName, NodeProperty property){
+        ((PNode) getTt()).addProperty(propertyName, property);
     }
 
     /**
@@ -108,16 +155,35 @@ public class PMDD extends MDD {
     }
 
     /**
+     * Remove a property from the true terminal (tt) node
+     * @param propertyName The name of the property to remove
+     * @return the property removed (null if none)
+     */
+    public NodeProperty removeTtProperty(String propertyName){
+        return ((PNode) getTt()).removeProperty(propertyName);
+    }
+
+    /**
      * Get the specified property from the tt node.
      * Perform this after the propogateProperties operation
      * (otherwise the tt node won't have any property)
      * @param propertyName The name of the property to get
      * @return the specified property from the tt node.
      */
-    public NodeProperty getTTProperty(String propertyName){
+    public NodeProperty getTtProperty(String propertyName){
         return ((PNode) getTt()).getProperty(propertyName);
     }
 
+    /**
+     * Get the specified property from the root node.
+     * Perform this after the reversePropogateProperties operation
+     * (otherwise the root node won't have any property)
+     * @param propertyName The name of the property to get
+     * @return the specified property from the tt node.
+     */
+    public NodeProperty getRootProperty(String propertyName){
+        return ((PNode) getRoot()).getProperty(propertyName);
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
