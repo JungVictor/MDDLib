@@ -16,7 +16,7 @@ public class ParametersSumDouble implements Allocable {
     private double min, max;
     private ArrayOfDouble vMin, vMax;
     private MapOf<Integer, Double> mapDouble;
-    private int precision;
+    private int epsilon;
 
 
     //**************************************//
@@ -35,13 +35,13 @@ public class ParametersSumDouble implements Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision){
+    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int epsilon){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.mapDouble = mapDouble;
-        this.precision = precision;
+        this.epsilon = epsilon;
     }
 
     public static ParametersSumDouble create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision){
@@ -57,7 +57,7 @@ public class ParametersSumDouble implements Allocable {
     public double vMin(int i){return vMin.get(i);}
     public double vMax(int i){return vMax.get(i);}
     public double mapDouble(int i){return mapDouble.get(i);}
-    public int precision(){return precision;}
+    public int epsilon(){return epsilon;}
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

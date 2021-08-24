@@ -116,7 +116,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         return result;
     }
 
-    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int precision, int size){
+    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
@@ -139,7 +139,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, precision);
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
         snode.setState(StateSumDouble.create(parameters));
 
         build(result, snode, D, size, true);

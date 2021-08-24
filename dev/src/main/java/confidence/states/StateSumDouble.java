@@ -73,7 +73,7 @@ public strictfp class StateSumDouble extends NodeState {
         double maxPotential = sum + doubleLabel + constraint.vMax(layer-1);
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
-        return Math.floor((sum + doubleLabel) * Math.pow(10, constraint.precision())) + "";
+        return Math.floor((sum + doubleLabel) * Math.pow(10, constraint.epsilon())) + "";
     }
 
     @Override

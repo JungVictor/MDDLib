@@ -31,8 +31,8 @@ public class MyMDDBuilder extends MDDBuilder {
         return MyConstraintBuilder.mulPF(mdd, D, m_min.toLog10(), m_max.toLog10(), mapPrimeFact, n);
     }
 
-    public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int precision, int size, Domains D){
-        return MyConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, precision, size);
+    public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
+        return MyConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size);
     }
 
     public static MDD confidence(MDD mdd, int gamma, int precision, int n, Domains D){
@@ -80,6 +80,6 @@ public class MyMDDBuilder extends MDDBuilder {
         }
         double s_max = -1 * Math.log(gamma);
 
-        return sumDouble(mdd, 0, s_max, mapLog, precision + epsilon, n, D);
+        return sumDouble(mdd, 0, s_max, mapLog, epsilon, n, D);
     }
 }

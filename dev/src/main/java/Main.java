@@ -25,7 +25,7 @@ public class Main {
 
 
         if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
-        //Domains domains = DomainsManagements.getDomains(dataFile);
+        Domains domains = DomainsManagements.getDomains(dataFile);
         /*
         MDD previous = null;
         MDD tmp = previous;
@@ -54,12 +54,11 @@ public class Main {
         int min = 9 * ((int) Math.pow(10, precision-1));
         int max = (int) Math.pow(10, precision);
         int step = (int) Math.pow(10, precision-2);
-        Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
-        //ConfidenceTests.testLog2((double)gamma * Math.pow(10, -precision), precision, 2,  n, domains);
-        ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
+        //Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
+        ConfidenceTests.testLog2(null,(double)gamma * Math.pow(10, -precision), precision, epsilon,  n, domains);
+        //ConfidenceTests.testLog3(gamma, precision, epsilon,  n, domains);
+        //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
         //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
-
-
     }
 
 
