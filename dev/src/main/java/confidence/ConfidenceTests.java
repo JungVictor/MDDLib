@@ -201,7 +201,7 @@ public strictfp class ConfidenceTests {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
 
             if(i == epsilon) extract = null;
-            else extract = extract(confidence, domains, n, precision, gamma);
+            else if (confidence.nSolutions() > 0) extract = extract(confidence, domains, n, precision, gamma);
 
             if (extract != null && extract.nSolutions() == 0) {
                 Memory.free(extract);
@@ -224,6 +224,7 @@ public strictfp class ConfidenceTests {
                 Logger.out.information("\rBuilding the difference... ");
                 if (result == null) result = Operation.minus(confidence, extract);
                 else {
+                    if(confidence.nSolutions() == 0) break;
                     MDD difference = Operation.minus(confidence, extract);
                     Logger.out.information("\rBuilding the union... ");
                     result = Operation.union(result, difference);
