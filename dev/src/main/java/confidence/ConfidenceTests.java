@@ -216,6 +216,10 @@ public strictfp class ConfidenceTests {
             if(i == epsilon) {
                 if(result == null) result = confidence;
                 else {
+                    if(confidence.nSolutions() == 0) {
+                        Memory.free(confidence);
+                        break;
+                    }
                     Logger.out.information("\rBuilding the union... ");
                     result = Operation.union(result, confidence);
                     Memory.free(confidence);
@@ -250,7 +254,7 @@ public strictfp class ConfidenceTests {
             nNodes = result.nodes();
             nArcs = result.arcs();
             nSol = result.nSolutions();
-            precision(result, domains, n, precision);
+            //precision(result, domains, n, precision);
         }
 
         Logger.out.information("");
