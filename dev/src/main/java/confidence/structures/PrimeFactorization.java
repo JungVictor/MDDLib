@@ -6,8 +6,6 @@ import structures.lists.ListOfInt;
 
 import java.io.*;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * <b>Class which represent a integer by its decomposition into prime numbers</b><br>
@@ -26,8 +24,8 @@ public class PrimeFactorization implements Allocable {
 
 
     // Attributes
-    private ListOfInt factor = ListOfInt.create();
-    private ListOfInt exponent = ListOfInt.create();
+    private ListOfInt factors = ListOfInt.create();
+    private ListOfInt exponents = ListOfInt.create();
 
     //**************************************//
     //           INITIALISATION             //
@@ -65,13 +63,13 @@ public class PrimeFactorization implements Allocable {
 
                 if (tmp % primeNumber == 0) {
                     //Si on a aucune valeur dans les listes ou que l'on divise par un nouveau nombre premier
-                    if(factor.size() == 0 || factor.get(factor.size()-1) != primeNumber){
-                        factor.add(primeNumber);
-                        exponent.add(1);
+                    if(factors.size() == 0 || factors.get(factors.size()-1) != primeNumber){
+                        factors.add(primeNumber);
+                        exponents.add(1);
                     }
                     //Si on continue de diviser par le même nombre premier
                     else{
-                        exponent.set(exponent.size()-1, exponent.get(exponent.size()-1)+1);
+                        exponents.set(exponents.size()-1, exponents.get(exponents.size()-1)+1);
                     }
 
                     tmp /= primeNumber;
@@ -79,9 +77,9 @@ public class PrimeFactorization implements Allocable {
             }
 
             // If there is no decomposition with these prime numbers then n is a prime number
-            if (factor.size() == 0){
-                factor.add(n);
-                exponent.add(1);
+            if (factors.size() == 0){
+                factors.add(n);
+                exponents.add(1);
             }
         }
     }
@@ -187,34 +185,34 @@ public class PrimeFactorization implements Allocable {
         int j = 0;
 
         // While neither of the end of iteratorI or iteratorJ is reached
-        while(i < this.factor.size() || j < other.factor.size()){
+        while(i < this.factors.size() || j < other.factors.size()){
 
             // If the end of this is reached
-            if(i >= factor.size()){
-                result.factor.add(other.factor.get(j));
-                result.exponent.add(other.exponent.get(j));
+            if(i >= factors.size()){
+                result.factors.add(other.factors.get(j));
+                result.exponents.add(other.exponents.get(j));
                 j++;
             }
             // If the end of other is reached
-            else if(j >= other.factor.size()){
-                result.factor.add(this.factor.get(i));
-                result.exponent.add(this.exponent.get(i));
+            else if(j >= other.factors.size()){
+                result.factors.add(this.factors.get(i));
+                result.exponents.add(this.exponents.get(i));
                 i++;
             }
             else {
-                if(this.factor.get(i) < other.factor.get(j)){
-                    result.factor.add(this.factor.get(i));
-                    result.exponent.add(this.exponent.get(i));
+                if(this.factors.get(i) < other.factors.get(j)){
+                    result.factors.add(this.factors.get(i));
+                    result.exponents.add(this.exponents.get(i));
                     i++;
                 }
-                else if(other.factor.get(j) < this.factor.get(i)){
-                    result.factor.add(other.factor.get(j));
-                    result.exponent.add(other.exponent.get(j));
+                else if(other.factors.get(j) < this.factors.get(i)){
+                    result.factors.add(other.factors.get(j));
+                    result.exponents.add(other.exponents.get(j));
                     j++;
                 }
                 else {
-                    result.factor.add(this.factor.get(i));
-                    result.exponent.add(this.exponent.get(i) + other.exponent.get(j));
+                    result.factors.add(this.factors.get(i));
+                    result.exponents.add(this.exponents.get(i) + other.exponents.get(j));
                     i++;
                     j++;
                 }
@@ -230,17 +228,17 @@ public class PrimeFactorization implements Allocable {
 
     public double toLog10(){
         double result = 0;
-        for(int i = 0; i < factor.size(); i++){
-            result += Math.log10(factor.get(i)) * exponent.get(i);
+        for(int i = 0; i < factors.size(); i++){
+            result += Math.log10(factors.get(i)) * exponents.get(i);
         }
         return result;
     }
 
     public PrimeFactorization copy(){
         PrimeFactorization result = new PrimeFactorization(1);
-        for(int i = 0; i < factor.size(); i++){
-            result.factor.add(this.factor.get(i));
-            result.exponent.add(this.exponent.get(i));
+        for(int i = 0; i < factors.size(); i++){
+            result.factors.add(this.factors.get(i));
+            result.exponents.add(this.exponents.get(i));
         }
         return result;
     }
@@ -248,10 +246,10 @@ public class PrimeFactorization implements Allocable {
     @Override
     public String toString(){
         StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < factor.size(); i++) {
-            builder.append(factor.get(i));
+        for(int i = 0; i < factors.size(); i++) {
+            builder.append(factors.get(i));
             builder.append(":");
-            builder.append(exponent.get(i));
+            builder.append(exponents.get(i));
             builder.append(",");
 
         }
@@ -270,8 +268,8 @@ public class PrimeFactorization implements Allocable {
 
     @Override
     public void free() {
-        this.factor.clear();
-        this.exponent.clear();
+        this.factors.clear();
+        this.exponents.clear();
         allocator().free(this);
     }
 

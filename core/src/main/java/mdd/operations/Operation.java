@@ -1,5 +1,6 @@
 package mdd.operations;
 
+import builder.MDDBuilder;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
@@ -17,7 +18,7 @@ import utils.Logger;
 public class Operation {
 
     private enum Operator {
-        UNION, INTERSECTION, DIAMOND, MINUS, INCLUSION;
+        UNION, INTERSECTION, DIAMOND, MINUS, INCLUSION
     }
 
     //**************************************//
@@ -25,8 +26,10 @@ public class Operation {
     //**************************************//
 
     public static MDD negation(MDD mdd){
-        MDD universal = MDD.create();
-        return minus(universal, mdd);
+        MDD universal = MDDBuilder.universal(MDD.create(), mdd.getDomains());
+        MDD negation = minus(universal, mdd);
+        Memory.free(universal);
+        return negation;
     }
 
 
@@ -295,15 +298,15 @@ public class Operation {
             Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
-                Node x1c, x2c;
+                Node y1, y2;
                 for(int v : D.get(i-1)){
                     boolean a1, a2;
                     a1 = x1 != null && x1.containsLabel(v);
                     a2 = x2 != null && x2.containsLabel(v);
                     if(apply(a1, a2, OP, i == size - 1)) {
-                        x1c = x1 == null ? null : x1.getChild(v);
-                        x2c = x2 == null ? null : x2.getChild(v);
-                        addArcAndNode(result, x, x1c, x2c, v, i, binder);
+                        y1 = x1 == null ? null : x1.getChild(v);
+                        y2 = x2 == null ? null : x2.getChild(v);
+                        addArcAndNode(result, x, y1, y2, v, i, binder);
                     }
                     else if(OP == Operator.INCLUSION && a1) return null;
                 }

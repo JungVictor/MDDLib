@@ -197,16 +197,22 @@ public strictfp class ConfidenceTests {
         MDD result = null;
         MDD confidence, extract = null;
         MDD tmp = null, tmp_res = null;
+
+        long time = System.currentTimeMillis();
+
         for (int i = 0; i <= epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
-
+            if(confidence.nSolutions() == 0) {
+                Memory.free(confidence);
+                break;
+            }
             if(i == epsilon) extract = null;
             else if (confidence.nSolutions() > 0) extract = extract(confidence, domains, n, precision, gamma);
 
             if (extract != null && extract.nSolutions() == 0) {
                 Memory.free(extract);
                 if(result == null) result = confidence;
-                else if(confidence.nSolutions() > 0) {
+                else {
                     result = Operation.union(result, confidence);
                     Memory.free(tmp_res);
                 }
@@ -217,14 +223,13 @@ public strictfp class ConfidenceTests {
                 if(result == null) result = confidence;
                 else {
                     Logger.out.information("\rBuilding the union... ");
-                    if(confidence.nSolutions() > 0) result = Operation.union(result, confidence);
+                    result = Operation.union(result, confidence);
                     Memory.free(confidence);
                 }
             } else {
                 Logger.out.information("\rBuilding the difference... ");
                 if (result == null) result = Operation.minus(confidence, extract);
                 else {
-                    if(confidence.nSolutions() == 0) break;
                     MDD difference = Operation.minus(confidence, extract);
                     Logger.out.information("\rBuilding the union... ");
                     result = Operation.union(result, difference);
@@ -242,6 +247,8 @@ public strictfp class ConfidenceTests {
             tmp_res = result;
         }
 
+        time = System.currentTimeMillis() - time;
+
         int nNodes = 0;
         int nArcs = 0;
         double nSol = 0;
@@ -250,13 +257,18 @@ public strictfp class ConfidenceTests {
             nNodes = result.nodes();
             nArcs = result.arcs();
             nSol = result.nSolutions();
-            //precision(result, domains, n, precision);
+            precision(result, domains, n, precision);
+
+            //MDD negation = Operation.negation(result);
+            //precision(negation, domains, n, precision);
         }
 
         Logger.out.information("");
+        Logger.out.information("\r\nTemps (ms) : " + time);
         Logger.out.information("\r\nNombre de noeuds : " + nNodes);
         Logger.out.information("\r\nNombre d'arcs : " + nArcs);
         Logger.out.information("\r\nNombre de solutions : " + nSol);
+
 
         System.out.println();
     }

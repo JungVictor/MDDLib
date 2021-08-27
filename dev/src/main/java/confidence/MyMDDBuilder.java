@@ -27,7 +27,6 @@ public class MyMDDBuilder extends MDDBuilder {
     }
 
     public static MDD mulPF(MDD mdd, PrimeFactorization m_min, PrimeFactorization m_max, MapOf<Integer, PrimeFactorization> mapPrimeFact, int n, Domains D){
-
         return MyConstraintBuilder.mulPF(mdd, D, m_min.toLog10(), m_max.toLog10(), mapPrimeFact, n);
     }
 

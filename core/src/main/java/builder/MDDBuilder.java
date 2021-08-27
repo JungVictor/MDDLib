@@ -2,6 +2,7 @@ package builder;
 
 import builder.constraints.*;
 import mdd.MDD;
+import mdd.components.Node;
 import mdd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
@@ -20,9 +21,36 @@ public class MDDBuilder {
     public static MDD universal(MDD mdd, int V, int size){
         ArrayOfInt values = ArrayOfInt.create(V);
         for(int i = 0; i < values.length; i++) values.set(i,i);
-        MDD universal = MDDUniversal.generate(mdd, values, size);
+
+        mdd.setSize(size+1);
+        Node current = mdd.getRoot();
+        Node next;
+
+        for(int i = 1; i < size+1; i++){
+            next = mdd.Node();
+            mdd.addNode(next, i);
+            for(int v : values) mdd.addArc(current, v, next, i-1);
+            current = next;
+        }
+
+        mdd.reduce();
         Memory.free(values);
-        return universal;
+        return mdd;
+    }
+    public static MDD universal(MDD mdd, Domains domains){
+        mdd.setSize(domains.size()+1);
+        Node current = mdd.getRoot();
+        Node next;
+
+        for(int i = 1; i < domains.size()+1; i++){
+            next = mdd.Node();
+            mdd.addNode(next, i);
+            for(int v : domains.get(i-1)) mdd.addArc(current, v, next, i-1);
+            current = next;
+        }
+
+        mdd.reduce();
+        return mdd;
     }
 
     /* AMONG / SEQ */
