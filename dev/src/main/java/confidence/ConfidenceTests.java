@@ -249,6 +249,8 @@ public strictfp class ConfidenceTests {
 
         time = System.currentTimeMillis() - time;
 
+        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
+
         int nNodes = 0;
         int nArcs = 0;
         double nSol = 0;
@@ -259,12 +261,10 @@ public strictfp class ConfidenceTests {
             nSol = result.nSolutions();
             precision(result, domains, n, precision);
 
-            //MDD negation = Operation.negation(result);
-            //precision(negation, domains, n, precision);
+            MDD negation = Operation.negation(result);
+            precision(negation, domains, n, precision);
         }
 
-        Logger.out.information("");
-        Logger.out.information("\r\nTemps (ms) : " + time);
         Logger.out.information("\r\nNombre de noeuds : " + nNodes);
         Logger.out.information("\r\nNombre d'arcs : " + nArcs);
         Logger.out.information("\r\nNombre de solutions : " + nSol);
