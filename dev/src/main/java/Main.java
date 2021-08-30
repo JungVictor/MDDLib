@@ -1,6 +1,7 @@
 import confidence.ConfidenceTests;
 import confidence.utils.ConfidenceDomainsGenerator;
 import confidence.utils.DomainsManagements;
+import confidence.utils.SpecialOperations;
 import structures.Domains;
 import utils.ArgumentParser;
 
@@ -55,7 +56,7 @@ public class Main {
         int max = (int) Math.pow(10, precision);
         int step = (int) Math.pow(10, precision-2);
         //Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
-        ConfidenceTests.testLog2(null,(double)gamma * Math.pow(10, -precision), precision, epsilon,  n, domains);
+        //ConfidenceTests.testLog2(null,(double)gamma * Math.pow(10, -precision), precision, epsilon,  n, domains);
         //ConfidenceTests.testLog3(gamma, precision, epsilon,  n, domains);
         //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
         //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);

@@ -1,7 +1,10 @@
 package confidence;
 
+import confidence.parameters.ParametersMulRelaxed;
 import confidence.parameters.ParametersSumDouble;
+import confidence.states.StateMulRelaxed;
 import confidence.states.StateSumDouble;
+import confidence.utils.SpecialOperations;
 import mdd.MDD;
 import mdd.components.SNode;
 import mdd.operations.ConstraintOperation;
@@ -11,7 +14,6 @@ import structures.arrays.ArrayOfDouble;
 import structures.generics.MapOf;
 
 public class MyConstraintOperation extends ConstraintOperation {
-
 
     static public MDD confidence(MDD result, MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();

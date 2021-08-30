@@ -38,6 +38,115 @@ public strictfp class ConfidenceTests {
         mul.accept(printer);
     }
 
+    public static MDD testMulRelaxed1(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+        long time1;
+        long time2;
+
+        Logger.out.information("Test avec le logarithme\n");
+        Logger.out.information("Epsilon = " + epsilon + "\n");
+        Logger.out.information("Gamma = " + gamma + "\n");
+
+        time1 = System.currentTimeMillis();
+        MDD confidence = MDD.create();
+
+        if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
+        else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
+
+        time2 = System.currentTimeMillis();
+
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
+        System.out.println("Nombre d'arcs : " + confidence.arcs());
+        System.out.println("Nombre de solutions : " + confidence.nSolutions());
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+
+        //precision(confidence, domains, n, precision);
+
+        System.out.println();
+
+        return confidence;
+    }
+
+    public static void testMulRelaxed2(double gamma, int precision, int epsilon, int n, Domains domains) {
+        MDD result = null;
+        MDD confidence, extract = null;
+        MDD tmp = null, tmp_res = null;
+
+        long time = System.currentTimeMillis();
+
+        for (int i = 0; i <= epsilon; i++) {
+            confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
+            if(confidence.nSolutions() == 0) {
+                Memory.free(confidence);
+                break;
+            }
+            if(i == epsilon) extract = null;
+            else if (confidence.nSolutions() > 0) extract = extract(confidence, domains, n, precision, gamma);
+
+            if (extract != null && extract.nSolutions() == 0) {
+                Memory.free(extract);
+                if(result == null) result = confidence;
+                else {
+                    result = Operation.union(result, confidence);
+                    Memory.free(tmp_res);
+                }
+                break;
+            }
+
+            if(i == epsilon) {
+                if(result == null) result = confidence;
+                else {
+                    Logger.out.information("\rBuilding the union... ");
+                    result = Operation.union(result, confidence);
+                    Memory.free(confidence);
+                }
+            } else {
+                Logger.out.information("\rBuilding the difference... ");
+                if (result == null) result = Operation.minus(confidence, extract);
+                else {
+                    MDD difference = Operation.minus(confidence, extract);
+                    Logger.out.information("\rBuilding the union... ");
+                    result = Operation.union(result, difference);
+                    Memory.free(difference);
+                }
+                Memory.free(confidence);
+            }
+
+            if(tmp != null) {
+                Memory.free(tmp);
+                Memory.free(tmp_res);
+            }
+
+            tmp = extract;
+            tmp_res = result;
+        }
+
+        time = System.currentTimeMillis() - time;
+
+        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
+
+        int nNodes = 0;
+        int nArcs = 0;
+        double nSol = 0;
+
+        if(result != null) {
+            nNodes = result.nodes();
+            nArcs = result.arcs();
+            nSol = result.nSolutions();
+            precision(result, domains, n, precision);
+
+            MDD negation = Operation.negation(result);
+            precision(negation, domains, n, precision);
+        }
+
+        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
+        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
+        Logger.out.information("\r\nNombre de solutions : " + nSol);
+
+
+        System.out.println();
+    }
+
     public static void testBigInteger1(MDDPrinter printer){
         int gamma = 70;
         int precision = 2;

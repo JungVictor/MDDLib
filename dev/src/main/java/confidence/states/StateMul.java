@@ -7,6 +7,7 @@ import confidence.parameters.ParametersMul;
 import java.math.BigInteger;
 
 public class StateMul extends NodeState {
+
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 

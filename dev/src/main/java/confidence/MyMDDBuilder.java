@@ -10,6 +10,10 @@ import java.math.BigInteger;
 
 public class MyMDDBuilder extends MDDBuilder {
 
+    public static MDD mulRelaxed(MDD mdd, double m_min, double m_max, double maxProbaDomains, double maxProbaEpsilon, int n, Domains D){
+        return MyConstraintBuilder.mulRelaxed(mdd, D, m_min, m_max, maxProbaDomains, maxProbaEpsilon, n);
+    }
+
     /**
      * <b>This method return a MDD which respect the multiplicative constraint</b><br>
      * The multiplicative constraint ensure that if we multiply all the variables together, the result belong to the interval [m_min, m_max].
@@ -32,6 +36,13 @@ public class MyMDDBuilder extends MDDBuilder {
 
     public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
         return MyConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size);
+    }
+
+    public static  MDD confidenceMulRelaxed(MDD mdd, int gamma, int precision, int epsilon, int n, Domains D){
+        double maxProbaDomains = Math.pow(10, precision);
+        double maxProbaEpsilon = Math.pow(10, epsilon);
+
+        return mulRelaxed(mdd, gamma, maxProbaDomains, maxProbaDomains, maxProbaEpsilon, n, D);
     }
 
     public static MDD confidence(MDD mdd, int gamma, int precision, int n, Domains D){

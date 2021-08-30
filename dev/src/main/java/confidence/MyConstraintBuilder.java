@@ -2,12 +2,15 @@ package confidence;
 
 import builder.constraints.ConstraintBuilder;
 import confidence.parameters.ParametersMulPF;
+import confidence.parameters.ParametersMulRelaxed;
 import confidence.states.StateMul;
 import confidence.states.StateMulPF;
+import confidence.states.StateMulRelaxed;
 import confidence.states.StateSumDouble;
 import confidence.structures.PrimeFactorization;
 import confidence.structures.arrays.ArrayOfBigInteger;
 import confidence.structures.arrays.ArrayOfPrimeFactorization;
+import confidence.utils.SpecialOperations;
 import mdd.MDD;
 import mdd.components.SNode;
 import memory.Memory;
@@ -20,6 +23,53 @@ import structures.arrays.ArrayOfDouble;
 import java.math.BigInteger;
 
 public class MyConstraintBuilder extends ConstraintBuilder {
+
+    public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size){
+        SNode snode = SNode.create();
+        ArrayOfDouble minValues = ArrayOfDouble.create(size);
+        ArrayOfDouble maxValues = ArrayOfDouble.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à maxProbaEpsilon
+        minValues.set(size-1, maxProbaEpsilon);
+        maxValues.set(size-1, maxProbaEpsilon);
+
+        for(int i = size - 2; i >= 0; i--){
+            //On initialise pour ne pas avoir de souci avec les conditions dans la boucle
+            double vMin = 0;
+            double vMax = 0;
+            boolean firstIteration = true;
+            for(int v : D.get(i+1)) {
+
+                if (firstIteration){
+                    vMin = v;
+                    vMax = v;
+                    firstIteration = false;
+                } else {
+                    if(v < vMin) vMin = v;
+                    if(v > vMax) vMax = v;
+                }
+
+            }
+
+            if(i < size - 1) {
+                vMin = SpecialOperations.multiplyCeil(vMin, minValues.get(i+1), maxProbaDomains);
+                vMax = SpecialOperations.multiplyCeil(vMax, maxValues.get(i+1), maxProbaDomains);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+
+        min = SpecialOperations.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
+        max = SpecialOperations.multiplyCeil(max, maxProbaDomains, maxProbaDomains);
+        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
+        snode.setState(StateMulRelaxed.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
 
     public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size){
         SNode snode = SNode.create();
