@@ -309,7 +309,7 @@ public strictfp class ConfidenceTests {
 
         long time = System.currentTimeMillis();
 
-        for (int i = 0; i <= epsilon; i++) {
+        for (int i = 1; i <= epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
             if(confidence.nSolutions() == 0) {
                 Memory.free(confidence);

@@ -1,10 +1,7 @@
 package confidence;
 
-import confidence.parameters.ParametersMulRelaxed;
 import confidence.parameters.ParametersSumDouble;
-import confidence.states.StateMulRelaxed;
 import confidence.states.StateSumDouble;
-import confidence.utils.SpecialOperations;
 import mdd.MDD;
 import mdd.components.SNode;
 import mdd.operations.ConstraintOperation;
@@ -16,6 +13,7 @@ import structures.generics.MapOf;
 public class MyConstraintOperation extends ConstraintOperation {
 
     static public MDD confidence(MDD result, MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
+        // CHECK MyMDDBuilder confidence IF MAKING CHANGE TO THIS FUNCTION !
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)){
@@ -23,8 +21,7 @@ public class MyConstraintOperation extends ConstraintOperation {
             }
         }
         double s_max = -1 * Math.log(gamma);
-
-        return sumDouble(result, mdd, D, 0, s_max, mapLog, precision + epsilon, n);
+        return sumDouble(result, mdd, D, 0, s_max, mapLog, epsilon, n);
     }
 
     /**
@@ -34,6 +31,7 @@ public class MyConstraintOperation extends ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
     static public MDD sumDouble(MDD result, MDD mdd, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int precision, int size){
+        // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
