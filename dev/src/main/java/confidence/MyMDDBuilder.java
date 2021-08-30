@@ -82,14 +82,6 @@ public class MyMDDBuilder extends MDDBuilder {
     }
 
     public static strictfp MDD confidence(MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
-        MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
-        for(int i = 0; i < n; i++){
-            for(int v : D.get(i)){
-                mapLog.put(v, -1 * Math.log(v * Math.pow(10, -precision)));
-            }
-        }
-        double s_max = -1 * Math.log(gamma);
-
-        return sumDouble(mdd, 0, s_max, mapLog, epsilon, n, D);
+        return MyConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, D);
     }
 }

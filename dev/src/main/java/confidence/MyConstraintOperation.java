@@ -13,7 +13,6 @@ import structures.generics.MapOf;
 public class MyConstraintOperation extends ConstraintOperation {
 
     static public MDD confidence(MDD result, MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
-        // CHECK MyMDDBuilder confidence IF MAKING CHANGE TO THIS FUNCTION !
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)){
@@ -21,6 +20,8 @@ public class MyConstraintOperation extends ConstraintOperation {
             }
         }
         double s_max = -1 * Math.log(gamma);
+
+        if(mdd == null) return MyMDDBuilder.sumDouble(result, 0, s_max, mapLog, epsilon, n, D);
         return sumDouble(result, mdd, D, 0, s_max, mapLog, epsilon, n);
     }
 
