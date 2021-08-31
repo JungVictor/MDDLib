@@ -25,6 +25,7 @@ import java.math.BigInteger;
 public class MyConstraintBuilder extends ConstraintBuilder {
 
     public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size){
+        // CHECK MyConstraintOperation mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
@@ -60,7 +61,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         }
 
         min = SpecialOperations.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
-        max = SpecialOperations.multiplyCeil(max, maxProbaDomains, maxProbaDomains);
+        max = SpecialOperations.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
         ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
         snode.setState(StateMulRelaxed.create(parameters));
 
@@ -167,6 +168,7 @@ public class MyConstraintBuilder extends ConstraintBuilder {
     }
 
     public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
+        // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);

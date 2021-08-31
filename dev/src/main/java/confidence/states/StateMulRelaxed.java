@@ -63,8 +63,8 @@ public strictfp class StateMulRelaxed extends NodeState {
         double newMul = SpecialOperations.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
         //Lignes à revoir pour l'ordre dans lequel les multiplications sont faites
-        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaDomains());
-        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaDomains());
+        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
+        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
 
         //Si l'intervalle [minPotential, maxPotential] intersection [constraint.min(), constraint.max] est vide
         if(maxPotential < constraint.min() || constraint.max() < minPotential ) return false;
@@ -78,8 +78,8 @@ public strictfp class StateMulRelaxed extends NodeState {
     public String hash(int label, int layer, int size){
         double newMul = SpecialOperations.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
-        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaDomains());
-        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaDomains());
+        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
+        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
         return Double.toString(newMul);

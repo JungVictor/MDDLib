@@ -39,10 +39,7 @@ public class MyMDDBuilder extends MDDBuilder {
     }
 
     public static  MDD confidenceMulRelaxed(MDD mdd, int gamma, int precision, int epsilon, int n, Domains D){
-        double maxProbaDomains = Math.pow(10, precision);
-        double maxProbaEpsilon = Math.pow(10, epsilon);
-
-        return mulRelaxed(mdd, gamma, maxProbaDomains, maxProbaDomains, maxProbaEpsilon, n, D);
+        return MyConstraintOperation.confidenceMulRelaxed(mdd, null, gamma, precision, epsilon, n, D);
     }
 
     public static MDD confidence(MDD mdd, int gamma, int precision, int n, Domains D){

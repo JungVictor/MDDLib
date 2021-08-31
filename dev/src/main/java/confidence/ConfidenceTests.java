@@ -38,19 +38,46 @@ public strictfp class ConfidenceTests {
         mul.accept(printer);
     }
 
-    public static MDD testMulRelaxed1(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+    public static void testMulRelaxed1(MDDPrinter printer){
+        int gamma = 70;
+        int precision = 2;
+        int epsilon = 6;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidenceMulRelaxed(MDD.create(), gamma, precision, epsilon, n, domains);
+        confidence.accept(printer);
+    }
+
+    public static MDD testMulRelaxed2(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
         long time1;
         long time2;
 
-        Logger.out.information("Test avec le logarithme\n");
+        Logger.out.information("Test avec les entiers et la relaxation\n");
         Logger.out.information("Epsilon = " + epsilon + "\n");
         Logger.out.information("Gamma = " + gamma + "\n");
 
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
-        if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
-        else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
+        if(previous != null) MyConstraintOperation.confidenceMulRelaxed(confidence, previous, gamma, precision, epsilon, n, domains);
+        else MyMDDBuilder.confidenceMulRelaxed(confidence, gamma, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
 
@@ -67,7 +94,7 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
-    public static void testMulRelaxed2(double gamma, int precision, int epsilon, int n, Domains domains) {
+    public static void testMulRelaxed3(int gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
         MDD confidence, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -75,7 +102,7 @@ public strictfp class ConfidenceTests {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
+            confidence = testMulRelaxed2(extract,gamma, precision, i, n, domains);
             if(confidence.nSolutions() == 0) {
                 Memory.free(confidence);
                 break;
@@ -269,7 +296,7 @@ public strictfp class ConfidenceTests {
         domains.put(3, 98);
         domains.put(3, 99);
 
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, epsilon, precision, n, domains);
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
         confidence.accept(printer);
     }
 

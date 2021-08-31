@@ -1,7 +1,7 @@
 import confidence.ConfidenceTests;
 import confidence.utils.ConfidenceDomainsGenerator;
 import confidence.utils.DomainsManagements;
-import confidence.utils.SpecialOperations;
+import representation.MDDPrinter;
 import structures.Domains;
 import utils.ArgumentParser;
 
@@ -52,10 +52,13 @@ public class Main {
         //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
         //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
 
-        int min = 9 * ((int) Math.pow(10, precision-1));
-        int max = (int) Math.pow(10, precision);
-        int step = (int) Math.pow(10, precision-2);
+        //int min = 9 * ((int) Math.pow(10, precision-1));
+        //int max = (int) Math.pow(10, precision);
+        //int step = (int) Math.pow(10, precision-2);
         //Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
+        //ConfidenceTests.testMulRelaxed1(new MDDPrinter());
+        //ConfidenceTests.testMulRelaxed2(null, gamma, precision, epsilon, n, domains);
+        //ConfidenceTests.testMulRelaxed3(gamma, precision, epsilon, n, domains);
         //ConfidenceTests.testLog2(null,(double)gamma * Math.pow(10, -precision), precision, epsilon,  n, domains);
         //ConfidenceTests.testLog3(gamma, precision, epsilon,  n, domains);
         //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
