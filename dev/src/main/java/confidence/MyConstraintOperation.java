@@ -73,7 +73,7 @@ public class MyConstraintOperation extends ConstraintOperation {
         }
 
         min = SpecialOperations.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
-        max = SpecialOperations.multiplyCeil(max, maxProbaDomains, maxProbaDomains);
+        max = SpecialOperations.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
         ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
         snode.setState(StateMulRelaxed.create(parameters));
 
