@@ -226,10 +226,14 @@ public class Operation {
     public static boolean inclusion(MDD mdd1, MDD mdd2){
         if(mdd2.size() > mdd1.size()) return false;
 
+        for (int i = 0; i < mdd1.getDomains().size(); i++) {
+            if(mdd1.getDomain(i).size() < mdd2.getDomain(i).size()) return false;
+            for(int value : mdd1.getDomain(i)) if(!mdd2.getDomain(i).contains(value)) return false;
+        }
+
         // Construction of V
         Domains D = Domains.create();
         D.union(mdd1.getDomains()); D.intersect(mdd2.getDomains());
-
         for(int i = 0; i < D.size(); i++) if(D.get(i).size() == 0) return false;
 
         boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), D);

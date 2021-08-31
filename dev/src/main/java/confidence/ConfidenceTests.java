@@ -94,7 +94,7 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
-    public static void testMulRelaxed3(int gamma, int precision, int epsilon, int n, Domains domains) {
+    public static MDD testMulRelaxed3(int gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
         MDD confidence, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -164,6 +164,7 @@ public strictfp class ConfidenceTests {
 
 
         System.out.println();
+        return result;
     }
 
     public static void testBigInteger1(MDDPrinter printer){
@@ -321,7 +322,7 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
-    public static void testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
+    public static MDD testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
         MDD confidence, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -392,12 +393,13 @@ public strictfp class ConfidenceTests {
 
 
         System.out.println();
+        return result;
     }
 
 
 
     @SuppressWarnings("unchecked")
-    private static void precision(MDD result, Domains D, int n, int precision){
+    public static void precision(MDD result, Domains D, int n, int precision){
         PMDD confidence = PMDD.create();
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){

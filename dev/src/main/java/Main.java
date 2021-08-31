@@ -1,6 +1,8 @@
 import confidence.ConfidenceTests;
 import confidence.utils.ConfidenceDomainsGenerator;
 import confidence.utils.DomainsManagements;
+import mdd.MDD;
+import mdd.operations.Operation;
 import representation.MDDPrinter;
 import structures.Domains;
 import utils.ArgumentParser;
@@ -57,10 +59,54 @@ public class Main {
         //int step = (int) Math.pow(10, precision-2);
         //Domains domains = ConfidenceDomainsGenerator.generateData(min, max, step, n);
         //ConfidenceTests.testMulRelaxed1(new MDDPrinter());
-        //ConfidenceTests.testMulRelaxed2(null, gamma, precision, epsilon, n, domains);
         //ConfidenceTests.testMulRelaxed3(gamma, precision, epsilon, n, domains);
+
+        /*
+        MDD previous = null;
+        for(int i = 0; i < epsilon; i++) {
+            MDD confidence = ConfidenceTests.testMulRelaxed2(previous, gamma, precision, i, n, domains);
+            if(previous != null) System.out.println("\n"+Operation.inclusion(confidence, previous));
+            System.out.println(confidence.getDomain(confidence.getDomains().size() - 1));
+            previous = confidence;
+        }
+
+         */
+
+        /*
+        MDD test1 = ConfidenceTests.testMulRelaxed3(gamma, precision, epsilon, n, domains);
         //ConfidenceTests.testLog2(null,(double)gamma * Math.pow(10, -precision), precision, epsilon,  n, domains);
-        //ConfidenceTests.testLog3(gamma, precision, epsilon,  n, domains);
+        MDD test2 = ConfidenceTests.testLog3(gamma, precision, epsilon,  n, domains);
+
+        System.out.println(test1.nSolutions());
+        System.out.println(test2.nSolutions());
+
+        MDD xD = Operation.minus(test2, test1);
+        xD.accept(new MDDPrinter());
+        System.out.println(xD.nSolutions());
+        ConfidenceTests.precision(xD, domains, n, precision);
+
+        MDD mdr = Operation.negation(test1);
+        ConfidenceTests.precision(mdr, domains, n, precision);
+
+        System.out.println(mdr.nSolutions() + test1.nSolutions());
+
+        for(int i = 0; i < mdr.getDomains().size(); i++) {
+            System.out.println(mdr.getDomain(i));
+            System.out.println(test1.getDomain(i));
+            System.out.println(test2.getDomain(i));
+        }
+
+        System.out.println(Operation.inclusion(xD, mdr));
+        System.out.println(Operation.inclusion(xD, test1));
+
+
+        MDD ptdr = ConfidenceTests.testMulRelaxed2(null, gamma, precision, 2, n, domains);
+        MDD xptdr = ConfidenceTests.testLog2(null, (double)gamma * Math.pow(10, -precision), precision, 2, n, domains);
+        System.out.println("\n"+(Operation.minus(xptdr, ptdr).nSolutions()));
+        System.out.println(Operation.inclusion(xD, xptdr));
+
+         */
+
         //ConfidenceTests.testBigInteger2(gamma, precision, n, domains);
         //ConfidenceTests.testPrimeFactorization2(gamma, precision, n, domains);
     }
