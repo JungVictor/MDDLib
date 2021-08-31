@@ -102,48 +102,40 @@ public strictfp class ConfidenceTests {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testMulRelaxed2(extract,gamma, precision, i, n, domains);
+            confidence = testMulRelaxed2(extract, gamma, precision, i, n, domains);
             if(confidence.nSolutions() == 0) {
                 Memory.free(confidence);
+                if(extract != null) Memory.free(extract);
                 break;
             }
-            if(i == epsilon) extract = null;
-            else if (confidence.nSolutions() > 0) extract = extract(confidence, domains, n, precision, gamma);
+            extract = extract(confidence, domains, n, precision, gamma);
 
-            if (extract != null && extract.nSolutions() == 0) {
+            // Stop
+            if(extract.nSolutions() == 0) {
                 Memory.free(extract);
                 if(result == null) result = confidence;
                 else {
                     result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
+                    Memory.free(confidence);
                 }
+                if(tmp != null) Memory.free(tmp);
+                if(tmp_res != null) Memory.free(tmp_res);
                 break;
             }
 
-            if(i == epsilon) {
-                if(result == null) result = confidence;
+            MDD diff = Operation.minus(confidence, extract);
+            if(diff.nSolutions() > 0) {
+                if (result == null) result = diff;
                 else {
-                    Logger.out.information("\rBuilding the union... ");
-                    result = Operation.union(result, confidence);
-                    Memory.free(confidence);
+                    result = Operation.union(result, diff);
+                    Memory.free(tmp_res);
+                    Memory.free(diff);
                 }
-            } else {
-                Logger.out.information("\rBuilding the difference... ");
-                if (result == null) result = Operation.minus(confidence, extract);
-                else {
-                    MDD difference = Operation.minus(confidence, extract);
-                    Logger.out.information("\rBuilding the union... ");
-                    result = Operation.union(result, difference);
-                    Memory.free(difference);
-                }
-                Memory.free(confidence);
-            }
+            } else Memory.free(diff);
 
-            if(tmp != null) {
-                Memory.free(tmp);
-                Memory.free(tmp_res);
-            }
+            if(tmp != null) Memory.free(tmp);
 
+            Memory.free(confidence);
             tmp = extract;
             tmp_res = result;
         }
@@ -336,51 +328,44 @@ public strictfp class ConfidenceTests {
 
         long time = System.currentTimeMillis();
 
-        for (int i = 1; i <= epsilon; i++) {
+        for (int i = 0; i <= epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
             if(confidence.nSolutions() == 0) {
                 Memory.free(confidence);
                 break;
             }
-            if(i == epsilon) extract = null;
-            else if (confidence.nSolutions() > 0) extract = extract(confidence, domains, n, precision, gamma);
+            extract = extract(confidence, domains, n, precision, gamma);
 
-            if (extract != null && extract.nSolutions() == 0) {
+            // Stop
+            if(extract.nSolutions() == 0) {
                 Memory.free(extract);
                 if(result == null) result = confidence;
                 else {
                     result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
+                    Memory.free(confidence);
                 }
+                if(tmp != null) Memory.free(tmp);
+                if(tmp_res != null) Memory.free(tmp_res);
                 break;
             }
 
-            if(i == epsilon) {
-                if(result == null) result = confidence;
+            MDD diff = Operation.minus(confidence, extract);
+            if(diff.nSolutions() > 0) {
+                if (result == null) result = diff;
                 else {
-                    Logger.out.information("\rBuilding the union... ");
-                    result = Operation.union(result, confidence);
-                    Memory.free(confidence);
+                    result = Operation.union(result, diff);
+                    Memory.free(tmp_res);
+                    Memory.free(diff);
                 }
-            } else {
-                Logger.out.information("\rBuilding the difference... ");
-                if (result == null) result = Operation.minus(confidence, extract);
-                else {
-                    MDD difference = Operation.minus(confidence, extract);
-                    Logger.out.information("\rBuilding the union... ");
-                    result = Operation.union(result, difference);
-                    Memory.free(difference);
-                }
-                Memory.free(confidence);
-            }
+            } else Memory.free(diff);
 
-            if(tmp != null) {
-                Memory.free(tmp);
-                Memory.free(tmp_res);
-            }
+            if(tmp != null) Memory.free(tmp);
 
+            Memory.free(confidence);
             tmp = extract;
             tmp_res = result;
+
+            if(result != null) System.out.println("LOG : " + result.nSolutions());
         }
 
         time = System.currentTimeMillis() - time;

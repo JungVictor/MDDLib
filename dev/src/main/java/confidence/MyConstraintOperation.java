@@ -77,7 +77,7 @@ public class MyConstraintOperation extends ConstraintOperation {
         ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
         snode.setState(StateMulRelaxed.create(parameters));
 
-        intersection(result, mdd, snode, true);
+        intersection(result, mdd, snode, false);
 
         Memory.free(snode);
         Memory.free(parameters);
