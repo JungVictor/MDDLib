@@ -17,15 +17,15 @@ public class SmallMath {
         double logarithm = 0;
         double M = number;
         double shift = 1;
-        double baseShift = Math.pow(base, -1);
+        double baseShift = Math.pow(10, -1);
         int lastDigit;
         for(int i = 0; i < n; i++) {
-            lastDigit = length((int) M);
+            lastDigit = length((int) M, base);
             logarithm += lastDigit * shift;
             shift *= baseShift;
             M = M(M, lastDigit, base);
         }
-        lastDigit = length((int) M);
+        lastDigit = length((int) M, base);
         logarithm += lastDigit * shift;
         if(ceil) logarithm += shift;
         return logarithm;
@@ -41,25 +41,25 @@ public class SmallMath {
 
     private static strictfp double M(double number, int a, int base){
         double POW = Math.pow(base, a);
-        return Math.pow(number / POW, base);
+        return Math.pow(number / POW, 10);
     }
 
-    private static int length(int number){
+    private static int length(int number, int base){
         if(number == 0) return -1;
         int length = 0;
-        if (number >= 100000000) {
+        if (number >= Math.pow(base, 8)) {
             length += 8;
-            number /= 100000000;
+            number /= Math.pow(base, 8);
         }
-        if (number >= 10000) {
+        if (number >= Math.pow(base, 4)) {
             length += 4;
-            number /= 10000;
+            number /= Math.pow(base, 4);
         }
-        if (number >= 100) {
+        if (number >= Math.pow(base, 2)) {
             length += 2;
-            number /= 100;
+            number /= Math.pow(base, 2);
         }
-        if (number >= 10) length += 1;
+        if (number >= base) length += 1;
         return length;
     }
 
