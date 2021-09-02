@@ -5,6 +5,7 @@ import memory.AllocatorOf;
 import memory.MemoryPool;
 import confidence.MyMemory;
 import confidence.parameters.ParametersSumDouble;
+import structures.Signature;
 
 public strictfp class StateSumDouble extends NodeState {
     // Thread safe allocator
@@ -74,6 +75,18 @@ public strictfp class StateSumDouble extends NodeState {
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
         return Math.floor((sum + doubleLabel) * Math.pow(10, constraint.epsilon())) + "";
+    }
+
+    @Override
+    public Signature hash(int label, int layer, int size, boolean test){
+        double doubleLabel = constraint.mapDouble(label);
+        double minPotential = sum + doubleLabel + constraint.vMin(layer-1);
+        double maxPotential = sum + doubleLabel + constraint.vMax(layer-1);
+
+        if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return Signature.EMPTY;
+        Signature hash = Signature.create();
+        hash.add(Math.floor((sum + doubleLabel) * Math.pow(10, constraint.epsilon())));
+        return hash;
     }
 
     @Override

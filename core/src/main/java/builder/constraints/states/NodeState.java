@@ -1,6 +1,7 @@
 package builder.constraints.states;
 
 import memory.Allocable;
+import structures.Signature;
 
 public abstract class NodeState implements Allocable {
 
@@ -20,6 +21,9 @@ public abstract class NodeState implements Allocable {
     }
 
     public abstract String hash(int label, int layer, int size);
+    public Signature hash(int label, int layer, int size, boolean test){
+        return null;
+    }
 
     public NodeState copy(){
         return null;
