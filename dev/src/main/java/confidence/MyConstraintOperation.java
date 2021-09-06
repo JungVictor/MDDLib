@@ -66,7 +66,7 @@ public class MyConstraintOperation extends ConstraintOperation {
             }
 
             if(i < size - 1) {
-                vMin = SpecialOperations.multiplyCeil(vMin, minValues.get(i+1), maxProbaDomains);
+                vMin = SpecialOperations.multiplyFloor(vMin, minValues.get(i+1), maxProbaDomains);
                 vMax = SpecialOperations.multiplyCeil(vMax, maxValues.get(i+1), maxProbaDomains);
             }
             minValues.set(i, vMin);

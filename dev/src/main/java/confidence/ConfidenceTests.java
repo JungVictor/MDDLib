@@ -324,50 +324,62 @@ public strictfp class ConfidenceTests {
 
     public static MDD testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
-        MDD confidence, extract = null;
+        MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
 
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
             confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
-            if(confidence.nSolutions() == 0) {
-                Memory.free(confidence);
-                break;
+
+            // Free the ancient extract
+            if(extract != null) {
+                Memory.free(extract);
+                extract = null;
             }
+
+            if(confidence.nSolutions() == 0) break;
+
             extract = extract(confidence, domains, n, precision, gamma);
 
             // Stop
             if(extract.nSolutions() == 0) {
+
                 Memory.free(extract);
-                if(result == null) result = confidence;
-                else {
-                    result = Operation.union(result, confidence);
-                    Memory.free(confidence);
+                extract = null;
+
+                if(result == null) {
+                    result = confidence;
+                    confidence = null;
                 }
-                if(tmp != null) Memory.free(tmp);
-                if(tmp_res != null) Memory.free(tmp_res);
+                else {
+                    tmp_res = result;
+                    result = Operation.union(result, confidence);
+                    Memory.free(tmp_res);
+                    Memory.free(confidence);
+                    confidence = null;
+                    tmp_res = null;
+                }
                 break;
             }
 
             MDD diff = Operation.minus(confidence, extract);
+            Memory.free(confidence);
+            confidence = null;
+
             if(diff.nSolutions() > 0) {
                 if (result == null) result = diff;
                 else {
+                    tmp_res = result;
                     result = Operation.union(result, diff);
                     Memory.free(tmp_res);
                     Memory.free(diff);
                 }
             } else Memory.free(diff);
-
-            if(tmp != null) Memory.free(tmp);
-
-            Memory.free(confidence);
-            tmp = extract;
-            tmp_res = result;
-
-            if(result != null) System.out.println("LOG : " + result.nSolutions());
         }
+
+        if(extract != null) Memory.free(extract);
+        if(confidence != null) Memory.free(confidence);
 
         time = System.currentTimeMillis() - time;
 
