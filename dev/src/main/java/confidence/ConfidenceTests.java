@@ -446,6 +446,10 @@ public strictfp class ConfidenceTests {
 
     @SuppressWarnings("unchecked")
     public static void precision(MDD result, Domains D, int n, int precision){
+        if(result.nSolutions() == 0) {
+            System.out.println("\rCONFIDENCE = NO SOLUTION !");
+            return;
+        }
         PMDD confidence = PMDD.create();
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
