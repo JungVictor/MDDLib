@@ -6,6 +6,7 @@ import mdd.operations.Operation;
 import representation.MDDPrinter;
 import structures.Domains;
 import utils.ArgumentParser;
+import utils.SmallMath;
 
 public class Main {
 
@@ -29,6 +30,12 @@ public class Main {
 
         if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
         Domains domains = DomainsManagements.getDomains(dataFile);
+
+
+        //ConfidenceTests.testLogInt2(null, gamma, precision, epsilon, 15, n, domains);
+        ConfidenceTests.testLogInt3(gamma, precision, epsilon, 15, n, domains);
+        //ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
+
         /*
         MDD previous = null;
         MDD tmp = previous;

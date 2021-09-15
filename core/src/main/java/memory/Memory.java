@@ -49,6 +49,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<MapOf<Integer, Long>> mapOfIntegerLongPool = new MemoryPool<>();
+    public static MapOf<Integer, Long> MapOfIntegerLong(){
+        MapOf<Integer, Long> object = mapOfIntegerLongPool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegerLongPool);
+            mapOfIntegerLongPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     private static final MemoryPool<MapOf<Integer, Node>> mapOfIntegerNodePool = new MemoryPool<>();
     public static MapOf<Integer, Node> MapOfIntegerNode(){
         MapOf<Integer, Node> object = mapOfIntegerNodePool.get();

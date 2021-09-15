@@ -1,12 +1,8 @@
 package confidence;
 
 import builder.constraints.ConstraintBuilder;
-import confidence.parameters.ParametersMulPF;
-import confidence.parameters.ParametersMulRelaxed;
-import confidence.states.StateMul;
-import confidence.states.StateMulPF;
-import confidence.states.StateMulRelaxed;
-import confidence.states.StateSumDouble;
+import confidence.parameters.*;
+import confidence.states.*;
 import confidence.structures.PrimeFactorization;
 import confidence.structures.arrays.ArrayOfBigInteger;
 import confidence.structures.arrays.ArrayOfPrimeFactorization;
@@ -14,9 +10,9 @@ import confidence.utils.SpecialOperations;
 import mdd.MDD;
 import mdd.components.SNode;
 import memory.Memory;
-import confidence.parameters.ParametersMul;
-import confidence.parameters.ParametersSumDouble;
 import structures.Domains;
+import structures.arrays.ArrayOfInt;
+import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import structures.arrays.ArrayOfDouble;
 
@@ -193,6 +189,40 @@ public class MyConstraintBuilder extends ConstraintBuilder {
         }
         ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
         snode.setState(StateSumDouble.create(parameters));
+
+        build(result, snode, D, size, true);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static strictfp MDD sumRelaxed(MDD result, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size){
+        // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
+        SNode snode = SNode.create();
+        ArrayOfLong minValues = ArrayOfLong.create(size);
+        ArrayOfLong maxValues = ArrayOfLong.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 0
+        minValues.set(size-1, 0);
+        maxValues.set(size-1, 0);
+
+        for(int i = size - 2; i >= 0; i--){
+            long vMin = Long.MAX_VALUE, vMax = Long.MIN_VALUE;
+            for(int v : D.get(i+1)) {
+                long value = map.get(v);
+                if(value < vMin) vMin = value;
+                if(value > vMax) vMax = value;
+            }
+            if(i < size - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision);
+        snode.setState(StateSumRelaxed.create(parameters));
 
         build(result, snode, D, size, true);
 

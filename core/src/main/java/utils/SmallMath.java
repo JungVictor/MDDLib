@@ -7,6 +7,33 @@ public class SmallMath {
 
     private SmallMath(){}
 
+
+    /**
+     * Compute the logarithm as a long
+     * @param number
+     * @param precision
+     * @param base
+     * @param n
+     * @param ceil
+     * @return
+     */
+    public static long log(long number, int precision, int base, int n, boolean ceil){
+        if(number == Math.pow(base, precision)) return 0;
+        long logarithm = 0;
+        double M = number / Math.pow(base, precision);
+        int lastDigit;
+        cachePow(base);
+        for(int i = 0; i < n; i++) {
+            lastDigit = length((int) M, base);
+            logarithm = logarithm * 10 + lastDigit;
+            M = M(M, lastDigit, base);
+        }
+        lastDigit = length(M, base);
+        logarithm = logarithm * 10 + lastDigit;
+        if(ceil) logarithm += 1;
+        return logarithm;
+    }
+
     /**
      * Compute the logarithm of the given number in given base, up to given precision n.<br>
      * If you want to compute the log10(90.41) up to 5 digits : log(90.41, 10, 5).
