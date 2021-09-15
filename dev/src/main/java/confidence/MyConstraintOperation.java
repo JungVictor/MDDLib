@@ -28,10 +28,11 @@ public class MyConstraintOperation extends ConstraintOperation {
         MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)){
-                mapLog.put(v, -1 * SmallMath.log(v * Math.pow(10, -precision), 10, 10, true));
+                mapLog.put(v, -1 * SmallMath.log(v * Math.pow(10, -precision), 10, 15, true));
+
             }
         }
-        double s_max = -1 * SmallMath.log(gamma, 10, 10, false);
+        double s_max = -1 * SmallMath.log(gamma, 10, 15, false);
 
         if(mdd == null) return MyMDDBuilder.sumDouble(result, 0, s_max, mapLog, epsilon, n, D);
         return sumDouble(result, mdd, D, 0, s_max, mapLog, epsilon, n);

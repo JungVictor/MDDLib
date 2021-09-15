@@ -17,6 +17,7 @@ public class SmallMath {
      * @return The logarithm corresponding to the inputs
      */
     public static strictfp double log(double number, int base, int n, boolean ceil){
+        if(number == 1) return 0;
         double logarithm = 0;
         double M = number;
         double shift = 1;
