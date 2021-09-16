@@ -2,8 +2,10 @@ package utils;
 
 public class SmallMath {
 
-    // base, base ^ 2, base ^ 4, base ^ 8;
-    private static double[] pow = new double[4];
+    private static double negBase;
+    // base, base ^ 2, base ^ 4, base ^ 8, base ^ 16;
+    private static int[] ex = {0, 2, 4, 8, 16, 32};
+    private static double[] pow = new double[ex.length];
 
     private SmallMath(){}
 
@@ -46,11 +48,19 @@ public class SmallMath {
     public static strictfp double log(double number, int base, int n, boolean ceil){
         if(number == 1) return 0;
         double logarithm = 0;
-        double M = number;
         double shift = 1;
         double baseShift = Math.pow(10, -1);
-        int lastDigit;
+        int lastDigit = 0;
         cachePow(base);
+
+        while (number < negBase) {
+            lastDigit--;
+            number*=base;
+        }
+
+        logarithm += lastDigit;
+
+        double M = number;
         for(int i = 0; i < n; i++) {
             lastDigit = length((int) M, base);
             logarithm += lastDigit * shift;
@@ -78,29 +88,19 @@ public class SmallMath {
 
     private static void cachePow(int base) {
         if(pow[0] == base) return;
-        pow[0] = base;
-        pow[1] = Math.pow(base, 2);
-        pow[2] = Math.pow(base, 4);
-        pow[3] = Math.pow(base, 8);
+        for(int i = 0; i < ex.length; i++) pow[i] = Math.pow(base, ex[i]);
+        negBase = Math.pow(base, -1);
     }
 
     private static int length(double number, int base){
         if(number <= 0) return -1;
         int length = 0;
-        // base ^ 8
-        if (number >= pow[3]) {
-            length += 8;
-            number /= pow[3];
-        }
-        // base ^ 4
-        if (number >= pow[2]) {
-            length += 4;
-            number /= pow[2];
-        }
-        // base ^ 2
-        if (number >= pow[1]) {
-            length += 2;
-            number /= pow[1];
+        for(int i = ex.length - 1; i >= 0; i--) {
+            // base ^ ex[i]
+            if (number >= pow[i]) {
+                length += ex[i];
+                number /= pow[i];
+            }
         }
         if (number >= base) length += 1;
         return length;
