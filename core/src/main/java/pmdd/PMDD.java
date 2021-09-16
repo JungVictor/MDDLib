@@ -72,7 +72,7 @@ public class PMDD extends MDD {
     //**************************************//
 
     /**
-     * <b>TOPDOWN PROPAGATION</b><br/>
+     * <b>TOPDOWN PROPAGATION</b><br>
      * Propagate all properties from the root node through the MDD to the tt node
      * Clean all allocated properties during the run
      * @return The map of name -> property of the tt node after the propagation
@@ -82,7 +82,7 @@ public class PMDD extends MDD {
     }
 
     /**
-     * <b>TOPDOWN PROPAGATION</b><br/>
+     * <b>TOPDOWN PROPAGATION</b><br>
      * Propagate all properties from the root node through the MDD to the tt node
      * If clean is true, then the properties are cleaned after the propagation.
      * Otherwise, nodes keep the properties even after the end of the algorithm.
@@ -100,7 +100,7 @@ public class PMDD extends MDD {
     }
 
     /**
-     * <b>BOTTOMUP PROPAGATION</b><br/>
+     * <b>BOTTOMUP PROPAGATION</b><br>
      * Propagate all properties from the tt node through the MDD to the root node.
      * @return The map of name -> property of the root node after the propagation
      */
@@ -109,7 +109,7 @@ public class PMDD extends MDD {
     }
 
     /**
-     * <b>BOTTOMUP PROPAGATION</b><br/>
+     * <b>BOTTOMUP PROPAGATION</b><br>
      * Propagate all properties from the tt node through the MDD to the root node.
      * If clean is true, then the properties are cleaned after the propagation.
      * Otherwise, nodes keep the properties even after the end of the algorithm.

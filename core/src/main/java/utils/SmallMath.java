@@ -4,8 +4,8 @@ public class SmallMath {
 
     private static double negBase;
     // base, base ^ 2, base ^ 4, base ^ 8, base ^ 16;
-    private static int[] ex = {0, 2, 4, 8, 16, 32};
-    private static double[] pow = new double[ex.length];
+    private static final int[] ex = {0, 2, 4, 8, 16, 32};
+    private static final double[] pow = new double[ex.length];
 
     private SmallMath(){}
 
@@ -22,14 +22,24 @@ public class SmallMath {
     public static long log(long number, int precision, int base, int n, boolean ceil){
         if(number == Math.pow(base, precision)) return 0;
         long logarithm = 0;
-        double M = number / Math.pow(base, precision);
+        double num = number / Math.pow(base, precision);
         int lastDigit;
+        int firstDigit = 0;
         cachePow(base);
+
+        while (num < negBase) {
+            firstDigit--;
+            num *= base;
+        }
+
+        double M = num;
         for(int i = 0; i < n; i++) {
-            lastDigit = length((int) M, base);
-            logarithm = logarithm * 10 + lastDigit;
+            lastDigit = length(Math.floor(M), base);
+            if(i == 0) logarithm = logarithm * 10 + lastDigit + firstDigit;
+            else logarithm = logarithm * 10 + lastDigit;
             M = M(M, lastDigit, base);
         }
+
         lastDigit = length(M, base);
         logarithm = logarithm * 10 + lastDigit;
         if(ceil) logarithm += 1;
@@ -55,14 +65,14 @@ public class SmallMath {
 
         while (number < negBase) {
             lastDigit--;
-            number*=base;
+            number *= base;
         }
 
         logarithm += lastDigit;
 
         double M = number;
         for(int i = 0; i < n; i++) {
-            lastDigit = length((int) M, base);
+            lastDigit = length(Math.floor(M), base);
             logarithm += lastDigit * shift;
             shift *= baseShift;
             M = M(M, lastDigit, base);
