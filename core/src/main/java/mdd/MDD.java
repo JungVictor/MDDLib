@@ -6,9 +6,13 @@ import mdd.operations.Pack;
 import memory.*;
 import representation.MDDVisitor;
 import structures.Domains;
+import structures.MDDTable;
+import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.lists.ListOfInt;
 import structures.lists.ListOfLayer;
+import structures.lists.UnorderedListOfNode;
 
 import java.util.Random;
 
@@ -78,6 +82,91 @@ public class MDD implements Allocable {
     //**************************************//
     //         SPECIAL FUNCTIONS            //
     //**************************************//
+
+    private static ArrayOfInt fillTupleValue(MDDTable table, int row, ArrayOfInt values){
+        for(int i = 0; i < values.length; i++) values.set(i, table.valueOfIndex(row, i));
+        return values;
+    }
+
+    public static MDD createFromTable(MDDTable table){
+        MDD result = MDD.create();
+        result.setSize(table.tupleSize() + 1);
+
+        ArrayOfInt values = ArrayOfInt.create(table.tupleSize());
+        for(int i = 0; i < table.numberOfTuples(); i++) result.addPath(fillTupleValue(table, i, values));
+        Memory.free(values);
+
+        result.reduce();
+        return result;
+    }
+
+    /**
+     * Create the MDD corresponding to the given <b>SORTED</b> Table.
+     * @param table The sorted table
+     * @return The MDD corresponding to the sorted table
+     */
+    public static MDD createFromSortedTable(MDDTable table){
+        MDD result = MDD.create();
+
+        ListOfInt nextIndices = ListOfInt.create();
+        ListOfInt indices = ListOfInt.create();
+        ListOfInt tmp_switch_i;
+        indices.add(0);
+
+        UnorderedListOfNode nextNodes = UnorderedListOfNode.create();
+        UnorderedListOfNode nodes = UnorderedListOfNode.create();
+        UnorderedListOfNode tmp_switch_n;
+        nodes.add(result.getRoot());
+
+        int size = table.numberOfTuples();
+        int length = table.tupleSize();
+        result.setSize(length+1);
+
+        Node source;
+        int lastIndex;
+        int maxRowCurrentIndex;
+        int value;
+
+        for(int column = 0; column < size; column++) {
+            source = nodes.get(0);
+            value = table.noneValue();
+            lastIndex = 0;
+            if(indices.size() > 1) maxRowCurrentIndex = indices.get(1);
+            else maxRowCurrentIndex = Integer.MAX_VALUE;
+            for(int row = 0; row < length; row++) {
+                if(table.valueOfIndex(row, column) == value && maxRowCurrentIndex > row) continue;
+                value = table.valueOfIndex(row, column);
+
+                if(maxRowCurrentIndex <= row) {
+                    lastIndex++;
+                    if(indices.size() > lastIndex+1) maxRowCurrentIndex = indices.get(lastIndex+1);
+                    else maxRowCurrentIndex = Integer.MAX_VALUE;
+                    source = nodes.get(lastIndex);
+                }
+
+                Node elementNode = result.Node();
+                result.addArcAndNode(source, value, elementNode, column + 1);
+                nextIndices.add(row);
+                nextNodes.add(elementNode);
+            }
+            nodes.clear();
+            tmp_switch_n = nextNodes;
+            nextNodes = nodes;
+            nodes = tmp_switch_n;
+
+            indices.clear();
+            tmp_switch_i = nextIndices;
+            nextIndices = indices;
+            indices = tmp_switch_i;
+        }
+
+        Memory.free(nodes);
+        Memory.free(nextNodes);
+        Memory.free(indices);
+        Memory.free(nextIndices);
+        result.reduce();
+        return result;
+    }
 
     /**
      * Accept a MDDVisitor (design pattern).
@@ -376,10 +465,10 @@ public class MDD implements Allocable {
      * Add the path corresponding to the given values from the MDD's root.
      * @param values Labels of the path
      */
-    public void addPath(int... values){
+    public void addPath(ArrayOfInt values){
         Node current = getRoot();
         for(int i = 0; i < values.length; i++) {
-            int v = values[i];
+            int v = values.get(i);
             if(current.containsLabel(v)) current = current.getChild(v);
             else{
                 Node next = Node();
