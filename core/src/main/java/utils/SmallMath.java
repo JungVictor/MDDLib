@@ -17,7 +17,6 @@ public class SmallMath {
         return Math.floor((x * y) / divisor);
     }
 
-
     /**
      * Compute the logarithm as a long
      * @param number

@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public class MDDReader {
 
+    private static String directoryPath = "data/mdds/";
+
     private static int n;
 
     private static void saveLayer(MDD mdd, int layer, PrintWriter writer, HashMap<Node, String> currentBinding, HashMap<Node, String> nextBinding){
@@ -57,7 +59,7 @@ public class MDDReader {
         HashMap<String, Node> currentBinding = new HashMap<>(), nextBinding = new HashMap<>(), tmp;
         currentBinding.put("root", mdd.getRoot());
         try {
-            Scanner reader = new Scanner(new File(file));
+            Scanner reader = new Scanner(new File(directoryPath+file));
             while (reader.hasNextLine()){
                 mdd.setSize(mdd.size()+1);
                 loadLayer(mdd, line++, reader.nextLine(), currentBinding, nextBinding);
@@ -79,7 +81,7 @@ public class MDDReader {
     public static boolean save(MDD mdd, String file){
         n = 0;
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter(file+".mdd"));
+            PrintWriter writer = new PrintWriter(new FileWriter(directoryPath+file+".mdd"));
             HashMap<Node, String> currentBinding = new HashMap<>(), nextBinding = new HashMap<>(), tmp;
             currentBinding.put(mdd.getRoot(), "root");
             for(int i = 0; i < mdd.size(); i++) {

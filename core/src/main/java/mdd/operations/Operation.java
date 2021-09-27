@@ -12,6 +12,7 @@ import structures.arrays.ArrayOfNode;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import utils.Logger;
+import utils.SmallMath;
 
 /**
  * <b>The class dedicated to perform classical operation on and between MDDs</b>
@@ -33,18 +34,29 @@ public class Operation {
         return negation;
     }
 
-    public static double probability(MDD mdd, MapOf<Integer, Double>[] P){
+    public static double probability(MDD mdd, MapOf<Integer, Double>[] P, int precision, boolean ceil){
         if(mdd.getTt() == null) return 0;
         if(mdd.getTt() == mdd.getRoot()) return 0;
+        double divisor = Math.pow(10, precision);
         // Initialize the count of solution of each node to 0 (result of an addition)
         for(int i = 0; i < mdd.size(); i++) for(Node x : mdd.getLayer(i)) x.s = 0;
-        mdd.getTt().s = 1; // First case -> multiplication (so init at 1 NOT 0 !)
-        for(int i = mdd.size() - 2; i  >= 0; i--){
-            for(Node x : mdd.getLayer(i)){
-                for(int arc : x.getChildren())  x.s += x.getChild(arc).s * P[i].get(arc);
+        mdd.getTt().s = divisor; // First case -> multiplication (so init at 1 NOT 0 !)
+        if(ceil) {
+            for (int i = mdd.size() - 2; i >= 0; i--) {
+                for (Node x : mdd.getLayer(i)) {
+                    for (int arc : x.getChildren())
+                        x.s += SmallMath.multiplyCeil(x.getChild(arc).s, P[i].get(arc), divisor);
+                }
+            }
+        } else {
+            for (int i = mdd.size() - 2; i >= 0; i--) {
+                for (Node x : mdd.getLayer(i)) {
+                    for (int arc : x.getChildren())
+                        x.s += SmallMath.multiplyFloor(x.getChild(arc).s, P[i].get(arc), divisor);
+                }
             }
         }
-        return mdd.getRoot().s;
+        return mdd.getRoot().s / divisor;
     }
 
     //**************************************//
