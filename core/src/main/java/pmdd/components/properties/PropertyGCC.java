@@ -1,8 +1,7 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 import structures.integers.TupleOfInt;
 import structures.lists.ListOfInt;
@@ -14,6 +13,11 @@ import structures.lists.ListOfInt;
  */
 public class PropertyGCC extends NodeProperty {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
+
     private MapOf<Integer, TupleOfInt> bounds;
     private MapOf<Integer, TupleOfInt> currentValues;
     private int BASE = 2;
@@ -23,8 +27,23 @@ public class PropertyGCC extends NodeProperty {
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertyGCC(MemoryPool<NodeProperty> pool){
-        super(pool);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static PropertyGCC create(MapOf<Integer, TupleOfInt> max){
+        PropertyGCC property = allocator().allocate();
+        property.prepare();
+        property.setMaxValues(max);
+        return property;
+    }
+
+    public PropertyGCC(int allocatedIndex){
+        super(allocatedIndex);
         super.setName(GCC);
     }
 
@@ -77,7 +96,7 @@ public class PropertyGCC extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        PropertyGCC next = PMemory.PropertyGCC(bounds);
+        PropertyGCC next = PropertyGCC.create(bounds);
         for(int v : currentValues) next.currentValues.put(v, TupleOfInt.create(currentValues.get(v)));
         if(bounds.contains(value)) next.currentValues.get(value).incr(1,1);
         return next;
@@ -200,5 +219,33 @@ public class PropertyGCC extends NodeProperty {
         Memory.free(currentValues);
         BASE = 2;
         super.free();
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertyGCC type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertyGCC> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertyGCC[] arrayCreation(int capacity) {
+            return new PropertyGCC[capacity];
+        }
+
+        @Override
+        protected PropertyGCC createObject(int index) {
+            return new PropertyGCC(index);
+        }
     }
 }

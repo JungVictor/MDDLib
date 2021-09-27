@@ -3,9 +3,7 @@ package pmdd;
 import pmdd.components.properties.PropertySumDouble;
 import mdd.MDD;
 import mdd.components.Node;
-import pmdd.PMDD;
 import pmdd.components.PNode;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 
 public strictfp class ConstraintPruning {
@@ -89,7 +87,7 @@ public strictfp class ConstraintPruning {
      */
     @SuppressWarnings("unchecked")
     private static void confidence(PMDD confidence, MapOf<Integer, Double> mapLog){
-        PropertySumDouble confidenceProperty = PMemory.PropertySumDouble(0, 0, mapLog);
+        PropertySumDouble confidenceProperty = PropertySumDouble.create(0, 0, mapLog);
         confidence.addRootProperty("confidence", confidenceProperty);
         MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties(false).get("confidence").getData();
         double borne_sup = Math.exp(ranges.get(1));

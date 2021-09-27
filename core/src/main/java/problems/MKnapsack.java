@@ -1,18 +1,13 @@
 package problems;
 
 import builder.MDDBuilder;
-import builder.constraints.MDDGCC;
 import mdd.MDD;
-import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
-import pmdd.components.properties.NodeProperty;
 import pmdd.components.properties.PropertySum;
-import pmdd.memory.PMemory;
 import representation.MDDPrinter;
 import structures.Domains;
-import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.integers.TupleOfInt;
@@ -138,7 +133,7 @@ public class MKnapsack {
         for(int i = 0; i < data.length; i++) profits.put(i, data[i][1]);
         profits.put(-1, 0);
 
-        PropertySum profitProperty = PMemory.PropertySum(0,0, profits);
+        PropertySum profitProperty = PropertySum.create(0,0, profits);
         result.addRootProperty("profit", profitProperty);
         MapOf<Integer, Integer> maxProfit = (MapOf<Integer, Integer>) result.propagateProperties().get("profit").getResult().getData();
 

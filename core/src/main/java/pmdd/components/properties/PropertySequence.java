@@ -1,8 +1,7 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.integers.TupleOfInt;
 import structures.arrays.ArrayOfTupleOfInt;
 import structures.generics.MapOf;
@@ -16,31 +15,50 @@ import structures.generics.SetOf;
  */
 public class PropertySequence extends NodeProperty {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
+
     private PropertySequence accumulator;
-    private final ArrayOfTupleOfInt values;
-    private final SetOf<Integer> label = Memory.SetOfInteger();
+    private ArrayOfTupleOfInt values;
+    private SetOf<Integer> label;
 
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size, boolean base) {
-        this(pool, label, 1);
-        accumulator = PMemory.PropertySequence(label, size, false);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
     }
 
-    public PropertySequence(MemoryPool<NodeProperty> pool, SetOf<Integer> label, int size){
-        super(pool);
+    public static PropertySequence create(SetOf<Integer> label, int size){
+        PropertySequence property = allocator().allocate();
+        property.prepare();
+        property.init(label, size);
+        return property;
+    }
+
+    public static PropertySequence createFirst(SetOf<Integer> label, int size){
+        PropertySequence property = create(label, 1);
+        property.accumulator = create(label, size);
+        return property;
+    }
+
+    public PropertySequence(int allocatedIndex){
+        super(allocatedIndex);
+    }
+
+    public void init(SetOf<Integer> label, int size){
+        this.label = Memory.SetOfInteger();
         for(int j : label) this.label.add(j);
-        super.setName(SEQ);
 
         this.values = ArrayOfTupleOfInt.create(size);
-        init(size);
-    }
-
-    public void init(int size){
-        this.values.setLength(size);
         for(int i = 0; i < size; i++) values.set(i, TupleOfInt.create(i, 0));
     }
 
@@ -74,7 +92,7 @@ public class PropertySequence extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        PropertySequence next = PMemory.PropertySequence(label, values.length()+1, false);
+        PropertySequence next = PropertySequence.create(label, values.length()+1);
         for(int i = 1; i < values.length()+1; i++){
             next.values.get(i).setFirst(values.get(i-1).getFirst() + labelToValue(value));
             next.values.get(i).setSecond(values.get(i-1).getSecond() + labelToValue(value));
@@ -130,8 +148,37 @@ public class PropertySequence extends NodeProperty {
 
     @Override
     public void free(){
+        Memory.free(values);
+        Memory.free(label);
         accumulator = null;
-        label.clear();
         super.free();
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertySequence type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertySequence> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertySequence[] arrayCreation(int capacity) {
+            return new PropertySequence[capacity];
+        }
+
+        @Override
+        protected PropertySequence createObject(int index) {
+            return new PropertySequence(index);
+        }
     }
 }

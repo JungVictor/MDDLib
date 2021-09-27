@@ -1,5 +1,6 @@
 package pmdd.components.properties;
 
+import memory.Allocable;
 import memory.MemoryObject;
 import memory.MemoryPool;
 import structures.generics.MapOf;
@@ -23,7 +24,7 @@ import structures.generics.MapOf;
  * Other functions are for management and storage purposes.
  *
  */
-public abstract class NodeProperty implements MemoryObject {
+public abstract class NodeProperty implements Allocable {
 
     // Names of the constraints
     public static final String
@@ -34,11 +35,7 @@ public abstract class NodeProperty implements MemoryObject {
             CONSECUTIVE = "consecutive",
             AMONG = "among";
 
-
-    // MemoryObject variables
-    private final MemoryPool<NodeProperty> pool;
-    private int ID = -1;
-    //
+    private int allocatedIndex;
 
     // Name of the property
     private String name;
@@ -48,8 +45,8 @@ public abstract class NodeProperty implements MemoryObject {
     //           INITIALISATION             //
     //**************************************//
 
-    public NodeProperty(MemoryPool<NodeProperty> pool) {
-        this.pool = pool;
+    public NodeProperty(int allocatedIndex) {
+        this.allocatedIndex = allocatedIndex;
     }
 
     /**
@@ -192,17 +189,15 @@ public abstract class NodeProperty implements MemoryObject {
     // Implementation of MemoryObject interface
 
     @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
-    public void free() {
-        prepare();
-        this.pool.free(this, ID);
+    public void free(){
+
     }
 
-    @Override
     public void prepare(){}
 
 }

@@ -1,8 +1,7 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 
@@ -15,6 +14,10 @@ import structures.generics.SetOf;
  */
 public class PropertyAllDiff extends NodeProperty {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
     private SetOf<Integer> values;
     private SetOf<Integer> alldiff;
 
@@ -23,8 +26,23 @@ public class PropertyAllDiff extends NodeProperty {
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertyAllDiff(MemoryPool<NodeProperty> pool){
-        super(pool);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static PropertyAllDiff create(SetOf<Integer> values){
+        PropertyAllDiff property = allocator().allocate();
+        property.prepare();
+        property.addValues(values);
+        return property;
+    }
+
+    public PropertyAllDiff(int allocatedIndex){
+        super(allocatedIndex);
         super.setName(ALLDIFF);
     }
 
@@ -60,7 +78,7 @@ public class PropertyAllDiff extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value) {
-        PropertyAllDiff allDiff = PMemory.PropertyAllDiff(values);
+        PropertyAllDiff allDiff = PropertyAllDiff.create(values);
         for(int v : this.alldiff) allDiff.alldiff.add(v);
 
         if(values.contains(value)) allDiff.alldiff.add(value);
@@ -124,8 +142,8 @@ public class PropertyAllDiff extends NodeProperty {
 
     @Override
     public void prepare() {
-        this.alldiff = Memory.SetOfInteger();
-        this.values = Memory.SetOfInteger();
+        alldiff = Memory.SetOfInteger();
+        values = Memory.SetOfInteger();
     }
 
     @Override
@@ -135,5 +153,33 @@ public class PropertyAllDiff extends NodeProperty {
         Memory.free(values);
         Memory.free(alldiff);
         super.free();
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertyAllDiff type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertyAllDiff> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertyAllDiff[] arrayCreation(int capacity) {
+            return new PropertyAllDiff[capacity];
+        }
+
+        @Override
+        protected PropertyAllDiff createObject(int index) {
+            return new PropertyAllDiff(index);
+        }
     }
 }

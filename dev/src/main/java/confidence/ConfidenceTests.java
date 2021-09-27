@@ -1,13 +1,13 @@
 package confidence;
 
 import builder.MDDBuilder;
+import mdd.operations.ConstraintOperation;
 import pmdd.ConstraintPruning;
 import pmdd.components.properties.PropertySumDouble;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
-import pmdd.memory.PMemory;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.MapOf;
@@ -78,7 +78,7 @@ public strictfp class ConfidenceTests {
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
-        if(previous != null) MyConstraintOperation.confidenceMulRelaxed(confidence, previous, gamma, precision, epsilon, n, domains);
+        if(previous != null) ConstraintOperation.confidenceMulRelaxed(confidence, previous, gamma, precision, epsilon, n, domains);
         else MyMDDBuilder.confidenceMulRelaxed(confidence, gamma, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
@@ -329,7 +329,7 @@ public strictfp class ConfidenceTests {
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
-        if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
+        if(previous != null) ConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
         else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
@@ -455,7 +455,7 @@ public strictfp class ConfidenceTests {
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
-        if(previous != null) MyConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, logPrecision, domains);
+        if(previous != null) ConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, logPrecision, domains);
         else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, logPrecision, domains);
 
         time2 = System.currentTimeMillis();
@@ -577,14 +577,14 @@ public strictfp class ConfidenceTests {
             return;
         }
         PMDD confidence = PMDD.create();
-        MapOf<Integer, Double> mapLog = MyMemory.MapOfIntegerDouble();
+        MapOf<Integer, Double> mapLog = Memory.MapOfIntegerDouble();
         for(int i = 0; i < n; i++){
             for(int v : D.get(i)) mapLog.put(v, Math.log(v * Math.pow(10, -precision)));
         }
         result.clearAllAssociations();
         result.copy(confidence);
 
-        PropertySumDouble confidenceProperty = PMemory.PropertySumDouble(0, 0, mapLog);
+        PropertySumDouble confidenceProperty = PropertySumDouble.create(0, 0, mapLog);
         confidence.addRootProperty("confidence", confidenceProperty);
         MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties(false).get("confidence").getData();
         double borne_sup = Math.exp(ranges.get(1));
@@ -614,7 +614,7 @@ public strictfp class ConfidenceTests {
         result.clearAllAssociations();
         result.copy(confidence);
 
-        PropertySumDouble confidenceProperty = PMemory.PropertySumDouble(0, 0, mapLog);
+        PropertySumDouble confidenceProperty = PropertySumDouble.create(0, 0, mapLog);
         confidence.addTtProperty("confidence", confidenceProperty);
         confidence.reversePropagateProperties(false);
 

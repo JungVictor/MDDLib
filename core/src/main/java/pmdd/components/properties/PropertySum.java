@@ -1,8 +1,7 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 import structures.integers.TupleOfInt;
 
@@ -12,6 +11,11 @@ import structures.integers.TupleOfInt;
  */
 public class PropertySum extends NodeProperty {
 
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
+
     private TupleOfInt value;
     private MapOf<Integer, Integer> bindings;
 
@@ -19,8 +23,29 @@ public class PropertySum extends NodeProperty {
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertySum(MemoryPool<NodeProperty> pool){
-        super(pool);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public static PropertySum create(int v1, int v2){
+        PropertySum property = allocator().allocate();
+        property.prepare();
+        property.setValue(v1, v2);
+        return property;
+    }
+
+    public static PropertySum create(int v1, int v2, MapOf<Integer, Integer> bindings){
+        PropertySum property = create(v1, v2);
+        property.setBindings(bindings);
+        return property;
+    }
+
+    public PropertySum(int allocatedIndex){
+        super(allocatedIndex);
         super.setName(SUM);
     }
 
@@ -66,7 +91,7 @@ public class PropertySum extends NodeProperty {
     @Override
     public NodeProperty createProperty(int val) {
         if(bindings != null) val = bindings.get(val);
-        return PMemory.PropertySum(value.getFirst()+val, value.getSecond()+val, bindings);
+        return PropertySum.create(value.getFirst()+val, value.getSecond()+val, bindings);
     }
 
     @Override
@@ -98,11 +123,39 @@ public class PropertySum extends NodeProperty {
         Memory.free(value);
         this.bindings = null;
         super.free();
+        allocator().free(this);
     }
 
     @Override
     public void prepare(){
         super.prepare();
         this.value = TupleOfInt.create();
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertySum type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertySum> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertySum[] arrayCreation(int capacity) {
+            return new PropertySum[capacity];
+        }
+
+        @Override
+        protected PropertySum createObject(int index) {
+            return new PropertySum(index);
+        }
     }
 }

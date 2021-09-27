@@ -1,10 +1,7 @@
 package builder.constraints.states;
 
-import builder.constraints.parameters.ParametersAmong;
 import builder.constraints.parameters.ParametersSum;
 import memory.AllocatorOf;
-import memory.Memory;
-import memory.MemoryPool;
 
 public class StateSum extends NodeState {
     // Thread safe allocator

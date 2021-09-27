@@ -1,12 +1,16 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 import structures.integers.TupleOfDouble;
 
 public strictfp class PropertySumDouble extends NodeProperty {
+
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
 
     private TupleOfDouble value;
     private MapOf<Integer, Double> bindings;
@@ -15,8 +19,30 @@ public strictfp class PropertySumDouble extends NodeProperty {
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertySumDouble(MemoryPool<NodeProperty> pool){
-        super(pool);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+
+    public static PropertySumDouble create(double v1, double v2){
+        PropertySumDouble property = allocator().allocate();
+        property.prepare();
+        property.setValue(v1, v2);
+        return property;
+    }
+
+    public static PropertySumDouble create(double v1, double v2, MapOf<Integer, Double> bindings){
+        PropertySumDouble property = create(v1, v2);
+        property.setBindings(bindings);
+        return property;
+    }
+
+    public PropertySumDouble(int allocatedIndex){
+        super(allocatedIndex);
         super.setName(SUM);
     }
 
@@ -70,7 +96,7 @@ public strictfp class PropertySumDouble extends NodeProperty {
     public NodeProperty createProperty(int val) {
         double v = val;
         if(bindings != null) v = bindings.get(val);
-        return PMemory.PropertySumDouble(value.getFirst()+v, value.getSecond()+v, bindings);
+        return PropertySumDouble.create(value.getFirst()+v, value.getSecond()+v, bindings);
     }
 
     @Override
@@ -109,5 +135,32 @@ public strictfp class PropertySumDouble extends NodeProperty {
     public void prepare(){
         super.prepare();
         this.value = TupleOfDouble.create();
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertySumDouble type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertySumDouble> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertySumDouble[] arrayCreation(int capacity) {
+            return new PropertySumDouble[capacity];
+        }
+
+        @Override
+        protected PropertySumDouble createObject(int index) {
+            return new PropertySumDouble(index);
+        }
     }
 }

@@ -1,3 +1,4 @@
+import confidence.ConfidenceTests;
 import utils.confidence.ConfidenceDomainsGenerator;
 import utils.DomainsManagements;
 import structures.Domains;
@@ -27,16 +28,9 @@ public class Main {
         if(generateRandom) DomainsManagements.saveDomains(dataFile, ConfidenceDomainsGenerator.generateRandomDomains(precision, n, size, p));
         Domains domains = DomainsManagements.getDomains(dataFile);
 
-
-        double t1 = SmallMath.log(1, 14, 10, 8, false);
-        double t2 = SmallMath.log(0.00000000000001, 10, 10, true);
-        double t = Math.log10(0.00000000000001);
-
-        System.out.println(SmallMath.log(2, 2, 10, true));
-
         //ConfidenceTests.testLogInt2(null, gamma, precision, epsilon, 15, n, domains);
         //ConfidenceTests.testLogInt3(gamma, precision, epsilon, 15, n, domains);
-        //ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
+        ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
 
         /*
         MDD previous = null;

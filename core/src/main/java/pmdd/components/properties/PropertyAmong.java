@@ -1,12 +1,16 @@
 package pmdd.components.properties;
 
+import memory.AllocatorOf;
 import memory.Memory;
-import memory.MemoryPool;
-import pmdd.memory.PMemory;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
 
 public class PropertyAmong extends NodeProperty {
+
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
 
     private ArrayOfInt values;
     private int min, max, n, depth;
@@ -17,9 +21,24 @@ public class PropertyAmong extends NodeProperty {
     //           INITIALISATION             //
     //**************************************//
 
-    public PropertyAmong(MemoryPool<NodeProperty> pool) {
-        super(pool);
+    /**
+     * Get the allocator. Thread safe.
+     * @return The allocator.
+     */
+    private static Allocator allocator(){
+        return localStorage.get();
+    }
+
+    public PropertyAmong(int allocatedIndex) {
+        super(allocatedIndex);
         setName(AMONG);
+    }
+
+    public static PropertyAmong create(int q, int min, int max, SetOf<Integer> V){
+        PropertyAmong property = allocator().allocate();
+        property.prepare();
+        property.setParameters(q, min, max, V);
+        return property;
     }
 
     /**
@@ -47,7 +66,7 @@ public class PropertyAmong extends NodeProperty {
 
     @Override
     public NodeProperty createProperty(int value){
-        PropertyAmong nextProperty = PMemory.PropertyAmong(values.length, min, max, V);
+        PropertyAmong nextProperty = create(values.length, min, max, V);
         nextProperty.depth = depth + 1;
         nextProperty.n = first ? n-1 : n;
         for(int i = values.length - 1; i > 0; i--) nextProperty.values.set(i-1, values.get(i));
@@ -123,6 +142,34 @@ public class PropertyAmong extends NodeProperty {
         Memory.free(values);
         this.V = null;
         super.free();
+        allocator().free(this);
+    }
+
+
+    /**
+     * <b>The allocator that is in charge of the PropertyAmong type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
+    static final class Allocator extends AllocatorOf<PropertyAmong> {
+
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected PropertyAmong[] arrayCreation(int capacity) {
+            return new PropertyAmong[capacity];
+        }
+
+        @Override
+        protected PropertyAmong createObject(int index) {
+            return new PropertyAmong(index);
+        }
     }
 
 

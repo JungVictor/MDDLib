@@ -1,7 +1,6 @@
 package builder.constraints.states;
 
 import builder.constraints.parameters.ParametersMulRelaxed;
-import confidence.utils.SpecialOperations;
 import memory.AllocatorOf;
 import utils.SmallMath;
 
