@@ -1,10 +1,7 @@
-package confidence.states;
+package builder.constraints.states;
 
-import builder.constraints.states.NodeState;
 import memory.AllocatorOf;
-import memory.MemoryPool;
-import confidence.MyMemory;
-import confidence.parameters.ParametersSumDouble;
+import builder.constraints.parameters.ParametersSumDouble;
 import structures.Signature;
 
 public strictfp class StateSumDouble extends NodeState {

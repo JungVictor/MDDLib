@@ -3,6 +3,7 @@ package builder;
 import builder.constraints.*;
 import mdd.MDD;
 import mdd.components.Node;
+import mdd.operations.ConstraintOperation;
 import mdd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
@@ -11,6 +12,8 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
 import structures.integers.TupleOfInt;
+
+import java.math.BigInteger;
 
 public class MDDBuilder {
 
@@ -161,4 +164,60 @@ public class MDDBuilder {
     public static MDD neq(MDD mdd, int size, ArrayOfInt V){
         return MDDCompareNextValue.generate(mdd, size, V, MDDCompareNextValue.OP.NEQ);
     }
+
+    public static MDD mulRelaxed(MDD mdd, double m_min, double m_max, double maxProbaDomains, double maxProbaEpsilon, int n, Domains D){
+        return ConstraintBuilder.mulRelaxed(mdd, D, m_min, m_max, maxProbaDomains, maxProbaEpsilon, n);
+    }
+
+    /**
+     * <b>This method return a MDD which respect the multiplicative constraint</b><br>
+     * The multiplicative constraint ensure that if we multiply all the variables together, the result belong to the interval [m_min, m_max].
+     * This method only works for positives numbers.
+     * As the product can be very hugh, the type of m_min and m_max is BigInteger
+     * @param mdd
+     * @param m_min The lower bound of the constraint.
+     * @param m_max The upper bound of the constraint.
+     * @param n The number of variables.
+     * @param D The domains of the variables.
+     * @return The MDD satisfying the multiplicative constraint.
+     */
+    public static MDD mul(MDD mdd, BigInteger m_min, BigInteger m_max, int n, Domains D){
+        return ConstraintBuilder.mul(mdd, D, m_min, m_max, n);
+    }
+
+    public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
+        return ConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size);
+    }
+
+    public static MDD sumRelaxed(MDD mdd, long s_min, long s_max, MapOf<Integer, Long> map, int epsilon, int precision, int size, Domains D){
+        return ConstraintBuilder.sumRelaxed(mdd, D, s_min, s_max, map, epsilon, precision, size);
+    }
+
+    public static  MDD confidenceMulRelaxed(MDD mdd, int gamma, int precision, int epsilon, int n, Domains D){
+        return ConstraintOperation.confidenceMulRelaxed(mdd, null, gamma, precision, epsilon, n, D);
+    }
+
+    public static MDD confidence(MDD mdd, int gamma, int precision, int n, Domains D){
+        int step = (int) Math.pow(10, precision);
+        BigInteger bigIntStep = BigInteger.valueOf(step);
+
+        BigInteger bigIntGamma = BigInteger.valueOf(gamma);
+        BigInteger m_max = bigIntStep;
+
+        for (int i = 0; i < n-1; i++){
+            bigIntGamma = bigIntGamma.multiply(bigIntStep);
+            m_max = m_max.multiply(bigIntStep);
+        }
+
+        return mul(mdd, bigIntGamma, m_max, n, D);
+    }
+
+    public static strictfp MDD confidence(MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
+        return ConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, D);
+    }
+
+    public static MDD confidence(MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D){
+        return ConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, logPrecision, D);
+    }
+
 }

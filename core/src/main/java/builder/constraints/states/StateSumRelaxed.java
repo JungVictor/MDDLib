@@ -1,12 +1,7 @@
-package confidence.states;
+package builder.constraints.states;
 
-import builder.constraints.states.NodeState;
-import confidence.parameters.ParametersMulRelaxed;
-import confidence.parameters.ParametersSumRelaxed;
+import builder.constraints.parameters.ParametersSumRelaxed;
 import memory.AllocatorOf;
-import memory.MemoryPool;
-import confidence.MyMemory;
-import confidence.parameters.ParametersSumDouble;
 import structures.Signature;
 
 public strictfp class StateSumRelaxed extends NodeState {

@@ -7,12 +7,17 @@ import mdd.components.Node;
 import mdd.components.SNode;
 import memory.Memory;
 import structures.Domains;
+import structures.arrays.ArrayOfBigInteger;
+import structures.arrays.ArrayOfDouble;
+import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
 import structures.integers.TupleOfInt;
 import utils.Logger;
+import utils.SmallMath;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 
 public class ConstraintBuilder {
@@ -193,4 +198,172 @@ public class ConstraintBuilder {
         Memory.free(D);
         return result;
     }
+
+
+    //*************************//
+    //      CONFIDENCE         //
+    //*************************//
+
+    public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size){
+        // CHECK MyConstraintOperation mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
+        SNode snode = SNode.create();
+        ArrayOfDouble minValues = ArrayOfDouble.create(size);
+        ArrayOfDouble maxValues = ArrayOfDouble.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à maxProbaEpsilon
+        minValues.set(size-1, maxProbaEpsilon);
+        maxValues.set(size-1, maxProbaEpsilon);
+
+        for(int i = size - 2; i >= 0; i--){
+            //On initialise pour ne pas avoir de souci avec les conditions dans la boucle
+            double vMin = 0;
+            double vMax = 0;
+            boolean firstIteration = true;
+            for(int v : D.get(i+1)) {
+
+                if (firstIteration){
+                    vMin = v;
+                    vMax = v;
+                    firstIteration = false;
+                } else {
+                    if(v < vMin) vMin = v;
+                    if(v > vMax) vMax = v;
+                }
+
+            }
+
+            if(i < size - 1) {
+                vMin = SmallMath.multiplyFloor(vMin, minValues.get(i+1), maxProbaDomains);
+                vMax = SmallMath.multiplyCeil(vMax, maxValues.get(i+1), maxProbaDomains);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+
+        min = SmallMath.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
+        max = SmallMath.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
+        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
+        snode.setState(StateMulRelaxed.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size){
+        SNode snode = SNode.create();
+        ArrayOfBigInteger minValues = ArrayOfBigInteger.create(size);
+        ArrayOfBigInteger maxValues = ArrayOfBigInteger.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 1
+        minValues.set(size-1, BigInteger.valueOf(1));
+        maxValues.set(size-1, BigInteger.valueOf(1));
+
+        for(int i = size - 2; i >= 0; i--){
+            //On initialise pour ne pas avoir de souci avec les conditions dans la boucle
+            BigInteger vMin = BigInteger.ZERO;
+            BigInteger vMax = BigInteger.ZERO;
+            boolean firstIteration = true;
+            for(int v : D.get(i+1)) {
+                BigInteger bigIntV = BigInteger.valueOf(v);
+
+                if (firstIteration){
+                    vMin = bigIntV;
+                    vMax = bigIntV;
+                    firstIteration = false;
+                } else {
+                    if(bigIntV.compareTo(vMin) < 0) vMin = bigIntV;
+                    if(bigIntV.compareTo(vMax) > 0) vMax = bigIntV;
+                }
+
+            }
+
+            if(i < size - 1) {
+                vMin = vMin.multiply(minValues.get(i+1));
+                vMax = vMax.multiply(maxValues.get(i+1));
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+
+        ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues);
+        snode.setState(StateMul.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
+        // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
+        SNode snode = SNode.create();
+        ArrayOfDouble minValues = ArrayOfDouble.create(size);
+        ArrayOfDouble maxValues = ArrayOfDouble.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 0
+        minValues.set(size-1, 0.0);
+        maxValues.set(size-1, 0.0);
+
+        for(int i = size - 2; i >= 0; i--){
+            double vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            for(int v : D.get(i+1)) {
+                double doubleV = mapDouble.get(v);
+                if(doubleV < vMin) vMin = doubleV;
+                if(doubleV > vMax) vMax = doubleV;
+            }
+            if(i < size - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        snode.setState(StateSumDouble.create(parameters));
+
+        build(result, snode, D, size, true);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static strictfp MDD sumRelaxed(MDD result, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size){
+        // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
+        SNode snode = SNode.create();
+        ArrayOfLong minValues = ArrayOfLong.create(size);
+        ArrayOfLong maxValues = ArrayOfLong.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 0
+        minValues.set(size-1, 0);
+        maxValues.set(size-1, 0);
+
+        for(int i = size - 2; i >= 0; i--){
+            long vMin = Long.MAX_VALUE, vMax = Long.MIN_VALUE;
+            for(int v : D.get(i+1)) {
+                long value = map.get(v);
+                if(value < vMin) vMin = value;
+                if(value > vMax) vMax = value;
+            }
+            if(i < size - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision);
+        snode.setState(StateSumRelaxed.create(parameters));
+
+        build(result, snode, D, size, true);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
 }

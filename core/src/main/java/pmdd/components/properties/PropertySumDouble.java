@@ -1,9 +1,8 @@
-package confidence.properties;
+package pmdd.components.properties;
 
-import confidence.MyMemory;
 import memory.Memory;
 import memory.MemoryPool;
-import pmdd.components.properties.NodeProperty;
+import pmdd.memory.PMemory;
 import structures.generics.MapOf;
 import structures.integers.TupleOfDouble;
 
@@ -55,7 +54,7 @@ public strictfp class PropertySumDouble extends NodeProperty {
 
     @Override
     public MapOf getData(){
-        MapOf<Integer, Double> data = MyMemory.MapOfIntegerDouble();
+        MapOf<Integer, Double> data = Memory.MapOfIntegerDouble();
         data.put(0, value.getFirst());
         data.put(1, value.getSecond());
         return data;
@@ -71,7 +70,7 @@ public strictfp class PropertySumDouble extends NodeProperty {
     public NodeProperty createProperty(int val) {
         double v = val;
         if(bindings != null) v = bindings.get(val);
-        return MyMemory.PropertySumDouble(value.getFirst()+v, value.getSecond()+v, bindings);
+        return PMemory.PropertySumDouble(value.getFirst()+v, value.getSecond()+v, bindings);
     }
 
     @Override

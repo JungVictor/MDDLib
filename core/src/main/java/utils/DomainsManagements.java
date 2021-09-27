@@ -1,4 +1,4 @@
-package confidence.utils;
+package utils;
 
 import structures.Domains;
 

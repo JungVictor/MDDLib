@@ -1,8 +1,7 @@
-package confidence.states;
+package builder.constraints.states;
 
-import builder.constraints.states.NodeState;
 import memory.AllocatorOf;
-import confidence.parameters.ParametersMul;
+import builder.constraints.parameters.ParametersMul;
 
 import java.math.BigInteger;
 

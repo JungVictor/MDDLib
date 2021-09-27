@@ -1,7 +1,6 @@
-package confidence.structures.arrays;
+package structures.arrays;
 
 import memory.AllocatorOf;
-import structures.arrays.ArrayOf;
 
 import java.math.BigInteger;
 

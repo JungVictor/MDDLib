@@ -1,12 +1,9 @@
-package confidence.states;
+package builder.constraints.states;
 
-import builder.constraints.states.NodeState;
-import confidence.parameters.ParametersMul;
-import confidence.parameters.ParametersMulRelaxed;
+import builder.constraints.parameters.ParametersMulRelaxed;
 import confidence.utils.SpecialOperations;
 import memory.AllocatorOf;
-
-import java.math.BigInteger;
+import utils.SmallMath;
 
 public strictfp class StateMulRelaxed extends NodeState {
 
@@ -53,18 +50,18 @@ public strictfp class StateMulRelaxed extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateMulRelaxed state = StateMulRelaxed.create(constraint);
-        state.mul = SpecialOperations.multiplyCeil(mul, label, constraint.maxProbaDomains());
+        state.mul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
 
-        double newMul = SpecialOperations.multiplyCeil(mul, label, constraint.maxProbaDomains());
+        double newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
         //Lignes à revoir pour l'ordre dans lequel les multiplications sont faites
-        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
-        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
+        double minPotential = SmallMath.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
+        double maxPotential = SmallMath.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
 
         //Si l'intervalle [minPotential, maxPotential] intersection [constraint.min(), constraint.max] est vide
         if(maxPotential < constraint.min() || constraint.max() < minPotential ) return false;
@@ -76,10 +73,10 @@ public strictfp class StateMulRelaxed extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        double newMul = SpecialOperations.multiplyCeil(mul, label, constraint.maxProbaDomains());
+        double newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
-        double minPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
-        double maxPotential = SpecialOperations.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
+        double minPotential = SmallMath.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
+        double maxPotential = SmallMath.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());
 
         if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return "";
         return Double.toString(newMul);
@@ -88,7 +85,7 @@ public strictfp class StateMulRelaxed extends NodeState {
     @Override
     public NodeState merge(NodeState state, int label, int layer, int size){
         StateMulRelaxed stateMulrelaxed = (StateMulRelaxed) state;
-        double m = SpecialOperations.multiplyCeil(stateMulrelaxed.mul, label, constraint.maxProbaDomains());
+        double m = SmallMath.multiplyCeil(stateMulrelaxed.mul, label, constraint.maxProbaDomains());
         if(m < mul) mul = m;
         return null;
     }

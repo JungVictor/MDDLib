@@ -92,4 +92,18 @@ public class PMemory {
         return object;
     }
 
+
+    private static final MemoryPool<NodeProperty> mapOfPropertySumDouble = new MemoryPool<>();
+    public static PropertySumDouble PropertySumDouble(double v1, double v2, MapOf<Integer, Double> bindings){
+        PropertySumDouble object = (PropertySumDouble) mapOfPropertySumDouble.get();
+        if(object == null){
+            object = new PropertySumDouble(mapOfPropertySumDouble);
+            mapOfPropertySumDouble.add(object);
+        }
+        object.prepare();
+        object.setValue(v1, v2);
+        object.setBindings(bindings);
+        return object;
+    }
+
 }

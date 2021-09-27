@@ -1,11 +1,13 @@
 package confidence;
 
 import builder.MDDBuilder;
-import confidence.properties.PropertySumDouble;
+import pmdd.ConstraintPruning;
+import pmdd.components.properties.PropertySumDouble;
 import mdd.MDD;
 import mdd.operations.Operation;
 import memory.Memory;
 import pmdd.PMDD;
+import pmdd.memory.PMemory;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.MapOf;
@@ -582,7 +584,7 @@ public strictfp class ConfidenceTests {
         result.clearAllAssociations();
         result.copy(confidence);
 
-        PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
+        PropertySumDouble confidenceProperty = PMemory.PropertySumDouble(0, 0, mapLog);
         confidence.addRootProperty("confidence", confidenceProperty);
         MapOf<Integer, Double> ranges = (MapOf<Integer, Double>) confidence.propagateProperties(false).get("confidence").getData();
         double borne_sup = Math.exp(ranges.get(1));
@@ -612,7 +614,7 @@ public strictfp class ConfidenceTests {
         result.clearAllAssociations();
         result.copy(confidence);
 
-        PropertySumDouble confidenceProperty = MyMemory.PropertySumDouble(0, 0, mapLog);
+        PropertySumDouble confidenceProperty = PMemory.PropertySumDouble(0, 0, mapLog);
         confidence.addTtProperty("confidence", confidenceProperty);
         confidence.reversePropagateProperties(false);
 

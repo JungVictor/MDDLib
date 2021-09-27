@@ -1,6 +1,6 @@
-package confidence.parameters;
+package builder.constraints.parameters;
 
-import confidence.structures.arrays.ArrayOfBigInteger;
+import structures.arrays.ArrayOfBigInteger;
 import memory.Allocable;
 import memory.AllocatorOf;
 

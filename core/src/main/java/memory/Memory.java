@@ -104,6 +104,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<MapOf<Integer, Double>> mapOfIntegerDoublePool = new MemoryPool<>();
+    public static MapOf<Integer, Double> MapOfIntegerDouble(){
+        MapOf<Integer, Double> object = mapOfIntegerDoublePool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegerDoublePool);
+            mapOfIntegerDoublePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
 
     //**************************************//
     //                SETS                  //

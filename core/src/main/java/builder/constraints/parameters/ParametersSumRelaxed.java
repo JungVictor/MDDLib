@@ -1,11 +1,9 @@
-package confidence.parameters;
+package builder.constraints.parameters;
 
 import memory.Allocable;
 import memory.AllocatorOf;
-import structures.arrays.ArrayOfInt;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
-import structures.arrays.ArrayOfDouble;
 
 public class ParametersSumRelaxed implements Allocable {
 

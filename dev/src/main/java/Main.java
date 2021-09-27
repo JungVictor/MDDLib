@@ -1,9 +1,5 @@
-import confidence.ConfidenceTests;
-import confidence.utils.ConfidenceDomainsGenerator;
-import confidence.utils.DomainsManagements;
-import mdd.MDD;
-import mdd.operations.Operation;
-import representation.MDDPrinter;
+import utils.confidence.ConfidenceDomainsGenerator;
+import utils.DomainsManagements;
 import structures.Domains;
 import utils.ArgumentParser;
 import utils.SmallMath;
@@ -32,8 +28,14 @@ public class Main {
         Domains domains = DomainsManagements.getDomains(dataFile);
 
 
+        double t1 = SmallMath.log(1, 14, 10, 8, false);
+        double t2 = SmallMath.log(0.00000000000001, 10, 10, true);
+        double t = Math.log10(0.00000000000001);
+
+        System.out.println(SmallMath.log(2, 2, 10, true));
+
         //ConfidenceTests.testLogInt2(null, gamma, precision, epsilon, 15, n, domains);
-        ConfidenceTests.testLogInt3(gamma, precision, epsilon, 15, n, domains);
+        //ConfidenceTests.testLogInt3(gamma, precision, epsilon, 15, n, domains);
         //ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
 
         /*
