@@ -9,6 +9,7 @@ import structures.Binder;
 import structures.arrays.ArrayOfBoolean;
 import structures.arrays.ArrayOfMDD;
 import structures.arrays.ArrayOfNode;
+import structures.generics.MapOf;
 import structures.generics.SetOf;
 import utils.Logger;
 
@@ -32,6 +33,19 @@ public class Operation {
         return negation;
     }
 
+    public static double probability(MDD mdd, MapOf<Integer, Double>[] P){
+        if(mdd.getTt() == null) return 0;
+        if(mdd.getTt() == mdd.getRoot()) return 0;
+        // Initialize the count of solution of each node to 0 (result of an addition)
+        for(int i = 0; i < mdd.size(); i++) for(Node x : mdd.getLayer(i)) x.s = 0;
+        mdd.getTt().s = 1; // First case -> multiplication (so init at 1 NOT 0 !)
+        for(int i = mdd.size() - 2; i  >= 0; i--){
+            for(Node x : mdd.getLayer(i)){
+                for(int arc : x.getChildren())  x.s += x.getChild(arc).s * P[i].get(arc);
+            }
+        }
+        return mdd.getRoot().s;
+    }
 
     //**************************************//
     //          BINARY OPERATIONS           //
