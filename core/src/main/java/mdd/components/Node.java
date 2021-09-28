@@ -24,7 +24,6 @@ public class Node implements Allocable {
     // Index in Memory
     private final int allocatedIndex;
 
-    public double s = 0;
     private OutArcs children;
     private InArcs parents;
     private ArrayOfNode associations;
@@ -418,7 +417,6 @@ public class Node implements Allocable {
         Memory.free(children);
         Memory.free(parents);
         Memory.free(associations);
-        s = 0;
         dealloc();
     }
 

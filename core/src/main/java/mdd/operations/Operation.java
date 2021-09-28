@@ -37,26 +37,43 @@ public class Operation {
     public static double probability(MDD mdd, MapOf<Integer, Double>[] P, int precision, boolean ceil){
         if(mdd.getTt() == null) return 0;
         if(mdd.getTt() == mdd.getRoot()) return 0;
+        MapOf<Node, Double> currentLayer = Memory.MapOfNodeDouble();
+        MapOf<Node, Double> next = Memory.MapOfNodeDouble(), tmp;
+
         double divisor = Math.pow(10, precision);
-        // Initialize the count of solution of each node to 0 (result of an addition)
-        for(int i = 0; i < mdd.size(); i++) for(Node x : mdd.getLayer(i)) x.s = 0;
-        mdd.getTt().s = divisor; // First case -> multiplication (so init at 1 NOT 0 !)
+        // First case -> multiplication (so init at *1* NOT 0 !)
+        currentLayer.put(mdd.getTt(), divisor);
         if(ceil) {
             for (int i = mdd.size() - 2; i >= 0; i--) {
                 for (Node x : mdd.getLayer(i)) {
+                    double sum = 0;
                     for (int arc : x.getChildren())
-                        x.s += SmallMath.multiplyCeil(x.getChild(arc).s, P[i].get(arc), divisor);
+                       sum += SmallMath.multiplyCeil(currentLayer.get(x.getChild(arc)), P[i].get(arc), divisor);
+                    next.put(x, sum);
                 }
+                currentLayer.clear();
+                tmp = currentLayer;
+                currentLayer = next;
+                next = tmp;
             }
         } else {
             for (int i = mdd.size() - 2; i >= 0; i--) {
                 for (Node x : mdd.getLayer(i)) {
+                    double sum = 0;
                     for (int arc : x.getChildren())
-                        x.s += SmallMath.multiplyFloor(x.getChild(arc).s, P[i].get(arc), divisor);
+                        sum += SmallMath.multiplyFloor(currentLayer.get(x.getChild(arc)), P[i].get(arc), divisor);
+                    next.put(x, sum);
                 }
+                currentLayer.clear();
+                tmp = currentLayer;
+                currentLayer = next;
+                next = tmp;
             }
         }
-        return mdd.getRoot().s / divisor;
+        double result = currentLayer.get(mdd.getRoot()) / divisor;
+        Memory.free(currentLayer);
+        Memory.free(next);
+        return result;
     }
 
     //**************************************//

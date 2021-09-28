@@ -422,15 +422,29 @@ public class MDD implements Allocable {
     public double nSolutions(){
         if(tt == null) return 0;
         if(tt == root) return 0;
-        // Initialize the count of solution of each node to 0
-        for(int i = 0; i < size; i++) for(Node x : getLayer(i)) x.s = 0;
-        root.s = 1;
-        for(int i = 0; i < size; i++){
+
+        MapOf<Node, Double> currentLayer = Memory.MapOfNodeDouble();
+        MapOf<Node, Double> next = Memory.MapOfNodeDouble(), tmp;
+
+        currentLayer.put(tt, 1.0);
+
+        for(int i = size - 2; i >= 0; i--){
             for(Node x : getLayer(i)){
-                for(int arc : x.getChildren()) x.getChild(arc).s += x.s;
+                double sum = 0;
+                for(int arc : x.getChildren()) sum += currentLayer.get(x.getChild(arc));
+                next.put(x, sum);
             }
+            currentLayer.clear();
+            tmp = currentLayer;
+            currentLayer = next;
+            next = tmp;
         }
-        return tt.s;
+        double result = currentLayer.get(root);
+
+        Memory.free(currentLayer);
+        Memory.free(next);
+
+        return result;
     }
 
     //**************************************//

@@ -115,6 +115,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<MapOf<Node, Double>> mapOfNodeDoublePool = new MemoryPool<>();
+    public static MapOf<Node, Double> MapOfNodeDouble(){
+        MapOf<Node, Double> object = mapOfNodeDoublePool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfNodeDoublePool);
+            mapOfNodeDoublePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
 
     //**************************************//
     //                SETS                  //
