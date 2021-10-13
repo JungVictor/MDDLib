@@ -3,7 +3,7 @@ package pmdd.components.properties;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.MapOf;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 
 /**
  * SUM CONSTRAINT

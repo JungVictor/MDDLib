@@ -2,7 +2,7 @@ package pmdd.components.properties;
 
 import memory.AllocatorOf;
 import memory.Memory;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 import structures.arrays.ArrayOfTupleOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;

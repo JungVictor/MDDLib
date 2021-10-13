@@ -1,7 +1,7 @@
 package structures.arrays;
 
 import memory.AllocatorOf;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 
 public class ArrayOfTupleOfInt extends ArrayOf<TupleOfInt> {
 

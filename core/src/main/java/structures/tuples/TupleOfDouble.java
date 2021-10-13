@@ -1,4 +1,4 @@
-package structures.integers;
+package structures.tuples;
 
 import memory.Allocable;
 import memory.AllocatorOf;

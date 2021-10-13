@@ -13,7 +13,7 @@ import problems.carsequencing.CarSequencingData;
 import structures.arrays.ArrayOfMDD;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 import utils.Logger;
 
 public class CarSequencing {

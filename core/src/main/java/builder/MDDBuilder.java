@@ -11,7 +11,7 @@ import structures.Domains;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 
 import java.math.BigInteger;
 

@@ -303,6 +303,28 @@ public class MDD implements Allocable {
     }
 
     /**
+     * Replace the values of all arcs according to the given mapping, from layer start to layer stop.
+     * For instance, you want to replace all arcs with value 0 by [1, 2] :
+     * all you have to do is make a mapping 0 -> {1, 2} and give it as an input.
+     * This function takes an array of map, so that you can have a map for each layer.
+     * mapping[0] corresponds to the mapping for layer "start".
+     * @param mapping The mapping of the values
+     * @param start The first layer of the operation
+     * @param stop The last layer of the operation
+     */
+    public void replace(MapOf<Integer, SetOf<Integer>>[] mapping, int start, int stop){
+        SetOf<Integer> setV = Memory.SetOfInteger();
+        for(int i = start; i < stop - 1; i++){
+            this.D.get(i).clear();
+            for(Node node : getLayer(i)) {
+                node.replace(mapping[i-start], setV);
+                this.D.get(i).add(setV);
+            }
+        }
+        Memory.free(setV);
+    }
+
+    /**
      * Replace the values of all arcs according to the map : [ 0 -> V0, 1 -> V1 ].
      * Simplification of the main function to use with binary MDDs.
      * @param V0 All values associated to 0

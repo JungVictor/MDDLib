@@ -3,7 +3,7 @@ package builder.constraints.parameters;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.MapOf;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 
 import java.util.Set;
 

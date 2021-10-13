@@ -3,7 +3,7 @@ package memory;
 import mdd.components.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.integers.TupleOfInt;
+import structures.tuples.TupleOfInt;
 import structures.lists.ListOfInt;
 
 /**

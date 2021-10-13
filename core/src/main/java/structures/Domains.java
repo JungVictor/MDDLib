@@ -45,7 +45,7 @@ public class Domains implements Allocable {
     //**************************************//
 
     public void add(int index){
-        domains.add(index, Memory.SetOfInteger());
+        while(domains.size() <= index) domains.add(Memory.SetOfInteger());
     }
 
     public void put(int index, int value){
