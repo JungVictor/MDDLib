@@ -10,15 +10,19 @@ public class StochasticVariableTest {
         StochasticVariable gamma = StochasticVariable.create(4);
         StochasticVariable delta = StochasticVariable.create(4);
 
-        alpha.setQuantity(2000, 10000);
+        alpha.setQuantity(0, 3000);
+        beta.setQuantity(0, 5000);
+        gamma.setQuantity(0, 10000);
 
-        alpha.setValue(6000, 6000);
-        beta.setValue(3000, 3000);
+        alpha.setValue(9000, 9000);
+        beta.setValue(6000, 6000);
+        gamma.setValue(1000, 1000);
 
+        StochasticVariable[] X = {alpha, beta, gamma};
 
-        StochasticVariable[] X = {alpha, beta};
-
-        long res = Stochastic.packByNonDecreasingCost(X, alpha, 5000, 4);
+        long res = Stochastic.lowerbound(X, alpha, 5000, 4);
+        System.out.println(res);
+        res = Stochastic.upperbound(X, alpha, 5000, 4);
         System.out.println(res);
     }
 
