@@ -5,6 +5,7 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.tuples.TupleOfLong;
+import utils.Logger;
 
 public class StochasticVariable implements Allocable {
 
