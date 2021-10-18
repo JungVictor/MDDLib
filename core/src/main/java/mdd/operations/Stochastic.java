@@ -63,8 +63,8 @@ public class Stochastic {
      */
     public static long upperbound(StochasticVariable[] X, StochasticVariable pivot, long threshold, int precision){
         ArrayOfLong quantities = ArrayOfLong.create(X.length);
-        long one = (long) Math.pow(10, precision);
-        long maxQuantity = one;
+        double one = Math.pow(10, precision);
+        long maxQuantity = (long) one;
         long currentValue = 0;
         int pivotPos = -1;
         long lowerboundSum = 0;
@@ -76,25 +76,26 @@ public class Stochastic {
             if(X[i].getMinQuantity() == 0) continue;
 
             quantities.set(i, Math.min(maxQuantity, X[i].getMinQuantity()));
-            currentValue += (quantities.get(i) * X[i].getMaxValue()) / one;
+            currentValue += quantities.get(i) * X[i].getMaxValue();
             maxQuantity -= X[i].getMinQuantity();
             lowerboundSum += X[i].getMinQuantity();
         }
 
         // Fill from largest to smallest value
         for(int i = 0; i < X.length; i++){
-            if(X[i] == pivot) pivotPos = i;
             if(maxQuantity <= 0) continue;
             // Already a min value
             if(quantities.get(i) != 0) {
                 quantities.set(i, Math.min(maxQuantity+X[i].getMinQuantity(), X[i].getMaxQuantity()));
-                currentValue += ((quantities.get(i) - X[i].getMinQuantity()) * X[i].getMaxValue()) / one;
+                currentValue += (quantities.get(i) - X[i].getMinQuantity()) * X[i].getMaxValue();
             } else {
                 quantities.set(i, Math.min(maxQuantity, X[i].getMaxQuantity()));
-                currentValue += (quantities.get(i) * X[i].getMaxValue()) / one;
+                currentValue += quantities.get(i) * X[i].getMaxValue();
             }
             maxQuantity -= X[i].getMaxQuantity() - X[i].getMinQuantity();
         }
+
+        currentValue = (long) Math.floor(currentValue / one);
 
         long quantity = quantities.get(pivotPos);
         // If we maxxed up until the pivot
@@ -104,9 +105,7 @@ public class Stochastic {
         }
 
         long swappable = pivot.getMaxQuantity() - quantity;
-        long pivotValue = 0;
         long swapValue = 0;
-
 
         for(int i = X.length - 1; i >= 0; i--){
             // Empty
@@ -120,24 +119,23 @@ public class Stochastic {
             swappable = Math.min(quantities.get(i) - X[i].getMinQuantity(), pivot.getMaxQuantity() - quantity);
             if(swappable == 0) continue;
 
-            pivotValue = ((quantity - pivot.getMinQuantity()) * pivot.getMaxValue()) / one;
-            swapValue = (swappable * X[i].getMaxValue()) / one;
+            swapValue = (long) Math.floor((swappable * X[i].getMaxValue()) / one);
 
-            long reserved = (currentValue - pivotValue - swapValue);
+            long reserved = (currentValue - swapValue);
             long minSwapValue = threshold - reserved;
 
             long swap = pivot.maxSwappingQuantity(X[i], minSwapValue, swappable, precision);
+            if(swap > swappable) swap = swappable;
             if(swap < 0) {
-                if (X[i].getMaxValue() >= pivot.getMaxValue()) swap = swappable - (one + swap);
+                if (X[i].getMaxValue() >= pivot.getMaxValue()) swap = (long) (swappable - (one + swap));
                 else break;
                 if(swap > swappable) break;
             }
             swap = Math.min(swap, pivot.getMaxQuantity());
             quantity += swap;
-            currentValue += ((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one;
+            currentValue += Math.floor(((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one);
             quantities.set(i, quantities.get(i) - swap);
             quantities.set(pivotPos, quantity);
-
         }
         if(quantity < 0) return 0;
 
@@ -147,8 +145,8 @@ public class Stochastic {
 
     public static long lowerbound(StochasticVariable[] X, StochasticVariable pivot, long threshold, int precision){
         ArrayOfLong quantities = ArrayOfLong.create(X.length);
-        long one = (long) Math.pow(10, precision);
-        long maxQuantity = one;
+        double one = Math.pow(10, precision);
+        long maxQuantity = (long) one;
         long currentValue = 0;
         int pivotPos = -1;
 
@@ -158,27 +156,30 @@ public class Stochastic {
             if(maxQuantity <= 0) continue;
             if(X[i].getMinQuantity() == 0) continue;
 
-            quantities.set(i, Math.min(maxQuantity, X[i].getMinQuantity()));
-            currentValue += (quantities.get(i) * X[i].getMaxValue()) / one;
+            quantities.set(i, X[i].getMinQuantity());
+            currentValue += quantities.get(i) * X[i].getMaxValue();
             maxQuantity -= X[i].getMinQuantity();
         }
 
+        // If we can't reach all minimum, impossible
+        if(maxQuantity < 0) return -1;
+
         // Fill from largest to smallest value
         for(int i = 0; i < X.length; i++){
-            if(X[i] == pivot) pivotPos = i;
             if(maxQuantity <= 0) continue;
 
             // Already a min value
             if(quantities.get(i) != 0) {
                 quantities.set(i, Math.min(maxQuantity+X[i].getMinQuantity(), X[i].getMaxQuantity()));
-                currentValue += ((quantities.get(i) - X[i].getMinQuantity()) * X[i].getMaxValue()) / one;
+                currentValue += (quantities.get(i) - X[i].getMinQuantity()) * X[i].getMaxValue();
             } else {
                 quantities.set(i, Math.min(maxQuantity, X[i].getMaxQuantity()));
-                currentValue += (quantities.get(i) * X[i].getMaxValue()) / one;
+                currentValue += quantities.get(i) * X[i].getMaxValue();
             }
             maxQuantity -= X[i].getMaxQuantity() - X[i].getMinQuantity();
         }
 
+        currentValue = (long) Math.floor(currentValue / one);
         long quantity = quantities.get(pivotPos);
         // If we maxxed up until the pivot
         if(quantity == pivot.getMinQuantity()) {
@@ -192,34 +193,37 @@ public class Stochastic {
 
         for(int i = 0; i < X.length; i++){
 
-            // Empty
+            // Full
             if(quantities.get(i) >= X[i].getMaxQuantity()) continue;
             if(i == pivotPos) continue;
-            if(quantity <= 0) continue;
+            if(quantity <= 0) break;
 
             // If we try to go up but we can only go down, stop
             if (currentValue <= threshold && pivot.getMaxValue() >= X[i].getMaxValue()) break;
 
             swappable = Math.min(quantity - pivot.getMinQuantity(), X[i].getMaxQuantity() - quantities.get(i));
-            pivotValue = (swappable * pivot.getMaxValue()) / one;
+
+
+            pivotValue = (long) Math.floor((swappable * pivot.getMaxValue()) / one);
 
             long reserved = (currentValue - pivotValue);
-            //long locked = (quantities.get(i) * X[i].getMaxValue()) / one;
             long minSwapValue = threshold - reserved;
 
-            long swap = X[i].maxSwappingQuantity(pivot, minSwapValue, swappable, precision);
+            long swap;
+            if(minSwapValue <= 0) swap = swappable;
+            else swap = X[i].maxSwappingQuantity(pivot, minSwapValue, swappable, precision);
             if(swap > swappable) swap = swappable;
 
             quantity -= swap;
-            currentValue += ((X[i].getMaxValue() - pivot.getMaxValue()) * swap) / one;
+            currentValue += Math.floor(((X[i].getMaxValue() - pivot.getMaxValue()) * swap) / one);
             quantities.set(i, quantities.get(i) + swap);
             quantities.set(pivotPos, quantity);
         }
 
         // Can remove some quantity
-        if(currentValue > threshold) {
+        if(currentValue > threshold && quantity > 0) {
             long exceed = currentValue - threshold;
-            quantity = quantity - (exceed * one) / pivot.getMaxValue();
+            quantity = (long) Math.floor(quantity - (exceed * one) / pivot.getMaxValue());
         }
         return quantity;
     }

@@ -197,6 +197,7 @@ class StochasticTest {
     }
 
     @Test
+    // Rounding errors...
     void instance7(){
         long threshold = 5000;
 
@@ -205,13 +206,15 @@ class StochasticTest {
         gamma.setQuantity(0, 6666);
         delta.setQuantity(0, 5000);
 
+        beta.setValue(6000, 6000);
+
         StochasticVariable[] X = {alpha, beta, gamma, delta};
 
         long[][] expected = {
                 {0, 2000},
-                {4000, 8000},
-                {0, 4000},
-                {0, 2000}
+                {1997, 10000},
+                {0, 6003},
+                {0, 4000}
         };
 
         for(int i = 0; i < X.length; i++) {
@@ -265,7 +268,7 @@ class StochasticTest {
         StochasticVariable[] X = {alpha, beta, gamma};
 
         long[][] expected = {
-                {2286, 10000},
+                {2285, 10000},
                 {0, 5000},
                 {0, 1000},
         };
