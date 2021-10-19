@@ -51,13 +51,10 @@ class StochasticTest {
                 {0, 0}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -79,13 +76,10 @@ class StochasticTest {
                 {0, 2500}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -105,13 +99,11 @@ class StochasticTest {
                 {0, 3333}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -131,13 +123,10 @@ class StochasticTest {
                 {0, 3333}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -157,13 +146,10 @@ class StochasticTest {
                 {1000, 3333}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -190,13 +176,10 @@ class StochasticTest {
                 {0, 5000}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -221,13 +204,10 @@ class StochasticTest {
                 {0, 4000}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
     @Test
@@ -251,13 +231,10 @@ class StochasticTest {
                 {0, 4000}
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -279,13 +256,10 @@ class StochasticTest {
                 {3250, 5500},
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 
@@ -307,13 +281,10 @@ class StochasticTest {
                 {0, 1000},
         };
 
-        for(int i = 0; i < X.length; i++) {
-            pivot = X[i];
-            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][0], lb);
+        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
 
-            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
-            assertEquals(expected[i][1], ub);
+        for(int i = 0; i < expected.length; i++) {
+            for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
         }
     }
 }

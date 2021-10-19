@@ -18,6 +18,7 @@ public class StochasticVariable implements Allocable {
     private TupleOfLong quantity;
     private TupleOfLong value;
 
+
     //**************************************//
     //              CONSTRUCTOR             //
     //**************************************//
@@ -57,23 +58,86 @@ public class StochasticVariable implements Allocable {
     }
 
     //**************************************//
+    //               SPECIALS               //
+    //**************************************//
+
+    @Override
+    public String toString(){
+        return "Q: ["+getMinQuantity()+", " + getMaxQuantity() + "] - V: ["+getMinValue()+", " + getMaxValue() + "]";
+    }
+
+    //**************************************//
     //              OPERATIONS              //
     //**************************************//
 
-    public long maxSwappingQuantity(StochasticVariable x, long minValue, long quantity, int precision){
+    /**
+     * Return the maximum amount of quantity that can be swapped using the max value of the variables.
+     * @param x The variable from which we take some quantity
+     * @param minValue The minimal value to obtain by swapping quantities
+     * @param quantity The quantity that we can swap
+     * @param precision The precision of the variables
+     * @return The maximum amount of quantity that can be swapped from x to this
+     */
+    public long maxSwappingQuantityMax(StochasticVariable x, long minValue, long quantity, int precision){
         long one = (long) Math.pow(10, precision);
         long currentValue = (quantity * x.getMaxValue());
         if(getMaxValue() == x.getMaxValue()) return quantity;
         long res = (currentValue - minValue * one) / (x.getMaxValue() - getMaxValue());
-        if(res <= 0 && quantity * getMaxValue() >= minValue * one) return quantity;
+        if(res <= 0){
+            if(quantity * getMaxValue() >= minValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
+        if(res >= quantity) {
+            if(quantity * getMaxValue() >= minValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
         return res;
     }
 
-    public long minSwappingQuantity(StochasticVariable x, long maxValue, long quantity, int precision){
+    /**
+     * Return the maximum amount of quantity that can be swapped using the min value of the variables.
+     * @param x The variable from which we take some quantity
+     * @param minValue The minimal value to obtain by swapping quantities
+     * @param quantity The quantity that we can swap
+     * @param precision The precision of the variables
+     * @return The maximum amount of quantity that can be swapped from x to this
+     */
+    public long maxSwappingQuantityMin(StochasticVariable x, long minValue, long quantity, int precision){
         long one = (long) Math.pow(10, precision);
-        long currentValue = (quantity * getMaxValue());
+        long currentValue = (quantity * x.getMinValue());
+        if(getMinValue() == x.getMinValue()) return quantity;
+        long res = (currentValue - minValue * one) / (x.getMinValue() - getMinValue());
+        if(res <= 0){
+            if(quantity * getMinValue() >= minValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
+        if(res >= quantity) {
+            if(quantity * getMinValue() >= minValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
+        return res;
+    }
+
+    public long minSwappingQuantityMax(StochasticVariable x, long maxValue, long quantity, int precision){
+        long one = (long) Math.pow(10, precision);
+        long currentValue = (quantity * x.getMaxValue());
         if(getMaxValue() == x.getMaxValue()) return quantity;
-        return (currentValue - maxValue * one) / (getMaxValue() - x.getMaxValue());
+        long res = (currentValue - maxValue * one) / (x.getMaxValue() - getMaxValue());
+        if(res <= 0){
+            if(quantity * getMaxValue() <= maxValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
+        if(res >= quantity) {
+            if(quantity * getMaxValue() <= maxValue * one) return quantity;
+            // Error : -1 ?
+            return 0;
+        }
+        return res;
     }
 
 
