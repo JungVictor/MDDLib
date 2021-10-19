@@ -35,7 +35,8 @@ class StochasticTest {
     *********************/
     @Test
     void instance1(){
-        long threshold = 6000;
+        long minThreshold = 6000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(5000, 6000);
         beta.setQuantity(0, 2000);
@@ -51,7 +52,7 @@ class StochasticTest {
                 {0, 0}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -60,7 +61,8 @@ class StochasticTest {
 
     @Test
     void instance2(){
-        long threshold = 6000;
+        long minThreshold = 6000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 10000);
         beta.setQuantity(0, 10000);
@@ -76,7 +78,7 @@ class StochasticTest {
                 {0, 2500}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -85,7 +87,8 @@ class StochasticTest {
 
     @Test
     void instance3(){
-        long threshold = 6000;
+        long minThreshold = 6000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 10000);
         beta.setQuantity(0, 8000);
@@ -100,7 +103,7 @@ class StochasticTest {
         };
 
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -109,7 +112,8 @@ class StochasticTest {
 
     @Test
     void instance4(){
-        long threshold = 6000;
+        long minThreshold = 6000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(5000, 10000);
         beta.setQuantity(0, 1000);
@@ -123,7 +127,7 @@ class StochasticTest {
                 {0, 3333}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -132,7 +136,8 @@ class StochasticTest {
 
     @Test
     void instance5(){
-        long threshold = 6000;
+        long minThreshold = 6000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(5000, 10000);
         beta.setQuantity(0, 4000);
@@ -146,7 +151,7 @@ class StochasticTest {
                 {1000, 3333}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -160,7 +165,8 @@ class StochasticTest {
 
     @Test
     void instance6(){
-        long threshold = 5000;
+        long minThreshold = 5000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 10000);
         beta.setQuantity(0, 10000);
@@ -176,7 +182,7 @@ class StochasticTest {
                 {0, 5000}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -186,7 +192,8 @@ class StochasticTest {
     @Test
         // Rounding errors...
     void instance7(){
-        long threshold = 5000;
+        long minThreshold = 5000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 2000);
         beta.setQuantity(0, 10000);
@@ -204,7 +211,7 @@ class StochasticTest {
                 {0, 4000}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -213,7 +220,8 @@ class StochasticTest {
     @Test
         // Rounding errors...
     void instance7b(){
-        long threshold = 5000;
+        long minThreshold = 5000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 2000);
         beta.setQuantity(0, 10000);
@@ -231,7 +239,7 @@ class StochasticTest {
                 {0, 4000}
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -240,7 +248,8 @@ class StochasticTest {
 
     @Test
     void instance8(){
-        long threshold = 5000;
+        long minThreshold = 5000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 1000);
         beta.setQuantity(0, 5000);
@@ -256,7 +265,7 @@ class StochasticTest {
                 {3250, 5500},
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
@@ -265,7 +274,8 @@ class StochasticTest {
 
     @Test
     void instance9(){
-        long threshold = 5000;
+        long minThreshold = 5000;
+        long maxThreshold = 10000;
 
         alpha.setQuantity(0, 10000);
         beta.setQuantity(0, 5000);
@@ -281,7 +291,7 @@ class StochasticTest {
                 {0, 1000},
         };
 
-        long[][] actual = Stochastic.computeBounds(X, threshold, 10000, 4);
+        long[][] actual = Stochastic.computeBounds(X, minThreshold, maxThreshold, 4);
 
         for(int i = 0; i < expected.length; i++) {
             for(int j = 0; j < expected[i].length; j++) assertEquals(actual[i][j], expected[i][j]);
