@@ -63,7 +63,17 @@ public class StochasticVariable implements Allocable {
     public long maxSwappingQuantity(StochasticVariable x, long minValue, long quantity, int precision){
         long one = (long) Math.pow(10, precision);
         long currentValue = (quantity * x.getMaxValue());
-        return (currentValue - minValue * one) / (x.getMaxValue() - getMaxValue());
+        if(getMaxValue() == x.getMaxValue()) return quantity;
+        long res = (currentValue - minValue * one) / (x.getMaxValue() - getMaxValue());
+        if(res <= 0 && quantity * getMaxValue() >= minValue * one) return quantity;
+        return res;
+    }
+
+    public long minSwappingQuantity(StochasticVariable x, long maxValue, long quantity, int precision){
+        long one = (long) Math.pow(10, precision);
+        long currentValue = (quantity * getMaxValue());
+        if(getMaxValue() == x.getMaxValue()) return quantity;
+        return (currentValue - maxValue * one) / (getMaxValue() - x.getMaxValue());
     }
 
 

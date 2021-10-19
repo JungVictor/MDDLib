@@ -284,4 +284,137 @@ public class Stochastic {
         return quantity;
     }
 
+    public static long upperbound_(StochasticVariable[] X, StochasticVariable pivot, long minThreshold, long maxThreshold, int precision){
+        // The array of distribution
+        ArrayOfLong quantities = ArrayOfLong.create(X.length);
+        double one = Math.pow(10, precision);
+        // The amount we can distribute among the variables
+        long maxQuantity = (long) one;
+        // The current value of the distribution
+        long currentValue = 0;
+        // The position of the pivot in the array X
+        int pivotPos = -1;
+        // The sum of all lower bounds (minimum quantities)
+        long lowerboundSum = 0;
+
+        // Set first all minimum quantity
+        for(int i = 0; i < X.length; i++){
+            if(X[i] == pivot) pivotPos = i;
+            if(maxQuantity <= 0) continue;
+            if(X[i].getMinQuantity() == 0) continue;
+
+            quantities.set(i, Math.min(maxQuantity, X[i].getMinQuantity()));
+            currentValue += quantities.get(i) * X[i].getMaxValue();
+            maxQuantity -= X[i].getMinQuantity();
+            lowerboundSum += X[i].getMinQuantity();
+        }
+
+
+
+        // If we can't reach all minimum, impossible
+        if(maxQuantity < 0) return -1;
+        // If by doing the minimum we are above the threshold (up)
+        if(maxThreshold * one < currentValue) return -1;
+
+        maxQuantity += quantities.get(pivotPos);
+        long maxToAdd = (long) Math.floor(((maxThreshold * one - currentValue)) / pivot.getMaxValue());
+        maxToAdd = Math.min(maxToAdd + pivot.getMinQuantity(), pivot.getMaxQuantity());
+        quantities.set(pivotPos, Math.min(maxQuantity, maxToAdd));
+        maxQuantity -= quantities.get(pivotPos);
+
+        // Fill from largest to smallest value
+        for(int i = 0; i < X.length; i++){
+            if(maxQuantity <= 0) break;
+            if(i == pivotPos) continue;
+            maxToAdd = (long) Math.floor(((maxThreshold * one - currentValue)) / X[i].getMaxValue());
+            maxToAdd = Math.min(maxToAdd + X[i].getMinQuantity(), X[i].getMaxQuantity());
+            // Already a min value
+            if(quantities.get(i) != 0) {
+                // Compute what is added at most
+                // We empty what is left OR put the quantity to the maximum
+                quantities.set(i, Math.min(maxQuantity+X[i].getMinQuantity(), maxToAdd));
+                currentValue += (quantities.get(i) - X[i].getMinQuantity()) * X[i].getMaxValue();
+            } else {
+                quantities.set(i, Math.min(maxQuantity, maxToAdd));
+                currentValue += quantities.get(i) * X[i].getMaxValue();
+            }
+            // Remove from what is left what was added
+            maxQuantity -= X[i].getMaxQuantity() - X[i].getMinQuantity();
+        }
+
+        // The current value associated with the distribution
+        currentValue = (long) Math.floor(currentValue / one);
+
+        long quantity = quantities.get(pivotPos);
+        // If we maxxed up the pivot and previous value
+        if(quantity == pivot.getMaxQuantity() - lowerboundSum + pivot.getMinQuantity()) {
+            // If the current value is over the threshold, then it is okay
+            if (currentValue >= minThreshold) {
+                if(currentValue <= maxThreshold) return quantity;
+            }
+            // Otherwise we can't get above because all values that are greater are already full
+            else return -1;
+        }
+
+        // The amount that can be swapped
+        long swappable = 0;
+        // The value that will be swapped
+        long swapValue = 0;
+
+        System.out.println(quantities);
+
+        for(int i = X.length - 1; i >= 0; i--){
+            // Empty
+            if(quantities.get(i) <= 0) continue;
+            if(i == pivotPos) continue;
+
+            // If we try to go up but we can only go down, stop
+            if (currentValue <= minThreshold && pivot.getMaxValue() <= X[i].getMaxValue()) break;
+            // Skip if we are above the max threshold and try to swap with bigger values
+            if (currentValue >= maxThreshold && pivot.getMaxValue() >= X[i].getMaxValue()) continue;
+
+            // Min between what I can take and what I can receive
+            swappable = Math.min(quantities.get(i) - X[i].getMinQuantity(), pivot.getMaxQuantity() - quantity);
+            if(swappable == 0) continue;
+
+            // The value that will be removed (and possibly transferred)
+            swapValue = (long) Math.floor((swappable * X[i].getMaxValue()) / one);
+
+            long reserved = (currentValue - swapValue); // The value that is locked
+            long minSwapValue = minThreshold - reserved;   // What must be reached
+
+            // Compute the amount that we can swap between X[i] and the pivot
+            long swap;
+            // Decreasing the current value
+            if(pivot.getMaxValue() < X[i].getMaxValue()) {
+                if(minSwapValue <= 0) swap = swappable;
+                else swap = pivot.maxSwappingQuantity(X[i], minSwapValue, swappable, precision);
+            }
+            // Increasing the current value
+            else {
+
+            }
+            if (minSwapValue <= 0) swap = pivot.minSwappingQuantity(X[i], maxThreshold-reserved, swappable, precision);
+            else swap = pivot.maxSwappingQuantity(X[i], minSwapValue, swappable, precision);
+            if(swap > swappable) swap = swappable;
+            if(swap < 0) {
+                // If we are swapping with a smaller value
+                if (X[i].getMaxValue() >= pivot.getMaxValue()) swap = (long) (swappable - (one + swap));
+                else break;
+                if(swap > swappable) break;
+            }
+
+            // Update the quantity distribution and the current value associated with the new distribution
+            quantity += swap;
+            currentValue += Math.floor(((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one);
+            quantities.set(i, quantities.get(i) - swap);
+            quantities.set(pivotPos, quantity);
+        }
+
+        // If the pivot is empty
+        if(quantity < 0) return 0;
+
+        return quantity;
+    }
+
 }

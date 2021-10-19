@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StochasticTest {
 
-    StochasticVariable alpha, beta, gamma, delta;
+    StochasticVariable alpha, beta, gamma, delta, omega;
     StochasticVariable pivot;
 
     @BeforeEach
@@ -19,11 +19,15 @@ class StochasticTest {
         beta = StochasticVariable.create(4);
         gamma = StochasticVariable.create(4);
         delta = StochasticVariable.create(4);
+        omega = StochasticVariable.create(4);
 
         alpha.setValue(7000, 7000);
         beta.setValue(5000, 5000);
         gamma.setValue(4000, 4000);
         delta.setValue(3000, 3000);
+        omega.setValue(0,0);
+        omega.setQuantity(0, 10000);
+
     }
 
     /********************
@@ -197,7 +201,7 @@ class StochasticTest {
     }
 
     @Test
-    // Rounding errors...
+        // Rounding errors...
     void instance7(){
         long threshold = 5000;
 
@@ -214,6 +218,36 @@ class StochasticTest {
                 {0, 2000},
                 {1997, 10000},
                 {0, 6003},
+                {0, 4000}
+        };
+
+        for(int i = 0; i < X.length; i++) {
+            pivot = X[i];
+            long lb = Stochastic.lowerbound(X, pivot, threshold, 4);
+            assertEquals(expected[i][0], lb);
+
+            long ub = Stochastic.upperbound(X, pivot, threshold, 4);
+            assertEquals(expected[i][1], ub);
+        }
+    }
+    @Test
+        // Rounding errors...
+    void instance7b(){
+        long threshold = 5000;
+
+        alpha.setQuantity(0, 2000);
+        beta.setQuantity(0, 10000);
+        gamma.setQuantity(0, 6500);
+        delta.setQuantity(0, 5000);
+
+        beta.setValue(6000, 6000);
+
+        StochasticVariable[] X = {alpha, beta, gamma, delta};
+
+        long[][] expected = {
+                {0, 2000},
+                {2000, 10000},
+                {0, 6000},
                 {0, 4000}
         };
 

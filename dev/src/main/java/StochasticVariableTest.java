@@ -15,11 +15,14 @@ public class StochasticVariableTest {
         beta.setQuantity(0, 5000);
         gamma.setQuantity(0, 10000);
 
-
         alpha.setValue(7000, 7000);
         beta.setValue(6000, 6000);
         gamma.setValue(4000, 4000);
         delta.setValue(3000, 3000);
+
+        long res = alpha.maxSwappingQuantity(beta, 6000, 10000, 4);
+        System.out.println(res);
+        System.out.println(gamma.maxSwappingQuantity(alpha, 8000, 10000, 4));
 
         long threshold = 5000;
 
