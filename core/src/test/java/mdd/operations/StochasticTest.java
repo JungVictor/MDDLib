@@ -1,6 +1,5 @@
 package mdd.operations;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import structures.StochasticVariable;
@@ -10,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class StochasticTest {
 
     StochasticVariable alpha, beta, gamma, delta, omega;
-    StochasticVariable pivot;
 
     @BeforeEach
     void init(){

@@ -84,7 +84,7 @@ public class Stochastic {
         for(int i = 0; i < X.length; i++){
             if(maxQuantity <= 0) break;
             quantities.set(i, Math.min(maxQuantity, X[i].getMaxQuantity()));
-            currentValue += quantities.get(i) * X[i].getMinValue();
+            currentValue += quantities.get(i) * X[i].getMaxValue();
             // Remove from what is left what was added
             maxQuantity -= X[i].getMaxQuantity();
         }
@@ -112,14 +112,14 @@ public class Stochastic {
             if(i == pivotPos) continue;
 
             // If we try to go up but we can only go down, stop
-            if (currentValue <= threshold && pivot.getMinValue() <= X[i].getMinValue()) break;
+            if (currentValue <= threshold && pivot.getMaxValue() <= X[i].getMaxValue()) break;
 
             // Min between what I can take and what I can receive
             swappable = Math.min(quantities.get(i), pivot.getMaxQuantity() - quantity);
             if(swappable == 0) continue;
 
             // The value that will be removed (and possibly transfered)
-            swapValue = (long) Math.floor((swappable * X[i].getMinValue()) / one);
+            swapValue = (long) Math.floor((swappable * X[i].getMaxValue()) / one);
 
             long reserved = (currentValue - swapValue); // The value that is locked
             long minSwapValue = threshold - reserved;   // What must be reached
@@ -129,7 +129,7 @@ public class Stochastic {
 
             // Update the quantity distribution and the current value associated with the new distribution
             quantity += swap;
-            currentValue += Math.floor(((pivot.getMinValue() - X[i].getMinValue()) * swap) / one);
+            currentValue += Math.floor(((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one);
             quantities.set(i, quantities.get(i) - swap);
             quantities.set(pivotPos, quantity);
         }
@@ -280,7 +280,6 @@ public class Stochastic {
             X[i].setMaxQuantity(X[i].getMaxQuantity() - X[i].getMinQuantity());
             bounds[i][0] = X[i].getMinQuantity();
             bounds[i][1] = X[i].getMinQuantity();
-            X[i].setMinQuantity(0);
         }
 
 
@@ -299,13 +298,15 @@ public class Stochastic {
         long lb, ub;
 
         for(int i = 0; i < X.length; i++){
-            ub = upperbound(X, i, minThreshold - minValueMin, maxQuantity, precision);
+            ub = upperbound(X, i, minThreshold - minValueMax, maxQuantity, precision);
             ub = Math.min(ub, upperboundMin(X, i, maxThreshold - minValueMin, maxQuantity, precision));
             lb = lowerbound(X, i, minThreshold - minValueMax, maxQuantity, precision);
 
             bounds[i][0] += lb;
             bounds[i][1] += ub;
         }
+
+        for(StochasticVariable v : X) v.setMaxQuantity(v.getMaxQuantity()+v.getMinQuantity());
 
         return bounds;
     }
