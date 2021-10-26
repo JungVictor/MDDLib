@@ -8,6 +8,8 @@ import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import utils.SmallMath;
 
+import java.util.Arrays;
+
 public class Stochastic {
 
     /**
@@ -310,4 +312,83 @@ public class Stochastic {
 
         return bounds;
     }
+
+    public static long upperboundAll(StochasticVariable[] X, long[][] bounds, long threshold, long totalQuantity, int precision){
+        // The array of distribution
+        ArrayOfLong quantities = ArrayOfLong.create(X.length);
+        double one = Math.pow(10, precision);
+        // The current value of the distribution
+        long currentValue = 0;
+
+        long maxQuantity = totalQuantity;
+
+        int lastFilled = -1;
+
+        // Fill from largest to smallest value
+        for(int i = 0; i < X.length; i++){
+            if(maxQuantity <= 0) break;
+            quantities.set(i, Math.min(maxQuantity, X[i].getMaxQuantity()));
+            currentValue += quantities.get(i) * X[i].getMaxValue();
+            // Remove from what is left what was added
+            maxQuantity -= X[i].getMaxQuantity();
+            lastFilled = i;
+            if(quantities.get(i) == X[i].getMaxQuantity()) bounds[i][1] = X[i].getMaxQuantity();
+            if(quantities.get(i) == totalQuantity) bounds[i][1] = totalQuantity;
+        }
+
+        // The current value associated with the distribution
+        currentValue = (long) Math.floor(currentValue / one);
+
+        // If the current value is below the threshold, then no solution
+        if (currentValue < threshold) return -1;
+
+        // The amount that can be swapped
+        long swappable = 0;
+        // The value that will be swapped
+        long swapValue = 0;
+
+        int lastComplete = lastFilled - 1;
+        if (lastComplete == -1) lastComplete = lastFilled;
+
+        for(int i = X.length - 1; i > lastFilled; i--) bounds[i][0] = 0;
+
+        for(int i = X.length - 1; i > lastComplete; i--){
+            // Break
+            if(lastFilled == -1) break;
+            if(i==lastFilled) lastFilled--;
+            // If we try to go up but we can only go down, stop
+            //if (currentValue < threshold) continue;
+
+            // While we didn't filled the variable or got to the lowerbound
+            while(currentValue > threshold && X[i].getMaxQuantity() > quantities.get(i)) {
+                // Min between what I can take and what I can receive
+                swappable = Math.min(quantities.get(lastFilled), X[i].getMaxQuantity()- quantities.get(i));
+                // if(swappable == 0) continue;
+                // The value that will be removed (and possibly transfered)
+                swapValue = (long) Math.floor((swappable * X[lastFilled].getMaxValue()) / one);
+
+                long reserved = (currentValue - swapValue); // The value that is locked
+                long minSwapValue = threshold - reserved;   // What must be reached
+
+                // Compute the amount that we can swap between X[i] and the pivot
+                long swap = X[i].maxSwappingQuantityMax(X[lastFilled], minSwapValue, swappable, precision);
+
+                // Update the quantity distribution and the current value associated with the new distribution
+                currentValue += Math.floor(((X[i].getMaxValue() - X[lastFilled].getMaxValue()) * swap) / one);
+                quantities.set(i, quantities.get(i) + swap);
+                quantities.set(lastFilled, quantities.get(lastFilled) - swap);
+                if (quantities.get(lastFilled) == 0) lastFilled--;
+            }
+
+            bounds[i][1] = quantities.get(i) + X[i].getMinQuantity();
+            int current = i;
+            while (i-1 > lastComplete && X[i-1].getMaxQuantity() - quantities.get(i-1) <= bounds[current][1]) bounds[--i][1] = X[i].getMaxQuantity() + X[i].getMinQuantity();
+            if(i == 0) break;
+            currentValue += Math.floor(((X[i-1].getMaxValue() - X[current].getMaxValue()) * quantities.get(current)) / one);
+            quantities.set(i-1, quantities.get(current) + quantities.get(i-1));
+            quantities.set(current, 0);
+        }
+        return lastComplete;
+    }
+
 }
