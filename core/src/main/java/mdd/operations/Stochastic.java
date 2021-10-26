@@ -173,7 +173,8 @@ public class Stochastic {
     public static long lowerbound(StochasticVariable[] X, int pivotPos, long threshold, long maxQuantity, int precision){
         // The array of distribution
         ArrayOfLong quantities = ArrayOfLong.create(X.length);
-        double one = Math.pow(10, precision);
+        double one = Math.pow(10, precision-1);
+        threshold *= 10;
         // The current value of the distribution
         long currentValue = 0;
         // The position of the pivot in the array X
@@ -233,7 +234,7 @@ public class Stochastic {
             // The value that we must reach by doing the swap
             long minSwapValue = threshold - reserved;
 
-            long swap = X[i].maxSwappingQuantityMax(pivot, minSwapValue, swappable, precision);
+            long swap = X[i].maxSwappingQuantityMax(pivot, minSwapValue, swappable, precision-1);
 
             // Update the quantity distribution and the current value associated with the new distribution
             quantity -= swap;
