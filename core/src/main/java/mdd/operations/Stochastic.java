@@ -303,11 +303,10 @@ public class Stochastic {
         // it means that all variable AFTER lastFilled already have their lowerbound (= 0), so no need to
         // compute it again
         long lastFilled = upperboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
+        lastFilled = lowerboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
 
         // Compute the lowerbound of biggest value, up to lastFilled
-        for(int i = 0; i <= lastFilled; i++){
-            bounds[i][0] = lowerbound(X, i, minThreshold - minValueMax, maxQuantity, precision);
-        }
+        //for(int i = 0; i <= lastFilled; i++) bounds[i][0] = lowerbound(X, i, minThreshold - minValueMax, maxQuantity, precision);
 
         // Perform the upperbound with the <= threshold
         // The final upperbound is the lowest of both <= threshold and >= threshold
@@ -375,8 +374,6 @@ public class Stochastic {
         int lastComplete = lastFilled - 1;
         if (lastComplete == -1) lastComplete = lastFilled;
 
-        for(int i = X.length - 1; i > lastFilled; i--) bounds[i][0] = 0;
-
         for(int i = X.length - 1; i > lastComplete; i--){
             // Break
             if(lastFilled == -1) break;
@@ -413,6 +410,97 @@ public class Stochastic {
             currentValue += Math.floor(((X[i-1].getMaxValue() - X[current].getMaxValue()) * quantities.get(current)) / one);
             quantities.set(i-1, quantities.get(current) + quantities.get(i-1));
             quantities.set(current, 0);
+        }
+        return lastComplete+1;
+    }
+
+
+    public static long lowerboundAll(StochasticVariable[] X, long[][] bounds, long threshold, long totalQuantity, int precision){
+        int acceptableRoundingDifference = 2;
+        // The array of distribution
+        ArrayOfLong quantities = ArrayOfLong.create(X.length + 1);
+        double one = Math.pow(10, precision - 1);
+        threshold *= 10;
+        // The current value of the distribution
+        long currentValue = 0;
+
+        long maxQuantity = totalQuantity;
+
+        int lastFilled = -1;
+
+        // Fill from largest to smallest value
+        for(int i = 0; i < X.length; i++){
+            if(maxQuantity <= 0) break;
+            quantities.set(i, Math.min(maxQuantity, X[i].getMaxQuantity()));
+            currentValue += quantities.get(i) * X[i].getMaxValue();
+            // Remove from what is left what was added
+            maxQuantity -= X[i].getMaxQuantity();
+            lastFilled = i;
+        }
+
+        // The current value associated with the distribution
+        currentValue = (long) Math.floor(currentValue / one);
+
+        // If the current value is below the threshold, then no solution
+        if (currentValue < threshold) return -1;
+
+        // The amount that can be swapped
+        long swappable = 0;
+        // The value that will be swapped
+        long swapValue = 0;
+
+        int lastComplete = lastFilled;
+        if (lastComplete == -1) lastComplete = lastFilled;
+
+        // Update max bounds ?
+        for(int i = X.length - 1; i > lastFilled; i--) bounds[i][0] = 0;
+
+        StochasticVariable pivot = X[lastFilled];
+        StochasticVariable fake = StochasticVariable.create(0, (long) one * 10, 0, 0);
+
+        for(int i = 0; i <= lastComplete; i++){
+            // Break
+            if(i == lastFilled) lastFilled++;
+            if(lastFilled == X.length) pivot = fake;
+            else if(lastFilled > X.length) break;
+            else pivot = X[lastFilled];
+
+            // While we didn't filled the variable or got to the lowerbound
+            while(currentValue > threshold + acceptableRoundingDifference && quantities.get(i) > 0) {
+                // Min between what I can take and what I can receive
+                swappable = Math.min(quantities.get(i), pivot.getMaxQuantity() - quantities.get(lastFilled));
+                // if(swappable == 0) continue;
+                // The value that will be removed (and possibly transfered)
+                swapValue = (long) Math.floor((swappable * X[i].getMaxValue()) / one);
+
+                long reserved = (currentValue - swapValue); // The value that is locked
+                long minSwapValue = threshold - reserved;   // What must be reached
+
+                // Compute the amount that we can swap between X[i] and the pivot
+                long swap = pivot.maxSwappingQuantityMax(X[i], minSwapValue, swappable, precision-1);
+
+                // Update the quantity distribution and the current value associated with the new distribution
+                currentValue += Math.floor(((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one);
+                quantities.set(lastFilled, quantities.get(lastFilled) + swap);
+                quantities.set(i, quantities.get(i) - swap);
+                if (quantities.get(lastFilled) == pivot.getMaxQuantity()) {
+                    lastFilled++;
+                    if(lastFilled == X.length) pivot = fake;
+                    else if(lastFilled > X.length) break;
+                    else pivot = X[lastFilled];
+                }
+            }
+
+            bounds[i][0] = quantities.get(i);
+            int current = i;
+            while (i+1 <= lastComplete && quantities.get(i+1) <= X[current].getMaxQuantity() - bounds[current][0]) i++;
+            if(i == X.length - 1) break;
+
+            long preswap = X[current].getMaxQuantity() - quantities.get(current);
+            currentValue += Math.floor(((X[current].getMaxValue() - X[i+1].getMaxValue()) * preswap) / one);
+
+            quantities.set(i+1, quantities.get(i+1) - preswap);
+            quantities.set(current, X[current].getMaxQuantity());
         }
         return lastComplete+1;
     }

@@ -72,7 +72,7 @@ class StochasticTest {
         long[][] expected = {
                 {5000, 10000},
                 {0, 5000},
-                {0, 3333},
+                {0, 3334},
                 {0, 2500}
         };
 
@@ -97,7 +97,7 @@ class StochasticTest {
         long[][] expected = {
                 {5000, 10000},
                 {0, 5000},
-                {0, 3333}
+                {0, 3334}
         };
 
 
@@ -176,7 +176,7 @@ class StochasticTest {
         long[][] expected = {
                 {0, 10000},
                 {0, 10000},
-                {0, 6666},
+                {0, 6667},
                 {0, 5000}
         };
 
@@ -188,7 +188,7 @@ class StochasticTest {
     }
 
     @Test
-        // Rounding errors...
+    // Rounding errors...
     void instance7(){
         long minThreshold = 5000;
         long maxThreshold = 10000;
@@ -215,8 +215,8 @@ class StochasticTest {
             for(int j = 0; j < expected[i].length; j++) assertEquals(expected[i][j], actual[i][j]);
         }
     }
+
     @Test
-        // Rounding errors...
     void instance7b(){
         long minThreshold = 5000;
         long maxThreshold = 10000;

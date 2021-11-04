@@ -442,13 +442,15 @@ public class MDD implements Allocable {
      * @return The number of solutions represented by the MDD
      */
     public double nSolutions(){
-        if(tt == null) return 0;
+        if(getLayer(size - 1).size() == 0) return 0;
         if(tt == root) return 0;
 
         MapOf<Node, Double> currentLayer = Memory.MapOfNodeDouble();
         MapOf<Node, Double> next = Memory.MapOfNodeDouble(), tmp;
 
-        currentLayer.put(tt, 1.0);
+        //currentLayer.put(tt, 1.0);
+
+        for(Node x : getLayer(size - 1)) currentLayer.put(x, 1.0);
 
         for(int i = size - 2; i >= 0; i--){
             for(Node x : getLayer(i)){
