@@ -38,6 +38,7 @@ public class MDDReader {
 
     private static void loadLayer(MDD mdd, int i, String layer, HashMap<String, Node> currentBinding, HashMap<String, Node> nextBinding){
         if(layer.isEmpty()) return;
+        mdd.setSize(mdd.size()+1);
         String[] nodes = layer.split(";");
         for(String node : nodes){
             String[] split = node.split(":");
@@ -61,7 +62,6 @@ public class MDDReader {
         try {
             Scanner reader = new Scanner(new File(directoryPath+file));
             while (reader.hasNextLine()){
-                mdd.setSize(mdd.size()+1);
                 loadLayer(mdd, line++, reader.nextLine(), currentBinding, nextBinding);
                 Logger.out.information("\rLOADING LAYER " + line);
                 tmp = currentBinding;
