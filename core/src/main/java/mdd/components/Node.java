@@ -68,6 +68,10 @@ public class Node implements Allocable {
         return Node.create();
     }
 
+    public void sortChildren(){
+        children.sort();
+    }
+
     //**************************************//
     //               SETTERS                //
     //**************************************//

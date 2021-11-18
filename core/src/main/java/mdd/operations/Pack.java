@@ -124,7 +124,10 @@ public class Pack implements Allocable {
      */
     static private void reduceLayer(Layer L, int i){
         UnorderedListOfNode removed = UnorderedListOfNode.create();
-        for(Node node : L) if(node.numberOfChildren() == 0) removed.add(node);
+        for(Node node : L) {
+            if(node.numberOfChildren() == 0) removed.add(node);
+            else node.sortChildren();
+        }
         for(Node node : removed) L.removeAndFree(node);
         Memory.free(removed);
         Pack p = Pack.create(0, i, L);

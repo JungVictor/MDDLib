@@ -23,7 +23,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
     // Index in Memory
     private final int allocatedIndex;
 
-
+    private boolean isSorted = false;
     private final HashMap<Integer, Node> arcs = new HashMap<>();
     private final ArrayList<Integer> values = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
      * @param node Node to associate with the given label
      */
     public void add(int label, Node node){
-        if(!this.values.contains(label)) addValueAndSort(label);
+        if(!this.values.contains(label)) addValue(label);
         this.arcs.put(label, node);
     }
 
@@ -154,6 +154,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
     public void clear(){
         this.values.clear();
         this.arcs.clear();
+        isSorted = false;
     }
 
     /**
@@ -168,9 +169,29 @@ public class OutArcs implements Allocable, Iterable<Integer> {
      * Add a value to the set of values and sort the set in increasing order.
      * @param value Value to add
      */
-    public void addValueAndSort(int value){
-        values.add(value);
+    private void addValueAndSort(int value){
+        int bottom = 0;
+        int up = values.size();
+        int pos = 0;
+        while (bottom <= up) {
+            pos = bottom + (up - bottom) / 2;
+            if(values.get(pos) > value) up = pos - 1;
+            else if(values.get(pos) < value) bottom = pos + 1;
+            else break;
+        }
+        for(int i = pos; i < values.size() - 1; i++) values.set(i+1, values.get(i));
+        values.set(pos, value);
+    }
+
+    public void addValue(int label){
+        if(isSorted) addValueAndSort(label);
+        else values.add(label);
+    }
+
+    public void sort(){
+        if(isSorted) return;
         Collections.sort(values);
+        isSorted = true;
     }
 
     /**
@@ -200,6 +221,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
     public void free() {
         arcs.clear();
         values.clear();
+        isSorted = false;
         dealloc();
     }
 
