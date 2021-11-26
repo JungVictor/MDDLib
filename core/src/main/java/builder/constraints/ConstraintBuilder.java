@@ -15,6 +15,7 @@ import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
+import structures.lists.ListOfInt;
 import structures.tuples.TupleOfInt;
 import utils.Logger;
 import utils.SmallMath;
@@ -37,6 +38,7 @@ public class ConstraintBuilder {
         result.setSize(size+1);
         result.setRoot(constraint);
 
+        ListOfInt successors = ListOfInt.create();
         HashMap<String, SNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                 nextNodesConstraint = Memory.SetOfNode(),
@@ -47,7 +49,7 @@ public class ConstraintBuilder {
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
                 SNode x = (SNode) node;
-                for(int value : rule.successors(i - 1, x)) {
+                for(int value : rule.successors(successors,i - 1, x)) {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
@@ -72,6 +74,7 @@ public class ConstraintBuilder {
 
             bindings.clear();
         }
+        Memory.free(successors);
         Memory.free(currentNodesConstraint);
         Memory.free(nextNodesConstraint);
 

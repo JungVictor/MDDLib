@@ -1,38 +1,32 @@
-package builder.rules;
+package builder.rules.operations;
 
+import builder.rules.SuccessionRule;
 import mdd.components.Node;
 import memory.AllocatorOf;
-import structures.Domains;
 import structures.lists.ListOfInt;
 
 /**
- * The default SuccesionRule. <br/>
- * The successors are the values in the domain for the given variable.
+ * The SuccesionRule for the union operator. <br/>
+ * The successors are the values of all out-going labels of nodes associated to the given node.
  */
-public class SuccessionRuleDefault extends SuccessionRule {
+public class SuccessionRuleUnion extends SuccessionRule {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private Domains D;
-
-    public SuccessionRuleDefault(int allocatedIndex) {
+    public SuccessionRuleUnion(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     @Override
     public Iterable<Integer> successors(ListOfInt successors, int layer, Node x) {
-        return D.get(layer);
+        successors.clear();
+        for(Node n : x.getAssociations()) if(n != null) successors.add(n.getValues());
+        return successors;
     }
 
-    public void init(Domains D){
-        this.D = D;
-    }
-
-    public static SuccessionRuleDefault create(Domains D){
-        SuccessionRuleDefault object = allocator().allocate();
-        object.init(D);
-        return object;
+    public static SuccessionRuleUnion create(){
+        return allocator().allocate();
     }
 
     //**************************************//
@@ -49,17 +43,16 @@ public class SuccessionRuleDefault extends SuccessionRule {
 
     @Override
     public void free() {
-        this.D = null;
         allocator().free(this);
     }
 
 
     /**
-     * <b>The allocator that is in charge of the SuccessionRuleDefault type.</b><br>
+     * <b>The allocator that is in charge of the SuccessionRuleUnion type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<SuccessionRuleDefault> {
+    static final class Allocator extends AllocatorOf<SuccessionRuleUnion> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -70,13 +63,13 @@ public class SuccessionRuleDefault extends SuccessionRule {
         }
 
         @Override
-        protected SuccessionRuleDefault[] arrayCreation(int capacity) {
-            return new SuccessionRuleDefault[capacity];
+        protected SuccessionRuleUnion[] arrayCreation(int capacity) {
+            return new SuccessionRuleUnion[capacity];
         }
 
         @Override
-        protected SuccessionRuleDefault createObject(int index) {
-            return new SuccessionRuleDefault(index);
+        protected SuccessionRuleUnion createObject(int index) {
+            return new SuccessionRuleUnion(index);
         }
     }
 }

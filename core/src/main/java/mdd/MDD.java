@@ -589,8 +589,8 @@ public class MDD implements Allocable {
         // Merge similar nodes
         SetOf<Integer> V = Memory.SetOfInteger();
         D.fillWithValues(V);
-        //if(size > 1 && getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
-        if(size > 1 && getLayer(size - 2).size() != 0) HashReduce.reduce(this);
+        if(size > 1 && getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
+        //if(size > 1 && getLayer(size - 2).size() != 0) HashReduce.reduce(this);
         Memory.free(V);
     }
 

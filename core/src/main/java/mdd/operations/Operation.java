@@ -1,6 +1,7 @@
 package mdd.operations;
 
 import builder.MDDBuilder;
+import builder.rules.SuccessionRule;
 import mdd.MDD;
 import mdd.components.Node;
 import memory.Memory;
@@ -11,6 +12,7 @@ import structures.arrays.ArrayOfMDD;
 import structures.arrays.ArrayOfNode;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.lists.ListOfInt;
 import utils.Logger;
 import utils.SmallMath;
 
@@ -237,7 +239,7 @@ public class Operation {
         D.union(mdd1.getDomains()); D.intersect(mdd2.getDomains());
         for(int i = 0; i < D.size(); i++) if(D.get(i).size() == 0) return false;
 
-        boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size(), D);
+        boolean result = inclusion(mdd1.getRoot(), mdd2.getRoot(), mdd2.size());
         Memory.free(D);
         return result;
     }
@@ -248,12 +250,11 @@ public class Operation {
      * @param root1 The first root
      * @param root2 The second root
      * @param size The size of both sub-MDDs
-     * @param D The domains of the variables
      * @return true if there is an inclusion, false otherwise
      */
-    public static boolean inclusion(Node root1, Node root2, int size, Domains D){
+    public static boolean inclusion(Node root1, Node root2, int size){
         MDD inclusion = MDD.create();
-        boolean result = perform(inclusion, root1, root2, size, D, Operator.INCLUSION) != null;
+        boolean result = perform(inclusion, root1, root2, size, SuccessionRule.INTERSECTION, Operator.INCLUSION) != null;
         Memory.free(inclusion);
         return result;
     }
@@ -289,13 +290,15 @@ public class Operation {
      * @param root1 The root node of the first MDD
      * @param root2 The root node of the second MDD
      * @param size The size of the MDD result
-     * @param D The domains of the variables
+     * @param rule The succession rule
      * @param OP The type of operation
      * @return The MDD resulting from the operation
      */
-    private static MDD perform(MDD result, Node root1, Node root2, int size, Domains D, Operator OP){
+    private static MDD perform(MDD result, Node root1, Node root2, int size, SuccessionRule rule, Operator OP){
         result.setSize(size);
         Binder binder = Binder.create();
+
+        ListOfInt successors = ListOfInt.create();
 
         result.getRoot().associate(root1, root2);
 
@@ -304,7 +307,7 @@ public class Operation {
             for(Node x : result.getLayer(i-1)){
                 Node x1 = x.getX1(), x2 = x.getX2();
                 Node y1, y2;
-                for(int v : D.get(i-1)){
+                for(int v : rule.successors(successors, i-1, x)){
                     boolean a1, a2;
                     a1 = x1 != null && x1.containsLabel(v);
                     a2 = x2 != null && x2.containsLabel(v);
@@ -327,6 +330,7 @@ public class Operation {
             binder.clear();
         }
         Memory.free(binder);
+        Memory.free(successors);
 
         result.reduce();
         return result;
@@ -341,14 +345,11 @@ public class Operation {
      */
     private static MDD perform(MDD result, MDD mdd1, MDD mdd2, Operator OP){
         result.setSize(mdd1.size());
-        // Construction of V
-        Domains D = Domains.create();
-        D.union(mdd1.getDomains());
-        if(OP == Operator.INTERSECTION) D.intersect(mdd2.getDomains());
-        else D.union(mdd2.getDomains());
+        SuccessionRule rule;
+        if(OP == Operator.INTERSECTION) rule = SuccessionRule.INTERSECTION;
+        else rule = SuccessionRule.UNION;
 
-        perform(result, mdd1.getRoot(), mdd2.getRoot(), mdd1.size(), D, OP);
-        Memory.free(D);
+        perform(result, mdd1.getRoot(), mdd2.getRoot(), mdd1.size(), rule, OP);
         return result;
     }
 
@@ -490,7 +491,6 @@ public class Operation {
         ArrayOfNode ys = ArrayOfNode.create(mdds.length());
         ArrayOfBoolean a = ArrayOfBoolean.create(mdds.length());
         Binder binder = Binder.create();
-        Domains D = Domains.create();
         //
 
         if(OP != Operator.INTERSECTION && OP != Operator.UNION) {
@@ -498,10 +498,11 @@ public class Operation {
         }
         result.setSize(mdds.get(0).size());
 
-        // Construction of V
-        D.union(mdds.get(0).getDomains());
-        if(OP == Operator.INTERSECTION) for(int i = 1; i < mdds.length(); i++) D.intersect(mdds.get(i).getDomains());
-        else for(int i = 1; i < mdds.length(); i++) D.union(mdds.get(i).getDomains());
+        SuccessionRule rule;
+        if(OP == Operator.INTERSECTION) rule = SuccessionRule.INTERSECTION;
+        else rule = SuccessionRule.UNION;
+
+        ListOfInt successors = ListOfInt.create();
 
 
         for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());
@@ -513,7 +514,7 @@ public class Operation {
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
                 ArrayOfNode xs = x.getAssociations();
-                for(int v : D.get(i-1)){
+                for(int v : rule.successors(successors, i-1, x)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
                         for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
@@ -528,7 +529,7 @@ public class Operation {
         Memory.free(ys);
         Memory.free(a);
         Memory.free(binder);
-        Memory.free(D);
+        Memory.free(successors);
 
         result.reduce();
         return result;

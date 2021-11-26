@@ -2,36 +2,41 @@ package builder.rules;
 
 import mdd.components.Node;
 import memory.AllocatorOf;
-import structures.Domains;
 import structures.lists.ListOfInt;
 
 /**
- * The default SuccesionRule. <br/>
- * The successors are the values in the domain for the given variable.
+ * The Legendary Chupapaya SuccessionRule. <br/>
+ * The successors are the possible successors of all in-going labels for a given node
  */
-public class SuccessionRuleDefault extends SuccessionRule {
+public class SuccessionRuleChupapaya extends SuccessionRule {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private Domains D;
+    //private Trie trie
 
-    public SuccessionRuleDefault(int allocatedIndex) {
+    public SuccessionRuleChupapaya(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     @Override
     public Iterable<Integer> successors(ListOfInt successors, int layer, Node x) {
-        return D.get(layer);
+        successors.clear();
+
+        for (int inLabel : x.getParents()) {
+            // successors.add(successeurs de inLabel)
+        }
+
+        return successors;
     }
 
-    public void init(Domains D){
-        this.D = D;
+    public void init(){
+        //this.trie = trie;
     }
 
-    public static SuccessionRuleDefault create(Domains D){
-        SuccessionRuleDefault object = allocator().allocate();
-        object.init(D);
+    public static SuccessionRuleChupapaya create(){
+        SuccessionRuleChupapaya object = allocator().allocate();
+        //object.init(trie);
         return object;
     }
 
@@ -49,17 +54,17 @@ public class SuccessionRuleDefault extends SuccessionRule {
 
     @Override
     public void free() {
-        this.D = null;
+        //this.trie = null;
         allocator().free(this);
     }
 
 
     /**
-     * <b>The allocator that is in charge of the SuccessionRuleDefault type.</b><br>
+     * <b>The allocator that is in charge of the SuccessionRuleChupapaya type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<SuccessionRuleDefault> {
+    static final class Allocator extends AllocatorOf<SuccessionRuleChupapaya> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -70,13 +75,13 @@ public class SuccessionRuleDefault extends SuccessionRule {
         }
 
         @Override
-        protected SuccessionRuleDefault[] arrayCreation(int capacity) {
-            return new SuccessionRuleDefault[capacity];
+        protected SuccessionRuleChupapaya[] arrayCreation(int capacity) {
+            return new SuccessionRuleChupapaya[capacity];
         }
 
         @Override
-        protected SuccessionRuleDefault createObject(int index) {
-            return new SuccessionRuleDefault(index);
+        protected SuccessionRuleChupapaya createObject(int index) {
+            return new SuccessionRuleChupapaya(index);
         }
     }
 }
