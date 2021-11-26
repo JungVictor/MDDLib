@@ -2,6 +2,7 @@ package mdd;
 
 import mdd.components.Layer;
 import mdd.components.Node;
+import mdd.operations.HashReduce;
 import mdd.operations.Pack;
 import memory.*;
 import representation.MDDVisitor;
@@ -588,7 +589,8 @@ public class MDD implements Allocable {
         // Merge similar nodes
         SetOf<Integer> V = Memory.SetOfInteger();
         D.fillWithValues(V);
-        if(size > 1 && getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
+        //if(size > 1 && getLayer(size - 2).size() != 0) Pack.pReduce(L, size, V);
+        if(size > 1 && getLayer(size - 2).size() != 0) HashReduce.reduce(this);
         Memory.free(V);
     }
 

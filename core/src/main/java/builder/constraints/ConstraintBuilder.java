@@ -2,6 +2,8 @@ package builder.constraints;
 
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
+import builder.rules.SuccessionRule;
+import builder.rules.SuccessionRuleDefault;
 import mdd.MDD;
 import mdd.components.Node;
 import mdd.components.SNode;
@@ -26,6 +28,12 @@ public class ConstraintBuilder {
         return build(result, constraint, D, size, false);
     }
     protected static MDD build(MDD result, SNode constraint, Domains D, int size, boolean relaxation){
+        SuccessionRuleDefault rule = SuccessionRuleDefault.create(D);
+        build(result, constraint, rule, size, relaxation);
+        Memory.free(rule);
+        return result;
+    }
+    protected static MDD build(MDD result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
         result.setSize(size+1);
         result.setRoot(constraint);
 
@@ -39,7 +47,7 @@ public class ConstraintBuilder {
             Logger.out.information("\rLAYER " + i);
             for(Node node : result.getLayer(i-1)){
                 SNode x = (SNode) node;
-                for(int value : D.get(i-1)) {
+                for(int value : rule.successors(i - 1, x)) {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
