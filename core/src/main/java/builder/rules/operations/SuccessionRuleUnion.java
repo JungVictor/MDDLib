@@ -3,6 +3,7 @@ package builder.rules.operations;
 import builder.rules.SuccessionRule;
 import mdd.components.Node;
 import memory.AllocatorOf;
+import structures.generics.SetOf;
 import structures.lists.ListOfInt;
 
 /**
@@ -19,7 +20,7 @@ public class SuccessionRuleUnion extends SuccessionRule {
     }
 
     @Override
-    public Iterable<Integer> successors(ListOfInt successors, int layer, Node x) {
+    public Iterable<Integer> successors(SetOf<Integer> successors, int layer, Node x) {
         successors.clear();
         for(Node n : x.getAssociations()) if(n != null) successors.add(n.getValues());
         return successors;

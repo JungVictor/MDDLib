@@ -4,7 +4,7 @@ import builder.rules.operations.SuccessionRuleIntersection;
 import builder.rules.operations.SuccessionRuleUnion;
 import mdd.components.Node;
 import memory.Allocable;
-import structures.lists.ListOfInt;
+import structures.generics.SetOf;
 
 /**
  * Define a succession rule when building the MDD. <br/>
@@ -24,7 +24,7 @@ public  abstract class SuccessionRule implements Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public abstract Iterable<Integer> successors(ListOfInt successors, int layer, Node x);
+    public abstract Iterable<Integer> successors(SetOf<Integer> successors, int layer, Node x);
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

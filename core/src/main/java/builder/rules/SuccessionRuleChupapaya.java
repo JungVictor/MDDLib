@@ -2,7 +2,7 @@ package builder.rules;
 
 import mdd.components.Node;
 import memory.AllocatorOf;
-import structures.lists.ListOfInt;
+import structures.generics.SetOf;
 
 /**
  * The Legendary Chupapaya SuccessionRule. <br/>
@@ -20,7 +20,7 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
     }
 
     @Override
-    public Iterable<Integer> successors(ListOfInt successors, int layer, Node x) {
+    public Iterable<Integer> successors(SetOf<Integer> successors, int layer, Node x) {
         successors.clear();
 
         for (int inLabel : x.getParents()) {

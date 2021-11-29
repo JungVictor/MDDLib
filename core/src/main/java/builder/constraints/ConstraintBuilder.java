@@ -38,7 +38,7 @@ public class ConstraintBuilder {
         result.setSize(size+1);
         result.setRoot(constraint);
 
-        ListOfInt successors = ListOfInt.create();
+        SetOf<Integer> successors = Memory.SetOfInteger();
         HashMap<String, SNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                 nextNodesConstraint = Memory.SetOfNode(),

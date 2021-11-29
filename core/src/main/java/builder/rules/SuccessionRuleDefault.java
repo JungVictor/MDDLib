@@ -3,7 +3,7 @@ package builder.rules;
 import mdd.components.Node;
 import memory.AllocatorOf;
 import structures.Domains;
-import structures.lists.ListOfInt;
+import structures.generics.SetOf;
 
 /**
  * The default SuccesionRule. <br/>
@@ -21,7 +21,7 @@ public class SuccessionRuleDefault extends SuccessionRule {
     }
 
     @Override
-    public Iterable<Integer> successors(ListOfInt successors, int layer, Node x) {
+    public Iterable<Integer> successors(SetOf<Integer> successors, int layer, Node x) {
         return D.get(layer);
     }
 

@@ -298,7 +298,7 @@ public class Operation {
         result.setSize(size);
         Binder binder = Binder.create();
 
-        ListOfInt successors = ListOfInt.create();
+        SetOf<Integer> successors = Memory.SetOfInteger();
 
         result.getRoot().associate(root1, root2);
 
@@ -502,7 +502,7 @@ public class Operation {
         if(OP == Operator.INTERSECTION) rule = SuccessionRule.INTERSECTION;
         else rule = SuccessionRule.UNION;
 
-        ListOfInt successors = ListOfInt.create();
+        SetOf<Integer> successors = Memory.SetOfInteger();
 
 
         for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());
