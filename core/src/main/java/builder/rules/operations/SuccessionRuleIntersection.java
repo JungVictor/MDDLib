@@ -3,7 +3,7 @@ package builder.rules.operations;
 import builder.rules.SuccessionRule;
 import mdd.components.Node;
 import memory.AllocatorOf;
-import structures.generics.SetOf;
+import structures.generics.CollectionOf;
 
 /**
  * The SuccesionRule for intersection. <br/>
@@ -19,7 +19,7 @@ public class SuccessionRuleIntersection extends SuccessionRule {
     }
 
     @Override
-    public Iterable<Integer> successors(SetOf<Integer> successors, int layer, Node x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, Node x) {
         return x.getX1().getValues();
     }
 

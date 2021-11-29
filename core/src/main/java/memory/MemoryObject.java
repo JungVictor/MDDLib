@@ -3,7 +3,7 @@ package memory;
 /**
  * <b>MemoryObject is an interface that must be implemented if you want your object to be able to be reused.</b>
  */
-public interface MemoryObject {
+public interface MemoryObject extends Freeable {
 
     /**
      * Prepare the object to be usable as a new one
@@ -15,11 +15,6 @@ public interface MemoryObject {
      * @param ID
      */
     void setID(int ID);
-
-    /**
-     * Free the object
-     */
-    void free();
 
 
 }

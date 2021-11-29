@@ -10,11 +10,9 @@ import structures.Binder;
 import structures.arrays.ArrayOfBoolean;
 import structures.arrays.ArrayOfMDD;
 import structures.arrays.ArrayOfNode;
-import structures.generics.MapOf;
+import structures.generics.CollectionOf;
 import structures.generics.SetOf;
-import structures.lists.ListOfInt;
 import utils.Logger;
-import utils.SmallMath;
 
 /**
  * <b>The class dedicated to perform classical operation on and between MDDs</b>
@@ -298,7 +296,7 @@ public class Operation {
         result.setSize(size);
         Binder binder = Binder.create();
 
-        SetOf<Integer> successors = Memory.SetOfInteger();
+        CollectionOf<Integer> successors = rule.getCollection();
 
         result.getRoot().associate(root1, root2);
 
@@ -502,7 +500,7 @@ public class Operation {
         if(OP == Operator.INTERSECTION) rule = SuccessionRule.INTERSECTION;
         else rule = SuccessionRule.UNION;
 
-        SetOf<Integer> successors = Memory.SetOfInteger();
+        CollectionOf<Integer> successors = rule.getCollection();
 
 
         for(int i = 0; i < mdds.length(); i++) ys.set(i, mdds.get(i).getRoot());

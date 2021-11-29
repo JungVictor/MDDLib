@@ -2,11 +2,12 @@ package structures.lists;
 
 import memory.Allocable;
 import memory.AllocatorOf;
+import structures.generics.CollectionOf;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ListOfInt implements Allocable, Iterable<Integer> {
+public class ListOfInt implements Allocable, CollectionOf<Integer> {
 
     // Thread safe allocator
     private final static ThreadLocal<ListOfInt.Allocator> localStorage = ThreadLocal.withInitial(ListOfInt.Allocator::new);
@@ -90,6 +91,14 @@ public class ListOfInt implements Allocable, Iterable<Integer> {
         }
         fIsSorted = false;
         list[size++] = element;
+    }
+
+    /**
+     * Add the element at the end of the list
+     * @param element Element to add
+     */
+    public void add(Integer element){
+        add(element);
     }
 
     /**

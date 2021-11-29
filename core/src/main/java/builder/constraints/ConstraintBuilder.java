@@ -12,10 +12,10 @@ import structures.Domains;
 import structures.arrays.ArrayOfBigInteger;
 import structures.arrays.ArrayOfDouble;
 import structures.arrays.ArrayOfLong;
+import structures.generics.CollectionOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
-import structures.lists.ListOfInt;
 import structures.tuples.TupleOfInt;
 import utils.Logger;
 import utils.SmallMath;
@@ -38,7 +38,7 @@ public class ConstraintBuilder {
         result.setSize(size+1);
         result.setRoot(constraint);
 
-        SetOf<Integer> successors = Memory.SetOfInteger();
+        CollectionOf<Integer> successors = rule.getCollection();
         HashMap<String, SNode> bindings = new HashMap<>();
         SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
                 nextNodesConstraint = Memory.SetOfNode(),

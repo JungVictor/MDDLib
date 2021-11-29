@@ -13,14 +13,10 @@ public class Memory {
 
     /**
      * Free the object
-     * @param memoryObject The object to free
+     * @param freeable The object to free
      */
-    public static void free(MemoryObject memoryObject){
-        memoryObject.free();
-    }
-
-    public static void free(Allocable allocable){
-        allocable.free();
+    public static void free(Freeable freeable){
+        freeable.free();
     }
 
     //**************************************//
