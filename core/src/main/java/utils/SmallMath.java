@@ -27,9 +27,9 @@ public class SmallMath {
      * @return
      */
     public static long log(long number, int precision, int base, int n, boolean ceil){
-        if(number == Math.pow(base, precision)) return 0;
+        if(number == Math.pow(10, precision)) return 0;
         long logarithm = 0;
-        double num = number / Math.pow(base, precision);
+        double num = number / Math.pow(10, precision);
         int lastDigit;
         int firstDigit = 0;
         cachePow(base);
