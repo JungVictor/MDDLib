@@ -84,6 +84,45 @@ public class ConstraintOperation {
     }
 
     /**
+     * Perform the intersection operation between mdd and a sum constraint.
+     * The map makes the link between a label and its sum value.
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @return the MDD resulting from the intersection between mdd and the sum constraint
+     */
+    static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map){
+
+        ArrayOfInt minValues = ArrayOfInt.create(mdd.size());
+        ArrayOfInt maxValues = ArrayOfInt.create(mdd.size());
+
+        for(int i = mdd.size() - 1; i >= 0; i--){
+            int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            for(int v : mdd.getDomain(i)) {
+                v = map.get(v);
+                if(v < vMin) vMin = v;
+                if(v > vMax) vMax = v;
+            }
+            if(i < mdd.size() - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+
+        SNode constraint = SNode.create();
+        ParametersMapSum parameters = ParametersMapSum.create(min, max, minValues, maxValues, map);
+        constraint.setState(StateMapSum.create(parameters));
+
+        intersection(result, mdd, constraint);
+
+        Memory.free(constraint);
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    /**
      * Perform the intersection operation between mdd and a gcc constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
