@@ -98,7 +98,7 @@ public class ListOfInt implements Allocable, CollectionOf<Integer> {
      * @param element Element to add
      */
     public void add(Integer element){
-        add(element);
+        add(element.intValue());
     }
 
     /**
