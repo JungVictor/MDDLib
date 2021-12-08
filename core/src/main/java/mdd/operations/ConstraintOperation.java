@@ -54,16 +54,16 @@ public class ConstraintOperation {
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max){
 
-        ArrayOfInt minValues = ArrayOfInt.create(mdd.size());
-        ArrayOfInt maxValues = ArrayOfInt.create(mdd.size());
+        ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
+        ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
 
-        for(int i = mdd.size() - 1; i >= 0; i--){
+        for(int i = mdd.size() - 3; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-            for(int v : mdd.getDomain(i)) {
+            for(int v : mdd.getDomain(i+1)) {
                 if(v < vMin) vMin = v;
                 if(v > vMax) vMax = v;
             }
-            if(i < mdd.size() - 1) {
+            if(i < mdd.size() - 2) {
                 vMin += minValues.get(i+1);
                 vMax += maxValues.get(i+1);
             }
@@ -92,17 +92,17 @@ public class ConstraintOperation {
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map){
 
-        ArrayOfInt minValues = ArrayOfInt.create(mdd.size());
-        ArrayOfInt maxValues = ArrayOfInt.create(mdd.size());
+        ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
+        ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
 
-        for(int i = mdd.size() - 1; i >= 0; i--){
+        for(int i = mdd.size() - 3; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-            for(int v : mdd.getDomain(i)) {
+            for(int v : mdd.getDomain(i+1)) {
                 v = map.get(v);
                 if(v < vMin) vMin = v;
                 if(v > vMax) vMax = v;
             }
-            if(i < mdd.size() - 1) {
+            if(i < mdd.size() - 2) {
                 vMin += minValues.get(i+1);
                 vMax += maxValues.get(i+1);
             }
