@@ -444,6 +444,132 @@ public strictfp class ConfidenceTests {
         return result;
     }
 
+    public static MDD testLogULP2(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+        long time1;
+        long time2;
+
+        Logger.out.information("Test avec le logarithme ULP\n");
+        Logger.out.information("Epsilon = " + epsilon + "\n");
+        Logger.out.information("Gamma = " + gamma + "\n");
+
+        time1 = System.currentTimeMillis();
+        MDD confidence = MDD.create();
+
+        if(previous != null) ConstraintOperation.confidenceULP(confidence, previous, gamma, precision, epsilon, n, domains);
+        else MyMDDBuilder.confidenceULP(confidence, gamma, precision, epsilon, n, domains);
+
+        time2 = System.currentTimeMillis();
+
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
+        System.out.println("Nombre d'arcs : " + confidence.arcs());
+        System.out.println("Nombre de solutions : " + confidence.nSolutions());
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+
+        //precision(confidence, domains, n, precision);
+
+        System.out.println();
+
+        return confidence;
+    }
+
+    public static MDD testLogULP3(int gamma, int precision, int epsilon, int n, Domains domains) {
+        MDD result = null;
+        MDD confidence = null, extract = null;
+        MDD tmp = null, tmp_res = null;
+
+        long time = System.currentTimeMillis();
+
+        for (int i = 0; i <= epsilon; i++) {
+            confidence = testLogULP2(extract, gamma, precision, i, n, domains);
+
+            // Free the ancient extract
+            if(extract != null) {
+                Memory.free(extract);
+                extract = null;
+            }
+
+            if(confidence.nSolutions() == 0) break;
+            else if(i == epsilon) {
+                if(result == null) {
+                    result = confidence;
+                    confidence = null;
+                } else {
+                    tmp_res = result;
+                    result = Operation.union(result, confidence);
+                    Memory.free(tmp_res);
+                }
+                break;
+            }
+
+            extract = extract(confidence, domains, n, precision, gamma);
+
+            // Stop
+            if(extract.nSolutions() == 0) {
+
+                Memory.free(extract);
+                extract = null;
+
+                if(result == null) {
+                    result = confidence;
+                    confidence = null;
+                }
+                else {
+                    tmp_res = result;
+                    result = Operation.union(result, confidence);
+                    Memory.free(tmp_res);
+                    Memory.free(confidence);
+                    confidence = null;
+                    tmp_res = null;
+                }
+                break;
+            }
+
+            MDD diff = Operation.minus(confidence, extract);
+            Memory.free(confidence);
+            confidence = null;
+
+            if(diff.nSolutions() > 0) {
+                if (result == null) result = diff;
+                else {
+                    tmp_res = result;
+                    result = Operation.union(result, diff);
+                    Memory.free(tmp_res);
+                    Memory.free(diff);
+                }
+            } else Memory.free(diff);
+        }
+
+        if(extract != null) Memory.free(extract);
+        if(confidence != null) Memory.free(confidence);
+
+        time = System.currentTimeMillis() - time;
+
+        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
+
+        int nNodes = 0;
+        int nArcs = 0;
+        double nSol = 0;
+
+        if(result != null) {
+            nNodes = result.nodes();
+            nArcs = result.arcs();
+            nSol = result.nSolutions();
+            precision(result, domains, n, precision);
+
+            MDD negation = Operation.negation(result);
+            precision(negation, domains, n, precision);
+        }
+
+        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
+        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
+        Logger.out.information("\r\nNombre de solutions : " + nSol);
+
+
+        System.out.println();
+        return result;
+    }
+
     public static MDD testLogInt2(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
         long time1;
         long time2;
@@ -568,6 +694,55 @@ public strictfp class ConfidenceTests {
 
         System.out.println();
         return result;
+    }
+
+    public static MDD testLogInt4(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains) {
+        MDD result = null;
+        MDD confidence = null, extract = null;
+        MDD tmp = null, tmp_res = null;
+
+        long time = System.currentTimeMillis();
+
+        confidence = testLogInt2(extract, gamma, precision, epsilon, logPrecision, n, domains);
+        extract = extract(confidence, domains, n, precision, gamma);
+        result = Operation.minus(confidence, extract);
+
+        confidence = testLogInt2(extract, gamma, precision, 15, logPrecision, n, domains);
+        extract = extract(confidence, domains, n, precision, gamma);
+
+        confidence = Operation.minus(confidence, extract);
+        result = Operation.union(result, confidence);
+
+        if(extract != null) Memory.free(extract);
+        if(confidence != null) Memory.free(confidence);
+
+        time = System.currentTimeMillis() - time;
+
+        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
+
+        int nNodes = 0;
+        int nArcs = 0;
+        double nSol = 0;
+
+        if(result != null) {
+            nNodes = result.nodes();
+            nArcs = result.arcs();
+            nSol = result.nSolutions();
+            precision(result, domains, n, precision);
+
+            MDD negation = Operation.negation(result);
+            precision(negation, domains, n, precision);
+        }
+
+        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
+        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
+        Logger.out.information("\r\nNombre de solutions : " + nSol);
+
+
+        System.out.println();
+        return result;
+
+
     }
 
     @SuppressWarnings("unchecked")

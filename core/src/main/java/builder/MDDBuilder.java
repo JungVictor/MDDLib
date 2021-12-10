@@ -189,6 +189,10 @@ public class MDDBuilder {
         return ConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size);
     }
 
+    public static MDD sumDoubleULP(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
+        return ConstraintBuilder.sumDoubleULP(mdd, D, s_min, s_max, mapDouble, epsilon, size);
+    }
+
     public static MDD sumRelaxed(MDD mdd, long s_min, long s_max, MapOf<Integer, Long> map, int epsilon, int precision, int size, Domains D){
         return ConstraintBuilder.sumRelaxed(mdd, D, s_min, s_max, map, epsilon, precision, size);
     }
@@ -214,6 +218,10 @@ public class MDDBuilder {
 
     public static strictfp MDD confidence(MDD mdd, double gamma, int precision, int epsilon, int n, Domains D){
         return ConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, D);
+    }
+
+    public static strictfp MDD confidenceULP(MDD mdd, int gamma, int precision, int epsilon, int n, Domains D){
+        return ConstraintOperation.confidenceULP(mdd, null, gamma, precision, epsilon, n, D);
     }
 
     public static MDD confidence(MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D){

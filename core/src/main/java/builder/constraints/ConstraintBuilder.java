@@ -320,7 +320,7 @@ public class ConstraintBuilder {
         maxValues.set(size-1, 0.0);
 
         for(int i = size - 2; i >= 0; i--){
-            double vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            double vMin = Double.MAX_VALUE, vMax = -Double.MAX_VALUE;
             for(int v : D.get(i+1)) {
                 double doubleV = mapDouble.get(v);
                 if(doubleV < vMin) vMin = doubleV;
@@ -335,6 +335,40 @@ public class ConstraintBuilder {
         }
         ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
         snode.setState(StateSumDouble.create(parameters));
+
+        build(result, snode, D, size, true);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static strictfp MDD sumDoubleULP(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
+        // CHECK MyConstraintOperation sumDoubleULP IF MAKING CHANGE TO THIS FUNCTION !
+        SNode snode = SNode.create();
+        ArrayOfDouble minValues = ArrayOfDouble.create(size);
+        ArrayOfDouble maxValues = ArrayOfDouble.create(size);
+
+        //Important d'initialiser la dernière valeur du tableau à 0
+        minValues.set(size-1, 0.0);
+        maxValues.set(size-1, 0.0);
+
+        for(int i = size - 2; i >= 0; i--){
+            double vMin = Double.MAX_VALUE, vMax = -Double.MAX_VALUE;
+            for(int v : D.get(i+1)) {
+                double doubleV = mapDouble.get(v);
+                if(doubleV < vMin) vMin = doubleV;
+                if(doubleV > vMax) vMax = doubleV;
+            }
+            if(i < size - 1) {
+                vMin = Math.nextDown(vMin + minValues.get(i+1));
+                vMax = Math.nextUp(vMax + maxValues.get(i+1));
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        snode.setState(StateSumDoubleULP.create(parameters));
 
         build(result, snode, D, size, true);
 
