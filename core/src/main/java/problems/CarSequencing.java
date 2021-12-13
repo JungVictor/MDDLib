@@ -125,7 +125,7 @@ public class CarSequencing {
         }
 
         MDD seq = MDDBuilder.sequence(MDD.create(), data.seqSizeOption(i), 0, data.seqMaxOption(i), data.nCars());
-        MDD sum = ConstraintBuilder.sum(MDD.create(), Binary.Set(), data.nCarsWithOption(i), data.nCarsWithOption(i), data.nCars());
+        MDD sum = MDDBuilder.sum(MDD.create(), data.nCarsWithOption(i), data.nCarsWithOption(i), data.nCars(), Binary.Set());
 
         MDD option = Operation.intersection(seq, sum);
         option.replace(V0, V1);

@@ -114,27 +114,6 @@ public class ConstraintBuilder {
         result.reduce();
         return result;
     }
-    public static MDD sequence(MDD result, int q, int min, int max, int size){
-        Domains B = Domains.create();
-        for(int i = 0; i < size; i++) {
-            B.add(i);
-            B.put(i, 0); B.put(i, 1);
-        }
-        SetOf<Integer> One = Memory.SetOfInteger(); One.add(1);
-        SNode snode = SNode.create();
-        ParametersAmong parameters = ParametersAmong.create(q, min, max, One);
-        snode.setState(StateAmong.create(parameters));
-
-        build(result, snode, B, size);
-
-        Memory.free(parameters);
-        Memory.free(B);
-        Memory.free(One);
-
-        result.reduce();
-
-        return result;
-    }
 
     public static MDD sum(MDD result, Domains D, int min, int max, int size){
         SNode snode = SNode.create();
@@ -163,16 +142,6 @@ public class ConstraintBuilder {
         result.reduce();
         return result;
     }
-    public static MDD sum(MDD result, SetOf<Integer> V, int min, int max, int size){
-        Domains D = Domains.create();
-        for(int i = 0; i < size; i++) {
-            D.add(i);
-            D.get(i).add(V);
-        }
-        sum(result, D, min, max, size);
-        Memory.free(D);
-        return result;
-    }
 
     public static MDD gcc(MDD result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size){
         SNode constraint = SNode.create();
@@ -188,25 +157,15 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD allDiff(MDD result, Domains D, SetOf<Integer> V, int size){
+    public static MDD alldiff(MDD result, Domains D, SetOf<Integer> V, SetOf<Integer> variables, int size){
         SNode constraint = SNode.create();
-        ParametersAllDiff parameters = ParametersAllDiff.create(V);
+        ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
 
         build(result, constraint, D, size);
 
         Memory.free(parameters);
         result.reduce();
-        return result;
-    }
-    public static MDD allDiff(MDD result, SetOf<Integer> V, int size){
-        Domains D = Domains.create();
-        for(int i = 0; i < size; i++) {
-            D.add(i);
-            D.get(i).add(V);
-        }
-        allDiff(result, D, V, size);
-        Memory.free(D);
         return result;
     }
 

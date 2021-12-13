@@ -31,9 +31,9 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
-    static public MDD allDiff(MDD result, MDD mdd, SetOf<Integer> V){
+    static public MDD allDiff(MDD result, MDD mdd, SetOf<Integer> V, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersAllDiff parameters = ParametersAllDiff.create(V);
+        ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
 
         result.getRoot().associate(mdd.getRoot(), constraint);

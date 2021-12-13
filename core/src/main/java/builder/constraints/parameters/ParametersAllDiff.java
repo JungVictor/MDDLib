@@ -14,6 +14,8 @@ public class ParametersAllDiff implements Allocable {
 
     // References, must not be free or cleaned by the object
     private SetOf<Integer> V;
+    // Variables affected by the constraint
+    private SetOf<Integer> variables;
 
 
     //**************************************//
@@ -32,20 +34,31 @@ public class ParametersAllDiff implements Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(SetOf<Integer> V){
+    public void init(SetOf<Integer> V, SetOf<Integer> variables){
         this.V = V;
+        this.variables = variables;
+    }
+
+    public static ParametersAllDiff create(SetOf<Integer> V, SetOf<Integer> variables){
+        ParametersAllDiff object = allocator().allocate();
+        object.init(V, variables);
+        return object;
     }
 
     public static ParametersAllDiff create(SetOf<Integer> V){
-        ParametersAllDiff object = allocator().allocate();
-        object.init(V);
-        return object;
+        return create(V, null);
     }
 
     //**************************************//
 
     public boolean contains(int label){
         return V.contains(label);
+    }
+    public boolean isVariable(int layer) {
+        return variables == null || variables.contains(layer);
+    }
+    public SetOf<Integer> set(){
+        return V;
     }
 
     //**************************************//
