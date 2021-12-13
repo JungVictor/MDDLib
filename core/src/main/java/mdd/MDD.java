@@ -15,6 +15,7 @@ import structures.lists.ListOfInt;
 import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfNode;
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -352,6 +353,29 @@ public class MDD implements Allocable {
         while (current != tt){
             int idx = random.nextInt(current.numberOfChildren());
             path[i++] = current.getValue(idx);
+            current = current.getChild(path[i-1]);
+        }
+        return path;
+    }
+
+    public int[] stochasticRandomWalk(HashMap<Integer, Double> probabilities){
+        Node current = root;
+        Random random = new Random();
+        int[] path = new int[size-1];
+        int i=0;
+        while (current != tt){
+            double sumProba = 0.0;
+            for(int idx = 0; idx < current.numberOfChildren(); idx++){
+                sumProba += probabilities.get(current.getValue(idx));
+            }
+            double randomSelection = random.nextDouble() * sumProba;
+            double cumulativeProba = probabilities.get(current.getValue(0));
+            int idx = 1;
+            while (cumulativeProba < randomSelection && idx < current.numberOfChildren()){
+                cumulativeProba += probabilities.get(current.getValue(idx));
+                idx++;
+            }
+            path[i++] = current.getValue(idx-1);
             current = current.getChild(path[i-1]);
         }
         return path;
