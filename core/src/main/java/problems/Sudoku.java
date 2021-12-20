@@ -11,15 +11,15 @@ import structures.generics.SetOf;
 
 public class Sudoku {
 
-    public static MDD solve(int sqr){
-        int n = sqr * sqr;
+    public static MDD solve(int x, int y){
+        int n = x * y;
         SetOf<Integer> V = Memory.SetOfInteger();
         for(int i = 0; i < n; i++) V.add(i+1);
 
         MDD result = lines(V, n);
         //MDD result = MDDBuilder.universal(MDD.create(), createDomains(n));
         result = columns(result, V, n);
-        result = cases(result, V, sqr);
+        result = cases(result, V, x, y);
 
         return result;
     }
@@ -66,12 +66,12 @@ public class Sudoku {
         return result;
     }
 
-    private static MDD cases(MDD columns, SetOf<Integer> V, int sqr){
+    private static MDD cases(MDD columns, SetOf<Integer> V, int x, int y){
         SetOf<Integer> variables = Memory.SetOfInteger();
         MDD result = columns, tmp = result;
-        for(int ci = 0; ci < sqr; ci++) {
-            for(int cj = 0; cj < sqr; cj++) {
-                variables = caseConstraint(variables, ci, cj, sqr);
+        for(int ci = 0; ci < x; ci++) {
+            for(int cj = 0; cj < y; cj++) {
+                variables = caseConstraint(variables, ci, cj, x, y);
                 result = ConstraintOperation.allDiff(MDD.create(), result, V, variables);
                 Memory.free(tmp);
                 tmp = result;
@@ -82,11 +82,11 @@ public class Sudoku {
         return result;
     }
 
-    private static SetOf<Integer> caseConstraint(SetOf<Integer> variables, int ci, int cj, int sqr){
-        int n = sqr * sqr;
-        int start = ci*n*sqr+cj*sqr;
-        for(int i = 0; i < sqr; i++){
-            for(int j = 0; j < sqr; j++) variables.add(start+i*n+j);
+    private static SetOf<Integer> caseConstraint(SetOf<Integer> variables, int ci, int cj, int x, int y){
+        int n = x * y;
+        int start = ci*n*x+cj*y;
+        for(int i = 0; i < x; i++){
+            for(int j = 0; j < y; j++) variables.add(start+i*n+j);
         }
         return variables;
     }

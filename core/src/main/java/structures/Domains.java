@@ -31,6 +31,11 @@ public class Domains implements Allocable {
     public static Domains create(){
         return allocator().allocate();
     }
+    public static Domains create(int size){
+        Domains D = allocator().allocate();
+        D.add(size);
+        return D;
+    }
 
     /**
      * Get the allocator. Thread safe.

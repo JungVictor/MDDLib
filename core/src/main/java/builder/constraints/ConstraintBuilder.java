@@ -25,16 +25,16 @@ import java.util.HashMap;
 
 public class ConstraintBuilder {
 
-    protected static MDD build(MDD result, SNode constraint, Domains D, int size){
+    public static MDD build(MDD result, SNode constraint, Domains D, int size){
         return build(result, constraint, D, size, false);
     }
-    protected static MDD build(MDD result, SNode constraint, Domains D, int size, boolean relaxation){
+    public static MDD build(MDD result, SNode constraint, Domains D, int size, boolean relaxation){
         SuccessionRuleDefault rule = SuccessionRuleDefault.create(D);
         build(result, constraint, rule, size, relaxation);
         Memory.free(rule);
         return result;
     }
-    protected static MDD build(MDD result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
+    public static MDD build(MDD result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
         result.setSize(size+1);
         result.setRoot(constraint);
 

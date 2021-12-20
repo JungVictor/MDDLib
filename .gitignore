@@ -9,6 +9,7 @@ target/
 
 # MDDs
 *.mdd
+dot/
 
 # Log file
 *.log

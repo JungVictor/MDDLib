@@ -14,7 +14,7 @@ public class StateSum extends NodeState {
     //           INITIALISATION             //
     //**************************************//
 
-    public StateSum(int allocatedIndex) {
+    private StateSum(int allocatedIndex) {
         super(allocatedIndex);
     }
 
