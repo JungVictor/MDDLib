@@ -16,7 +16,7 @@ public strictfp class ConstraintPruning {
      * that the structure of the MDD does not allow purely bad arcs.
      * @param mdd Confidence Constraint's MDD
      * @param propertyName The name of the property ("confidence" by default)
-     * @param values The binding (int label -> double value)
+     * @param values The binding (int label → double value)
      * @param min The lower threshold of the constraint
      * @return The MDD containing arcs and nodes leading to a false solution
      */

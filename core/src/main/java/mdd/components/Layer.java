@@ -49,7 +49,7 @@ public class Layer implements Allocable, Iterable<Node> {
 
     /**
      * Accept a MDDVisitor. Used to represent the MDD.
-     * @param visitor
+     * @param visitor The visitor
      */
     public void accept(MDDVisitor visitor){
         visitor.visit(this);

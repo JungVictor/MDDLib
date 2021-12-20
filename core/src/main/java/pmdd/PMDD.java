@@ -75,7 +75,7 @@ public class PMDD extends MDD {
      * <b>TOPDOWN PROPAGATION</b><br>
      * Propagate all properties from the root node through the MDD to the tt node
      * Clean all allocated properties during the run
-     * @return The map of name -> property of the tt node after the propagation
+     * @return The map of name → property of the tt node after the propagation
      */
     public MapOf<String, NodeProperty> propagateProperties(){
         return propagateProperties(true);
@@ -87,7 +87,7 @@ public class PMDD extends MDD {
      * If clean is true, then the properties are cleaned after the propagation.
      * Otherwise, nodes keep the properties even after the end of the algorithm.
      * @param clean True if the properties must be free during the run, false otherwise.
-     * @return The map of name -> property of the tt node after the propagation
+     * @return The map of name → property of the tt node after the propagation
      */
     public MapOf<String, NodeProperty> propagateProperties(boolean clean) {
         for(int i = 0; i < size() - 1; i++){
@@ -102,7 +102,7 @@ public class PMDD extends MDD {
     /**
      * <b>BOTTOMUP PROPAGATION</b><br>
      * Propagate all properties from the tt node through the MDD to the root node.
-     * @return The map of name -> property of the root node after the propagation
+     * @return The map of name → property of the root node after the propagation
      */
     public MapOf<String, NodeProperty> reversePropagateProperties() {
         return reversePropagateProperties(true);
@@ -114,7 +114,7 @@ public class PMDD extends MDD {
      * If clean is true, then the properties are cleaned after the propagation.
      * Otherwise, nodes keep the properties even after the end of the algorithm.
      * @param clean True if the properties must be free during the run, false otherwise.
-     * @return The map of name -> property of the root node after the propagation
+     * @return The map of name → property of the root node after the propagation
      */
     public MapOf<String, NodeProperty> reversePropagateProperties(boolean clean) {
         for(int i = size() - 1; i > 0; i--){

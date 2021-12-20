@@ -7,7 +7,7 @@ import memory.Memory;
 import structures.generics.CollectionOf;
 
 /**
- * The SuccesionRule for the union operator. <br/>
+ * The SuccesionRule for the union operator. <br>
  * The successors are the values of all out-going labels of nodes associated to the given node.
  */
 public class SuccessionRuleUnion extends SuccessionRule {

@@ -19,12 +19,12 @@ public class SmallMath {
 
     /**
      * Compute the logarithm as a long
-     * @param number
-     * @param precision
-     * @param base
-     * @param n
-     * @param ceil
-     * @return
+     * @param number The number
+     * @param precision The precision of the number
+     * @param base The base of the logarithm
+     * @param n The precision of the logarithm
+     * @param ceil True if we compute the ceil of the logarithm, false otherwise
+     * @return The logarithm as a long of the given number, computed to the given base with given precision.
      */
     public static long log(long number, int precision, int base, int n, boolean ceil){
         if(number == Math.pow(10, precision)) return 0;

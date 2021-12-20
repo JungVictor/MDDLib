@@ -6,7 +6,7 @@ import memory.Memory;
 import structures.generics.CollectionOf;
 
 /**
- * The Legendary Chupapaya SuccessionRule. <br/>
+ * The Legendary Chupapaya SuccessionRule. <br>
  * The successors are the possible successors of all in-going labels for a given node
  */
 public class SuccessionRuleChupapaya extends SuccessionRule {

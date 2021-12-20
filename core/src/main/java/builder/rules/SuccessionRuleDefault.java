@@ -6,7 +6,7 @@ import structures.Domains;
 import structures.generics.CollectionOf;
 
 /**
- * The default SuccesionRule. <br/>
+ * The default SuccesionRule. <br>
  * The successors are the values in the domain for the given variable.
  */
 public class SuccessionRuleDefault extends SuccessionRule {

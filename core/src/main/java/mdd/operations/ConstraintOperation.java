@@ -29,6 +29,8 @@ public class ConstraintOperation {
      * Perform the intersection operation between mdd and a alldiff constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
+     * @param V The set of constrained values
+     * @param variables The set of constrained variables
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
     static public MDD allDiff(MDD result, MDD mdd, SetOf<Integer> V, SetOf<Integer> variables){
@@ -50,6 +52,8 @@ public class ConstraintOperation {
      * Perform the intersection operation between mdd and a sum constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max){
@@ -88,6 +92,9 @@ public class ConstraintOperation {
      * The map makes the link between a label and its sum value.
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param map The map associating label → value
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
     static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map){
@@ -126,6 +133,7 @@ public class ConstraintOperation {
      * Perform the intersection operation between mdd and a gcc constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
+     * @param maxValues The GCC values
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
     static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
@@ -147,6 +155,10 @@ public class ConstraintOperation {
      * Perform the intersection operation between mdd and a sequence constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
+     * @param q The size of the sequence
+     * @param min The minimum number of appearances of a value in the sequence
+     * @param max The maximum number of appearances of a value in the sequence
+     * @param V The set of constrained values
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
     static public MDD sequence(MDD result, MDD mdd, int q, int min, int max, SetOf<Integer> V){
@@ -322,13 +334,6 @@ public class ConstraintOperation {
         return result;
     }
 
-    /**
-     * Perform the intersection operation between mdd and a sum constraint
-     *
-     * @param result The MDD that will store the result
-     * @param mdd    The MDD on which to perform the operation
-     * @return the MDD resulting from the intersection between mdd and the sum constraint
-     */
     public static strictfp MDD sumDouble(MDD result, MDD mdd, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size) {
         // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();

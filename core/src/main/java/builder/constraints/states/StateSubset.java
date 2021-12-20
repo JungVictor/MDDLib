@@ -28,6 +28,7 @@ public class StateSubset extends NodeState {
      * Create a StateSubset with specified parameters.
      * The object is managed by the allocator.
      * @param constraint Parameters of the constraint
+     * @param setID The ID of the set
      * @return A StateSubset with given parameters
      */
     public static StateSubset create(ParametersSubset constraint, int setID){

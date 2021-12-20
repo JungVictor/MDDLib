@@ -191,7 +191,7 @@ public class MDDBuilder {
      * The multiplicative constraint ensure that if we multiply all the variables together, the result belong to the interval [m_min, m_max].
      * This method only works for positives numbers.
      * As the product can be very hugh, the type of m_min and m_max is BigInteger
-     * @param mdd
+     * @param mdd The MDD that will stock the result of the operation
      * @param m_min The lower bound of the constraint.
      * @param m_max The upper bound of the constraint.
      * @param n The number of variables.

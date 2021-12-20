@@ -1,9 +1,27 @@
+import builder.MDDBuilder;
 import confidence.ConfidenceTests;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.engine.GraphvizCmdLineEngine;
+import guru.nidi.graphviz.engine.GraphvizEngine;
+import mdd.MDD;
+import mdd.operations.ConstraintOperation;
+import pmdd.PMDD;
+import pmdd.components.properties.PropertySum;
+import problems.Sudoku;
+import representation.MDD2Dot;
+import representation.MDDGraphviz;
+import representation.MDDPrinter;
+import utils.MDDReader;
 import utils.confidence.ConfidenceDomainsGenerator;
 import utils.DomainsManagements;
 import structures.Domains;
 import utils.ArgumentParser;
 import utils.SmallMath;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class Main {
 
@@ -30,7 +48,12 @@ public class Main {
 
         //ConfidenceTests.testLogInt2(null, gamma, precision, epsilon, 15, n, domains);
         //ConfidenceTests.testLogInt3(gamma, precision, epsilon, 15, n, domains);
-        ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
+        MDD result = ConfidenceTests.testLog3(gamma, precision, epsilon, n, domains);
+
+        //MDD test = MDDReader.load(MDD.create(), "MDD_LAYERS_11_input_20000.mdd");
+        //System.out.println("\r"+test.size());
+
+
 
         /*
         MDD previous = null;

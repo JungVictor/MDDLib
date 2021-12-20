@@ -49,7 +49,7 @@ public class PropertyGCC extends NodeProperty {
 
     /**
      * Initialise the minimum and maximum values possible for the GCC.
-     * @param bounds the mapping of value -> (min, max)
+     * @param bounds the mapping of value → (min, max)
      */
     public void setMaxValues(MapOf<Integer, TupleOfInt> bounds){
         this.bounds.clear();

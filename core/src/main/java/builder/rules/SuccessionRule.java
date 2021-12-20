@@ -8,7 +8,7 @@ import structures.generics.CollectionOf;
 import structures.lists.ListOfInt;
 
 /**
- * Define a succession rule when building the MDD. <br/>
+ * Define a succession rule when building the MDD. <br>
  * That is to say, what are the possible values for my arcs given a node and a layer.
  */
 public  abstract class SuccessionRule implements Allocable {

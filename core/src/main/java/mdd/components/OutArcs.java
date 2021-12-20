@@ -50,7 +50,7 @@ public class OutArcs implements Allocable, Iterable<Integer> {
 
     /**
      * Accept a MDDVisitor.
-     * @param visitor
+     * @param visitor The visitor
      */
     public void accept(MDDVisitor visitor){
         visitor.visit(this);

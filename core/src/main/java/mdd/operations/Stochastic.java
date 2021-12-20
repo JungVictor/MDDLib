@@ -16,7 +16,7 @@ public class Stochastic {
      * Given a MDD and a map associating labels to probabilities (by layer), compute
      * the probability of the whole MDD.
      * @param mdd The MDD
-     * @param P The associations labels -> probabilities
+     * @param P The associations labels → probabilities
      * @param precision The precision of the probabilities
      * @param ceil true if the rounding must be ceil, false if floor
      * @return The probability of the MDD
@@ -255,8 +255,8 @@ public class Stochastic {
     /**
      * Compute all bounds of the StochasticVariables in X in a way that we respect the two thresholds.
      * @param X The array of StochasticVariable ordered by non increasing cost
-     * @param minThreshold The minimum threshold value >=
-     * @param maxThreshold The maximum threshold value <=
+     * @param minThreshold The minimum threshold value
+     * @param maxThreshold The maximum threshold value
      * @param precision The precision of the variables
      * @return The bounds respecting both thresholds.
      */
@@ -330,7 +330,7 @@ public class Stochastic {
      * This algorithm doesn't use a pivot.
      * @param X The array of StochasticVariable ordered by non increasing cost
      * @param bounds The array containing all current bounds of variables in X (that will be updated)
-     * @param threshold The minimum threshold value >=
+     * @param threshold The minimum threshold value
      * @param totalQuantity The total amount of quantity we can put
      * @param precision The precision of the variables
      * @return The upperbounds respecting the given threshold.

@@ -73,7 +73,7 @@ public class MDD implements Allocable {
 
     /**
      * Free the current root node and add as a root the given node
-     * @param root
+     * @param root The node to set as root
      */
     public void setRoot(Node root){
         L.get(0).freeAllNodes();    // remove the current root
@@ -197,6 +197,7 @@ public class MDD implements Allocable {
     }
 
     /**
+     * @param root The node to set as root
      * @return a MDD the same type as the current MDD with the given node as a root
      */
     public MDD MDD(Node root){
@@ -239,6 +240,7 @@ public class MDD implements Allocable {
      * Create a copy of the given MDD from root to tt onto the given MDD.
      * Add the copy of the nodes to the given MDD at the same layer + the given offset.
      * @param copy The MDD used to stock the copy
+     * @param root The root node of the MDD
      * @param offset The offset of the copy
      * @return A copy of the current MDD from root to tt
      */
@@ -277,7 +279,7 @@ public class MDD implements Allocable {
     /**
      * Replace the values of all arcs according to the given mapping.
      * For instance, you want to replace all arcs with value 0 by [1, 2] :
-     * all you have to do is make a mapping 0 -> {1, 2} and give it as an input.
+     * all you have to do is make a mapping 0 → {1, 2} and give it as an input.
      * @param mapping The mapping of the values
      */
     public void replace(MapOf<Integer, SetOf<Integer>> mapping){
@@ -287,7 +289,7 @@ public class MDD implements Allocable {
     /**
      * Replace the values of all arcs according to the given mapping, from layer start to layer stop.
      * For instance, you want to replace all arcs with value 0 by [1, 2] :
-     * all you have to do is make a mapping 0 -> {1, 2} and give it as an input.
+     * all you have to do is make a mapping 0 → {1, 2} and give it as an input.
      * @param mapping The mapping of the values
      * @param start The first layer of the operation
      * @param stop The last layer of the operation
@@ -307,7 +309,7 @@ public class MDD implements Allocable {
     /**
      * Replace the values of all arcs according to the given mapping, from layer start to layer stop.
      * For instance, you want to replace all arcs with value 0 by [1, 2] :
-     * all you have to do is make a mapping 0 -> {1, 2} and give it as an input.
+     * all you have to do is make a mapping 0 → {1, 2} and give it as an input.
      * This function takes an array of map, so that you can have a map for each layer.
      * mapping[0] corresponds to the mapping for layer "start".
      * @param mapping The mapping of the values
@@ -327,7 +329,7 @@ public class MDD implements Allocable {
     }
 
     /**
-     * Replace the values of all arcs according to the map : [ 0 -> V0, 1 -> V1 ].
+     * Replace the values of all arcs according to the map : [ 0 → V0, 1 → V1 ].
      * Simplification of the main function to use with binary MDDs.
      * @param V0 All values associated to 0
      * @param V1 All values associated to 1
@@ -565,6 +567,7 @@ public class MDD implements Allocable {
      * @param source The source node (parent)
      * @param value The value of the arc's label
      * @param destination The destination node (child)
+     * @param layer The layer of the PARENT node (source)
      */
     public void addArc(Node source, int value, Node destination, int layer){
         source.addChild(value, destination);

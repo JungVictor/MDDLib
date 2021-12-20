@@ -134,6 +134,8 @@ public abstract class NodeProperty implements Allocable {
      * specifying if it is for the final layer
      * You need to create the property in a way that it acts as a "checker".
      * @param v Value of the label
+     * @param layer Layer of the node holding the property
+     * @param size Size of the MDD
      * @return true if the information is degenerate after the transition, false otherwise.
      */
     public boolean isValid(int v, int layer, int size){

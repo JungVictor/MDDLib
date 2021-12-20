@@ -63,6 +63,8 @@ public class CarSequencingInstance {
     /**
      * Solve the CarSequencing problem.<br>
      * Begin with 2 options, then progressively add all options one by one
+     * @param cs Description of the CarSequencing problem
+     * @param mode Method of resolution (default = 0)
      */
     public static void full(CarSequencing cs, int mode){
         long clock = System.currentTimeMillis();
@@ -102,6 +104,7 @@ public class CarSequencingInstance {
     /**
      * Solve the CarSequencing problem by relaxing it to a smaller size,
      * then combine it to form a full size MDD.
+     * @param cs Description of the CarSequencing problem
      */
     public static void relaxed(CarSequencing cs){
 

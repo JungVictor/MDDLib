@@ -6,7 +6,7 @@ import memory.AllocatorOf;
 import structures.generics.CollectionOf;
 
 /**
- * The SuccesionRule for intersection. <br/>
+ * The SuccesionRule for intersection. <br>
  * The successors are the out-going label of the first node associated.
  */
 public class SuccessionRuleIntersection extends SuccessionRule {

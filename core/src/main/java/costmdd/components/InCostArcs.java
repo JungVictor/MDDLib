@@ -49,6 +49,7 @@ public class InCostArcs extends InArcs {
 
     /**
      * Get the cost associated with the given arc
+     * @param node The parent
      * @param label Label of the arc
      * @return the cost associated with the given arc
      */

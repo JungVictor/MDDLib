@@ -12,7 +12,7 @@ public interface MemoryObject extends Freeable {
 
     /**
      * Set the ID of the object in memory. That technically is its position in the stack.
-     * @param ID
+     * @param ID The ID of the object in memory.
      */
     void setID(int ID);
 

@@ -79,7 +79,7 @@ public class PNode extends Node {
     }
 
     /**
-     * Get the map of name -> property.
+     * Get the map associating name to property.
      * @return The map of all properties tied to their name
      */
     public MapOf<String, NodeProperty> getProperties(){

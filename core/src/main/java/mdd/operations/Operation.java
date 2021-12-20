@@ -81,6 +81,7 @@ public class Operation {
     /**
      * Perform an intersection between mdd1 and mdd2 from layer start to layer stop.
      * Stock the result in the given result MDD.
+     * @param result The MDD that will stock the result of the operation
      * @param mdd1 The first MDD
      * @param mdd2 The second MDD
      * @param start The starting layer
@@ -371,6 +372,7 @@ public class Operation {
      * @param label Label of the arc to add
      * @param layer index of the layer where the node will be added
      * @param binder The binder
+     * @return The node added
      */
     public static Node addArcAndNode(MDD mdd, Node x, Node y1, Node y2, int label, int layer, Binder binder){
         Node y;
@@ -439,6 +441,7 @@ public class Operation {
     /**
      * Perform the intersection of multiple MDDs
      * Stock the result in the given result MDD.
+     * @param result The MDD that will stock the result of the operation
      * @param mdds The array of all MDDs
      * @return the intersection of all the MDDs.
      */
