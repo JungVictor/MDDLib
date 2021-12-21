@@ -4,13 +4,12 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
+import structures.generics.SetOf;
 
-public class ParametersSumRelaxed implements Allocable {
+public class ParametersSumRelaxed extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
     // References, must not be free or cleaned by the object
     private long min, max;
@@ -33,10 +32,10 @@ public class ParametersSumRelaxed implements Allocable {
     }
 
     private ParametersSumRelaxed(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision){
+    public void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -44,11 +43,12 @@ public class ParametersSumRelaxed implements Allocable {
         this.map = map;
         this.epsilon = epsilon;
         this.precision = precision;
+        super.setVariables(variables);
     }
 
-    public static ParametersSumRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision){
+    public static ParametersSumRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
         ParametersSumRelaxed object = allocator().allocate();
-        object.init(min, max, vMin, vMax, map, epsilon, precision);
+        object.init(min, max, vMin, vMax, map, epsilon, precision, variables);
         return object;
     }
 
@@ -67,12 +67,8 @@ public class ParametersSumRelaxed implements Allocable {
     //**************************************//
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

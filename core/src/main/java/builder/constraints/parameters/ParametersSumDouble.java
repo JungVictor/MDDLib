@@ -4,13 +4,12 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.MapOf;
 import structures.arrays.ArrayOfDouble;
+import structures.generics.SetOf;
 
-public class ParametersSumDouble implements Allocable {
+public class ParametersSumDouble extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
     // References, must not be free or cleaned by the object
     private double min, max;
@@ -32,21 +31,22 @@ public class ParametersSumDouble implements Allocable {
     }
 
     private ParametersSumDouble(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int epsilon){
+    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int epsilon, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.mapDouble = mapDouble;
         this.epsilon = epsilon;
+        super.setVariables(variables);
     }
 
-    public static ParametersSumDouble create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision){
+    public static ParametersSumDouble create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision, SetOf<Integer> variables){
         ParametersSumDouble object = allocator().allocate();
-        object.init(min, max, vMin, vMax, mapDouble, precision);
+        object.init(min, max, vMin, vMax, mapDouble, precision, variables);
         return object;
     }
 
@@ -64,12 +64,8 @@ public class ParametersSumDouble implements Allocable {
     //**************************************//
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

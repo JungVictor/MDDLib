@@ -48,12 +48,15 @@ public strictfp class StateSumRelaxed extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumRelaxed state = StateSumRelaxed.create(constraint);
-        state.sum = sum + constraint.map(label);
+        state.sum = sum;
+        if(constraint.isVariable(layer-1)) state.sum += constraint.map(label);
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
+        if(!constraint.isVariable(layer-1)) return true;
+
         long value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
         long maxPotential = sum + value + constraint.vMax(layer-1);
@@ -66,7 +69,8 @@ public strictfp class StateSumRelaxed extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        long value = constraint.map(label);
+        long value = 0;
+        if(constraint.isVariable(layer-1)) value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
         long maxPotential = sum + value + constraint.vMax(layer-1);
 

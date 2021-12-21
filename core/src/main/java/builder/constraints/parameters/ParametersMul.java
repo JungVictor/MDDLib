@@ -3,15 +3,14 @@ package builder.constraints.parameters;
 import structures.arrays.ArrayOfBigInteger;
 import memory.Allocable;
 import memory.AllocatorOf;
+import structures.generics.SetOf;
 
 import java.math.BigInteger;
 
-public class ParametersMul implements Allocable {
+public class ParametersMul extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     // References, must not be free or cleaned by the object
@@ -31,19 +30,20 @@ public class ParametersMul implements Allocable {
     }
 
     private ParametersMul(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax){
+    public void init(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
+        super.setVariables(variables);
     }
 
-    public static ParametersMul create(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax){
+    public static ParametersMul create(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> variables){
         ParametersMul object = allocator().allocate();
-        object.init(min, max, vMin, vMax);
+        object.init(min, max, vMin, vMax, variables);
         return object;
     }
 
@@ -58,16 +58,12 @@ public class ParametersMul implements Allocable {
     //           MEMORY FUNCTIONS           //
     //**************************************//
 
-
-    @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
     @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
+
 
     /**
      * <b>The allocator that is in charge of the ParametersMul type.</b><br>

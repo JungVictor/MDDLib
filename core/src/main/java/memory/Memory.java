@@ -1,5 +1,6 @@
 package memory;
 
+import bdd.components.BinaryNode;
 import mdd.components.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -123,6 +124,17 @@ public class Memory {
     }
 
 
+    private static final MemoryPool<MapOf<BinaryNode, Long>> mapOfBinaryNodeLongPool = new MemoryPool<>();
+    public static MapOf<BinaryNode, Long> MapOfBinaryNodeLong(){
+        MapOf<BinaryNode, Long> object = mapOfBinaryNodeLongPool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfBinaryNodeLongPool);
+            mapOfBinaryNodeLongPool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     //**************************************//
     //                SETS                  //
     //**************************************//
@@ -136,7 +148,17 @@ public class Memory {
         }
         object.prepare();
         return object;
+    }
 
+    private static final MemoryPool<SetOf<BinaryNode>> setOfBinaryNodePool = new MemoryPool<>();
+    public static SetOf<BinaryNode> SetOfBinaryNode(){
+        SetOf<BinaryNode> object = setOfBinaryNodePool.get();
+        if(object == null) {
+            object = new SetOf<>(setOfBinaryNodePool);
+            setOfBinaryNodePool.add(object);
+        }
+        object.prepare();
+        return object;
     }
 
     private static final MemoryPool<SetOf<Integer>> setOfIntegerPool = new MemoryPool<>();

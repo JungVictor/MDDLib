@@ -53,12 +53,14 @@ public class StateMapSum extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateMapSum state = StateMapSum.create(constraint);
-        state.sum = sum + constraint.map(label);
+        state.sum = sum;
+        if(constraint.isVariable(layer-1)) state.sum += constraint.map(label);
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
+        if(!constraint.isVariable(layer-1)) return true;
         label = constraint.map(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
@@ -71,7 +73,8 @@ public class StateMapSum extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        label = constraint.map(label);
+        if(constraint.isVariable(layer-1)) label = constraint.map(label);
+        else label = 0;
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
 

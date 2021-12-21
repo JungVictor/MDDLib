@@ -62,7 +62,10 @@ public class MDDBuilder {
         //return MDDAmong.generate(mdd, q, min, max);
     }
     public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max){
-        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q);
+        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, null);
+    }
+    public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, SetOf<Integer> variables){
+        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, variables);
     }
 
     // Special case in binary, it's faster to do it this way ! (because reduction...)
@@ -97,12 +100,18 @@ public class MDDBuilder {
         return mdd;
     }
     public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
-        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, size);
+        return sequence(mdd, D, V, q, min, max, size, null);
+    }
+    public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
+        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, size, variables);
     }
 
     /* SUM */
+    public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.sum(mdd, D, s_min, s_max, n, variables);
+    }
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D){
-        return ConstraintBuilder.sum(mdd, D, s_min, s_max, n);
+        return sum(mdd, s_min, s_max, n, D, null);
         //return MDDSum.generate(mdd, s_min, s_max, n, V);
     }
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, SetOf<Integer> V){
@@ -127,7 +136,10 @@ public class MDDBuilder {
 
     /* GCC */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D){
-        return ConstraintBuilder.gcc(mdd, D, couples, n);
+        return ConstraintBuilder.gcc(mdd, D, couples, n, null);
+    }
+    public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.gcc(mdd, D, couples, n, variables);
     }
 
     /* ALL DIFF */
@@ -137,13 +149,13 @@ public class MDDBuilder {
             D.add(i);
             D.get(i).add(V);
         }
-        ConstraintBuilder.alldiff(mdd, D, V, null, size);
+        ConstraintBuilder.alldiff(mdd, D, V, size, null);
         Memory.free(D);
         return mdd;
         //return MDDAllDifferent.generate(mdd, V, size);
     }
     public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size){
-        return ConstraintBuilder.alldiff(mdd, D, V, null, size);
+        return ConstraintBuilder.alldiff(mdd, D, V, size, null);
         //return MDDAllDifferent.generate(mdd, V, C, size);
     }
     public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
@@ -152,13 +164,13 @@ public class MDDBuilder {
             domains.add(i);
             for(int v : D) domains.put(i, v);
         }
-        MDD result = ConstraintBuilder.alldiff(mdd, domains, V, null, size);
+        MDD result = ConstraintBuilder.alldiff(mdd, domains, V,  size, null);
         Memory.free(domains);
         return result;
         //return MDDAllDifferent.generate(mdd, V, C, size);
     }
-    public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, SetOf<Integer> variables, int size){
-        return ConstraintBuilder.alldiff(mdd, D, V, variables, size);
+    public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
+        return ConstraintBuilder.alldiff(mdd, D, V, size, variables);
     }
 
 
@@ -183,7 +195,10 @@ public class MDDBuilder {
     }
 
     public static MDD mulRelaxed(MDD mdd, double m_min, double m_max, double maxProbaDomains, double maxProbaEpsilon, int n, Domains D){
-        return ConstraintBuilder.mulRelaxed(mdd, D, m_min, m_max, maxProbaDomains, maxProbaEpsilon, n);
+        return ConstraintBuilder.mulRelaxed(mdd, D, m_min, m_max, maxProbaDomains, maxProbaEpsilon, n, null);
+    }
+    public static MDD mulRelaxed(MDD mdd, double m_min, double m_max, double maxProbaDomains, double maxProbaEpsilon, int n, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.mulRelaxed(mdd, D, m_min, m_max, maxProbaDomains, maxProbaEpsilon, n, variables);
     }
 
     /**
@@ -199,20 +214,36 @@ public class MDDBuilder {
      * @return The MDD satisfying the multiplicative constraint.
      */
     public static MDD mul(MDD mdd, BigInteger m_min, BigInteger m_max, int n, Domains D){
-        return ConstraintBuilder.mul(mdd, D, m_min, m_max, n);
+        return ConstraintBuilder.mul(mdd, D, m_min, m_max, n, null);
+    }
+    public static MDD mul(MDD mdd, BigInteger m_min, BigInteger m_max, int n, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.mul(mdd, D, m_min, m_max, n, variables);
     }
 
     public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
-        return ConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size);
+        return ConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size, null);
+    }
+    public static MDD sumDouble(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.sumDouble(mdd, D, s_min, s_max, mapDouble, epsilon, size, variables);
     }
 
     public static MDD sumDoubleULP(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D){
-        return ConstraintBuilder.sumDoubleULP(mdd, D, s_min, s_max, mapDouble, epsilon, size);
+        return ConstraintBuilder.sumDoubleULP(mdd, D, s_min, s_max, mapDouble, epsilon, size, null);
+    }
+    public static MDD sumDoubleULP(MDD mdd, double s_min, double s_max, MapOf<Integer, Double> mapDouble, int epsilon, int size, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.sumDoubleULP(mdd, D, s_min, s_max, mapDouble, epsilon, size, variables);
     }
 
     public static MDD sumRelaxed(MDD mdd, long s_min, long s_max, MapOf<Integer, Long> map, int epsilon, int precision, int size, Domains D){
-        return ConstraintBuilder.sumRelaxed(mdd, D, s_min, s_max, map, epsilon, precision, size);
+        return ConstraintBuilder.sumRelaxed(mdd, D, s_min, s_max, map, epsilon, precision, size, null);
     }
+    public static MDD sumRelaxed(MDD mdd, long s_min, long s_max, MapOf<Integer, Long> map, int epsilon, int precision, int size, Domains D, SetOf<Integer> variables){
+        return ConstraintBuilder.sumRelaxed(mdd, D, s_min, s_max, map, epsilon, precision, size, variables);
+    }
+
+
+    // OPERATION
+
 
     public static  MDD confidenceMulRelaxed(MDD mdd, int gamma, int precision, int epsilon, int n, Domains D){
         return ConstraintOperation.confidenceMulRelaxed(mdd, null, gamma, precision, epsilon, n, D);

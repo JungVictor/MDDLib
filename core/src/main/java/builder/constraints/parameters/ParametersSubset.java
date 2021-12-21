@@ -3,15 +3,14 @@ package builder.constraints.parameters;
 import memory.*;
 import structures.generics.MapOf;
 import structures.arrays.ArrayOfInt;
+import structures.generics.SetOf;
 
 import java.util.ArrayList;
 
-public class ParametersSubset implements Allocable {
+public class ParametersSubset extends ConstraintParameters{
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     private final ArrayList<SubsetData> datas = new ArrayList<>();
@@ -30,18 +29,19 @@ public class ParametersSubset implements Allocable {
     }
 
     private ParametersSubset(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+    public void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
         for(int i = 0; i < word.length+1; i++){
             datas.add(i, SubsetData.create(i, word, alphabetSize, maxSequenceSize));
         }
+        super.setVariables(variables);
     }
 
-    public static ParametersSubset create(ArrayOfInt word, int alphabetSize, int maxSequenceSize){
+    public static ParametersSubset create(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
         ParametersSubset object = allocator().allocate();
-        object.init(word, alphabetSize, maxSequenceSize);
+        object.init(word, alphabetSize, maxSequenceSize, variables);
         return object;
     }
 
@@ -68,12 +68,8 @@ public class ParametersSubset implements Allocable {
     // Implementation of MemoryObject interface
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

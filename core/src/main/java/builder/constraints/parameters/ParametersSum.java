@@ -3,13 +3,12 @@ package builder.constraints.parameters;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfInt;
+import structures.generics.SetOf;
 
-public class ParametersSum implements Allocable {
+public class ParametersSum extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     // References, must not be free or cleaned by the object
@@ -29,19 +28,20 @@ public class ParametersSum implements Allocable {
     }
 
     public ParametersSum(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax){
+    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
+        super.setVariables(variables);
     }
 
-    public static ParametersSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax){
+    public static ParametersSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> variables){
         ParametersSum object = allocator().allocate();
-        object.init(min, max, vMin, vMax);
+        object.init(min, max, vMin, vMax, variables);
         return object;
     }
 
@@ -60,12 +60,8 @@ public class ParametersSum implements Allocable {
     // Implementation of MemoryObject interface
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

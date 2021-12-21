@@ -56,7 +56,7 @@ public class ConstraintOperation {
      * @param max The maximum value of the sum
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
-    static public MDD sum(MDD result, MDD mdd, int min, int max){
+    static public MDD sum(MDD result, MDD mdd, int min, int max, SetOf<Integer> variables){
 
         ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
         ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
@@ -76,7 +76,7 @@ public class ConstraintOperation {
         }
 
         SNode constraint = SNode.create();
-        ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues);
+        ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues, variables);
         constraint.setState(StateSum.create(parameters));
 
         intersection(result, mdd, constraint);
@@ -97,7 +97,7 @@ public class ConstraintOperation {
      * @param map The map associating label → value
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
-    static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map){
+    static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map, SetOf<Integer> variables){
 
         ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
         ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
@@ -118,7 +118,7 @@ public class ConstraintOperation {
         }
 
         SNode constraint = SNode.create();
-        ParametersMapSum parameters = ParametersMapSum.create(min, max, minValues, maxValues, map);
+        ParametersMapSum parameters = ParametersMapSum.create(min, max, minValues, maxValues, map, variables);
         constraint.setState(StateMapSum.create(parameters));
 
         intersection(result, mdd, constraint);
@@ -136,9 +136,9 @@ public class ConstraintOperation {
      * @param maxValues The GCC values
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
-    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
+    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersGCC parameters = ParametersGCC.create(maxValues);
+        ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
         constraint.setState(state);
@@ -149,6 +149,9 @@ public class ConstraintOperation {
         Memory.free(parameters);
         result.reduce();
         return result;
+    }
+    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
+        return gcc(result, mdd, maxValues, null);
     }
 
     /**
@@ -161,9 +164,9 @@ public class ConstraintOperation {
      * @param V The set of constrained values
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
-    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max, SetOf<Integer> V){
+    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersAmong parameters = ParametersAmong.create(q, min, max, V);
+        ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         constraint.setState(StateAmong.create(parameters));
 
         intersection(result, mdd, constraint);
@@ -257,6 +260,20 @@ public class ConstraintOperation {
         return mulRelaxed(result, mdd, D, gamma, maxProbaDomains, maxProbaDomains, maxProbaEpsilon, n);
     }
 
+    public static strictfp MDD confidenceULP(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, Domains D) {
+        MapOf<Integer, Double> mapLog = Memory.MapOfIntegerDouble();
+        for (int i = 0; i < n; i++) {
+            for (int v : D.get(i)) {
+                mapLog.put(v, -1 * Math.nextUp(Math.log10(Math.nextUp(v * Math.pow(10, -precision)))));
+
+            }
+        }
+        double s_max = -1 * Math.nextDown(Math.log10(Math.nextDown(gamma * Math.pow(10, -precision))));
+
+        if (mdd == null) return MDDBuilder.sumDoubleULP(result, 0, s_max, mapLog, epsilon, n, D);
+        return sumDoubleULP(result, mdd, D, 0, s_max, mapLog, epsilon, n);
+    }
+
     public static strictfp MDD confidence(MDD result, MDD mdd, double gamma, int precision, int epsilon, int n, Domains D) {
         MapOf<Integer, Double> mapLog = Memory.MapOfIntegerDouble();
         for (int i = 0; i < n; i++) {
@@ -271,19 +288,20 @@ public class ConstraintOperation {
         return sumDouble(result, mdd, D, 0, s_max, mapLog, epsilon, n);
     }
 
-    public static strictfp MDD confidenceULP(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, Domains D) {
-        MapOf<Integer, Double> mapLog = Memory.MapOfIntegerDouble();
+    public static MDD confidence(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D) {
+        MapOf<Integer, Long> map = Memory.MapOfIntegerLong();
         for (int i = 0; i < n; i++) {
             for (int v : D.get(i)) {
-                mapLog.put(v, -1 * Math.nextUp(Math.log10(Math.nextUp(v * Math.pow(10, -precision)))));
-
+                map.put(v, -1 * SmallMath.log(v, precision, 10, logPrecision, true));
             }
         }
-        double s_max = -1 * Math.nextDown(Math.log10(Math.nextDown(gamma * Math.pow(10, -precision))));
+        long s_max = -1 * SmallMath.log(gamma, precision, 10, logPrecision, false);
 
-        if (mdd == null) return MDDBuilder.sumDoubleULP(result, 0, s_max, mapLog, epsilon, n, D);
-        return sumDoubleULP(result, mdd, D, 0, s_max, mapLog, epsilon, n);
+        if (mdd == null) return MDDBuilder.sumRelaxed(result, 0, s_max, map, epsilon, logPrecision, n, D);
+        return sumRelaxed(result, mdd, D, 0, s_max, map, epsilon, logPrecision, n);
     }
+
+    // ****** //
 
     public static strictfp MDD mulRelaxed(MDD result, MDD mdd, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size) {
         // CHECK MyConstraintBuilder mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
@@ -323,7 +341,7 @@ public class ConstraintOperation {
 
         min = SmallMath.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
         max = SmallMath.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
-        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
+        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon, null);
         snode.setState(StateMulRelaxed.create(parameters));
 
         intersection(result, mdd, snode, false);
@@ -358,7 +376,7 @@ public class ConstraintOperation {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon, null);
         snode.setState(StateSumDouble.create(parameters));
 
         intersection(result, mdd, snode, true);
@@ -393,7 +411,7 @@ public class ConstraintOperation {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon, null);
         snode.setState(StateSumDoubleULP.create(parameters));
 
         intersection(result, mdd, snode, true);
@@ -428,7 +446,7 @@ public class ConstraintOperation {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision);
+        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision, null);
         snode.setState(StateSumRelaxed.create(parameters));
 
         intersection(result, mdd, snode, true);
@@ -437,19 +455,6 @@ public class ConstraintOperation {
         Memory.free(parameters);
         result.reduce();
         return result;
-    }
-
-    public static MDD confidence(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D) {
-        MapOf<Integer, Long> map = Memory.MapOfIntegerLong();
-        for (int i = 0; i < n; i++) {
-            for (int v : D.get(i)) {
-                map.put(v, -1 * SmallMath.log(v, precision, 10, logPrecision, true));
-            }
-        }
-        long s_max = -1 * SmallMath.log(gamma, precision, 10, logPrecision, false);
-
-        if (mdd == null) return MDDBuilder.sumRelaxed(result, 0, s_max, map, epsilon, logPrecision, n, D);
-        return sumRelaxed(result, mdd, D, 0, s_max, map, epsilon, logPrecision, n);
     }
 
 

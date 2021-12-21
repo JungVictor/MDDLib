@@ -3,13 +3,12 @@ package builder.constraints.parameters;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfDouble;
+import structures.generics.SetOf;
 
-public class ParametersMulRelaxed implements Allocable {
+public class ParametersMulRelaxed extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     // References, must not be free or cleaned by the object
@@ -31,21 +30,22 @@ public class ParametersMulRelaxed implements Allocable {
     }
 
     private ParametersMulRelaxed(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon){
+    public void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.maxProbaDomains = maxProbaDomains;
         this.maxProbaEpsilon = maxProbaEpsilon;
+        super.setVariables(variables);
     }
 
-    public static ParametersMulRelaxed create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon){
+    public static ParametersMulRelaxed create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> variables){
         ParametersMulRelaxed object = allocator().allocate();
-        object.init(min, max, vMin, vMax, maxProbaDomains, maxProbaEpsilon);
+        object.init(min, max, vMin, vMax, maxProbaDomains, maxProbaEpsilon, variables);
         return object;
     }
 
@@ -62,14 +62,9 @@ public class ParametersMulRelaxed implements Allocable {
     //           MEMORY FUNCTIONS           //
     //**************************************//
 
-
-    @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
     @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

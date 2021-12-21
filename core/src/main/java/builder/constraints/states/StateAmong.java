@@ -52,6 +52,7 @@ public class StateAmong extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateAmong state = StateAmong.create(constraint);
+        if(!constraint.isVariable(layer-1)) return state;
         for(int i = 1; i < constraint.q(); i++) state.among.set(i-1, among.get(i));
         if(constraint.contains(label)) state.among.set(constraint.q()-1, 1);
         else state.among.set(constraint.q()-1, 0);
@@ -60,6 +61,7 @@ public class StateAmong extends NodeState {
 
     @Override
     public boolean isValid(int label, int layer, int size){
+        if(!constraint.isVariable(layer-1)) return true;
         int cpt = 0;
         for(int i = 1; i < constraint.q(); i++) cpt += among.get(i);
         if(constraint.contains(label)) cpt++;

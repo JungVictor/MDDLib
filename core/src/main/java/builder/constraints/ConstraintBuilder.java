@@ -82,10 +82,10 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
+    public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D, SetOf<Integer> variables) {
         D.add(-1);
         SNode snode = SNode.create();
-        ParametersSubset parameters = ParametersSubset.create(letters, D.size(), letters.length);
+        ParametersSubset parameters = ParametersSubset.create(letters, D.size(), letters.length, variables);
         snode.setState(StateSubset.create(parameters, 0));
 
         Domains domains = Domains.create();
@@ -101,10 +101,13 @@ public class ConstraintBuilder {
         result.reduce();
         return result;
     }
+    public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
+        return subset(result, letters, D, null);
+    }
 
-    public static MDD sequence(MDD result, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
+    public static MDD sequence(MDD result, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
-        ParametersAmong parameters = ParametersAmong.create(q, min, max, V);
+        ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         snode.setState(StateAmong.create(parameters));
 
         build(result, snode, D, size);
@@ -115,16 +118,20 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD sum(MDD result, Domains D, int min, int max, int size){
+    public static MDD sum(MDD result, Domains D, int min, int max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);
         ArrayOfInt maxValues = ArrayOfInt.create(size);
 
         for(int i = size - 2; i >= 0; i--){
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
-            for(int v : D.get(i+1)) {
-                if(v < vMin) vMin = v;
-                if(v > vMax) vMax = v;
+            if(variables.contains(i)) {
+                for (int v : D.get(i + 1)) {
+                    if (v < vMin) vMin = v;
+                    if (v > vMax) vMax = v;
+                }
+            } else {
+                vMin = 0; vMax = 0;
             }
             if(i < size - 1) {
                 vMin += minValues.get(i+1);
@@ -133,7 +140,7 @@ public class ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues);
+        ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues, variables);
         snode.setState(StateSum.create(parameters));
 
         build(result, snode, D, size);
@@ -143,9 +150,9 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD gcc(MDD result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size){
+    public static MDD gcc(MDD result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersGCC parameters = ParametersGCC.create(maxValues);
+        ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
         constraint.setState(state);
@@ -157,7 +164,7 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD alldiff(MDD result, Domains D, SetOf<Integer> V, SetOf<Integer> variables, int size){
+    public static MDD alldiff(MDD result, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
@@ -174,7 +181,8 @@ public class ConstraintBuilder {
     //      CONFIDENCE         //
     //*************************//
 
-    public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size){
+    // TODO : new min/max values
+    public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
@@ -212,7 +220,7 @@ public class ConstraintBuilder {
 
         min = SmallMath.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
         max = SmallMath.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
-        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon);
+        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon, variables);
         snode.setState(StateMulRelaxed.create(parameters));
 
         build(result, snode, D, size);
@@ -222,7 +230,7 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size){
+    public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
         ArrayOfBigInteger minValues = ArrayOfBigInteger.create(size);
         ArrayOfBigInteger maxValues = ArrayOfBigInteger.create(size);
@@ -258,7 +266,7 @@ public class ConstraintBuilder {
             maxValues.set(i, vMax);
         }
 
-        ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues);
+        ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues, variables);
         snode.setState(StateMul.create(parameters));
 
         build(result, snode, D, size);
@@ -268,7 +276,7 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
+    public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
@@ -292,7 +300,7 @@ public class ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon, variables);
         snode.setState(StateSumDouble.create(parameters));
 
         build(result, snode, D, size, true);
@@ -302,7 +310,7 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static strictfp MDD sumDoubleULP(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size){
+    public static strictfp MDD sumDoubleULP(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDoubleULP IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
@@ -326,7 +334,7 @@ public class ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon);
+        ParametersSumDouble parameters = ParametersSumDouble.create(min, max, minValues, maxValues, mapDouble, epsilon, variables);
         snode.setState(StateSumDoubleULP.create(parameters));
 
         build(result, snode, D, size, true);
@@ -336,7 +344,7 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static strictfp MDD sumRelaxed(MDD result, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size){
+    public static strictfp MDD sumRelaxed(MDD result, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
         SNode snode = SNode.create();
         ArrayOfLong minValues = ArrayOfLong.create(size);
@@ -360,7 +368,7 @@ public class ConstraintBuilder {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision);
+        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision, variables);
         snode.setState(StateSumRelaxed.create(parameters));
 
         build(result, snode, D, size, true);

@@ -4,18 +4,14 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.SetOf;
 
-public class ParametersAllDiff implements Allocable {
+public class ParametersAllDiff extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     // References, must not be free or cleaned by the object
     private SetOf<Integer> V;
-    // Variables affected by the constraint
-    private SetOf<Integer> variables;
 
 
     //**************************************//
@@ -31,12 +27,12 @@ public class ParametersAllDiff implements Allocable {
     }
 
     public ParametersAllDiff(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
     public void init(SetOf<Integer> V, SetOf<Integer> variables){
         this.V = V;
-        this.variables = variables;
+        super.setVariables(variables);
     }
 
     public static ParametersAllDiff create(SetOf<Integer> V, SetOf<Integer> variables){
@@ -54,9 +50,6 @@ public class ParametersAllDiff implements Allocable {
     public boolean contains(int label){
         return V.contains(label);
     }
-    public boolean isVariable(int layer) {
-        return variables == null || variables.contains(layer);
-    }
     public SetOf<Integer> set(){
         return V;
     }
@@ -67,12 +60,8 @@ public class ParametersAllDiff implements Allocable {
     // Implementation of MemoryObject interface
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

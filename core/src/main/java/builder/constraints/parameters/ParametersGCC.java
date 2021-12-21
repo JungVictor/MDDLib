@@ -3,16 +3,15 @@ package builder.constraints.parameters;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.MapOf;
+import structures.generics.SetOf;
 import structures.tuples.TupleOfInt;
 
 import java.util.Set;
 
-public class ParametersGCC implements Allocable {
+public class ParametersGCC extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
     // Not to free
     private MapOf<Integer, TupleOfInt> gcc;
@@ -32,18 +31,19 @@ public class ParametersGCC implements Allocable {
     }
 
     public ParametersGCC(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(MapOf<Integer, TupleOfInt> gcc){
+    public void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
         this.gcc = gcc;
         this.minimum = 0;
         for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
+        super.setVariables(variables);
     }
 
-    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc){
+    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
         ParametersGCC object = allocator().allocate();
-        object.init(gcc);
+        object.init(gcc, variables);
         return object;
     }
 
@@ -72,12 +72,8 @@ public class ParametersGCC implements Allocable {
     // Implementation of MemoryObject interface
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

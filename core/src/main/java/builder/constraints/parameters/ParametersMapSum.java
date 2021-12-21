@@ -4,19 +4,19 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
+import structures.generics.SetOf;
 
-public class ParametersMapSum implements Allocable {
+public class ParametersMapSum extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
 
     // References, must not be free or cleaned by the object
     private int min, max;
     private ArrayOfInt vMin, vMax;
     private MapOf<Integer, Integer> map;
+    private SetOf<Integer> variables;
 
     //**************************************//
     //           INITIALISATION             //
@@ -31,20 +31,21 @@ public class ParametersMapSum implements Allocable {
     }
 
     public ParametersMapSum(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map){
+    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.map = map;
+        super.setVariables(variables);
     }
 
-    public static ParametersMapSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map){
+    public static ParametersMapSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> variables){
         ParametersMapSum object = allocator().allocate();
-        object.init(min, max, vMin, vMax, map);
+        object.init(min, max, vMin, vMax, map, variables);
         return object;
     }
 
@@ -62,14 +63,9 @@ public class ParametersMapSum implements Allocable {
     //           MEMORY FUNCTIONS           //
     //**************************************//
     // Implementation of MemoryObject interface
-
-    @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
     @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 

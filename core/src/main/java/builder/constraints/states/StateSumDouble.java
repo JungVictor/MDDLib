@@ -48,12 +48,14 @@ public strictfp class StateSumDouble extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumDouble state = StateSumDouble.create(constraint);
-        state.sum = sum + constraint.mapDouble(label);
+        state.sum = sum;
+        if(constraint.isVariable(layer-1)) state.sum += constraint.mapDouble(label);
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
+        if(!constraint.isVariable(layer-1)) return true;
         double doubleLabel = constraint.mapDouble(label);
         double minPotential = sum + doubleLabel + constraint.vMin(layer-1);
         double maxPotential = sum + doubleLabel + constraint.vMax(layer-1);
@@ -66,7 +68,8 @@ public strictfp class StateSumDouble extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        double doubleLabel = constraint.mapDouble(label);
+        double doubleLabel = 0;
+        if(constraint.isVariable(layer-1)) doubleLabel = constraint.mapDouble(label);
         double minPotential = sum + doubleLabel + constraint.vMin(layer-1);
         double maxPotential = sum + doubleLabel + constraint.vMax(layer-1);
 

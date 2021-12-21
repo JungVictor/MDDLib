@@ -38,7 +38,7 @@ public class Sudoku {
             for(int j = 0; j < n; j++) if(j != i) D.get(i).add(j+1);
         }
 
-        MDD oL = MDDBuilder.alldiff(MDD.create(), D, V, null, n);
+        MDD oL = MDDBuilder.alldiff(MDD.create(), D, V, n);
 
         MDD result = Operation.concatenate(fL, oL);
         Memory.free(fL);
@@ -56,7 +56,7 @@ public class Sudoku {
         SetOf<Integer> variables = Memory.SetOfInteger();
         MDD result = lines, tmp = result;
         for(int i = 0; i < n; i++) {
-            variables = columnConstraint(variables, i, n);
+            columnConstraint(variables, i, n);
             result = ConstraintOperation.allDiff(MDD.create(), result, V, variables);
             Memory.free(tmp);
             tmp = result;
@@ -71,7 +71,7 @@ public class Sudoku {
         MDD result = columns, tmp = result;
         for(int ci = 0; ci < x; ci++) {
             for(int cj = 0; cj < y; cj++) {
-                variables = caseConstraint(variables, ci, cj, x, y);
+                caseConstraint(variables, ci, cj, x, y);
                 result = ConstraintOperation.allDiff(MDD.create(), result, V, variables);
                 Memory.free(tmp);
                 tmp = result;

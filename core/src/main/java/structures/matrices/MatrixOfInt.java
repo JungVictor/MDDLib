@@ -1,5 +1,7 @@
-package structures.integers;
+package structures.matrices;
 
+import memory.Allocable;
+import memory.AllocatorOf;
 import memory.MemoryObject;
 import memory.MemoryPool;
 
@@ -9,12 +11,13 @@ import java.util.Arrays;
  * <b>The class representing a matrix of int</b><br>
  * This prevent the creation of many arrays of int as it can be free and reused.
  */
-public class MatrixOfInt implements MemoryObject {
+public class MatrixOfInt implements Allocable {
 
-    // MemoryObject variables
-    private final MemoryPool<MatrixOfInt> pool;
-    private int ID = -1;
-    //
+    // Allocable variables
+    // Thread safe allocator
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    // Index in Memory
+    private final int allocatedIndex;
 
     private int[] matrix;
     private int height, length;
@@ -24,13 +27,20 @@ public class MatrixOfInt implements MemoryObject {
     //           INITIALISATION             //
     //**************************************//
 
-    public MatrixOfInt(MemoryPool<MatrixOfInt> pool, int height, int length){
-        this.pool = pool;
-        matrix = new int[height*length];
-        this.height = height;
-        this.length = length;
+    private MatrixOfInt(int allocatedIndex){
+        this.allocatedIndex = allocatedIndex;
     }
 
+    // To get a "new" object, you will have to ask the allocator first.
+    // Because we made the allocator Thread Safe, you must implement a function that will return the allocator.
+    private static Allocator allocator(){ return localStorage.get(); }
+
+
+    public static MatrixOfInt create(int height, int length){
+        MatrixOfInt matrix = allocator().allocate();
+        matrix.setSize(height, length);
+        return matrix;
+    }
 
     //**************************************//
     //         SPECIAL FUNCTIONS            //
@@ -68,10 +78,9 @@ public class MatrixOfInt implements MemoryObject {
      */
     public void setSize(int height, int length){
         int size = height * length;
-        if(size > matrix.length) matrix = new int[size];
+        if(matrix == null || size > matrix.length) matrix = new int[size];
         this.length = length;
         this.height = height;
-        prepare();
     }
 
     /**
@@ -136,17 +145,35 @@ public class MatrixOfInt implements MemoryObject {
     // Implementation of MemoryObject interface
 
     @Override
-    public void prepare() {
-        Arrays.fill(matrix, 0);
-    }
-
-    @Override
-    public void setID(int ID) {
-        this.ID = ID;
+    public int allocatedIndex(){
+        return allocatedIndex;
     }
 
     @Override
     public void free() {
-        pool.free(this, ID);
+        allocator().free(this);
     }
+
+    static final class Allocator extends AllocatorOf<MatrixOfInt> {
+
+        // You can specify the initial capacity. Default : 10.
+        Allocator(int capacity) {
+            super.init(capacity);
+        }
+
+        Allocator(){
+            super.init();
+        }
+
+        @Override
+        protected MatrixOfInt[] arrayCreation(int capacity) {
+            return new MatrixOfInt[capacity];
+        }
+
+        @Override
+        protected MatrixOfInt createObject(int index) {
+            return new MatrixOfInt(index);
+        }
+    }
+
 }

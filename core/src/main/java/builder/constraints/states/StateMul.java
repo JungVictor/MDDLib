@@ -50,13 +50,16 @@ public class StateMul extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateMul state = StateMul.create(constraint);
-        BigInteger bigIntLabel = BigInteger.valueOf(label);
-        state.mul = mul.multiply(bigIntLabel);
+        if(constraint.isVariable(layer-1)) {
+            BigInteger bigIntLabel = BigInteger.valueOf(label);
+            state.mul = mul.multiply(bigIntLabel);
+        } else state.mul = mul;
         return state;
     }
 
     @Override
     public boolean isValid(int label, int layer, int size){
+        if(!constraint.isVariable(layer-1)) return true;
         BigInteger bigIntLabel = BigInteger.valueOf(label);
         BigInteger newMul = mul.multiply(bigIntLabel);
 
@@ -74,8 +77,11 @@ public class StateMul extends NodeState {
 
     @Override
     public String hash(int label, int layer, int size){
-        BigInteger bigIntLabel = BigInteger.valueOf(label);
-        BigInteger newMul = mul.multiply(bigIntLabel);
+        BigInteger newMul;
+        if(constraint.isVariable(layer-1)) {
+            BigInteger bigIntLabel = BigInteger.valueOf(label);
+            newMul = mul.multiply(bigIntLabel);
+        } else newMul = mul;
 
         BigInteger minPotential = newMul.multiply(constraint.vMin(layer-1));
         BigInteger maxPotential = newMul.multiply(constraint.vMax(layer-1));

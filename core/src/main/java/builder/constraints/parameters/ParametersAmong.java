@@ -4,12 +4,10 @@ import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.SetOf;
 
-public class ParametersAmong implements Allocable {
+public class ParametersAmong extends ConstraintParameters {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-    // Index in Memory
-    private final int allocatedIndex;
 
     // References, must not be free or cleaned by the object
     private int q, min, max;
@@ -28,19 +26,20 @@ public class ParametersAmong implements Allocable {
         return localStorage.get();
     }
     public ParametersAmong(int allocatedIndex){
-        this.allocatedIndex = allocatedIndex;
+        super(allocatedIndex);
     }
 
-    public void init(int q, int min, int max, SetOf<Integer> V){
+    public void init(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
         this.q = q;
         this.min = min;
         this.max = max;
         this.V = V;
+        super.setVariables(variables);
     }
 
-    public static ParametersAmong create(int q, int min, int max, SetOf<Integer> V){
+    public static ParametersAmong create(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
         ParametersAmong object = allocator().allocate();
-        object.init(q, min, max, V);
+        object.init(q, min, max, V, variables);
         return object;
     }
 
@@ -61,12 +60,8 @@ public class ParametersAmong implements Allocable {
     // Implementation of MemoryObject interface
 
     @Override
-    public int allocatedIndex(){
-        return allocatedIndex;
-    }
-
-    @Override
     public void free() {
+        super.free();
         allocator().free(this);
     }
 
