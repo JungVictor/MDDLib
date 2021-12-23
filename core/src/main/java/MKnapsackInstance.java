@@ -1,6 +1,4 @@
-import mdd.MDD;
 import problems.MKnapsack;
-import representation.MDDPrinter;
 
 public class MKnapsackInstance {
 

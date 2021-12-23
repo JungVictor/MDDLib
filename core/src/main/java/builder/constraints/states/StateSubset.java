@@ -45,7 +45,11 @@ public class StateSubset extends NodeState {
         return localStorage.get();
     }
 
+
     //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
 
     @Override
     public NodeState createState(int label, int layer, int size) {
@@ -63,6 +67,11 @@ public class StateSubset extends NodeState {
         return Integer.toString(constraint.getNext(setID, label));
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of Allocable interface
 
     @Override
     public void free(){

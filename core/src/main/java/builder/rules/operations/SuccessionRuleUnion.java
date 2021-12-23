@@ -1,38 +1,60 @@
 package builder.rules.operations;
 
 import builder.rules.SuccessionRule;
-import mdd.components.Node;
+import dd.AbstractNode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
+import structures.successions.SuccessionOfAbstractNode;
 
 /**
- * The SuccesionRule for the union operator. <br>
+ * The SuccessionRule for the union operator. <br>
  * The successors are the values of all out-going labels of nodes associated to the given node.
  */
 public class SuccessionRuleUnion extends SuccessionRule {
 
+    public static final SuccessionRuleUnion RULE = new SuccessionRuleUnion(-1);
+
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    public SuccessionRuleUnion(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected SuccessionRuleUnion(int allocatedIndex) {
         super(allocatedIndex);
     }
 
+    /**
+     * Create a SuccessionRuleUnion.
+     * The object is managed by the allocator.
+     * @return A fresh SuccessionRuleUnion
+     */
+    public static SuccessionRuleUnion create(){
+        return allocator().allocate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CollectionOf<Integer> getCollection(){
         return Memory.SetOfInteger();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, Node x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
         successors.clear();
-        for(Node n : x.getAssociations()) if(n != null) successors.add(n.getValues());
+        SuccessionOfAbstractNode associations = x.getAssociations();
+        for(int i = 0; i < associations.length(); i++) {
+            AbstractNode n = associations.get(i);
+            if(n != null) successors.add(n.iterateOnChildLabel());
+        }
         return successors;
-    }
-
-    public static SuccessionRuleUnion create(){
-        return allocator().allocate();
     }
 
     //**************************************//
@@ -47,6 +69,9 @@ public class SuccessionRuleUnion extends SuccessionRule {
         return localStorage.get();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         allocator().free(this);
@@ -68,11 +93,17 @@ public class SuccessionRuleUnion extends SuccessionRule {
             this(10);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleUnion[] arrayCreation(int capacity) {
             return new SuccessionRuleUnion[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleUnion createObject(int index) {
             return new SuccessionRuleUnion(index);

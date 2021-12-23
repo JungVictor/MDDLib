@@ -6,6 +6,10 @@ import memory.Memory;
 import structures.generics.MapOf;
 import structures.lists.ListOfInt;
 
+/**
+ * <b>StateGCC</b><br>
+ * Represent the state of a GCC constraint.
+ */
 public class StateGCC extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -22,16 +26,27 @@ public class StateGCC extends NodeState {
     //           INITIALISATION             //
     //**************************************//
 
-    public StateGCC(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateGCC(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    public void init(ParametersGCC constraint){
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersGCC constraint){
         this.constraint = constraint;
         this.minimum = constraint.minimum();
         this.count = Memory.MapOfIntegerInteger();
     }
 
+    /**
+     * Initialise to the default state
+     */
     public void initV(){
         for(int v : constraint.V()) count.put(v,0);
     }
@@ -56,8 +71,15 @@ public class StateGCC extends NodeState {
         return localStorage.get();
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateGCC state = StateGCC.create(constraint);
@@ -78,6 +100,9 @@ public class StateGCC extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size) {
         if(!constraint.isVariable(layer-1)) return true;
@@ -90,6 +115,9 @@ public class StateGCC extends NodeState {
         return minimum <= potential && value+1 <= constraint.max(label);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         size += 1;
@@ -110,11 +138,15 @@ public class StateGCC extends NodeState {
         return builder.toString();
     }
 
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+    // Implementation of Allocable interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         Memory.free(count);
@@ -137,11 +169,17 @@ public class StateGCC extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateGCC[] arrayCreation(int capacity) {
             return new StateGCC[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateGCC createObject(int index) {
             return new StateGCC(index);

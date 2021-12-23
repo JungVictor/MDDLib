@@ -1,11 +1,16 @@
 package builder.constraints.parameters;
 
-import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 
+/**
+ * <b>ParametersSumRelaxed</b><br>
+ * Parameters of the relaxed Sum constraint. <br>
+ * Here, the value of the label is not the label itself : we get the value of the label from a map.<br>
+ * Contains the set of constrained variables, the bounds of the sum and the map associating labels with values.
+ */
 public class ParametersSumRelaxed extends ConstraintParameters {
 
     // Thread safe allocator
@@ -31,11 +36,27 @@ public class ParametersSumRelaxed extends ConstraintParameters {
         return localStorage.get();
     }
 
-    private ParametersSumRelaxed(int allocatedIndex){
+    /**
+     * Private constructor of the parameters.
+     * Initialise the allocated index in the allocator.
+     * @param allocatedIndex Allocated index in the allocator
+     */
+    protected ParametersSumRelaxed(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
+    /**
+     * Initialisation of the parameters
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param vMin The minimum sum achievable from a certain layer
+     * @param vMax The maximum sum achievable from a certain layer
+     * @param map The map associating labels with values
+     * @param epsilon The precision of the sum
+     * @param precision The precision of the values
+     * @param variables The set of constrained variables
+     */
+    protected void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -46,6 +67,18 @@ public class ParametersSumRelaxed extends ConstraintParameters {
         super.setVariables(variables);
     }
 
+    /**
+     * Get a ParametersSumRelaxed object from the allocator.
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param vMin The minimum sum achievable from a certain layer
+     * @param vMax The maximum sum achievable from a certain layer
+     * @param map The map associating labels with values
+     * @param epsilon The precision of the sum
+     * @param precision The precision of the values
+     * @param variables The set of constrained variables
+     * @return a fresh ParametersSumRelaxed object
+     */
     public static ParametersSumRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
         ParametersSumRelaxed object = allocator().allocate();
         object.init(min, max, vMin, vMax, map, epsilon, precision, variables);
@@ -54,18 +87,59 @@ public class ParametersSumRelaxed extends ConstraintParameters {
 
     //**************************************//
 
+    /**
+     * Get the minimum value of the sum
+     * @return The minimum value of the sum
+     */
     public long min(){return min;}
+
+    /**
+     * Get the maximum value of the sum
+     * @return The maximum value of the sum
+     */
     public long max(){return max;}
+
+    /**
+     * Get the minimum sum achievable from the layer i
+     * @param i The index of the layer
+     * @return The minimum sum achievable from the layer i
+     */
     public long vMin(int i){return vMin.get(i);}
+
+    /**
+     * Get the maximum sum achievable from the layer i
+     * @param i The index of the layer
+     * @return The maximum sum achievable from the layer i
+     */
+
     public long vMax(int i){return vMax.get(i);}
-    public long map(int i){return map.get(i);}
+
+    /**
+     * Get the value associated with the label
+     * @param label The label
+     * @return The value associated with the label
+     */
+    public long map(int label){return map.get(label);}
+
+    /**
+     * Get the precision of the sum
+     * @return The precision of the sum
+     */
     public int epsilon(){return epsilon;}
+
+    /**
+     * Get the precision of the values
+     * @return The precision of the values
+     */
     public int precision(){return precision;}
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         super.free();
@@ -74,7 +148,7 @@ public class ParametersSumRelaxed extends ConstraintParameters {
 
 
     /**
-     * <b>The allocator that is in charge of the ParametersSumDouble type.</b><br>
+     * <b>The allocator that is in charge of the ParametersSumRelaxed type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
@@ -88,11 +162,17 @@ public class ParametersSumRelaxed extends ConstraintParameters {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSumRelaxed[] arrayCreation(int capacity) {
             return new ParametersSumRelaxed[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSumRelaxed createObject(int index) {
             return new ParametersSumRelaxed(index);

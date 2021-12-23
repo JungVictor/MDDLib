@@ -4,6 +4,10 @@ import builder.constraints.parameters.ParametersSumRelaxed;
 import memory.AllocatorOf;
 import structures.Signature;
 
+/**
+ * <b>StateSumRelaxed</b><br>
+ * Represent the state of a relaxed Sum constraint using long.
+ */
 public strictfp class StateSumRelaxed extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -17,6 +21,35 @@ public strictfp class StateSumRelaxed extends NodeState {
     //**************************************//
 
     /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateSumRelaxed(int allocatedIndex) {
+        super(allocatedIndex);
+    }
+
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersSumRelaxed constraint){
+        this.constraint = constraint;
+        this.sum = 0;
+    }
+
+    /**
+     * Create a StateSumDouble with specified parameters.
+     * The object is managed by the allocator.
+     * @param constraint Parameters of the constraint
+     * @return A StateSumDouble with given parameters
+     */
+    public static StateSumRelaxed create(ParametersSumRelaxed constraint){
+        StateSumRelaxed object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
+    /**
      * Get the allocator. Thread safe.
      * @return The allocator.
      */
@@ -24,27 +57,23 @@ public strictfp class StateSumRelaxed extends NodeState {
         return localStorage.get();
     }
 
-    private StateSumRelaxed(int allocatedIndex) {
-        super(allocatedIndex);
-    }
-
-    public void init(ParametersSumRelaxed constraint){
-        this.constraint = constraint;
-        this.sum = 0;
-    }
-
-    public static StateSumRelaxed create(ParametersSumRelaxed constraint){
-        StateSumRelaxed object = allocator().allocate();
-        object.init(constraint);
-        return object;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString(){
         return Double.toString(sum);
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumRelaxed state = StateSumRelaxed.create(constraint);
@@ -53,6 +82,9 @@ public strictfp class StateSumRelaxed extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) return true;
@@ -67,6 +99,9 @@ public strictfp class StateSumRelaxed extends NodeState {
         return sum + value <= constraint.max();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         long value = 0;
@@ -78,6 +113,9 @@ public strictfp class StateSumRelaxed extends NodeState {
         return (long) ((sum + value) / Math.pow(10, constraint.precision() - constraint.epsilon())) + "";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Signature hash(int label, int layer, int size, boolean test){
         long value = constraint.map(label);
@@ -90,6 +128,9 @@ public strictfp class StateSumRelaxed extends NodeState {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState merge(NodeState state, int label, int layer, int size){
         StateSumRelaxed stateSumRelaxed = (StateSumRelaxed) state;
@@ -98,6 +139,15 @@ public strictfp class StateSumRelaxed extends NodeState {
         return null;
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of Allocable interface
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         this.constraint = null;
@@ -119,11 +169,17 @@ public strictfp class StateSumRelaxed extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumRelaxed[] arrayCreation(int capacity) {
             return new StateSumRelaxed[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumRelaxed createObject(int index) {
             return new StateSumRelaxed(index);

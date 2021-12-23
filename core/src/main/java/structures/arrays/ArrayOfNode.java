@@ -1,6 +1,6 @@
 package structures.arrays;
 
-import mdd.components.Node;
+import dd.mdd.components.Node;
 import memory.AllocatorOf;
 
 public class ArrayOfNode extends ArrayOf<Node> {

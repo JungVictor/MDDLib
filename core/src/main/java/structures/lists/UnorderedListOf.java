@@ -143,8 +143,6 @@ public abstract class UnorderedListOf<E> implements Allocable, Iterable<E> {
         return allocatedIndex;
     }
 
-
-
     @Override
     public Iterator<E> iterator() {
         iterator.i = 0;

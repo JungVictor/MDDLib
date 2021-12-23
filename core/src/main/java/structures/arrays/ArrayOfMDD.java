@@ -1,6 +1,6 @@
 package structures.arrays;
 
-import mdd.MDD;
+import dd.mdd.MDD;
 import memory.AllocatorOf;
 
 public class ArrayOfMDD extends ArrayOf<MDD> {

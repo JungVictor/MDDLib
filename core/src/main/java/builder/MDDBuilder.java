@@ -1,10 +1,10 @@
 package builder;
 
 import builder.constraints.*;
-import mdd.MDD;
-import mdd.components.Node;
-import mdd.operations.ConstraintOperation;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
+import dd.operations.ConstraintOperation;
+import dd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
 import structures.Domains;
@@ -15,12 +15,32 @@ import structures.tuples.TupleOfInt;
 
 import java.math.BigInteger;
 
+/**
+ * <b>MDDBuilder</b><br>
+ * Factory class that generate MDDs.
+ */
 public class MDDBuilder {
 
     /* UNIVERSAL */
+
+    /**
+     * Generate a universal MDD of given size with V as the domain of all variables.
+     * @param mdd The MDD result
+     * @param V The domain of all variables
+     * @param size The size of the MDD
+     * @return The universal MDD
+     */
     public static MDD universal(MDD mdd, ArrayOfInt V, int size){
         return MDDUniversal.generate(mdd, V, size);
     }
+
+    /**
+     * Generate a universal MDD of given size with D = {0...V} as the domain of all variables.
+     * @param mdd The MDD result
+     * @param V The number of variables in each domain
+     * @param size The size of the MDD
+     * @return The universal MDD
+     */
     public static MDD universal(MDD mdd, int V, int size){
         ArrayOfInt values = ArrayOfInt.create(V);
         for(int i = 0; i < values.length; i++) values.set(i,i);
@@ -40,6 +60,13 @@ public class MDDBuilder {
         Memory.free(values);
         return mdd;
     }
+
+    /**
+     * Generate a universal MDD with given domains.
+     * @param mdd The MDD result
+     * @param domains The domains of the variables
+     * @return The universal MDD
+     */
     public static MDD universal(MDD mdd, Domains domains){
         mdd.setSize(domains.size()+1);
         Node current = mdd.getRoot();
@@ -56,22 +83,69 @@ public class MDDBuilder {
         return mdd;
     }
 
+
     /* AMONG / SEQ */
+
+    /**
+     * Generate an MDD satisfying an among constraint with given parameters.
+     * The domain is binary (D[i] = {0,1} for each variable).
+     * All variables are constrained.
+     * @param mdd The MDD stocking the result
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @return an MDD satisfying an among constraint
+     */
     public static MDD among(MDD mdd, int q, int min, int max){
         return sum(mdd, min, max, q, Binary.Set());
-        //return MDDAmong.generate(mdd, q, min, max);
+        //return MDDAmong.generate(dd.mdd, q, min, max);
     }
+
+    /**
+     * Generate an MDD satisfying an among constraint with given parameters.
+     * All variables are constrained.
+     * @param mdd The MDD stocking the result
+     * @param D The domain of the variables
+     * @param V The set of constrained values
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @return an MDD satisfying an among constraint
+     */
     public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max){
         return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, null);
     }
+
+    /**
+     * Generate an MDD satisfying an among constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param D The domain of the variables
+     * @param V The set of constrained values
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying an among constraint
+     */
     public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, SetOf<Integer> variables){
         return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, variables);
     }
 
-    // Special case in binary, it's faster to do it this way ! (because reduction...)
+
+    /**
+     * Generate an MDD satisfying a sequence constraint with given parameters.
+     * The domain is binary (D[i] = {0,1} for each variable).
+     * @param mdd The MDD stocking the result
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @param size Size of the MDD
+     * @return an MDD satisfying a sequence constraint
+     */
     public static MDD sequence(MDD mdd, int q, int min, int max, int size){
+        // Special case in binary, it's faster to do it this way ! (because reduction...)
         size++;
-        MDD among = MDDBuilder.sum(mdd.MDD(), min, max, q, Binary.Set());
+        MDD among = MDDBuilder.sum(mdd.DD(), min, max, q, Binary.Set());
         MDD amongN = among.copy();
         MDD old_amongN = amongN;
 
@@ -99,21 +173,78 @@ public class MDDBuilder {
 
         return mdd;
     }
+
+    /**
+     * Generate an MDD satisfying a sequence constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param D The domain of the variables
+     * @param V The set of constrained values
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @param size Size of the MDD
+     * @return an MDD satisfying a sequence constraint
+     */
     public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size){
         return sequence(mdd, D, V, q, min, max, size, null);
     }
+
+    /**
+     * Generate an MDD satisfying a sequence constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param D The domain of the variables
+     * @param V The set of constrained values
+     * @param q The size of the window
+     * @param min The minimum number of occurrences
+     * @param max The maximum number of occurrences
+     * @param size Size of the MDD
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying a sequence constraint
+     */
     public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
         return ConstraintBuilder.sequence(mdd, D, V, q, min, max, size, variables);
     }
 
     /* SUM */
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param s_min The minimum value of the sum
+     * @param s_max The maximum value of the sum
+     * @param n The size of the MDD
+     * @param D The domains of the variables
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D, SetOf<Integer> variables){
         return ConstraintBuilder.sum(mdd, D, s_min, s_max, n, variables);
     }
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param s_min The minimum value of the sum
+     * @param s_max The maximum value of the sum
+     * @param n The size of the MDD
+     * @param D The domains of the variables
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D){
         return sum(mdd, s_min, s_max, n, D, null);
-        //return MDDSum.generate(mdd, s_min, s_max, n, V);
+        //return MDDSum.generate(dd.mdd, s_min, s_max, n, V);
     }
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * All variables have the same domain V.
+     * @param mdd The MDD stocking the result
+     * @param s_min The minimum value of the sum
+     * @param s_max The maximum value of the sum
+     * @param n The size of the MDD
+     * @param V The domains of the variables
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, SetOf<Integer> V){
         Domains D = Domains.create();
         for(int i = 0; i < n; i++) {
@@ -124,25 +255,82 @@ public class MDDBuilder {
         Memory.free(D);
         return mdd;
     }
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param s The exact value of the sum
+     * @param n The size of the MDD
+     * @param D The domains of the variables
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s, int n, Domains D){
         return sum(mdd, s, s, n, D);
     }
+
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * All variables have the same domain V.
+     * @param mdd The MDD stocking the result
+     * @param s The exact value of the sum
+     * @param n The size of the MDD
+     * @param V The domains of the variables
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s, int n, SetOf<Integer> V){
         return sum(mdd, s, s, n, V);
     }
+
+    /**
+     * Generate an MDD satisfying a sum constraint with given parameters.
+     * All variables have the same domain V = {0,1}
+     * @param mdd The MDD stocking the result
+     * @param s The exact value of the sum
+     * @param n The size of the MDD
+     * @return an MDD satisfying a sum constraint.
+     */
     public static MDD sum(MDD mdd, int s, int n){
         return sum(mdd, s, s, n, Binary.Set());
     }
 
     /* GCC */
+
+    /**
+     * Generate an MDD satisfying a GCC constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param n The size of the MDD
+     * @param couples The values of the GCC
+     * @param D The domains of the variables
+     * @return an MDD satisfying a GCC constraint
+     */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D){
         return ConstraintBuilder.gcc(mdd, D, couples, n, null);
     }
+
+    /**
+     * Generate an MDD satisfying a GCC constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param n The size of the MDD
+     * @param couples The values of the GCC
+     * @param D The domains of the variables
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying a GCC constraint
+     */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D, SetOf<Integer> variables){
         return ConstraintBuilder.gcc(mdd, D, couples, n, variables);
     }
 
     /* ALL DIFF */
+
+    /**
+     * Generate an MDD satisfying an AllDifferent constraint with given parameters.
+     * All values and variables are constrained.
+     * @param mdd The MDD stocking the result
+     * @param V The domains of each variable
+     * @param size The size of the MDD
+     * @return an MDD satisfying an AllDifferent constraint
+     */
     public static MDD alldiff(MDD mdd, SetOf<Integer> V, int size){
         Domains D = Domains.create();
         for(int i = 0; i < size; i++) {
@@ -152,12 +340,34 @@ public class MDDBuilder {
         ConstraintBuilder.alldiff(mdd, D, V, size, null);
         Memory.free(D);
         return mdd;
-        //return MDDAllDifferent.generate(mdd, V, size);
+        //return MDDAllDifferent.generate(dd.mdd, V, size);
     }
+
+    /**
+     * Generate an MDD satisfying an AllDifferent constraint with given parameters.
+     * All variables are constrained.
+     * @param mdd The MDD stocking the result
+     * @param D The domains of the variables
+     * @param V The set of constrained values
+     * @param size The size of the MDD
+     * @return an MDD satisfying an AllDifferent constraint
+     */
     public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size){
         return ConstraintBuilder.alldiff(mdd, D, V, size, null);
-        //return MDDAllDifferent.generate(mdd, V, C, size);
+        //return MDDAllDifferent.generate(dd.mdd, V, C, size);
     }
+
+
+    /**
+     * Generate an MDD satisfying an AllDifferent constraint with given parameters.
+     * All variables are constrained.
+     * All variables have the same domain D.
+     * @param mdd The MDD stocking the result
+     * @param D The domain of each variable
+     * @param V The set of constrained values
+     * @param size The size of the MDD
+     * @return an MDD satisfying an AllDifferent constraint
+     */
     public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
         Domains domains = Domains.create();
         for(int i = 0; i < size; i++){
@@ -167,8 +377,19 @@ public class MDDBuilder {
         MDD result = ConstraintBuilder.alldiff(mdd, domains, V,  size, null);
         Memory.free(domains);
         return result;
-        //return MDDAllDifferent.generate(mdd, V, C, size);
+        //return MDDAllDifferent.generate(dd.mdd, V, C, size);
     }
+
+
+    /**
+     * Generate an MDD satisfying an AllDifferent constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param D The domains of the variables
+     * @param V The set of constrained values
+     * @param size The size of the MDD
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying an AllDifferent constraint
+     */
     public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
         return ConstraintBuilder.alldiff(mdd, D, V, size, variables);
     }

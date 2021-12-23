@@ -1,8 +1,8 @@
 package structures;
 
-import mdd.components.Node;
+import dd.AbstractNode;
 import memory.*;
-import structures.arrays.ArrayOfNode;
+import structures.arrays.ArrayOfAbstractNode;
 import structures.generics.MapOf;
 
 /**
@@ -19,8 +19,8 @@ public class Binder implements Allocable {
     private final int allocatedIndex;
     //
 
-    private final MapOf<Node, Binder> reduction = new MapOf<>(null);
-    private Node leaf;
+    private final MapOf<AbstractNode, Binder> reduction = new MapOf<>(null);
+    private AbstractNode leaf;
     private int depth;
 
     //**************************************//
@@ -61,7 +61,7 @@ public class Binder implements Allocable {
      * @param nodes Nodes to add to the structure
      * @return The last Binder added to the general structure.
      */
-    public Binder path(ArrayOfNode nodes){
+    public Binder path(ArrayOfAbstractNode nodes){
         if(isLeaf(nodes.length)) return this;
         else if(reduction.get(nodes.get(depth)) != null) return reduction.get(nodes.get(depth)).path(nodes);
         else {
@@ -76,7 +76,7 @@ public class Binder implements Allocable {
      * Set the leaf of the LayerReduction
      * @param leaf Node that will be the leaf
      */
-    public void setLeaf(Node leaf){
+    public void setLeaf(AbstractNode leaf){
         this.leaf = leaf;
     }
 
@@ -84,7 +84,7 @@ public class Binder implements Allocable {
      * Get the leaf
      * @return (Node) The leaf
      */
-    public Node getLeaf(){
+    public AbstractNode getLeaf(){
         return leaf;
     }
 

@@ -1,4 +1,4 @@
-import mdd.MDD;
+import dd.mdd.MDD;
 import memory.Memory;
 import problems.LCS;
 import representation.MDDPrinter;

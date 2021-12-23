@@ -1,6 +1,5 @@
 package builder.constraints.parameters;
 
-import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -8,6 +7,11 @@ import structures.tuples.TupleOfInt;
 
 import java.util.Set;
 
+/**
+ * <b>ParametersGCC</b><br>
+ * Parameters of the GCC constraint. <br>
+ * Contains the min. and max. number of occurrences for each constrained value.
+ */
 public class ParametersGCC extends ConstraintParameters {
 
     // Thread safe allocator
@@ -30,17 +34,33 @@ public class ParametersGCC extends ConstraintParameters {
         return localStorage.get();
     }
 
-    public ParametersGCC(int allocatedIndex){
+    /**
+     * Private constructor of the parameters.
+     * Initialise the allocated index in the allocator.
+     * @param allocatedIndex Allocated index in the allocator
+     */
+    protected ParametersGCC(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
+    /**
+     * Initialisation of the parameters.
+     * @param gcc The values of the GCC
+     * @param variables The set of constrained variables
+     */
+    protected void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
         this.gcc = gcc;
         this.minimum = 0;
         for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
         super.setVariables(variables);
     }
 
+    /**
+     * Get a ParametersGCC object from the allocator.
+     * @param gcc The values of the GCC
+     * @param variables The set of constrained variables
+     * @return a fresh ParametersGCC object
+     */
     public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
         ParametersGCC object = allocator().allocate();
         object.init(gcc, variables);
@@ -49,20 +69,44 @@ public class ParametersGCC extends ConstraintParameters {
 
     //**************************************//
 
+    /**
+     * Check if the label is a constrained value
+     * @param label Value of the label
+     * @return True if the label is constrained, false otherwise
+     */
     public boolean contains(int label){
         return gcc.contains(label);
     }
 
+    /**
+     * Get the minimum occurrences for the given label
+     * @param label Value of the label
+     * @return The minimum occurrences for the given label
+     */
     public int min(int label){
         return gcc.get(label).getFirst();
     }
 
+    /**
+     * Get the maximum occurrences for the given label
+     * @param label Value of the label
+     * @return The maximum occurrences for the given label
+     */
     public int max(int label){
         return gcc.get(label).getSecond();
     }
 
+    /**
+     * Get the minimum number of variables necessary to satisfy the constraint. <br>
+     * That is, the sum of all min() of each variable.
+     * @return The minimum number of variables necessary to satisfy the constraint.
+     */
     public int minimum(){return minimum;}
 
+    /**
+     * Get the set of constrained values
+     * @return The set of constrained values
+     */
     public Set<Integer> V(){return gcc.keySet();}
 
 
@@ -71,6 +115,9 @@ public class ParametersGCC extends ConstraintParameters {
     //**************************************//
     // Implementation of MemoryObject interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         super.free();
@@ -92,11 +139,17 @@ public class ParametersGCC extends ConstraintParameters {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersGCC[] arrayCreation(int capacity) {
             return new ParametersGCC[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersGCC createObject(int index) {
             return new ParametersGCC(index);

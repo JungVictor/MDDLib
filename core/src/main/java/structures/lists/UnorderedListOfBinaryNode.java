@@ -1,10 +1,9 @@
 package structures.lists;
 
-import bdd.components.BinaryNode;
-import mdd.components.Node;
+import dd.bdd.components.BinaryNode;
 import memory.AllocatorOf;
 
-public class UnorderedListOfBinaryNode extends UnorderedListOf<BinaryNode> {
+public class UnorderedListOfBinaryNode extends UnorderedListOfAbstractNode<BinaryNode> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);

@@ -28,11 +28,16 @@ public class ParametersSubset extends ConstraintParameters{
         return localStorage.get();
     }
 
+    /**
+     * Private constructor of the parameters.
+     * Initialise the allocated index in the allocator.
+     * @param allocatedIndex Allocated index in the allocator
+     */
     private ParametersSubset(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
+    private void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
         for(int i = 0; i < word.length+1; i++){
             datas.add(i, SubsetData.create(i, word, alphabetSize, maxSequenceSize));
         }
@@ -67,6 +72,9 @@ public class ParametersSubset extends ConstraintParameters{
     //**************************************//
     // Implementation of MemoryObject interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         super.free();
@@ -89,11 +97,17 @@ public class ParametersSubset extends ConstraintParameters{
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSubset[] arrayCreation(int capacity) {
             return new ParametersSubset[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSubset createObject(int index) {
             return new ParametersSubset(index);
@@ -150,11 +164,17 @@ public class ParametersSubset extends ConstraintParameters{
         //**************************************//
         // Implementation of MemoryObject interface
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int allocatedIndex(){
             return allocatedIndex;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void free() {
             Memory.free(next);
@@ -176,11 +196,17 @@ public class ParametersSubset extends ConstraintParameters{
                 this(16);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             protected SubsetData[] arrayCreation(int capacity) {
                 return new SubsetData[capacity];
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             protected SubsetData createObject(int index) {
                 return new SubsetData(index);

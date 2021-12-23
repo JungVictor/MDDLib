@@ -1,12 +1,12 @@
 package structures.lists;
 
-import mdd.components.Node;
+import dd.mdd.components.Node;
 import memory.AllocatorOf;
 
 public class UnorderedListOfNode extends UnorderedListOf<Node> {
 
     // Thread safe allocator
-    private final static ThreadLocal<UnorderedListOfNode.Allocator> localStorage = ThreadLocal.withInitial(UnorderedListOfNode.Allocator::new);
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     private Node[] list;
 
@@ -21,7 +21,7 @@ public class UnorderedListOfNode extends UnorderedListOf<Node> {
      * Get the allocator. Thread safe.
      * @return The allocator.
      */
-    private static UnorderedListOfNode.Allocator allocator(){
+    private static Allocator allocator(){
         return localStorage.get();
     }
 

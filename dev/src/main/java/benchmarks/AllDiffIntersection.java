@@ -1,7 +1,7 @@
 package benchmarks;
 
 import builder.constraints.MDDAllDifferent;
-import mdd.MDD;
+import dd.mdd.MDD;
 import problems.AllDiff;
 import structures.arrays.ArrayOfInt;
 import utils.Logger;

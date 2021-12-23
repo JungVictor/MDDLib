@@ -2,11 +2,9 @@ package confidence;
 
 import builder.MDDBuilder;
 import confidence.structures.PrimeFactorization;
-import mdd.MDD;
+import dd.mdd.MDD;
 import structures.Domains;
 import structures.generics.MapOf;
-
-import java.math.BigInteger;
 
 public class MyMDDBuilder extends MDDBuilder {
     public static MDD mulPF(MDD mdd, PrimeFactorization m_min, PrimeFactorization m_max, MapOf<Integer, PrimeFactorization> mapPrimeFact, int n, Domains D){

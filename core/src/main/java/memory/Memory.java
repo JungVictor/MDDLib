@@ -1,9 +1,11 @@
 package memory;
 
-import bdd.components.BinaryNode;
-import mdd.components.*;
+import dd.bdd.components.BinaryNode;
+import dd.AbstractNode;
+import dd.mdd.components.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.generics.SetOfNode;
 import structures.tuples.TupleOfInt;
 import structures.lists.ListOfInt;
 
@@ -123,6 +125,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<MapOf<AbstractNode, Double>> mapOfAbstractNodeDoublePool = new MemoryPool<>();
+    public static MapOf<AbstractNode, Double> MapOfAbstractNodeDouble(){
+        MapOf<AbstractNode, Double> object = mapOfAbstractNodeDoublePool.get();
+        if(object == null){
+            object = new MapOf<>(mapOfAbstractNodeDoublePool);
+            mapOfAbstractNodeDoublePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
 
     private static final MemoryPool<MapOf<BinaryNode, Long>> mapOfBinaryNodeLongPool = new MemoryPool<>();
     public static MapOf<BinaryNode, Long> MapOfBinaryNodeLong(){
@@ -139,11 +152,11 @@ public class Memory {
     //                SETS                  //
     //**************************************//
 
-    private static final MemoryPool<SetOf<Node>> setOfNodePool = new MemoryPool<>();
-    public static SetOf<Node> SetOfNode(){
-        SetOf<Node> object = setOfNodePool.get();
+    private static final MemoryPool<SetOfNode<Node>> setOfNodePool = new MemoryPool<>();
+    public static SetOfNode<Node> SetOfNode(){
+        SetOfNode<Node> object = setOfNodePool.get();
         if(object == null) {
-            object = new SetOf<>(setOfNodePool);
+            object = new SetOfNode<>(setOfNodePool);
             setOfNodePool.add(object);
         }
         object.prepare();

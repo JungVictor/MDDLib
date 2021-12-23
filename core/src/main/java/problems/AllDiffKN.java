@@ -1,9 +1,9 @@
 package problems;
 
 import builder.MDDBuilder;
-import mdd.MDD;
-import mdd.components.Node;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
+import dd.operations.Operation;
 import memory.Memory;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -29,7 +29,7 @@ public class AllDiffKN {
         }
         for (int i = 0; i < K+K; i++) tokens.add(K + K + i + 1);
 
-        MDD alldiff = MDDBuilder.alldiff(mdd.MDD(), initial_domain, tokens,  K+K+1);
+        MDD alldiff = MDDBuilder.alldiff(mdd.DD(), initial_domain, tokens,  K+K+1);
 
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
         for(int i = 0; i < K*4+1; i++) mapping.put(i, Memory.SetOfInteger());

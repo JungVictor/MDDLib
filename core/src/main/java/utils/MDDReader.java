@@ -1,7 +1,7 @@
 package utils;
 
-import mdd.MDD;
-import mdd.components.Node;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class MDDReader {
     public static boolean save(MDD mdd, String file){
         n = 0;
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter(directoryPath+file+".mdd"));
+            PrintWriter writer = new PrintWriter(new FileWriter(directoryPath+file+".dd.mdd"));
             HashMap<Node, String> currentBinding = new HashMap<>(), nextBinding = new HashMap<>(), tmp;
             currentBinding.put(mdd.getRoot(), "root");
             for(int i = 0; i < mdd.size(); i++) {

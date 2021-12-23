@@ -1,5 +1,5 @@
-import mdd.MDD;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.operations.Operation;
 import memory.Memory;
 import problems.CarSequencing;
 import utils.ArgumentParser;

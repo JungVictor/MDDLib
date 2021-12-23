@@ -18,11 +18,19 @@ public class StateAmong extends NodeState {
     //           INITIALISATION             //
     //**************************************//
 
-    public StateAmong(int allocatedIndex){
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateAmong(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(ParametersAmong constraint){
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersAmong constraint){
         this.constraint = constraint;
         among = ArrayOfInt.create(constraint.q());
     }
@@ -47,8 +55,15 @@ public class StateAmong extends NodeState {
         return localStorage.get();
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateAmong state = StateAmong.create(constraint);
@@ -59,6 +74,9 @@ public class StateAmong extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) return true;
@@ -70,6 +88,9 @@ public class StateAmong extends NodeState {
         return constraint.min() <= cpt + potential && cpt <= constraint.max();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         int r = size - layer;
@@ -93,8 +114,11 @@ public class StateAmong extends NodeState {
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+    // Implementation of Allocable interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         Memory.free(among);
@@ -117,11 +141,17 @@ public class StateAmong extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateAmong[] arrayCreation(int capacity) {
             return new StateAmong[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateAmong createObject(int index) {
             return new StateAmong(index);

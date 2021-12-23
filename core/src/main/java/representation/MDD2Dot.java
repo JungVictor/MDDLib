@@ -1,7 +1,7 @@
 package representation;
 
-import mdd.MDD;
-import mdd.components.Node;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,15 +9,29 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
+/**
+ * <b>MDD2Dot</b><br>
+ * This class is used to convert an MDD to a .dot file that can be used to draw the MDD.
+ */
 public class MDD2Dot {
 
     private final static String path = "dot/", extension = ".dot";
 
+    /**
+     * Create the directory dot/ if it does not already exist
+     */
     private static void mkdir(){
         File file = new File(path);
         if(!file.exists()) file.mkdir();
     }
 
+    /**
+     * Convert the given MDD to a .dot file with given name
+     * @param mdd The MDD to convert
+     * @param filename The name of the .dot file
+     * @return The newly created .dot file
+     * @throws IOException Error during the creation of the file
+     */
     public static File convert(MDD mdd, String filename) throws IOException {
         int node_number = 0;
         HashMap<Node, Integer> names = new HashMap<>();
@@ -68,6 +82,11 @@ public class MDD2Dot {
         return file;
     }
 
+    /**
+     * Write the header of the .dot graph file into the given filewriter
+     * @param graph The filewriter
+     * @throws IOException Error during the writing
+     */
     private static void header(FileWriter graph) throws IOException {
         graph.write("digraph {\n");
         graph.write("\tgraph [nodesep=\"0.3\", ranksep=\"0.3\",fontsize=12]\n");

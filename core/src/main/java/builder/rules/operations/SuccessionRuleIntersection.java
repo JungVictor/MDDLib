@@ -1,32 +1,45 @@
 package builder.rules.operations;
 
 import builder.rules.SuccessionRule;
-import mdd.components.Node;
+import dd.AbstractNode;
 import memory.AllocatorOf;
 import structures.generics.CollectionOf;
 
 /**
- * The SuccesionRule for intersection. <br>
+ * The SuccessionRule for intersection. <br>
  * The successors are the out-going label of the first node associated.
  */
 public class SuccessionRuleIntersection extends SuccessionRule {
 
+    public static final SuccessionRuleIntersection RULE = new SuccessionRuleIntersection(-1);
+
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    public SuccessionRuleIntersection(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected SuccessionRuleIntersection(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, Node x) {
-        return x.getX1().getValues();
-    }
-
+    /**
+     * Create a SuccessionRuleIntersection.
+     * The object is managed by the allocator.
+     * @return A fresh SuccessionRuleIntersection
+     */
     public static SuccessionRuleIntersection create(){
         return allocator().allocate();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
+        return x.getX1().iterateOnChildLabel();
+    }
     //**************************************//
     //          SPECIAL FUNCTIONS           //
     //**************************************//
@@ -39,6 +52,9 @@ public class SuccessionRuleIntersection extends SuccessionRule {
         return localStorage.get();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         allocator().free(this);
@@ -60,11 +76,17 @@ public class SuccessionRuleIntersection extends SuccessionRule {
             this(10);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleIntersection[] arrayCreation(int capacity) {
             return new SuccessionRuleIntersection[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleIntersection createObject(int index) {
             return new SuccessionRuleIntersection(index);

@@ -1,10 +1,9 @@
 package problems;
 
 import builder.MDDBuilder;
-import builder.constraints.ConstraintBuilder;
-import mdd.MDD;
-import mdd.operations.ConstraintOperation;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.operations.ConstraintOperation;
+import dd.operations.Operation;
 import memory.Memory;
 import structures.Domains;
 import structures.generics.SetOf;

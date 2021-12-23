@@ -1,6 +1,5 @@
 package structures.lists;
 
-import mdd.components.Node;
 import memory.Allocable;
 import memory.AllocatorOf;
 

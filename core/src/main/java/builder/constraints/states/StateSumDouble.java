@@ -4,6 +4,10 @@ import memory.AllocatorOf;
 import builder.constraints.parameters.ParametersSumDouble;
 import structures.Signature;
 
+/**
+ * <b>StateSumDouble</b><br>
+ * Represent the state of a Sum constraint using double.
+ */
 public strictfp class StateSumDouble extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -17,6 +21,35 @@ public strictfp class StateSumDouble extends NodeState {
     //**************************************//
 
     /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateSumDouble(int allocatedIndex) {
+        super(allocatedIndex);
+    }
+
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersSumDouble constraint){
+        this.constraint = constraint;
+        this.sum = 0;
+    }
+
+    /**
+     * Create a StateSumDouble with specified parameters.
+     * The object is managed by the allocator.
+     * @param constraint Parameters of the constraint
+     * @return A StateSumDouble with given parameters
+     */
+    public static StateSumDouble create(ParametersSumDouble constraint){
+        StateSumDouble object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
+    /**
      * Get the allocator. Thread safe.
      * @return The allocator.
      */
@@ -24,27 +57,23 @@ public strictfp class StateSumDouble extends NodeState {
         return localStorage.get();
     }
 
-    private StateSumDouble(int allocatedIndex) {
-        super(allocatedIndex);
-    }
-
-    public void init(ParametersSumDouble constraint){
-        this.constraint = constraint;
-        this.sum = 0;
-    }
-
-    public static StateSumDouble create(ParametersSumDouble constraint){
-        StateSumDouble object = allocator().allocate();
-        object.init(constraint);
-        return object;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString(){
         return Double.toString(sum);
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumDouble state = StateSumDouble.create(constraint);
@@ -53,6 +82,9 @@ public strictfp class StateSumDouble extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) return true;
@@ -66,6 +98,9 @@ public strictfp class StateSumDouble extends NodeState {
         return sum + doubleLabel <= constraint.max();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         double doubleLabel = 0;
@@ -77,6 +112,9 @@ public strictfp class StateSumDouble extends NodeState {
         return Math.floor((sum + doubleLabel) * Math.pow(10, constraint.epsilon())) + "";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Signature hash(int label, int layer, int size, boolean test){
         double doubleLabel = constraint.mapDouble(label);
@@ -89,6 +127,9 @@ public strictfp class StateSumDouble extends NodeState {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState merge(NodeState state, int label, int layer, int size){
         StateSumDouble stateDouble = (StateSumDouble) state;
@@ -97,6 +138,15 @@ public strictfp class StateSumDouble extends NodeState {
         return null;
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of Allocable interface
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         this.constraint = null;
@@ -118,11 +168,17 @@ public strictfp class StateSumDouble extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumDouble[] arrayCreation(int capacity) {
             return new StateSumDouble[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumDouble createObject(int index) {
             return new StateSumDouble(index);

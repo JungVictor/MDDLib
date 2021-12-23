@@ -3,6 +3,10 @@ package builder.constraints.states;
 import builder.constraints.parameters.ParametersSum;
 import memory.AllocatorOf;
 
+/**
+ * <b>StateSum</b><br>
+ * Represent the state of a Sum constraint.
+ */
 public class StateSum extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -14,11 +18,19 @@ public class StateSum extends NodeState {
     //           INITIALISATION             //
     //**************************************//
 
-    private StateSum(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateSum(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    public void init(ParametersSum constraint){
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersSum constraint){
         this.constraint = constraint;
         this.sum = 0;
     }
@@ -43,24 +55,39 @@ public class StateSum extends NodeState {
         return localStorage.get();
     }
 
+
     //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString(){
         return Integer.toString(sum);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
+        label = constraint.value(label);
         StateSum state = StateSum.create(constraint);
         state.sum = sum;
         if(constraint.isVariable(layer-1)) state.sum += label;
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) return true;
+        label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
 
@@ -70,9 +97,13 @@ public class StateSum extends NodeState {
         return sum + label <= constraint.max();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) label = 0;
+        label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
 
@@ -80,12 +111,20 @@ public class StateSum extends NodeState {
         return Integer.toString(sum + label);
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of Allocable interface
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         this.constraint = null;
         allocator().free(this);
     }
-
 
     /**
      * <b>The allocator that is in charge of the StateSum type.</b><br>
@@ -102,11 +141,17 @@ public class StateSum extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSum[] arrayCreation(int capacity) {
             return new StateSum[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSum createObject(int index) {
             return new StateSum(index);

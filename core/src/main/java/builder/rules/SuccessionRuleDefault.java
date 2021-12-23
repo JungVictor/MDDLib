@@ -1,12 +1,12 @@
 package builder.rules;
 
-import mdd.components.Node;
+import dd.AbstractNode;
 import memory.AllocatorOf;
 import structures.Domains;
 import structures.generics.CollectionOf;
 
 /**
- * The default SuccesionRule. <br>
+ * The default SuccessionRule. <br>
  * The successors are the values in the domain for the given variable.
  */
 public class SuccessionRuleDefault extends SuccessionRule {
@@ -16,23 +16,41 @@ public class SuccessionRuleDefault extends SuccessionRule {
 
     private Domains D;
 
-    public SuccessionRuleDefault(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected SuccessionRuleDefault(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, Node x) {
-        return D.get(layer);
-    }
-
-    public void init(Domains D){
-        this.D = D;
-    }
-
+    /**
+     * Create a SuccessionRuleDefault.
+     * The object is managed by the allocator.
+     * @param D The domain
+     * @return A fresh SuccessionRuleDefault
+     */
     public static SuccessionRuleDefault create(Domains D){
         SuccessionRuleDefault object = allocator().allocate();
         object.init(D);
         return object;
+    }
+
+    /**
+     * Initialise the domain
+     * @param D The domain
+     */
+    private void init(Domains D){
+        this.D = D;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
+        return D.get(layer);
     }
 
     //**************************************//
@@ -47,6 +65,9 @@ public class SuccessionRuleDefault extends SuccessionRule {
         return localStorage.get();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         this.D = null;
@@ -69,11 +90,17 @@ public class SuccessionRuleDefault extends SuccessionRule {
             this(10);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleDefault[] arrayCreation(int capacity) {
             return new SuccessionRuleDefault[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleDefault createObject(int index) {
             return new SuccessionRuleDefault(index);

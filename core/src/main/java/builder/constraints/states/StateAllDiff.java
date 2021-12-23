@@ -5,6 +5,10 @@ import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.SetOf;
 
+/**
+ * <b>StateAllDiff</b><br>
+ * Represent the state of an All Different constraint.
+ */
 public class StateAllDiff extends NodeState {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -16,11 +20,19 @@ public class StateAllDiff extends NodeState {
     //           INITIALISATION             //
     //**************************************//
 
-    public StateAllDiff(int allocatedIndex) {
+    /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateAllDiff(int allocatedIndex) {
         super(allocatedIndex);
     }
 
-    public void init(ParametersAllDiff constraint){
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersAllDiff constraint){
         this.alldiff = Memory.SetOfInteger();
         this.constraint = constraint;
     }
@@ -45,8 +57,15 @@ public class StateAllDiff extends NodeState {
         return localStorage.get();
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateAllDiff state = StateAllDiff.create(constraint);
@@ -55,11 +74,17 @@ public class StateAllDiff extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         return !constraint.isVariable(layer-1) || !constraint.contains(label) || !alldiff.contains(label);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size) {
         StringBuilder builder = new StringBuilder();
@@ -73,8 +98,11 @@ public class StateAllDiff extends NodeState {
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
-    // Implementation of MemoryObject interface
+    // Implementation of Allocable interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         Memory.free(alldiff);
@@ -97,11 +125,17 @@ public class StateAllDiff extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateAllDiff[] arrayCreation(int capacity) {
             return new StateAllDiff[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateAllDiff createObject(int index) {
             return new StateAllDiff(index);

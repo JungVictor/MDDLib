@@ -1,14 +1,13 @@
 package problems;
 
 import builder.MDDBuilder;
-import builder.constraints.ConstraintBuilder;
 import builder.constraints.MDDGCC;
-import mdd.MDD;
-import mdd.operations.ConstraintOperation;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.operations.ConstraintOperation;
+import dd.operations.Operation;
 import memory.Memory;
 import memory.Binary;
-import pmdd.PMDD;
+import dd.mdd.pmdd.PMDD;
 import problems.carsequencing.CarSequencingData;
 import structures.arrays.ArrayOfMDD;
 import structures.generics.MapOf;
@@ -38,7 +37,8 @@ public class CarSequencing {
 
         // Options
         ArrayOfMDD options = options();
-        MDD opts = Operation.intersection(MDD.create(), options);
+        MDD opts = MDD.create();
+        Operation.intersection(opts, options);
         for(MDD mdd : options) Memory.free(mdd);
         Memory.free(options);
 
@@ -57,7 +57,7 @@ public class CarSequencing {
     }
 
     public MDD solve(MDD mdd, int option){
-        // The mdd is a relaxed solution
+        // The dd.mdd is a relaxed solution
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
 
         MapOf<Integer, Integer> old_bindings = Memory.MapOfIntegerInteger(), bindings = data.getBinding();
@@ -146,7 +146,8 @@ public class CarSequencing {
 
         // Options
         ArrayOfMDD options = options();
-        MDD opts = Operation.intersection(MDD.create(), options);
+        MDD opts = MDD.create();
+        Operation.intersection(opts, options);
 
         for(MDD mdd : options) Memory.free(mdd);
         Memory.free(options);
@@ -167,7 +168,7 @@ public class CarSequencing {
     }
 
     public MDD solve_legacy(MDD mdd, int option){
-        // The mdd is a relaxed solution
+        // The dd.mdd is a relaxed solution
         SetOf<Integer> V0 = Memory.SetOfInteger(), V1 = Memory.SetOfInteger();
 
         MapOf<Integer, Integer> old_bindings = Memory.MapOfIntegerInteger(), bindings = data.getBinding();
@@ -211,7 +212,7 @@ public class CarSequencing {
             gcc.put(v, TupleOfInt.create(ncars, ncars));
         }
         MDD conf = MDDGCC.generate(MDD.create(), data.nCars(), gcc, null);
-        MDD result = Operation.intersection(newMDD.MDD(), conf, newMDD);
+        MDD result = Operation.intersection(newMDD.DD(), conf, newMDD);
         Memory.free(conf);
         Memory.free(newMDD);
 

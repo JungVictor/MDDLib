@@ -1,9 +1,9 @@
 package problems;
 
 import builder.constraints.ConstraintBuilder;
-import mdd.MDD;
-import mdd.components.Node;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
+import dd.operations.Operation;
 import memory.Memory;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;

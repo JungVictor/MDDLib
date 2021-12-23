@@ -1,13 +1,13 @@
 package confidence;
 
 import builder.MDDBuilder;
-import mdd.operations.ConstraintOperation;
-import pmdd.ConstraintPruning;
-import pmdd.components.properties.PropertySumDouble;
-import mdd.MDD;
-import mdd.operations.Operation;
+import dd.operations.ConstraintOperation;
+import dd.mdd.pmdd.ConstraintPruning;
+import dd.mdd.pmdd.components.properties.PropertySumDouble;
+import dd.mdd.MDD;
+import dd.operations.Operation;
 import memory.Memory;
-import pmdd.PMDD;
+import dd.mdd.pmdd.PMDD;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.MapOf;

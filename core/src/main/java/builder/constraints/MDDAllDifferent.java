@@ -1,7 +1,7 @@
 package builder.constraints;
 
-import mdd.MDD;
-import mdd.components.Node;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
 import memory.Memory;
 import structures.arrays.ArrayOfInt;
 import utils.Logger;

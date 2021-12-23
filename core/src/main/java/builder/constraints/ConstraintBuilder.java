@@ -4,9 +4,9 @@ import builder.constraints.parameters.*;
 import builder.constraints.states.*;
 import builder.rules.SuccessionRule;
 import builder.rules.SuccessionRuleDefault;
-import mdd.MDD;
-import mdd.components.Node;
-import mdd.components.SNode;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
+import dd.mdd.components.SNode;
 import memory.Memory;
 import structures.Domains;
 import structures.arrays.ArrayOfBigInteger;
@@ -16,6 +16,7 @@ import structures.generics.CollectionOf;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
+import structures.generics.SetOfNode;
 import structures.tuples.TupleOfInt;
 import utils.Logger;
 import utils.SmallMath;
@@ -40,7 +41,7 @@ public class ConstraintBuilder {
 
         CollectionOf<Integer> successors = rule.getCollection();
         HashMap<String, SNode> bindings = new HashMap<>();
-        SetOf<Node> currentNodesConstraint = Memory.SetOfNode(),
+        SetOfNode<Node> currentNodesConstraint = Memory.SetOfNode(),
                 nextNodesConstraint = Memory.SetOfNode(),
                 tmp;
         int node_constraint = 0;
@@ -220,8 +221,8 @@ public class ConstraintBuilder {
 
         min = SmallMath.multiplyFloor(min, maxProbaEpsilon, maxProbaDomains);
         max = SmallMath.multiplyCeil(max, maxProbaEpsilon, maxProbaDomains);
-        ParametersMulRelaxed parameters = ParametersMulRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon, variables);
-        snode.setState(StateMulRelaxed.create(parameters));
+        ParametersProductRelaxed parameters = ParametersProductRelaxed.create(min, max, minValues, maxValues, maxProbaDomains, maxProbaEpsilon, variables);
+        snode.setState(StateProductRelaxed.create(parameters));
 
         build(result, snode, D, size);
 
@@ -266,8 +267,8 @@ public class ConstraintBuilder {
             maxValues.set(i, vMax);
         }
 
-        ParametersMul parameters = ParametersMul.create(min, max, minValues, maxValues, variables);
-        snode.setState(StateMul.create(parameters));
+        ParametersProduct parameters = ParametersProduct.create(min, max, minValues, maxValues, variables);
+        snode.setState(StateProduct.create(parameters));
 
         build(result, snode, D, size);
 

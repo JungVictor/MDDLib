@@ -1,10 +1,14 @@
 package builder.constraints.parameters;
 
-import memory.Allocable;
 import memory.AllocatorOf;
 import structures.arrays.ArrayOfInt;
 import structures.generics.SetOf;
 
+/**
+ * <b>ParametersSum</b><br>
+ * Parameters of the Sum constraint. <br>
+ * Contains the set of constrained variables, the bounds of the sum and the map associating labels with values.
+ */
 public class ParametersSum extends ConstraintParameters {
 
     // Thread safe allocator
@@ -27,11 +31,24 @@ public class ParametersSum extends ConstraintParameters {
         return localStorage.get();
     }
 
-    public ParametersSum(int allocatedIndex){
+    /**
+     * Private constructor of the parameters.
+     * Initialise the allocated index in the allocator.
+     * @param allocatedIndex Allocated index in the allocator
+     */
+    protected ParametersSum(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> variables){
+    /**
+     * Initialisation of the parameters
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param vMin The minimum sum achievable from a certain layer
+     * @param vMax The maximum sum achievable from a certain layer
+     * @param variables The set of constrained variables
+     */
+    protected void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> variables){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -39,6 +56,15 @@ public class ParametersSum extends ConstraintParameters {
         super.setVariables(variables);
     }
 
+    /**
+     * Get a ParametersSum object from the allocator.
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param vMin The minimum sum achievable from a certain layer
+     * @param vMax The maximum sum achievable from a certain layer
+     * @param variables The set of constrained variables
+     * @return a fresh ParametersSum object
+     */
     public static ParametersSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> variables){
         ParametersSum object = allocator().allocate();
         object.init(min, max, vMin, vMax, variables);
@@ -47,11 +73,40 @@ public class ParametersSum extends ConstraintParameters {
 
     //**************************************//
 
-
+    /**
+     * Get the minimum value of the sum
+     * @return The minimum value of the sum
+     */
     public int min(){return min;}
+
+    /**
+     * Get the maximum value of the sum
+     * @return The maximum value of the sum
+     */
     public int max(){return max;}
+
+    /**
+     * Get the minimum sum achievable from the layer i
+     * @param i The index of the layer
+     * @return The minimum sum achievable from the layer i
+     */
     public int vMin(int i){return vMin.get(i);}
+
+    /**
+     * Get the maximum sum achievable from the layer i
+     * @param i The index of the layer
+     * @return The maximum sum achievable from the layer i
+     */
     public int vMax(int i){return vMax.get(i);}
+
+    /**
+     * Get the value associated with the given label
+     * @param label The label of the arc
+     * @return The value associated with the given label
+     */
+    public int value(int label){
+        return label;
+    }
 
 
     //**************************************//
@@ -59,6 +114,9 @@ public class ParametersSum extends ConstraintParameters {
     //**************************************//
     // Implementation of MemoryObject interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         super.free();
@@ -80,11 +138,17 @@ public class ParametersSum extends ConstraintParameters {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSum[] arrayCreation(int capacity) {
             return new ParametersSum[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersSum createObject(int index) {
             return new ParametersSum(index);

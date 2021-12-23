@@ -1,6 +1,6 @@
 package builder.rules;
 
-import mdd.components.Node;
+import dd.AbstractNode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
@@ -20,16 +20,22 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
         super(allocatedIndex);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CollectionOf<Integer> getCollection(){
         return Memory.SetOfInteger();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, Node x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
         successors.clear();
 
-        for (int inLabel : x.getParents()) {
+        for (int inLabel : x.iterateOnParentLabel()) {
             // successors.add(successeurs de inLabel)
         }
 
@@ -58,6 +64,9 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
         return localStorage.get();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         //this.trie = null;
@@ -80,11 +89,17 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
             this(10);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleChupapaya[] arrayCreation(int capacity) {
             return new SuccessionRuleChupapaya[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected SuccessionRuleChupapaya createObject(int index) {
             return new SuccessionRuleChupapaya(index);

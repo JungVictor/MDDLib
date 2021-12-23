@@ -46,6 +46,17 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
         return object;
     }
 
+    /**
+     * Create a STATIC array, that can't be free from memory.
+     * @param array The array
+     * @return An ArrayOfInt corresponding to the given array
+     */
+    public static ArrayOfInt create(int... array){
+        ArrayOfInt object = new ArrayOfInt(-1);
+        object.array = array;
+        object.length = array.length;
+        return object;
+    }
 
     //**************************************//
     //          SPECIAL FUNCTIONS           //

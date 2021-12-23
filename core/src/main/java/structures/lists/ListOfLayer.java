@@ -1,6 +1,6 @@
 package structures.lists;
 
-import mdd.components.Layer;
+import dd.mdd.components.Layer;
 import memory.AllocatorOf;
 
 public class ListOfLayer extends ListOf<Layer> {

@@ -4,7 +4,13 @@ import memory.AllocatorOf;
 import builder.constraints.parameters.ParametersSumDouble;
 import structures.Signature;
 
+// TODO : extends StateSumDouble ?
+/**
+ * <b>StateSumDoubleULP</b><br>
+ * Represent the state of a Sum constraint using double.
+ */
 public strictfp class StateSumDoubleULP extends NodeState {
+
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
@@ -17,6 +23,35 @@ public strictfp class StateSumDoubleULP extends NodeState {
     //**************************************//
 
     /**
+     * Constructor. Initialise the index in the allocator.
+     * @param allocatedIndex Index of the object in the allocator
+     */
+    protected StateSumDoubleULP(int allocatedIndex) {
+        super(allocatedIndex);
+    }
+
+    /**
+     * Initialisation of the state
+     * @param constraint Parameters of the constraint
+     */
+    protected void init(ParametersSumDouble constraint){
+        this.constraint = constraint;
+        this.sum = 0;
+    }
+
+    /**
+     * Create a StateSumDoubleULP with specified parameters.
+     * The object is managed by the allocator.
+     * @param constraint Parameters of the constraint
+     * @return A StateSumDoubleULP with given parameters
+     */
+    public static StateSumDoubleULP create(ParametersSumDouble constraint){
+        StateSumDoubleULP object = allocator().allocate();
+        object.init(constraint);
+        return object;
+    }
+
+    /**
      * Get the allocator. Thread safe.
      * @return The allocator.
      */
@@ -24,27 +59,23 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return localStorage.get();
     }
 
-    private StateSumDoubleULP(int allocatedIndex) {
-        super(allocatedIndex);
-    }
-
-    public void init(ParametersSumDouble constraint){
-        this.constraint = constraint;
-        this.sum = 0;
-    }
-
-    public static StateSumDoubleULP create(ParametersSumDouble constraint){
-        StateSumDoubleULP object = allocator().allocate();
-        object.init(constraint);
-        return object;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString(){
         return Double.toString(sum);
     }
 
-    //**************************************//
 
+    //**************************************//
+    //           STATE FUNCTIONS            //
+    //**************************************//
+    // Implementation of NodeState functions
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumDoubleULP state = StateSumDoubleULP.create(constraint);
@@ -53,6 +84,9 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) return true;
@@ -67,6 +101,9 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return Math.nextDown(sum + doubleLabel) <= constraint.max();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String hash(int label, int layer, int size){
         double doubleLabel;
@@ -81,6 +118,9 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return Math.floor((sum + doubleLabel) * Math.pow(10, constraint.epsilon())) + "";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Signature hash(int label, int layer, int size, boolean test){
         double doubleLabel = constraint.mapDouble(label);
@@ -94,6 +134,9 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeState merge(NodeState state, int label, int layer, int size){
         StateSumDoubleULP stateDouble = (StateSumDoubleULP) state;
@@ -102,6 +145,15 @@ public strictfp class StateSumDoubleULP extends NodeState {
         return null;
     }
 
+
+    //**************************************//
+    //           MEMORY FUNCTIONS           //
+    //**************************************//
+    // Implementation of Allocable interface
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free(){
         this.constraint = null;
@@ -109,7 +161,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
     }
 
     /**
-     * <b>The allocator that is in charge of the StateSumDouble type.</b><br>
+     * <b>The allocator that is in charge of the StateSumDoubleULP type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
@@ -123,11 +175,17 @@ public strictfp class StateSumDoubleULP extends NodeState {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumDoubleULP[] arrayCreation(int capacity) {
             return new StateSumDoubleULP[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected StateSumDoubleULP createObject(int index) {
             return new StateSumDoubleULP(index);

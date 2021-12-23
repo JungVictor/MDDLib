@@ -1,9 +1,13 @@
 package builder.constraints.parameters;
 
-import memory.Allocable;
 import memory.AllocatorOf;
 import structures.generics.SetOf;
 
+/**
+ * <b>ParametersAllDiff</b><br>
+ * Parameters of the All Different constraint. <br>
+ * Contains the set of values that are constrained.
+ */
 public class ParametersAllDiff extends ConstraintParameters {
 
     // Thread safe allocator
@@ -26,30 +30,62 @@ public class ParametersAllDiff extends ConstraintParameters {
         return localStorage.get();
     }
 
-    public ParametersAllDiff(int allocatedIndex){
+    /**
+     * Private constructor of the parameters.
+     * Initialise the allocated index in the allocator.
+     * @param allocatedIndex Allocated index in the allocator
+     */
+    protected ParametersAllDiff(int allocatedIndex){
         super(allocatedIndex);
     }
 
-    public void init(SetOf<Integer> V, SetOf<Integer> variables){
+    /**
+     * Initialisation of the parameters.
+     * @param V The set of constrained values
+     * @param variables The set of constrained variables
+     */
+    protected void init(SetOf<Integer> V, SetOf<Integer> variables){
         this.V = V;
         super.setVariables(variables);
     }
 
+    /**
+     * Get a ParametersAllDiff object from the allocator.
+     * @param V The set of constrained values
+     * @param variables The set of constrained variables
+     * @return a fresh ParametersAllDiff object
+     */
     public static ParametersAllDiff create(SetOf<Integer> V, SetOf<Integer> variables){
         ParametersAllDiff object = allocator().allocate();
         object.init(V, variables);
         return object;
     }
 
+    /**
+     * Get a ParametersAllDiff object from the allocator.
+     * All variables are considered as constrained.
+     * @param V The set of constrained values
+     * @return a fresh ParametersAllDiff object
+     */
     public static ParametersAllDiff create(SetOf<Integer> V){
         return create(V, null);
     }
 
     //**************************************//
 
+    /**
+     * Check if the value is constrained.
+     * @param label Value of the label
+     * @return True if the value is constrained, false otherwise
+     */
     public boolean contains(int label){
         return V.contains(label);
     }
+
+    /**
+     * Get the set of all constrained values
+     * @return The set of all constrained values
+     */
     public SetOf<Integer> set(){
         return V;
     }
@@ -59,6 +95,9 @@ public class ParametersAllDiff extends ConstraintParameters {
     //**************************************//
     // Implementation of MemoryObject interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         super.free();
@@ -80,11 +119,17 @@ public class ParametersAllDiff extends ConstraintParameters {
             super.init();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersAllDiff[] arrayCreation(int capacity) {
             return new ParametersAllDiff[capacity];
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected ParametersAllDiff createObject(int index) {
             return new ParametersAllDiff(index);

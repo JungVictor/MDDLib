@@ -1,9 +1,9 @@
 package builder.constraints;
 
 import builder.MDDBuilder;
-import mdd.MDD;
-import mdd.components.Node;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.mdd.components.Node;
+import dd.operations.Operation;
 import memory.Binary;
 import memory.Memory;
 import structures.Binder;

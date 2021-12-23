@@ -1,11 +1,11 @@
 package problems;
 
 import builder.MDDBuilder;
-import mdd.MDD;
-import mdd.operations.Operation;
+import dd.mdd.MDD;
+import dd.operations.Operation;
 import memory.Memory;
-import pmdd.PMDD;
-import pmdd.components.properties.PropertySum;
+import dd.mdd.pmdd.PMDD;
+import dd.mdd.pmdd.components.properties.PropertySum;
 import representation.MDDPrinter;
 import structures.Domains;
 import structures.generics.MapOf;
