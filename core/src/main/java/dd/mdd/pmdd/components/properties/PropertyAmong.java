@@ -5,6 +5,10 @@ import memory.Memory;
 import structures.generics.SetOf;
 import structures.arrays.ArrayOfInt;
 
+/**
+ * <b>Among constraint</b><br>
+ * We stock the q previous values in an array.
+ */
 public class PropertyAmong extends NodeProperty {
 
     // Allocable variables

@@ -5,7 +5,7 @@ import structures.generics.MapOf;
 
 
 /**
- * <b>NODE PROPERTY</b><br>
+ * <b>NodeProperty</b><br>
  * This is the abstract class to represent node properties.
  * Main functions are : createProperty, mergeWithProperty and getResult.
  * <ul>

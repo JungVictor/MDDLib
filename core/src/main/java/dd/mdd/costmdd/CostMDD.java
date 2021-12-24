@@ -1,5 +1,6 @@
 package dd.mdd.costmdd;
 
+import dd.AbstractNode;
 import dd.mdd.costmdd.components.CostNode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
@@ -7,6 +8,10 @@ import memory.AllocatorOf;
 
 import java.util.InputMismatchException;
 
+/**
+ * <b>The class representing the CostMDD.</b> <br>
+ * Extends the <b>MDD</b> class, adding a value to the arcs (cost).
+ */
 public class CostMDD extends MDD {
 
     // Allocable variables
@@ -78,15 +83,31 @@ public class CostMDD extends MDD {
      * {@inheritDoc}
      */
     @Override
-    public MDD DD(){
-        return DD(Node());
+    public CostMDD DD(){
+        return MDD(Node());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MDD DD(Node root){
+    public CostMDD DD(AbstractNode root){
+        return MDD((Node) root);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CostMDD MDD(){
+        return create(Node());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CostMDD MDD(Node root){
         return create(root);
     }
 

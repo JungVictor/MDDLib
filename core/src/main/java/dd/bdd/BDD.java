@@ -11,6 +11,11 @@ import structures.lists.UnorderedListOfBinaryNode;
 
 import java.util.InputMismatchException;
 
+/**
+ * <b>The class representing the BDD.</b> <br>
+ * Contains a root node that is not null, a set of layers and a tt node if the MDD has been reduced.<br>
+ * The BDD is a sub-type of MDD with binary values.
+ */
 public class BDD extends DecisionDiagram {
 
     // Allocable variables
@@ -144,7 +149,7 @@ public class BDD extends DecisionDiagram {
      */
     @Override
     public BDD DD(){
-        return DD(Node());
+        return BDD(Node());
     }
 
     /**
@@ -152,7 +157,7 @@ public class BDD extends DecisionDiagram {
      */
     @Override
     public BDD DD(AbstractNode root){
-        if(root instanceof BinaryNode) return DD((BinaryNode) root);
+        if(root instanceof BinaryNode) return BDD((BinaryNode) root);
         throw new InputMismatchException("Expected the root to be at least of Node class !");
     }
 
@@ -161,8 +166,16 @@ public class BDD extends DecisionDiagram {
      * @param root The node to set as root
      * @return a BDD the same type as the current BDD with the given node as a root
      */
-    public BDD DD(BinaryNode root){
+    public BDD BDD(BinaryNode root){
         return create(root);
+    }
+
+    /**
+     * Create a BDD the same type as the current BDD
+     * @return a BDD the same type as the current BDD
+     */
+    public BDD BDD(){
+        return create(Node());
     }
 
 
@@ -461,10 +474,19 @@ public class BDD extends DecisionDiagram {
         dealloc();
     }
 
+    /**
+     * Call the allocator to free this object
+     */
     protected void dealloc(){
         allocator().free(this);
     }
 
+
+    /**
+     * <b>The allocator that is in charge of the BDD type.</b><br>
+     * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
+     * can be change if needed (might improve/decrease performance and/or memory usage).
+     */
     static final class Allocator extends AllocatorOf<BDD> {
 
         // You can specify the initial capacity. Default : 10.

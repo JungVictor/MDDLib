@@ -6,7 +6,7 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 
 /**
- * <b>ALL DIFFERENT CONSTRAINT</b><br>
+ * <b>All Different constraint</b><br>
  * We simply store into a set the already taken values.
  * If we try to add an already existing value, the constraint is violated.
  * We only take into account some values if specified, otherwise we take everything into account.

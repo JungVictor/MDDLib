@@ -1,5 +1,6 @@
 package dd.mdd.pmdd;
 
+import dd.AbstractNode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.AllocatorOf;
@@ -86,15 +87,32 @@ public class PMDD extends MDD {
      */
     @Override
     public PMDD DD(){
-        return DD(Node());
+        return MDD(Node());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PMDD DD(Node root){
+    public PMDD DD(AbstractNode root){
+        return MDD((Node) root);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PMDD MDD(Node root){
         return create(root);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PMDD MDD(){
+        return create(Node());
     }
 
 

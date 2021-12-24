@@ -2,6 +2,11 @@ package memory;
 
 import structures.integers.StackOfInt;
 
+/**
+ * <b>AllocatorOf</b><br>
+ * Memory Manager.<br>
+ * @param <T> Type of the object managed by the AllocatorOf. Must be Allocable.
+ */
 public abstract class AllocatorOf<T extends Allocable> {
 
     // The array of elements

@@ -6,7 +6,7 @@ import structures.generics.MapOf;
 import structures.tuples.TupleOfDouble;
 
 /**
- * <b>SUM CONSTRAINT (DOUBLE)</b><br>
+ * <b>Sum constraint (double)</b><br>
  * We use an interval to represents the [min, max] value of the sum.<br>
  */
 public strictfp class PropertySumDouble extends NodeProperty {

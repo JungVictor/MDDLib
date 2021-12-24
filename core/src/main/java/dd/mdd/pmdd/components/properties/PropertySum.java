@@ -6,7 +6,7 @@ import structures.generics.MapOf;
 import structures.tuples.TupleOfInt;
 
 /**
- * <b>SUM CONSTRAINT (INTEGER)</b><br>
+ * <b>Sum constraint (int)</b><br>
  * We use an interval to represents the [min, max] value of the sum.
  */
 public class PropertySum extends NodeProperty {

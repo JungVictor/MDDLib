@@ -8,7 +8,7 @@ import structures.generics.MapOf;
 import structures.generics.SetOf;
 
 /**
- * <b>SEQUENCE CONSTRAINT</b><br>
+ * <b>Sequence constraint</b><br>
  * We use a matrix to represent the couples (q, l, u) with q = the size of the sequence, l = lowerbound and u = upperbound.
  * values[q][0] = min, values[q][1] = max.
  * We take into account values passed as parameters.

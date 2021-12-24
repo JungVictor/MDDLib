@@ -1,5 +1,8 @@
 package memory;
 
+/**
+ * Object that is manage by an AllocatorOf
+ */
 public interface Allocable extends Freeable {
 
     /**

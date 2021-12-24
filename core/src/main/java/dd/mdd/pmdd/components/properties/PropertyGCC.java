@@ -7,7 +7,7 @@ import structures.tuples.TupleOfInt;
 import structures.lists.ListOfInt;
 
 /**
- * <b>GLOBAL CARDINALITY CONSTRAINT</b><br>
+ * <b>Global Cardinality Constraint (GCC)</b><br>
  * We use an interval to represent the number of time a value is taken : [min, max].
  * By doing this for each value, we have a matrix.
  */

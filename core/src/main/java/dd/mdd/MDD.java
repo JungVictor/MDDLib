@@ -22,7 +22,7 @@ import java.util.Random;
 
 /**
  * <b>The class representing the MDD.</b> <br>
- * Contains a root node that is not null, a set of layers and a tt node if the MDD has been reduce.
+ * Contains a root node that is not null, a set of layers and a tt node if the MDD has been reduced.
  */
 public class MDD extends DecisionDiagram {
 
@@ -147,17 +147,19 @@ public class MDD extends DecisionDiagram {
     }
 
     /**
-     * @return a MDD the same type as the current MDD, with the same Node type as the root for default Node
+     * Create an MDD.
+     * @return a new MDD
      */
-    public MDD DD(){
-        return DD(Node());
+    public MDD MDD(){
+        return create(Node());
     }
 
     /**
+     * Create an MDD with given node as root.
      * @param root The node to set as root
-     * @return a MDD the same type as the current MDD with the given node as a root
+     * @return a new MDD with given node as root.
      */
-    public MDD DD(Node root){
+    public MDD MDD(Node root){
         return create(root);
     }
 
@@ -165,8 +167,16 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
+    public MDD DD(){
+        return MDD(Node());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MDD DD(AbstractNode root){
-        if(root instanceof Node) DD((Node) root);
+        if(root instanceof Node) MDD((Node) root);
         else throw new InputMismatchException("Expected the root to be at least of Node class !");
         return null;
     }
