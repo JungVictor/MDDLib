@@ -3,6 +3,8 @@ package dd.operations;
 import builder.MDDBuilder;
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
+import dd.AbstractNode;
+import dd.DecisionDiagram;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.mdd.components.SNode;
@@ -27,14 +29,14 @@ import java.util.HashMap;
 public class ConstraintOperation {
 
     /**
-     * Perform the intersection operation between mdd and a alldiff constraint
+     * Perform the intersection operation between mdd and an alldiff constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation
      * @param V The set of constrained values
      * @param variables The set of constrained variables
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
-    static public MDD allDiff(MDD result, MDD mdd, SetOf<Integer> V, SetOf<Integer> variables){
+    static public DecisionDiagram allDiff(DecisionDiagram result, DecisionDiagram mdd, SetOf<Integer> V, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
@@ -58,7 +60,7 @@ public class ConstraintOperation {
      * @param variables The set of all constrained variables
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
-    static public MDD sum(MDD result, MDD mdd, int min, int max, SetOf<Integer> variables){
+    static public DecisionDiagram sum(DecisionDiagram result, DecisionDiagram mdd, int min, int max, SetOf<Integer> variables){
 
         ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
         ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
@@ -100,7 +102,7 @@ public class ConstraintOperation {
      * @param variables The set of all constrained variables
      * @return the MDD resulting from the intersection between mdd and the sum constraint
      */
-    static public MDD sum(MDD result, MDD mdd, int min, int max, MapOf<Integer, Integer> map, SetOf<Integer> variables){
+    static public DecisionDiagram sum(DecisionDiagram result, DecisionDiagram mdd, int min, int max, MapOf<Integer, Integer> map, SetOf<Integer> variables){
 
         ArrayOfInt minValues = ArrayOfInt.create(mdd.size()-1);
         ArrayOfInt maxValues = ArrayOfInt.create(mdd.size()-1);
@@ -140,7 +142,7 @@ public class ConstraintOperation {
      * @param variables The set of all constrained variables
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
-    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues, SetOf<Integer> variables){
+    static public DecisionDiagram gcc(DecisionDiagram result, DecisionDiagram mdd, MapOf<Integer, TupleOfInt> maxValues, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
         StateGCC state = StateGCC.create(parameters);
@@ -154,7 +156,7 @@ public class ConstraintOperation {
         result.reduce();
         return result;
     }
-    static public MDD gcc(MDD result, MDD mdd, MapOf<Integer, TupleOfInt> maxValues){
+    static public DecisionDiagram gcc(DecisionDiagram result, DecisionDiagram mdd, MapOf<Integer, TupleOfInt> maxValues){
         return gcc(result, mdd, maxValues, null);
     }
 
@@ -169,7 +171,7 @@ public class ConstraintOperation {
      * @param variables The set of all constrained variables
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
-    static public MDD sequence(MDD result, MDD mdd, int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
+    static public DecisionDiagram sequence(DecisionDiagram result, DecisionDiagram mdd, int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         constraint.setState(StateAmong.create(parameters));
@@ -188,7 +190,7 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
-    static protected void intersection(MDD result, MDD mdd, SNode constraint){
+    static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint){
         intersection(result, mdd, constraint, false);
     }
 
@@ -199,7 +201,7 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      * @param relaxation True if you perform a relaxation on the constraint, false otherwise
      */
-    static protected void intersection(MDD result, MDD mdd, SNode constraint, boolean relaxation){
+    static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint, boolean relaxation){
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
 
@@ -213,9 +215,9 @@ public class ConstraintOperation {
 
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(Node node : result.getLayer(i-1)){
+            for(AbstractNode node : result.iterateOnLayer(i-1)){
                 SNode x2 = (SNode) node.getX2();
-                Node x1 = node.getX1();
+                AbstractNode x1 = node.getX1();
                 for(int value : x1.iterateOnChildLabel()) {
                     NodeState state = x2.getState();
                     if(state.isValid(value, i, mdd.size())) {

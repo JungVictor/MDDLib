@@ -49,7 +49,8 @@ public class CarSequencing {
             gcc.put(v, TupleOfInt.create(ncars, ncars));
         }
         //MDD solution = MDDGCC.intersection(MDD.create(), opts, gcc);
-        MDD solution = ConstraintOperation.gcc(MDD.create(), opts, gcc);
+        MDD solution = MDD.create();
+        ConstraintOperation.gcc(solution, opts, gcc);
         Memory.free(opts);
         solution.reduce();
 

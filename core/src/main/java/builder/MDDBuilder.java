@@ -113,7 +113,8 @@ public class MDDBuilder {
      * @return an MDD satisfying an among constraint
      */
     public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max){
-        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, null);
+        ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, null);
+        return mdd;
     }
 
     /**
@@ -128,7 +129,8 @@ public class MDDBuilder {
      * @return an MDD satisfying an among constraint
      */
     public static MDD among(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, SetOf<Integer> variables){
-        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, variables);
+        ConstraintBuilder.sequence(mdd, D, V, q, min, max, q, variables);
+        return mdd;
     }
 
 
@@ -202,7 +204,8 @@ public class MDDBuilder {
      * @return an MDD satisfying a sequence constraint
      */
     public static MDD sequence(MDD mdd, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
-        return ConstraintBuilder.sequence(mdd, D, V, q, min, max, size, variables);
+        ConstraintBuilder.sequence(mdd, D, V, q, min, max, size, variables);
+        return mdd;
     }
 
     /* SUM */
@@ -218,7 +221,8 @@ public class MDDBuilder {
      * @return an MDD satisfying a sum constraint.
      */
     public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D, SetOf<Integer> variables){
-        return ConstraintBuilder.sum(mdd, D, s_min, s_max, n, variables);
+        ConstraintBuilder.sum(mdd, D, s_min, s_max, n, variables);
+        return mdd;
     }
 
     /**
@@ -305,7 +309,8 @@ public class MDDBuilder {
      * @return an MDD satisfying a GCC constraint
      */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D){
-        return ConstraintBuilder.gcc(mdd, D, couples, n, null);
+        ConstraintBuilder.gcc(mdd, D, couples, n, null);
+        return mdd;
     }
 
     /**
@@ -318,7 +323,8 @@ public class MDDBuilder {
      * @return an MDD satisfying a GCC constraint
      */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D, SetOf<Integer> variables){
-        return ConstraintBuilder.gcc(mdd, D, couples, n, variables);
+        ConstraintBuilder.gcc(mdd, D, couples, n, variables);
+        return mdd;
     }
 
     /* ALL DIFF */
@@ -331,13 +337,13 @@ public class MDDBuilder {
      * @param size The size of the MDD
      * @return an MDD satisfying an AllDifferent constraint
      */
-    public static MDD alldiff(MDD mdd, SetOf<Integer> V, int size){
+    public static MDD allDifferent(MDD mdd, SetOf<Integer> V, int size){
         Domains D = Domains.create();
         for(int i = 0; i < size; i++) {
             D.add(i);
             D.get(i).add(V);
         }
-        ConstraintBuilder.alldiff(mdd, D, V, size, null);
+        ConstraintBuilder.allDifferent(mdd, D, V, size, null);
         Memory.free(D);
         return mdd;
         //return MDDAllDifferent.generate(dd.mdd, V, size);
@@ -352,8 +358,9 @@ public class MDDBuilder {
      * @param size The size of the MDD
      * @return an MDD satisfying an AllDifferent constraint
      */
-    public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size){
-        return ConstraintBuilder.alldiff(mdd, D, V, size, null);
+    public static MDD allDifferent(MDD mdd, Domains D, SetOf<Integer> V, int size){
+        ConstraintBuilder.allDifferent(mdd, D, V, size, null);
+        return mdd;
         //return MDDAllDifferent.generate(dd.mdd, V, C, size);
     }
 
@@ -368,15 +375,15 @@ public class MDDBuilder {
      * @param size The size of the MDD
      * @return an MDD satisfying an AllDifferent constraint
      */
-    public static MDD alldiff(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
+    public static MDD allDifferent(MDD mdd, SetOf<Integer> D, SetOf<Integer> V, int size){
         Domains domains = Domains.create();
         for(int i = 0; i < size; i++){
             domains.add(i);
             for(int v : D) domains.put(i, v);
         }
-        MDD result = ConstraintBuilder.alldiff(mdd, domains, V,  size, null);
+        ConstraintBuilder.allDifferent(mdd, domains, V,  size, null);
         Memory.free(domains);
-        return result;
+        return mdd;
         //return MDDAllDifferent.generate(dd.mdd, V, C, size);
     }
 
@@ -390,8 +397,9 @@ public class MDDBuilder {
      * @param variables The set of constrained variables
      * @return an MDD satisfying an AllDifferent constraint
      */
-    public static MDD alldiff(MDD mdd, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
-        return ConstraintBuilder.alldiff(mdd, D, V, size, variables);
+    public static MDD allDifferent(MDD mdd, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
+        ConstraintBuilder.allDifferent(mdd, D, V, size, variables);
+        return mdd;
     }
 
 

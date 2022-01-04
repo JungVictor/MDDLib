@@ -29,7 +29,7 @@ public class AllDiffKN {
         }
         for (int i = 0; i < K+K; i++) tokens.add(K + K + i + 1);
 
-        MDD alldiff = MDDBuilder.alldiff(mdd.DD(), initial_domain, tokens,  K+K+1);
+        MDD alldiff = MDDBuilder.allDifferent(mdd.DD(), initial_domain, tokens,  K+K+1);
 
         MapOf<Integer, SetOf<Integer>> mapping = Memory.MapOfIntegerSetOfInteger();
         for(int i = 0; i < K*4+1; i++) mapping.put(i, Memory.SetOfInteger());

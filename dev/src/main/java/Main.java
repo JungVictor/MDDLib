@@ -7,7 +7,7 @@ import utils.ArgumentParser;
 
 public class Main {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         ArgumentParser parser = new ArgumentParser(
                 "-gamma", "9000", "-precision", "4", "-n", "10",

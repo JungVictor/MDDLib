@@ -4,6 +4,8 @@ import builder.constraints.parameters.*;
 import builder.constraints.states.*;
 import builder.rules.SuccessionRule;
 import builder.rules.SuccessionRuleDefault;
+import dd.AbstractNode;
+import dd.DecisionDiagram;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.mdd.components.SNode;
@@ -26,16 +28,46 @@ import java.util.HashMap;
 
 public class ConstraintBuilder {
 
-    public static MDD build(MDD result, SNode constraint, Domains D, int size){
+    /**
+     * Build the constraint corresponding to the one held by the given SNode.
+     * The succession is defined by the domains D (successors of one node at layer i = D[i]).
+     * @param result The DecisionDiagram holding the result
+     * @param constraint The given constraint
+     * @param D The rule of succession
+     * @param size The size of the DD
+     * @return The DD corresponding to the given constraint
+     */
+    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, Domains D, int size){
         return build(result, constraint, D, size, false);
     }
-    public static MDD build(MDD result, SNode constraint, Domains D, int size, boolean relaxation){
+
+    /**
+     * Build the constraint corresponding to the one held by the given SNode.
+     * The succession is defined by the domains D (successors of one node at layer i = D[i]).
+     * @param result The DecisionDiagram holding the result
+     * @param constraint The given constraint
+     * @param D The domains of the variables
+     * @param size The size of the DD
+     * @param relaxation True if the constraint must be relaxed when building, false otherwise
+     * @return The DD corresponding to the given constraint
+     */
+    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, Domains D, int size, boolean relaxation){
         SuccessionRuleDefault rule = SuccessionRuleDefault.create(D);
         build(result, constraint, rule, size, relaxation);
         Memory.free(rule);
         return result;
     }
-    public static MDD build(MDD result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
+
+    /**
+     * Build the constraint corresponding to the one held by the given SNode.
+     * @param result The DecisionDiagram holding the result
+     * @param constraint The given constraint
+     * @param rule The rule of succession
+     * @param size The size of the DD
+     * @param relaxation True if the constraint must be relaxed when building, false otherwise
+     * @return The DD corresponding to the given constraint
+     */
+    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
         result.setSize(size+1);
         result.setRoot(constraint);
 
@@ -48,7 +80,7 @@ public class ConstraintBuilder {
 
         for(int i = 1; i < result.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(Node node : result.getLayer(i-1)){
+            for(AbstractNode node : result.iterateOnLayer(i-1)){
                 SNode x = (SNode) node;
                 for(int value : rule.successors(successors,i - 1, x)) {
                     NodeState state = x.getState();
@@ -83,7 +115,15 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D, SetOf<Integer> variables) {
+    /**
+     * Build the DD corresponding to the subset constraint.
+     * @param result The DecisionDiagram holding the result
+     * @param letters The letters of the constraint
+     * @param D The domains of the variables
+     * @param variables The variables of the constraint
+     * @return The DD corresponding to the subset constraint
+     */
+    public static DecisionDiagram subset(DecisionDiagram result, ArrayOfInt letters, SetOf<Integer> D, SetOf<Integer> variables) {
         D.add(-1);
         SNode snode = SNode.create();
         ParametersSubset parameters = ParametersSubset.create(letters, D.size(), letters.length, variables);
@@ -102,11 +142,31 @@ public class ConstraintBuilder {
         result.reduce();
         return result;
     }
-    public static MDD subset(MDD result, ArrayOfInt letters, SetOf<Integer> D) {
+
+    /**
+     * Build the DD corresponding to the subset constraint.
+     * @param result The DecisionDiagram holding the result
+     * @param letters The letters of the constraint
+     * @param D The domains of the variables
+     * @return The DD corresponding to the subset constraint
+     */
+    public static DecisionDiagram subset(DecisionDiagram result, ArrayOfInt letters, SetOf<Integer> D) {
         return subset(result, letters, D, null);
     }
 
-    public static MDD sequence(MDD result, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
+    /**
+     * Build the DD corresponding to the sequence constraint.
+     * @param result The DecisionDiagram holding the result
+     * @param D Domains of the variables
+     * @param V The set of constrained values
+     * @param q Window of the sequence
+     * @param min Minimum number of occurrences of a value in V
+     * @param max Maximum number of occurrences of a value in V
+     * @param size The size of the DD
+     * @param variables The set of constrained variables
+     * @return The DecisionDiagram corresponding to the sequence constraint
+     */
+    public static DecisionDiagram sequence(DecisionDiagram result, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
         ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         snode.setState(StateAmong.create(parameters));
@@ -119,7 +179,17 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD sum(MDD result, Domains D, int min, int max, int size, SetOf<Integer> variables){
+    /**
+     * Build the DD corresponding to the sum constraint.
+     * @param result The DecisionDiagram holding the result
+     * @param D The domains of the variables
+     * @param min The minimum value of the sum
+     * @param max The maximum value of the sum
+     * @param size The size of the DD
+     * @param variables The set of constrained variables
+     * @return The DecisionDiagram corresponding to the sum constraint
+     */
+    public static DecisionDiagram sum(DecisionDiagram result, Domains D, int min, int max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);
         ArrayOfInt maxValues = ArrayOfInt.create(size);
@@ -151,7 +221,16 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD gcc(MDD result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size, SetOf<Integer> variables){
+    /**
+     * Build the DD corresponding to the GCC constraint
+     * @param result The DecisionDiagram holding the result
+     * @param D The domains of the variables
+     * @param maxValues The values of the GCC
+     * @param size The size of the DD
+     * @param variables The set of constrained variables
+     * @return The DecisionDiagram corresponding to the GCC constraint
+     */
+    public static DecisionDiagram gcc(DecisionDiagram result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
         StateGCC state = StateGCC.create(parameters);
@@ -165,7 +244,16 @@ public class ConstraintBuilder {
         return result;
     }
 
-    public static MDD alldiff(MDD result, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
+    /**
+     * Build the DD corresponding to the AllDifferent constraint
+     * @param result The DD holding the result
+     * @param D The domains of the variables
+     * @param V The set of constrained values
+     * @param size The size of the DD
+     * @param variables The set of constrained variables
+     * @return The DecisionDiagram corresponding to the AllDifferent constraint
+     */
+    public static DecisionDiagram allDifferent(DecisionDiagram result, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
         ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));

@@ -16,13 +16,15 @@ public class LCS {
         ArrayOfInt letters = ArrayOfInt.create(words[0].length());
         for (int j = 0; j < words[0].length(); j++) letters.set(j, words[0].charAt(j));
 
-        MDD result = ConstraintBuilder.subset(MDD.create(), letters, D);
+        MDD result = MDD.create();
+        ConstraintBuilder.subset(result, letters, D);
         MDD tmp = result;
         for(int i = 1; i < words.length; i++) {
             Logger.out.information(i+" " + (result.size()-1) + "\n");
             for (int j = 0; j < words[0].length(); j++) letters.set(j, words[i].charAt(j));
 
-            MDD word = ConstraintBuilder.subset(MDD.create(), letters, D);
+            MDD word = MDD.create();
+            ConstraintBuilder.subset(word, letters, D);
             Logger.out.information(word.nSolutions() + "\n");
             result = Operation.intersection(result, word);
             Memory.free(tmp);
