@@ -108,7 +108,7 @@ public strictfp class StateProductRelaxed extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         double newMul = mul;
         if(constraint.isVariable(layer-1)) newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
 

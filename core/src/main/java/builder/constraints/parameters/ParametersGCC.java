@@ -19,7 +19,7 @@ public class ParametersGCC extends ConstraintParameters {
 
     // Not to free
     private MapOf<Integer, TupleOfInt> gcc;
-    private int minimum;
+    private int minimum, violations;
 
 
     //**************************************//
@@ -48,9 +48,10 @@ public class ParametersGCC extends ConstraintParameters {
      * @param gcc The values of the GCC
      * @param variables The set of constrained variables
      */
-    protected void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
+    protected void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables, int violations){
         this.gcc = gcc;
         this.minimum = 0;
+        this.violations = violations;
         for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
         super.setVariables(variables);
     }
@@ -63,7 +64,20 @@ public class ParametersGCC extends ConstraintParameters {
      */
     public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
         ParametersGCC object = allocator().allocate();
-        object.init(gcc, variables);
+        object.init(gcc, variables, 0);
+        return object;
+    }
+
+    /**
+     * Get a ParametersGCC object from the allocator.
+     * @param gcc The values of the GCC
+     * @param violations The maximum number of violations allowed
+     * @param variables The set of constrained variables
+     * @return a fresh ParametersGCC object
+     */
+    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, int violations, SetOf<Integer> variables){
+        ParametersGCC object = allocator().allocate();
+        object.init(gcc, variables, violations);
         return object;
     }
 
@@ -102,6 +116,14 @@ public class ParametersGCC extends ConstraintParameters {
      * @return The minimum number of variables necessary to satisfy the constraint.
      */
     public int minimum(){return minimum;}
+
+    /**
+     * Get the maximum number of violations allowed
+     * @return The maximum number of violations allowed
+     */
+    public int violations(){
+        return violations;
+    }
 
     /**
      * Get the set of constrained values

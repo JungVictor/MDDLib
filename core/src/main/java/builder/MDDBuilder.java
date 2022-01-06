@@ -309,7 +309,7 @@ public class MDDBuilder {
      * @return an MDD satisfying a GCC constraint
      */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D){
-        ConstraintBuilder.gcc(mdd, D, couples, n, null);
+        ConstraintBuilder.gcc(mdd, D, couples, 0, n, null);
         return mdd;
     }
 
@@ -323,7 +323,22 @@ public class MDDBuilder {
      * @return an MDD satisfying a GCC constraint
      */
     public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, Domains D, SetOf<Integer> variables){
-        ConstraintBuilder.gcc(mdd, D, couples, n, variables);
+        ConstraintBuilder.gcc(mdd, D, couples, 0, n, variables);
+        return mdd;
+    }
+
+    /**
+     * Generate an MDD satisfying a GCC constraint with given parameters.
+     * @param mdd The MDD stocking the result
+     * @param n The size of the MDD
+     * @param couples The values of the GCC
+     * @param violations The maximum number of violations in the GCC
+     * @param D The domains of the variables
+     * @param variables The set of constrained variables
+     * @return an MDD satisfying a GCC constraint
+     */
+    public static MDD gcc(MDD mdd, int n, MapOf<Integer, TupleOfInt> couples, int violations, Domains D, SetOf<Integer> variables){
+        ConstraintBuilder.gcc(mdd, D, couples, violations, n, variables);
         return mdd;
     }
 

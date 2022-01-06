@@ -105,7 +105,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         double doubleLabel;
         if(constraint.isVariable(layer-1)) doubleLabel = constraint.mapDouble(label);
         else doubleLabel = 0;
@@ -122,7 +122,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public Signature hash(int label, int layer, int size, boolean test){
+    public Signature signature(int label, int layer, int size, boolean test){
         double doubleLabel = constraint.mapDouble(label);
         double minPotential = Math.nextDown(sum + doubleLabel + constraint.vMin(layer-1));
         //Revoir maxPotential

@@ -102,7 +102,7 @@ public strictfp class StateSumDouble extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         double doubleLabel = 0;
         if(constraint.isVariable(layer-1)) doubleLabel = constraint.mapDouble(label);
         double minPotential = sum + doubleLabel + constraint.vMin(layer-1);
@@ -116,7 +116,7 @@ public strictfp class StateSumDouble extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public Signature hash(int label, int layer, int size, boolean test){
+    public Signature signature(int label, int layer, int size, boolean test){
         double doubleLabel = constraint.mapDouble(label);
         double minPotential = sum + doubleLabel + constraint.vMin(layer-1);
         double maxPotential = sum + doubleLabel + constraint.vMax(layer-1);

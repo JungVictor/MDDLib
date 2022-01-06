@@ -86,7 +86,7 @@ public class ConstraintBuilder {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
-                            String hash = state.hash(value, i, result.size());
+                            String hash = state.signature(value, i, result.size());
                             SNode y = bindings.get(hash);
                             if (y == null) {
                                 y = SNode.create();
@@ -226,13 +226,14 @@ public class ConstraintBuilder {
      * @param result The DecisionDiagram holding the result
      * @param D The domains of the variables
      * @param maxValues The values of the GCC
+     * @param violations The maximum number of violations in the GCC
      * @param size The size of the DD
      * @param variables The set of constrained variables
      * @return The DecisionDiagram corresponding to the GCC constraint
      */
-    public static DecisionDiagram gcc(DecisionDiagram result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int size, SetOf<Integer> variables){
+    public static DecisionDiagram gcc(DecisionDiagram result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int violations, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
+        ParametersGCC parameters = ParametersGCC.create(maxValues, 16, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
         constraint.setState(state);

@@ -63,7 +63,7 @@ public class StateSubset extends NodeState {
     }
 
     @Override
-    public String hash(int label, int layer, int size) {
+    public String signature(int label, int layer, int size) {
         return Integer.toString(constraint.getNext(setID, label));
     }
 

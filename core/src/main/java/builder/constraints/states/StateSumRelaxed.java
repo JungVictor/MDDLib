@@ -103,7 +103,7 @@ public strictfp class StateSumRelaxed extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         long value = 0;
         if(constraint.isVariable(layer-1)) value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
@@ -117,7 +117,7 @@ public strictfp class StateSumRelaxed extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public Signature hash(int label, int layer, int size, boolean test){
+    public Signature signature(int label, int layer, int size, boolean test){
         long value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
         long maxPotential = sum + value + constraint.vMax(layer-1);

@@ -76,7 +76,7 @@ public class StateMulPF extends NodeState {
     }
 
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         PrimeFactorization newMul = mul.multiply(constraint.mapPrimeFact(label));
 
         PrimeFactorization minPotential = newMul.multiply(constraint.vMin(layer-1));

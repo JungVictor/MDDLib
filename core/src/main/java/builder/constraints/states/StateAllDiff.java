@@ -86,7 +86,7 @@ public class StateAllDiff extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size) {
+    public String signature(int label, int layer, int size) {
         StringBuilder builder = new StringBuilder();
         for(int v : constraint.set()) {
             if((v == label && constraint.isVariable(layer-1)) || alldiff.contains(v)) builder.append("1");

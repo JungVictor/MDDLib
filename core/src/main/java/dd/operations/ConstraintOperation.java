@@ -222,7 +222,7 @@ public class ConstraintOperation {
                     NodeState state = x2.getState();
                     if(state.isValid(value, i, mdd.size())) {
                         if(!x2.containsLabel(value)) {
-                            String hash = state.hash(value, i, mdd.size());
+                            String hash = state.signature(value, i, mdd.size());
                             SNode y2 = bindings.get(hash);
                             if (y2 == null) {
                                 y2 = SNode.create();

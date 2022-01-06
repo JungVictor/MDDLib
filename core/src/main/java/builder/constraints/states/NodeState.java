@@ -71,7 +71,7 @@ public abstract class NodeState implements Allocable {
      * @param size The total size of the DD
      * @return The signature of the state
      */
-    public abstract String hash(int label, int layer, int size);
+    public abstract String signature(int label, int layer, int size);
 
 
     /**
@@ -83,7 +83,7 @@ public abstract class NodeState implements Allocable {
      * @param test ---
      * @return The signature of the state
      */
-    public Signature hash(int label, int layer, int size, boolean test){
+    public Signature signature(int label, int layer, int size, boolean test){
         return null;
     }
 

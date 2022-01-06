@@ -101,7 +101,7 @@ public class StateSum extends NodeState {
      * {@inheritDoc}
      */
     @Override
-    public String hash(int label, int layer, int size){
+    public String signature(int label, int layer, int size){
         if(!constraint.isVariable(layer-1)) label = 0;
         label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
