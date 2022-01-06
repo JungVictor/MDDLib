@@ -14,7 +14,7 @@ The Javadoc is available at https://jungvictor.github.io/javadoc/.
 
 ### MDDViewer
 This allows you to visualise a .dot file on your browser, without having to install anything. This was made using the [viz.js](https://github.com/mdaines/viz.js) library under MIT License.  
-MDDLib is able to generate MDDs under .dot format. More information here : [MDD2Dot](mdd2dot).
+MDDLib is able to generate MDDs under .dot format. More information here : [MDD2Dot](https://jungvictor.github.io/#/mdd2dot).
 
 
 ## Planned
