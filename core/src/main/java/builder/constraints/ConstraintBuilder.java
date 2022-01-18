@@ -233,7 +233,7 @@ public class ConstraintBuilder {
      */
     public static DecisionDiagram gcc(DecisionDiagram result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int violations, int size, SetOf<Integer> variables){
         SNode constraint = SNode.create();
-        ParametersGCC parameters = ParametersGCC.create(maxValues, 16, variables);
+        ParametersGCC parameters = ParametersGCC.create(maxValues, violations, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
         constraint.setState(state);

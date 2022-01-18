@@ -41,6 +41,15 @@ public abstract class ConstraintParameters implements Allocable {
     }
 
     /**
+     * Get the number of constrained variables
+     * @return The number of constrained variables
+     */
+    public int numberOfVariables(){
+        if(variables == null) return -1;
+        return variables.size();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

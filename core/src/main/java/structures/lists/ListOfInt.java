@@ -53,7 +53,18 @@ public class ListOfInt implements Allocable, CollectionOf<Integer> {
 
     @Override
     public String toString(){
-        return Arrays.toString(list);
+        int iMax = size - 1;
+        if (iMax == -1)
+            return "[]";
+
+        StringBuilder b = new StringBuilder();
+        b.append('[');
+        for (int i = 0; ; i++) {
+            b.append(list[i]);
+            if (i == iMax)
+                return b.append(']').toString();
+            b.append(", ");
+        }
     }
 
     //**************************************//

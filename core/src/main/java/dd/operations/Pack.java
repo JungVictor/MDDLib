@@ -112,6 +112,8 @@ public class Pack implements Allocable {
             reduceLayer(L.get(i), i);
         }
 
+        Logger.out.information("\rDone reducing\t\t\t\t\t");
+
         for(UnorderedListOfNode nodes : Va.values()) Memory.free(nodes);
         for(UnorderedListOfNode nodes : Na.values()) Memory.free(nodes);
         LAYERS = null;

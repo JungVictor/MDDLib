@@ -109,6 +109,14 @@ public class MapOf<K, V> implements MemoryObject, Iterable<K> {
         return map.size();
     }
 
+    /**
+     * Copy the keys and values of the given map
+     * @param map The map to copy
+     */
+    public void copy(MapOf<K, V> map){
+        for(K key : map) this.map.put(key, map.get(key));
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

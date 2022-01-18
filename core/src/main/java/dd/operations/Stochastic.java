@@ -337,7 +337,7 @@ public class Stochastic {
         int acceptableRoundingDifference = 2;
         // The array of distribution
         ArrayOfLong quantities = ArrayOfLong.create(X.length);
-        double one = Math.pow(10, precision - 1);
+        double one = Math.pow(10, precision-1);
         threshold *= 10;
         // The current value of the distribution
         long currentValue = 0;
@@ -398,7 +398,7 @@ public class Stochastic {
                 quantities.set(i, quantities.get(i) + swap);
                 quantities.set(lastFilled, quantities.get(lastFilled) - swap);
                 if (quantities.get(lastFilled) == 0) lastFilled--;
-
+                if (lastFilled == -1) break;
             }
 
             bounds[i][1] += quantities.get(i);
