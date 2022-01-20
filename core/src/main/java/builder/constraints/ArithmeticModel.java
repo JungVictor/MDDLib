@@ -15,7 +15,7 @@ import utils.expressions.ExpressionParser;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class ExpressionModel {
+public class ArithmeticModel {
 
     private final HashMap<Integer, HashSet<Expression>> expressions = new HashMap<>();
     private final SetOf<Integer> variables = Memory.SetOfInteger();
