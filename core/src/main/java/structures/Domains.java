@@ -97,6 +97,13 @@ public class Domains implements Allocable {
         for(SetOf<Integer> values : domains) V.add(values);
     }
 
+    public void fill(int i, int begin, int end){
+        for(int v = begin; v <= end; v++) domains.get(i).add(v);
+    }
+
+    public void fillAll(int idx, int begin, int end){
+        for(int i = 0; i < idx; i++) fill(i, begin, end);
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
