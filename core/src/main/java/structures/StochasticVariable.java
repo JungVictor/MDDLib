@@ -138,6 +138,18 @@ public class StochasticVariable implements Allocable {
         return res;
     }
 
+    /**
+     * Check if the swap is worth between this variable and the given variable xi.
+     * @param xi The variable to swap with
+     * @param K The threshold
+     * @param V The current value
+     * @param p The quantity to swap
+     * @param one The number one in the appropriate precision
+     * @return True if the swap is worth it, false otherwise
+     */
+    public boolean worthSwappingWith(StochasticVariable xi, long K, int V, long p, long one) {
+        return V + (xi.getMaxValue() * p) / one > K;
+    }
 
     //**************************************//
     //              QUANTITY                //

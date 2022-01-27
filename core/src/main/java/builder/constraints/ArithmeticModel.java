@@ -3,7 +3,6 @@ package builder.constraints;
 import builder.constraints.parameters.ParametersExpression;
 import builder.constraints.states.StateExpression;
 import dd.DecisionDiagram;
-import dd.mdd.MDD;
 import dd.mdd.components.SNode;
 import memory.Memory;
 import structures.Domains;
@@ -15,17 +14,33 @@ import utils.expressions.ExpressionParser;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * <b>ArithmeticModel</b><br>
+ * This class is used to build DDs satisfying all expressions added to the model.
+ */
 public class ArithmeticModel {
 
     private final HashMap<Integer, HashSet<Expression>> expressions = new HashMap<>();
     private final SetOf<Integer> variables = Memory.SetOfInteger();
 
+    /**
+     * Add an expression to the model.
+     * @param expression The expression to add (as a String)
+     * @return The expression as an object
+     */
     public Expression addExpression(String expression){
         Expression expr = new ExpressionParser().parse(expression);
         bindExpressionToVariables(expr);
         return expr;
     }
 
+    /**
+     * Build the DD corresponding to the logical AND between all added expressions.
+     * @param result The DDs to stock the result
+     * @param D The domains of the variables
+     * @param size The size of the DD
+     * @return The DD corresponding to the logical AND between all added expressions.
+     */
     public DecisionDiagram build(DecisionDiagram result, Domains D, int size){
         // Min and max values initialisation
         ArrayOfInt min = ArrayOfInt.create(size);
@@ -61,6 +76,11 @@ public class ArithmeticModel {
         return null;
     }
 
+    /**
+     * Perform the bind between the expression and the variables in the expression.
+     * That way, you know all expressions containing a certain variable.
+     * @param expression The expression
+     */
     private void bindExpressionToVariables(Expression expression){
         for(int layer : expression.getBinding().values()) {
             variables.add(layer);

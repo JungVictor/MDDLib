@@ -4,6 +4,10 @@ import structures.generics.MapOf;
 
 import java.util.HashMap;
 
+/**
+ * <b>Expression</b><br>
+ * Represents an evaluable arithmetic expression.
+ */
 public class Expression {
 
     // All possible operations
@@ -264,26 +268,43 @@ public class Expression {
         return nVar;
     }
 
-    public int firstVariable(){
-        return firstVariable;
-    }
-
+    /**
+     * Get the last variable appearing in the expression.
+     * That is, the variable with the greatest index.
+     * @return The variable with the greatest index.
+     */
     public int lastVariable(){
         return lastVariable;
     }
 
+    /**
+     * Check if the expression contains a greater operator (or greater or equal)
+     * @return True if the operator is > or >=
+     */
     public boolean greaterOperator(){
         return operator.equals(GT) || operator.equals(GEQ);
     }
 
+    /**
+     * Check if the expression contains a less operator (or less or equal)
+     * @return True if the operator is < or <=
+     */
     public boolean lessOperator(){
         return operator.equals(LT) || operator.equals(LEQ);
     }
 
+    /**
+     * Check if the expression contains an equality (or different)
+     * @return True if the operator is = or !=.
+     */
     public boolean equalityOperator(){
         return operator.equals(EQ) || operator.equals(NEQ);
     }
 
+    /**
+     * Get the bindings of variables
+     * @return The bindings of variables
+     */
     public HashMap<String, Integer> getBinding(){
         return binding;
     }

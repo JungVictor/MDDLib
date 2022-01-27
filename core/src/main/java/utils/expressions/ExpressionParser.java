@@ -3,7 +3,10 @@ package utils.expressions;
 import java.util.HashMap;
 import static utils.expressions.Expression.*;
 
-
+/**
+ * <b>ExpressionParser</b><br>
+ * Create an Expression object from a String representing the expression.
+ */
 public class ExpressionParser {
 
     // Used to parse the beginning and the end of an absolute value
@@ -67,6 +70,11 @@ public class ExpressionParser {
         return expr.split("\\"+EQ);
     }
 
+    /**
+     * Parse all priorities operators
+     * @param expression The expression as a String
+     * @return The same expression with priorities parsed
+     */
     private String priority_parse(String expression){
         int i = 0;
         expression = absolute_parse(expression);
@@ -83,6 +91,11 @@ public class ExpressionParser {
         return expression;
     }
 
+    /**
+     * Parse the absolute from the expression
+     * @param expression The expression as a String
+     * @return The same expression with absolute parsed
+     */
     private String absolute_parse(String expression){
         StringBuilder builder = new StringBuilder(expression);
         int first_index = builder.indexOf(ABS);
@@ -98,6 +111,11 @@ public class ExpressionParser {
         return expression;
     }
 
+    /**
+     * Replace the absolute once they are treated
+     * @param expression The expression as a String
+     * @return The same expression with absolute replaced
+     */
     private String absolute_replace(String expression){
         // First index of "|" (close)
         int close = expression.indexOf(CLOSE_ABS);
@@ -115,6 +133,11 @@ public class ExpressionParser {
         return expression.replace(OPEN_ABS + absolute + CLOSE_ABS, name);
     }
 
+    /**
+     * Replace the parenthesis once they are treated
+     * @param expression The expression as a String
+     * @return The same expression with parenthesis replaced
+     */
     private String parenthesis_replace(String expression){
         // First index of ")"
         int close = expression.indexOf(CLOSE_PAR);
@@ -195,11 +218,6 @@ public class ExpressionParser {
         }
     }
 
-    public String replace(String expr, int... constants){
-        for(int c : constants) expr = expr.replaceFirst("%c", c+"");
-        return expr;
-    }
-
     /**
      * Given a mathematical expression (comparison), output the real Expression.
      * @param expr Mathematical expression
@@ -229,6 +247,11 @@ public class ExpressionParser {
         return expression;
     }
 
+    /**
+     * Given a mathematical expression, output the real Expression.
+     * @param expr Mathematical expression
+     * @return Expression
+     */
     public Expression parse_arith(String expr){
         // Init
         this.binders = new HashMap<>();

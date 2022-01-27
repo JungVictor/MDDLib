@@ -412,7 +412,6 @@ public class Stochastic {
         return lastComplete+1;
     }
 
-
     public static long lowerboundAll(StochasticVariable[] X, long[][] bounds, long threshold, long totalQuantity, int precision){
         int acceptableRoundingDifference = 2;
         // The array of distribution
@@ -501,6 +500,119 @@ public class Stochastic {
             quantities.set(current, X[current].getMaxQuantity());
         }
         return lastComplete+1;
+    }
+
+    /**
+     * Compute the lower bounds of all variables' cost in linear time.<br>
+     * /!\ The array X is sorted during the algorithm !
+     * @param X The array of StochasticVariable to filter
+     * @param threshold The minimum threshold
+     * @param totalQuantity The maximum amount of quantity to give (default = 1)
+     * @param precision The precision of the StochasticVariables
+     * @return The array of filtered costs
+     */
+    public static ArrayOfLong minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        int V = 0;
+        int lastNonEmpty = 0;
+        long swap = 0;
+        long one = (long) Math.pow(10, precision);
+        long q, qt;
+
+        ArrayOfLong p = ArrayOfLong.create(X.length);
+        ArrayOfLong min = ArrayOfLong.create(X.length);
+
+        // All min
+        for(int i = 0; i < X.length; i++) {
+            p.set(i, X[i].getMinQuantity());
+            totalQuantity -= p.get(i);
+        }
+
+        // Knapsack
+        for(int i = 0; i < X.length; i++) {
+            if(totalQuantity == 0) {
+                lastNonEmpty = i - 1;
+                break;
+            }
+            totalQuantity += p.get(i);
+            p.set(i, totalQuantity > X[i].getMaxQuantity() ? X[i].getMaxQuantity() : totalQuantity);
+            totalQuantity -= p.get(i);
+        }
+
+        for(int i = 0; i < X.length; i++) V += (p.get(i) * X[i].getMaxValue()) / one;
+
+        // Sort by ci*pi
+        sortByCiPi(X, p, lastNonEmpty);
+        int target = lastNonEmpty;
+        for(int i = 0; i <= lastNonEmpty; i++){
+            V -= (X[i].getMaxValue() * p.get(i)) / one;
+            while(p.get(i) > X[i].getMinQuantity() && target < X.length && X[i].worthSwappingWith(X[target], threshold, V, p.get(i), one)){
+                swap = maxSwapping(X, p, i, target);
+
+                V += (swap * X[target].getMaxValue()) / one;
+                p.set(target, p.get(target) + swap);
+                p.set(i, p.get(i) - swap);
+
+                // If glass is full, move to the next glass
+                if(p.get(target) == X[target].getMaxQuantity()) target++;
+            }
+
+            if(p.get(i) == 0) min.set(i, X[i].getMinValue());
+            else min.set(i, ((threshold - V) * one) / p.get(i));
+
+            swap = maxSwapping(X, p, i+1, i);
+            p.set(i, p.get(i) + swap);
+            p.set(i+1, p.get(i+1) - swap);
+
+            V += (X[i].getMaxValue() * p.get(i)) / one;
+        }
+        Memory.free(p);
+        return min;
+    }
+
+    /**
+     * Get the maximum quantity we can swap between X[i] and X[t].
+     * @param X The array of StochastVariables
+     * @param p The quantity distribution
+     * @param i The index of the giver variable
+     * @param t The index of the receiver variable
+     * @return The maximum quantity we can swap between X[i] and X[t].
+     */
+    private static long maxSwapping(StochasticVariable[] X, ArrayOfLong p, int i, int t){
+        // What we can take
+        long qi = p.get(i) - X[i].getMinQuantity();
+        // What we can receive
+        long qt = X[t].getMaxQuantity() - p.get(t);
+        // If we can take more than we can receive, the take only what we can receive
+        return qi > qt ? qt : qi;
+    }
+
+    /**
+     * Sort the array X by non-increasing order of the value cmax[i] * p[i].
+     * @param X The array of StochasticVariables
+     * @param p The quantity distribution
+     * @param k The index of the last variable to sort (included)
+     */
+    private static void sortByCiPi(StochasticVariable X[], ArrayOfLong p, int k){
+        ArrayOfLong cipi = ArrayOfLong.create(k+1);
+        for(int i = 0; i <= k; i++) cipi.set(i, X[i].getMaxValue() * X[i].getMaxQuantity());
+
+        for(int i = 0; i < cipi.length; i++){
+            int j = i;
+            StochasticVariable x = X[i];
+            long pi = p.get(i);
+            long v = cipi.get(i);
+            while(j > 0 && cipi.get(j-1) < v) {
+                cipi.set(j, cipi.get(j-1));
+                X[j] = X[j-1];
+                p.set(j, p.get(j-1));
+                j -= 1;
+            }
+            cipi.set(j, v);
+            X[j] = x;
+            p.set(j, pi);
+        }
+
+        Memory.free(cipi);
     }
 
 }
