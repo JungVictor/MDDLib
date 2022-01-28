@@ -147,7 +147,7 @@ public class StochasticVariable implements Allocable {
      * @param one The number one in the appropriate precision
      * @return True if the swap is worth it, false otherwise
      */
-    public boolean worthSwappingWith(StochasticVariable xi, long K, int V, long p, long one) {
+    public boolean worthSwappingWith(StochasticVariable xi, long K, long V, long p, long one) {
         return V + (xi.getMaxValue() * p) / one > K;
     }
 

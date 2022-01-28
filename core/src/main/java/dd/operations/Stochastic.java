@@ -4,6 +4,8 @@ import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.Memory;
 import structures.StochasticVariable;
+import structures.arrays.ArrayOfBoolean;
+import structures.arrays.ArrayOfInt;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import utils.SmallMath;
@@ -511,39 +513,82 @@ public class Stochastic {
      * @param precision The precision of the StochasticVariables
      * @return The array of filtered costs
      */
-    public static ArrayOfLong minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        int V = 0;
-        int lastNonEmpty = 0;
+    public static void minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        int lastNonFull = 0;
         long swap = 0;
-        long one = (long) Math.pow(10, precision);
         long q, qt;
 
         ArrayOfLong p = ArrayOfLong.create(X.length);
-        ArrayOfLong min = ArrayOfLong.create(X.length);
+        ArrayOfLong knapsack = ArrayOfLong.create(X.length);
 
         // All min
         for(int i = 0; i < X.length; i++) {
-            p.set(i, X[i].getMinQuantity());
-            totalQuantity -= p.get(i);
+            knapsack.set(i, X[i].getMinQuantity());
+            totalQuantity -= knapsack.get(i);
         }
 
         // Knapsack
         for(int i = 0; i < X.length; i++) {
             if(totalQuantity == 0) {
-                lastNonEmpty = i - 1;
+                if(i > 1 && knapsack.get(i-1) == X[i-1].getMaxQuantity()) lastNonFull = i;
+                else lastNonFull = i - 1;
                 break;
             }
-            totalQuantity += p.get(i);
-            p.set(i, totalQuantity > X[i].getMaxQuantity() ? X[i].getMaxQuantity() : totalQuantity);
-            totalQuantity -= p.get(i);
+            totalQuantity += knapsack.get(i);
+            knapsack.set(i, totalQuantity > X[i].getMaxQuantity() ? X[i].getMaxQuantity() : totalQuantity);
+            totalQuantity -= knapsack.get(i);
         }
+
+        ArrayOfBoolean indices = ArrayOfBoolean.create(lastNonFull+1);
+        for(int i = 0; i <= lastNonFull; i++) indices.set(i, true);
+
+        // Sort by ci*pi
+        sortByCiPi(X, knapsack, lastNonFull);
+
+        // While we did not filter all variables, we filter
+        boolean stop = false;
+        int cpt = 0;
+        while(!stop){
+            // Reset the knapsack to each iteration
+            p.copy(knapsack);
+            stop = minCostFilteringStep(X, indices, p, lastNonFull, threshold, precision);
+        }
+
+        Memory.free(p);
+        Memory.free(knapsack);
+    }
+
+    /**
+     * One step of the minCostFiltering algorithm.
+     * Filter all possible min cost such that the algorithm stays linear.
+     * @param X The array of StochasticVariable to filter
+     * @param indices The boolean array of variables that need to be filtered. indices[i] = true if the variable must be filtered.
+     * @param p The quantity distribution (= knapsack)
+     * @param lastNonFull The last non full variable (first variable to swap with)
+     * @param threshold The minimum threshold
+     * @param precision The precision of the variable
+     * @return True if we filtered every variable in indices, false otherwise
+     */
+    public static boolean minCostFilteringStep(
+            StochasticVariable[] X, ArrayOfBoolean indices, ArrayOfLong p, int lastNonFull,
+            long threshold, int precision) {
+        int V = 0;
+        long swap = 0;
+        long one = (long) Math.pow(10, precision);
+        long q, qt;
 
         for(int i = 0; i < X.length; i++) V += (p.get(i) * X[i].getMaxValue()) / one;
 
-        // Sort by ci*pi
-        sortByCiPi(X, p, lastNonEmpty);
-        int target = lastNonEmpty;
-        for(int i = 0; i <= lastNonEmpty; i++){
+        int target = lastNonFull;
+        int i = 0;
+        boolean skipped = false;
+        while(i <= lastNonFull){
+            // If the variable is already filtered
+            if(!indices.get(i)) {
+                i++;
+                continue;
+            }
+
             V -= (X[i].getMaxValue() * p.get(i)) / one;
             while(p.get(i) > X[i].getMinQuantity() && target < X.length && X[i].worthSwappingWith(X[target], threshold, V, p.get(i), one)){
                 swap = maxSwapping(X, p, i, target);
@@ -556,17 +601,54 @@ public class Stochastic {
                 if(p.get(target) == X[target].getMaxQuantity()) target++;
             }
 
-            if(p.get(i) == 0) min.set(i, X[i].getMinValue());
-            else min.set(i, ((threshold - V) * one) / p.get(i));
+            if(p.get(i) > 0) X[i].setMinValue(((threshold - V) * one) / p.get(i));
 
-            swap = maxSwapping(X, p, i+1, i);
-            p.set(i, p.get(i) + swap);
-            p.set(i+1, p.get(i+1) - swap);
+            indices.set(i, false);
 
-            V += (X[i].getMaxValue() * p.get(i)) / one;
+            int current = i;
+            i++;
+            swap = maxSwapping(X, p, i, current);
+
+            // Search the next variable to filter
+            while (i <= lastNonFull) {
+                if(!indices.get(i)) i++;
+                else if(mustResetKnapsack(X, V, threshold, p.get(current), swap, p.get(i), one, current, i, lastNonFull)) {
+                    swap = maxSwapping(X, p, i, current);
+                    i++;
+                    skipped = true;
+                } else break;
+            }
+
+            p.set(current, p.get(current) + swap);
+            p.set(i, p.get(i) - swap);
+            V += (X[current].getMaxValue() * p.get(current)) / one;
         }
         Memory.free(p);
-        return min;
+        return !skipped;
+    }
+
+    /**
+     *
+     * @param X The array of StochasticVariables to filter
+     * @param V The value of the knapsack of X[current]
+     * @param K The threshold
+     * @param pi The quantity of X[current]
+     * @param pnext The quantity of X[next]
+     * @param swap The quantity swapped from next to current
+     * @param one Representation of 1 in adapted precision
+     * @param current The index of the current variable
+     * @param next The index of the next variable
+     * @param lastNonEmpty The last non empty glass filled by the knapsack
+     * @return True if we must reset the knapsack to compute the min cost, false otherwise
+     */
+    private static boolean mustResetKnapsack(StochasticVariable[] X,
+                                             long V, long K, long pi, long swap, long pnext, long one,
+                                             int current, int next, int lastNonEmpty){
+        V = V + (X[current].getMaxValue() * (pi+swap) - X[next].getMaxValue() * pnext) / one;
+        return  X[next].getMaxQuantity() - X[next].getMinQuantity() < X[current].getMaxQuantity() - pi &&
+                V < K &&
+                X[next].worthSwappingWith(X[lastNonEmpty], K, V, pnext, one);
+
     }
 
     /**
