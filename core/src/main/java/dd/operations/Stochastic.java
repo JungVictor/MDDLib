@@ -570,6 +570,56 @@ public class Stochastic {
     }
 
     /**
+     * Compute the lower bounds of all variables' cost in polynomial time.<br>
+     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b>
+     * @param X The array of StochasticVariable to filter
+     * @param threshold The minimum threshold
+     * @param totalQuantity The maximum amount of quantity to give
+     * @param precision The precision of StochasticVariable
+     */
+    public static void minCostFilteringPolynomial(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
+        ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
+        long totalCost = tmp.get(0);
+        int firstNonFull = (int) tmp.get(1);
+        threshold = (long) (threshold * Math.pow(10 , precision));
+
+        long filteredActualQuantity;
+        long newCost;
+        int current;
+
+        long newMinCost;
+
+        for(int i = 0; i < X.length; i++) {
+            filteredActualQuantity = maxPackingQuantities.get(i);
+            //Total cost of max packing without X[i] and its given quantity
+            newCost = totalCost - filteredActualQuantity * X[i].getMaxValue();
+            current = firstNonFull;
+
+            //If the StochasticVariable can give quantity to another
+            if (X[i].getMinQuantity() != maxPackingQuantities.get(i)){
+                long swappableQuantity;
+
+                //If the current
+                if (i == current) current++;
+
+                //While it is worth to exchange with the i-th StochasticVariable
+                while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold){
+                    swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)) );
+                    newCost += swappableQuantity * X[current].getMaxValue();
+                    //Enlever de filteredAcutalQuantity la quantité échangée
+                    filteredActualQuantity -= swappableQuantity;
+                    current++;
+                }
+            }
+            newMinCost = 0;
+            if (filteredActualQuantity > 0) newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
+            //if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The constraint is impossible to satisfy");
+            if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
+        }
+    }
+
+    /**
      * Get the maximum quantity we can swap between X[i] and X[t].
      * @param X The array of StochastVariables
      * @param p The quantity distribution
@@ -615,4 +665,49 @@ public class Stochastic {
         Memory.free(cipi);
     }
 
+    /**
+     * Distribute the quantity in order to get the maximal total cost of
+     * an array of StochasticVariables, and put that distribution in the
+     * the array quantities. <br>
+     * <b> /!\ The total cost returned has a precision * 2 /!\</b>
+     * @param X The array of StochasticVariables
+     * @param quantities The array which will get the distribution
+     * @param totalQuantity The quantity that can be distributed
+     * @return An array containing : <br>
+     * -Index 0 : the maximal total cost (<b> /!\ precision * 2 /!\ </b>) <br>
+     * -Index 1 : the position of the first non-full SotchasticVariable
+     */
+    public static ArrayOfLong maxPacking(StochasticVariable[] X, ArrayOfLong quantities, long totalQuantity){
+        if(X.length > quantities.length()){
+            throw new ArrayIndexOutOfBoundsException("The array storing the results is too small for the given array of StochasticVariable");
+        }
+
+        long availableQuantity = totalQuantity;
+        long totalCost = 0;
+
+        //First we fill the minimal values
+        for(int i = 0; i < X.length; i++){
+            quantities.set(i, X[i].getMinQuantity());
+            totalCost += X[i].getMinQuantity() * X[i].getMaxValue();
+            availableQuantity -= X[i].getMinQuantity();
+        }
+
+        //Then we put the remaining quantity, starting by the highest values
+        int current = 0;
+        while(availableQuantity > 0 && current < X.length){
+            long swappableQuantity = Math.min(availableQuantity, (X[current].getMaxQuantity() - X[current].getMinQuantity()));
+            quantities.set(current, quantities.get(current) + swappableQuantity);
+            totalCost += swappableQuantity * X[current].getMaxValue();
+            availableQuantity -= swappableQuantity;
+            current++;
+        }
+
+        //If the previous StochasticVariable is not full
+        if(quantities.get(current - 1) < X[current - 1].getMaxQuantity()) current--;
+
+        ArrayOfLong tuple = ArrayOfLong.create(2);
+        tuple.set(0, totalCost);
+        tuple.set(1, current);
+        return tuple;
+    }
 }
