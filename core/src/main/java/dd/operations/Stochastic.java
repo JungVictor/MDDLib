@@ -569,7 +569,7 @@ public class Stochastic {
      * @param precision The precision of the variable
      * @return True if we filtered every variable in indices, false otherwise
      */
-    public static boolean minCostFilteringStep(
+    private static boolean minCostFilteringStep(
             StochasticVariable[] X, ArrayOfBoolean indices, ArrayOfLong p, int lastNonFull,
             long threshold, int precision) {
         int V = 0;
@@ -819,7 +819,11 @@ public class Stochastic {
                 //Filtering
                 if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
             }
+            Memory.free(costReached);
+            Memory.free(quantityNeeded);
         }
+        Memory.free(maxPackingQuantities);
+        Memory.free(tmp);
     }
     /**
      * Get the maximum quantity we can swap between X[i] and X[t].
