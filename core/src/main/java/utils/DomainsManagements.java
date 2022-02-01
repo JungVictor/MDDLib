@@ -6,7 +6,7 @@ import java.io.*;
 
 public class DomainsManagements {
 
-    private static String directoryPath = "data/";
+    private static String directoryPath = "data/MDDDomains/";
 
     public static Domains getDomains(String fileName){
         Domains domains = Domains.create();
