@@ -312,7 +312,7 @@ public class Stochastic {
         // The final upperbound is the lowest of both <= threshold and >= threshold
         for(int i = 0; i < X.length; i++) {
             ub = Math.min(bounds[i][1], upperboundMin(X, i, maxThreshold - minValueMin, maxQuantity, precision));
-            bounds[i][1] = ub;
+            bounds[i][1] = Math.min(ub, X[i].getMaxQuantity());
         }
 
         // Add the lowerbound that was removed
@@ -716,6 +716,13 @@ public class Stochastic {
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
 
+        System.out.println("First non full : "+ firstNonFull);
+
+        if(totalCost < threshold){
+            throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
+        }
+
+
         //If there is no swapping possible
         if(firstNonFull >= X.length){
             long newMinCost;
@@ -812,12 +819,16 @@ public class Stochastic {
                         }
                     }
                     //If there is no quantity to give
-                    else {newMinCost = (long) Math.floor(((threshold - newCost)) / filteredActualQuantity);}
+                    else {newMinCost = (long) Math.floor(((threshold - newCost)) / filteredActualQuantity);
+                    }
                 }
                 //If it is possible to satisfy the threshold without the i-th StochasticVariable
                 else {newMinCost = 0;}
                 //Filtering
                 if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
+                if (newMinCost > X[i].getMaxValue()){
+                    throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
+                }
             }
             Memory.free(costReached);
             Memory.free(quantityNeeded);
