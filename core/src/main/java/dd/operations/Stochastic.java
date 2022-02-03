@@ -253,7 +253,8 @@ public class Stochastic {
     }
 
     /**
-     * Compute all bounds of the StochasticVariables in X in a way that we respect the two thresholds.
+     * Compute all bounds of the StochasticVariables in X in a way that we respect the two thresholds.<br>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable ordered by non increasing cost
      * @param minThreshold The minimum threshold value
      * @param maxThreshold The maximum threshold value
@@ -263,9 +264,13 @@ public class Stochastic {
     public static long[][] computeBounds(StochasticVariable[] X, long minThreshold, long maxThreshold, int precision){
         long[][] bounds = new long[X.length][2];
 
-        double one = Math.pow(10, precision);
+        long one = (long) Math.pow(10, precision);
+
+        minThreshold = (long) (minThreshold * one);
+        maxThreshold = (long) (maxThreshold * one);
+
         // The amount we can distribute among the variables
-        long maxQuantity = (long) one;
+        long maxQuantity = one;
         // The current value of the distribution
         long minValueMin = 0;
         long minValueMax = 0;
@@ -282,10 +287,6 @@ public class Stochastic {
             maxQuantity -= X[i].getMinQuantity();
             X[i].setMaxQuantity(X[i].getMaxQuantity() - X[i].getMinQuantity());
         }
-
-
-        minValueMin = (long) Math.floor(minValueMin / one);
-        minValueMax = (long) Math.floor(minValueMax / one);
 
         // If we can't reach all minimum or we go over the max with min values : impossible
         if(maxQuantity < 0 || minValueMin >= maxThreshold) {
@@ -327,7 +328,8 @@ public class Stochastic {
 
     /**
      * Compute all upperbounds of the variables in X in linear time.
-     * This algorithm doesn't use a pivot.
+     * This algorithm doesn't use a pivot.<br>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable ordered by non increasing cost
      * @param bounds The array containing all current bounds of variables in X (that will be updated)
      * @param threshold The minimum threshold value
@@ -339,8 +341,7 @@ public class Stochastic {
         int acceptableRoundingDifference = 2;
         // The array of distribution
         ArrayOfLong quantities = ArrayOfLong.create(X.length);
-        double one = Math.pow(10, precision-1);
-        threshold *= 10;
+        double one = Math.pow(10, precision);
         // The current value of the distribution
         long currentValue = 0;
 
@@ -360,11 +361,11 @@ public class Stochastic {
             if(quantities.get(i) == totalQuantity) bounds[i][1] = totalQuantity;
         }
 
-        // The current value associated with the distribution
-        currentValue = (long) Math.floor(currentValue / one);
 
         // If the current value is below the threshold, then no solution
-        if (currentValue < threshold) return -1;
+        if (currentValue < threshold){
+            throw new IllegalArgumentException("The constraint is impossible to satisfy");
+        }
 
         // The amount that can be swapped
         long swappable = 0;
@@ -382,21 +383,23 @@ public class Stochastic {
             //if (currentValue < threshold) continue;
 
             // While we didn't filled the variable or got to the lowerbound
-            while(currentValue > threshold + acceptableRoundingDifference && X[i].getMaxQuantity() > quantities.get(i)) {
+            while(currentValue > threshold && X[i].getMaxQuantity() > quantities.get(i)) {
                 // Min between what I can take and what I can receive
                 swappable = Math.min(quantities.get(lastFilled), X[i].getMaxQuantity()- quantities.get(i));
                 // if(swappable == 0) continue;
                 // The value that will be removed (and possibly transfered)
-                swapValue = (long) Math.floor((swappable * X[lastFilled].getMaxValue()) / one);
+                swapValue = swappable * X[lastFilled].getMaxValue();
 
                 long reserved = (currentValue - swapValue); // The value that is locked
                 long minSwapValue = threshold - reserved;   // What must be reached
 
                 // Compute the amount that we can swap between X[i] and the pivot
-                long swap = X[i].maxSwappingQuantityMax(X[lastFilled], minSwapValue, swappable, precision-1);
+                long swap = X[i].maxSwappingQuantityMax(X[lastFilled], minSwapValue, swappable, precision);
+
+                if(swap == 0) break;
 
                 // Update the quantity distribution and the current value associated with the new distribution
-                currentValue += Math.floor(((X[i].getMaxValue() - X[lastFilled].getMaxValue()) * swap) / one);
+                currentValue += (X[i].getMaxValue() - X[lastFilled].getMaxValue()) * swap;
                 quantities.set(i, quantities.get(i) + swap);
                 quantities.set(lastFilled, quantities.get(lastFilled) - swap);
                 if (quantities.get(lastFilled) == 0) lastFilled--;
@@ -407,7 +410,7 @@ public class Stochastic {
             int current = i;
             while (i-1 > lastComplete && X[i-1].getMaxQuantity() - quantities.get(i-1) <= bounds[current][1]) bounds[--i][1] = X[i].getMaxQuantity();
             if(i == 0) break;
-            currentValue += Math.floor(((X[i-1].getMaxValue() - X[current].getMaxValue()) * quantities.get(current)) / one);
+            currentValue += (X[i-1].getMaxValue() - X[current].getMaxValue()) * quantities.get(current);
             quantities.set(i-1, quantities.get(current) + quantities.get(i-1));
             quantities.set(current, 0);
         }
@@ -418,8 +421,7 @@ public class Stochastic {
         int acceptableRoundingDifference = 2;
         // The array of distribution
         ArrayOfLong quantities = ArrayOfLong.create(X.length + 1);
-        double one = Math.pow(10, precision - 1);
-        threshold *= 10;
+        long one = (long) Math.pow(10, precision);
         // The current value of the distribution
         long currentValue = 0;
 
@@ -437,11 +439,10 @@ public class Stochastic {
             lastFilled = i;
         }
 
-        // The current value associated with the distribution
-        currentValue = (long) Math.floor(currentValue / one);
-
         // If the current value is below the threshold, then no solution
-        if (currentValue < threshold) return -1;
+        if (currentValue < threshold) {
+            throw new IllegalArgumentException("The constraint is impossible to satisfy");
+        }
 
         // The amount that can be swapped
         long swappable = 0;
@@ -455,7 +456,7 @@ public class Stochastic {
         for(int i = X.length - 1; i > lastFilled; i--) bounds[i][0] = 0;
 
         StochasticVariable pivot = X[lastFilled];
-        StochasticVariable fake = StochasticVariable.create(0, (long) one * 10, 0, 0);
+        StochasticVariable fake = StochasticVariable.create(0, (long) one, 0, 0);
 
         for(int i = 0; i <= lastComplete; i++){
             // Break
@@ -465,21 +466,23 @@ public class Stochastic {
             else pivot = X[lastFilled];
 
             // While we didn't filled the variable or got to the lowerbound
-            while(currentValue > threshold + acceptableRoundingDifference && quantities.get(i) > 0) {
+            while(currentValue > threshold && quantities.get(i) > 0) {
                 // Min between what I can take and what I can receive
                 swappable = Math.min(quantities.get(i), pivot.getMaxQuantity() - quantities.get(lastFilled));
                 // if(swappable == 0) continue;
                 // The value that will be removed (and possibly transfered)
-                swapValue = (long) Math.floor((swappable * X[i].getMaxValue()) / one);
+                swapValue = swappable * X[i].getMaxValue();
 
                 long reserved = (currentValue - swapValue); // The value that is locked
                 long minSwapValue = threshold - reserved;   // What must be reached
 
                 // Compute the amount that we can swap between X[i] and the pivot
-                long swap = pivot.maxSwappingQuantityMax(X[i], minSwapValue, swappable, precision-1);
+                long swap = pivot.maxSwappingQuantityMax(X[i], minSwapValue, swappable, precision);
+
+                if(swap == 0) break;
 
                 // Update the quantity distribution and the current value associated with the new distribution
-                currentValue += Math.floor(((pivot.getMaxValue() - X[i].getMaxValue()) * swap) / one);
+                currentValue += (pivot.getMaxValue() - X[i].getMaxValue()) * swap;
                 quantities.set(lastFilled, quantities.get(lastFilled) + swap);
                 quantities.set(i, quantities.get(i) - swap);
                 if (quantities.get(lastFilled) == pivot.getMaxQuantity()) {
@@ -496,7 +499,7 @@ public class Stochastic {
             if(i == X.length - 1) break;
 
             long preswap = X[current].getMaxQuantity() - quantities.get(current);
-            currentValue += Math.floor(((X[current].getMaxValue() - X[i+1].getMaxValue()) * preswap) / one);
+            currentValue += (X[current].getMaxValue() - X[i+1].getMaxValue()) * preswap;
 
             quantities.set(i+1, quantities.get(i+1) - preswap);
             quantities.set(current, X[current].getMaxQuantity());
@@ -653,7 +656,8 @@ public class Stochastic {
 
     /**
      * Compute the lower bounds of all variables' cost in polynomial time.<br>
-     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b>
+     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b><br>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -703,7 +707,8 @@ public class Stochastic {
 
     /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
-     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b>
+     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b><br>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -713,6 +718,7 @@ public class Stochastic {
         ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
         long totalCost = tmp.get(0);
+        System.out.println("TOTAL COST :" + totalCost);
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
 
@@ -907,7 +913,12 @@ public class Stochastic {
             quantities.set(i, X[i].getMinQuantity());
             totalCost += X[i].getMinQuantity() * X[i].getMaxValue();
             availableQuantity -= X[i].getMinQuantity();
+            if (availableQuantity < 0){
+                throw new IllegalArgumentException("There is no enough quantity to fill the min");
+            }
         }
+
+        long tmp = totalCost;
 
         //Then we put the remaining quantity, starting by the highest values
         int current = 0;
@@ -925,6 +936,7 @@ public class Stochastic {
         ArrayOfLong tuple = ArrayOfLong.create(2);
         tuple.set(0, totalCost);
         tuple.set(1, current);
+
         return tuple;
     }
 }

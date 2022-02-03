@@ -80,14 +80,14 @@ public class StochasticVariable implements Allocable {
         long one = (long) Math.pow(10, precision);
         long currentValue = (quantity * x.getMaxValue());
         if(getMaxValue() == x.getMaxValue()) return quantity;
-        long res = (long) Math.ceil((currentValue - minValue * one * 1.0) / (x.getMaxValue() - getMaxValue()));
+        long res = (long) Math.ceil((currentValue - minValue * 1.0) / (x.getMaxValue() - getMaxValue()));
         if(res <= 0){
-            if(quantity * getMaxValue() >= minValue * one) return quantity;
+            if(quantity * getMaxValue() >= minValue) return quantity;
             // Error : -1 ?
             return 0;
         }
         if(res >= quantity) {
-            if(quantity * getMaxValue() >= minValue * one) return quantity;
+            if(quantity * getMaxValue() >= minValue) return quantity;
             // Error : -1 ?
             return 0;
         }
