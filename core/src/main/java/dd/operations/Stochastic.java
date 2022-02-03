@@ -714,15 +714,13 @@ public class Stochastic {
      * @param totalQuantity The maximum amount of quantity to give
      * @param precision The precision of StochasticVariable
      */
-    public static void minCostFilteringDichotomous(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+    public static long[] minCostFilteringDichotomous(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        long[] minBounds = new long[X.length];
         ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
         long totalCost = tmp.get(0);
-        System.out.println("TOTAL COST :" + totalCost);
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
-
-        System.out.println("First non full : "+ firstNonFull);
 
         if(totalCost < threshold){
             throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
@@ -734,7 +732,12 @@ public class Stochastic {
             long newMinCost;
             for(int i = 0; i < X.length; i++) {
                 newMinCost = (long) Math.floor((threshold - (totalCost - X[i].getMaxQuantity() * X[i].getMaxValue())) / (X[i].getMaxQuantity()));
-                if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
+                if (newMinCost > X[i].getMinValue()){
+                    minBounds[i] = newMinCost;
+                }
+                else {
+                    minBounds[i] = X[i].getMinValue();
+                }
             }
         }
         else {
@@ -831,7 +834,12 @@ public class Stochastic {
                 //If it is possible to satisfy the threshold without the i-th StochasticVariable
                 else {newMinCost = 0;}
                 //Filtering
-                if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
+                if (newMinCost > X[i].getMinValue()){
+                    minBounds[i] = newMinCost;
+                }
+                else {
+                    minBounds[i] = X[i].getMinValue();
+                }
                 if (newMinCost > X[i].getMaxValue()){
                     throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
                 }
@@ -841,6 +849,7 @@ public class Stochastic {
         }
         Memory.free(maxPackingQuantities);
         Memory.free(tmp);
+        return minBounds;
     }
     /**
      * Get the maximum quantity we can swap between X[i] and X[t].
