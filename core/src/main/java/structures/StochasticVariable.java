@@ -1,5 +1,6 @@
 package structures;
 
+import dd.operations.Stochastic;
 import memory.Allocable;
 import memory.AllocatorOf;
 import memory.Memory;
@@ -15,6 +16,7 @@ public class StochasticVariable implements Allocable {
 
     private TupleOfLong quantity;
     private TupleOfLong value;
+    private int precision = -1;
 
 
     //**************************************//
@@ -40,7 +42,9 @@ public class StochasticVariable implements Allocable {
 
     public static StochasticVariable create(int precision){
         long one = (long) Math.pow(10, precision);
-        return create(0, one, 0, one);
+        StochasticVariable X = create(0, one, 0, one);
+        X.precision = precision;
+        return X;
     }
 
     public static StochasticVariable create(TupleOfLong quantity, TupleOfLong value){
@@ -62,6 +66,22 @@ public class StochasticVariable implements Allocable {
     @Override
     public String toString(){
         return "Q: ["+getMinQuantity()+", " + getMaxQuantity() + "] - V: ["+getMinValue()+", " + getMaxValue() + "]";
+    }
+
+    /**
+     * Get the precision of the variable
+     * @return The precision of the variable (-1) if not specified
+     */
+    public int getPrecision(){
+        return precision;
+    }
+
+    /**
+     * Set the precision of the variable
+     * @param precision The precision of the variable
+     */
+    public void setPrecision(int precision){
+        this.precision = precision;
     }
 
     //**************************************//

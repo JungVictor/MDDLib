@@ -516,12 +516,13 @@ public class Stochastic {
      * @param precision The precision of the StochasticVariables
      * @return The array of filtered costs
      */
-    public static void minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+    public static ArrayOfLong minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
         int lastNonFull = 0;
         long swap = 0;
         long q, qt;
 
         ArrayOfLong p = ArrayOfLong.create(X.length);
+        ArrayOfLong bounds = ArrayOfLong.create(X.length);
         ArrayOfLong knapsack = ArrayOfLong.create(X.length);
 
         // All min
@@ -554,11 +555,14 @@ public class Stochastic {
         while(!stop){
             // Reset the knapsack to each iteration
             p.copy(knapsack);
-            stop = minCostFilteringStep(X, indices, p, lastNonFull, threshold, precision);
+            stop = minCostFilteringStep(X, indices, p, bounds, lastNonFull, threshold, precision);
         }
+
+        for(int i = 0; i < X.length; i++) if(X[i].getMinValue() < bounds.get(i) || bounds.get(i) < 0) bounds.set(i, X[i].getMinValue());
 
         Memory.free(p);
         Memory.free(knapsack);
+        return bounds;
     }
 
     /**
@@ -573,7 +577,7 @@ public class Stochastic {
      * @return True if we filtered every variable in indices, false otherwise
      */
     private static boolean minCostFilteringStep(
-            StochasticVariable[] X, ArrayOfBoolean indices, ArrayOfLong p, int lastNonFull,
+            StochasticVariable[] X, ArrayOfBoolean indices, ArrayOfLong p, ArrayOfLong result, int lastNonFull,
             long threshold, int precision) {
         int V = 0;
         long swap = 0;
@@ -604,7 +608,7 @@ public class Stochastic {
                 if(p.get(target) == X[target].getMaxQuantity()) target++;
             }
 
-            if(p.get(i) > 0) X[i].setMinValue(((threshold - V) * one) / p.get(i));
+            if(p.get(i) > 0) result.set(i, ((threshold - V) * one) / p.get(i));
 
             indices.set(i, false);
 
@@ -663,9 +667,10 @@ public class Stochastic {
      * @param totalQuantity The maximum amount of quantity to give
      * @param precision The precision of StochasticVariable
      */
-    public static void minCostFilteringPolynomial(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+    public static ArrayOfLong minCostFilteringPolynomial(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
         ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
+        ArrayOfLong bounds = ArrayOfLong.create(X.length);
         long totalCost = tmp.get(0);
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
@@ -701,8 +706,9 @@ public class Stochastic {
             newMinCost = 0;
             if (filteredActualQuantity > 0) newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
             //if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The constraint is impossible to satisfy");
-            if (newMinCost > X[i].getMinValue()) X[i].setMinValue(newMinCost);
+            if (newMinCost > X[i].getMinValue()) bounds.set(i, newMinCost);
         }
+        return bounds;
     }
 
     /**
@@ -714,8 +720,8 @@ public class Stochastic {
      * @param totalQuantity The maximum amount of quantity to give
      * @param precision The precision of StochasticVariable
      */
-    public static long[] minCostFilteringDichotomous(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        long[] minBounds = new long[X.length];
+    public static ArrayOfLong minCostFilteringDichotomous(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        ArrayOfLong minBounds = ArrayOfLong.create(X.length);
         ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
         long totalCost = tmp.get(0);
@@ -732,12 +738,8 @@ public class Stochastic {
             long newMinCost;
             for(int i = 0; i < X.length; i++) {
                 newMinCost = (long) Math.floor((threshold - (totalCost - X[i].getMaxQuantity() * X[i].getMaxValue())) / (X[i].getMaxQuantity()));
-                if (newMinCost > X[i].getMinValue()){
-                    minBounds[i] = newMinCost;
-                }
-                else {
-                    minBounds[i] = X[i].getMinValue();
-                }
+                if (newMinCost > X[i].getMinValue()) minBounds.set(i, newMinCost);
+                else minBounds.set(i, X[i].getMinValue());
             }
         }
         else {
@@ -834,12 +836,8 @@ public class Stochastic {
                 //If it is possible to satisfy the threshold without the i-th StochasticVariable
                 else {newMinCost = 0;}
                 //Filtering
-                if (newMinCost > X[i].getMinValue()){
-                    minBounds[i] = newMinCost;
-                }
-                else {
-                    minBounds[i] = X[i].getMinValue();
-                }
+                if (newMinCost > X[i].getMinValue()) minBounds.set(i, newMinCost);
+                else minBounds.set(i, X[i].getMinValue());
                 if (newMinCost > X[i].getMaxValue()){
                     throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
                 }

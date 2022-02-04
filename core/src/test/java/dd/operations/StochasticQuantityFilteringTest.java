@@ -6,7 +6,7 @@ import structures.StochasticVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StochasticTest {
+class StochasticQuantityFilteringTest {
 
     StochasticVariable alpha, beta, gamma, delta, omega;
 
