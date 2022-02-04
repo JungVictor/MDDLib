@@ -560,6 +560,8 @@ public class Stochastic {
 
         for(int i = 0; i < X.length; i++) if(X[i].getMinValue() < bounds.get(i) || bounds.get(i) < 0) bounds.set(i, X[i].getMinValue());
 
+        sortByCi(X, bounds, lastNonFull);
+
         Memory.free(p);
         Memory.free(knapsack);
         return bounds;
@@ -893,6 +895,28 @@ public class Stochastic {
         }
 
         Memory.free(cipi);
+    }
+
+    /**
+     * Sort the array X by non-increasing order of the value cmax[i].
+     * @param X The array of StochasticVariables
+     * @param p The quantity distribution
+     * @param k The index of the last variable to sort (included)
+     */
+    private static void sortByCi(StochasticVariable X[], ArrayOfLong p, int k){
+        for(int i = 0; i < X.length; i++){
+            int j = i;
+            StochasticVariable x = X[i];
+            long pi = p.get(i);
+            long v = X[i].getMaxValue();
+            while(j > 0 && X[j-1].getMaxValue() < v) {
+                X[j] = X[j-1];
+                p.set(j, p.get(j-1));
+                j -= 1;
+            }
+            X[j] = x;
+            p.set(j, pi);
+        }
     }
 
     /**

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StochasticCostFilteringTest {
 
     String[] testFiles = {"test1.txt", "test2.txt"};
-    double[] minThresholds = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8};
+    double[] minThresholds = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, -1, -1, -1};
 
     private void testEquality(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
         ArrayOfLong pseudolinear = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
@@ -34,6 +34,7 @@ class StochasticCostFilteringTest {
     void minCostFilteringTest(){
         int precision;
         long one, minThreshold, maxThreshold;
+        long maxPack;
 
         for(String filename : testFiles) {
 
@@ -45,10 +46,19 @@ class StochasticCostFilteringTest {
             one = (long) Math.pow(10, precision);
             maxThreshold = one;
 
+            // Compute the maximum amount achievable with the current data
+            maxPack = Stochastic.maxPacking(X, ArrayOfLong.create(X.length), one).get(0) / one;
+            minThresholds[minThresholds.length - 1] = maxPack;
+            minThresholds[minThresholds.length - 2] = maxPack - (0.001) * one;
+            minThresholds[minThresholds.length - 3] = maxPack - (0.01) * one;
+
             // Test all min thresholds
             for (double minK : minThresholds) {
 
-                minThreshold = (long) minK * one;
+                minThreshold = (long) (minK * one);
+
+                // Impossible to satisfy
+                if(minThreshold > maxPack) continue;
 
                 // Test equality of the methods BEFORE quantity filtering
                 testEquality(X, minThreshold, maxThreshold, precision);
