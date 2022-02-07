@@ -689,20 +689,22 @@ public class Stochastic {
             newCost = totalCost - filteredActualQuantity * X[i].getMaxValue();
             current = firstNonFull;
 
-            //If the StochasticVariable can give quantity to another
-            if (X[i].getMinQuantity() != maxPackingQuantities.get(i)){
-                long swappableQuantity;
+            //If it is not possible to satisfy the threshold without the i-th StochasticVariable
+            if (newCost < threshold) {
+                //If the StochasticVariable can give quantity to another
+                if (X[i].getMinQuantity() != maxPackingQuantities.get(i)) {
+                    long swappableQuantity;
 
-                //If the current
-                if (i == current) current++;
+                    //If the current
+                    if (i == current) current++;
 
-                //While it is worth to exchange with the current-th StochasticVariable
-                while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold){
-                    swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)) );
-                    newCost += swappableQuantity * X[current].getMaxValue();
-                    //Enlever de filteredAcutalQuantity la quantité échangée
-                    filteredActualQuantity -= swappableQuantity;
-                    current++;
+                    //While it is worth to exchange with the current-th StochasticVariable
+                    while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold) {
+                        swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
+                        newCost += swappableQuantity * X[current].getMaxValue();
+                        filteredActualQuantity -= swappableQuantity;
+                        current++;
+                    }
                 }
             }
             newMinCost = 0;
