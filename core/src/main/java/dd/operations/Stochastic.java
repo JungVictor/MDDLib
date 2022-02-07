@@ -599,6 +599,12 @@ public class Stochastic {
             }
 
             V -= (X[i].getMaxValue() * p.get(i)) / one;
+
+            // If above the threshold without the value, skip everything else ?
+            if(V > threshold) {
+                while (i <= lastNonFull) indices.set(i++, false);
+                break;
+            }
             while(p.get(i) > X[i].getMinQuantity() && target < X.length && X[i].worthSwappingWith(X[target], threshold, V, p.get(i), one)){
                 swap = maxSwapping(X, p, i, target);
 
