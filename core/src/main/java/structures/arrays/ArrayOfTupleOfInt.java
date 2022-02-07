@@ -20,10 +20,10 @@ public class ArrayOfTupleOfInt extends ArrayOf<TupleOfInt> {
     }
 
     /**
-     * Create an ArrayOfNode with specified capacity.
+     * Create an ArrayOfTupleOfInt with specified capacity.
      * The object is managed by the allocator.
      * @param capacity Capacity of the array
-     * @return An ArrayOfNode with given capacity
+     * @return An ArrayOfTupleOfInt with given capacity
      */
     public static ArrayOfTupleOfInt create(int capacity){
         ArrayOfTupleOfInt object = allocator().allocate();
@@ -32,7 +32,7 @@ public class ArrayOfTupleOfInt extends ArrayOf<TupleOfInt> {
     }
 
     /**
-     * Create an ArrayOfNode.
+     * Create an ArrayOfTupleOfInt.
      * It will be put at the specified index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
@@ -62,7 +62,7 @@ public class ArrayOfTupleOfInt extends ArrayOf<TupleOfInt> {
     }
 
     /**
-     * <b>The allocator that is in charge of the ArrayOfNode type.</b><br>
+     * <b>The allocator that is in charge of the ArrayOfTupleOfInt type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */

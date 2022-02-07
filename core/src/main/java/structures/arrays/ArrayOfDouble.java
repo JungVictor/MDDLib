@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * <b>Class to symbolize an array of int.</b> <br>
- * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
+ * Similar to the ArrayOf class, this one is specifically for the primitive type int. Works similarly.
  */
 public class ArrayOfDouble implements Iterable<Double>, Allocable {
 
@@ -18,7 +18,7 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
 
     private double[] array;
     public int length;
-    private final SuccessionOfDoubleIterator iterator = new SuccessionOfDoubleIterator();
+    private final ArrayOfDoubleIterator iterator = new ArrayOfDoubleIterator();
 
 
     //**************************************//
@@ -42,10 +42,10 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
     }
 
     /**
-     * Create a SuccessionOfDouble with specified capacity.
+     * Create a ArrayOfDouble with specified capacity.
      * The object is managed by the allocator.
      * @param capacity Capacity of the array
-     * @return A SuccessionOfDouble with given capacity
+     * @return A ArrayOfDouble with given capacity
      */
     public static ArrayOfDouble create(int capacity){
         ArrayOfDouble object = allocator().allocate();
@@ -54,11 +54,11 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
     }
 
     /**
-     * Create a SuccessionOfDouble with specified capacity.
+     * Create a ArrayOfDouble with specified capacity.
      * The object is managed by the allocator.<br>
      * The array is never cleaned.
      * @param capacity Capacity of the array
-     * @return A SuccessionOfDouble with given capacity
+     * @return A ArrayOfDouble with given capacity
      */
     public static ArrayOfDouble fastCreate(int capacity){
         ArrayOfDouble object = allocator().allocate();
@@ -223,7 +223,7 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
         return iterator;
     }
 
-    private class SuccessionOfDoubleIterator implements Iterator<Double> {
+    private class ArrayOfDoubleIterator implements Iterator<Double> {
         private int i = 0;
 
         @Override
@@ -239,7 +239,7 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
 
 
     /**
-     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * <b>The allocator that is in charge of the ArrayOfDouble type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */

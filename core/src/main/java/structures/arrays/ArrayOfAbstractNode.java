@@ -21,10 +21,10 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
     }
 
     /**
-     * Create an SuccessionOfNode with specified capacity.
+     * Create an ArrayOfAbstractNode with specified capacity.
      * The object is managed by the allocator.
      * @param capacity Capacity of the array
-     * @return An SuccessionOfNode with given capacity
+     * @return An ArrayOfAbstractNode with given capacity
      */
     public static ArrayOfAbstractNode create(int capacity){
         ArrayOfAbstractNode object = allocator().allocate();
@@ -33,7 +33,7 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
     }
 
     /**
-     * Create an SuccessionOfNode.
+     * Create an ArrayOfAbstractNode.
      * It will be put at the specified index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
@@ -63,7 +63,7 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
     }
 
     /**
-     * <b>The allocator that is in charge of the SuccessionOfNode type.</b><br>
+     * <b>The allocator that is in charge of the ArrayOfAbstractNode type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */

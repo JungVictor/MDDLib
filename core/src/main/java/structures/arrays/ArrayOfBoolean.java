@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * <b>Class to symbolize an array of int.</b> <br>
- * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
+ * Similar to the ArrayOf class, this one is specifically for the primitive type int. Works similarly.
  */
 public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
 
@@ -18,7 +18,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
 
     private boolean[] array;
     public int length;
-    private final SuccessionOfBooleanIterator iterator = new SuccessionOfBooleanIterator();
+    private final ArrayOfBooleanIterator iterator = new ArrayOfBooleanIterator();
 
 
     //**************************************//
@@ -29,23 +29,42 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(int capacity){
-        this.array = new boolean[capacity];
+    /**
+     * Initialise the object.
+     * @param capacity The capacity of the array
+     * @return True if the array must be cleaned, false otherwise
+     */
+    private boolean init(int capacity){
         this.length = capacity;
+        if(array != null && array.length >= capacity) return true;
+        this.array = new boolean[capacity];
+        return false;
     }
 
     /**
-     * Create an SuccessionOfInt with specified capacity.
+     * Create an ArrayOfBoolean with specified capacity.
      * The object is managed by the allocator.
      * @param capacity Capacity of the array
-     * @return An SuccessionOfInt with given capacity
+     * @return An ArrayOfBoolean with given capacity
      */
     public static ArrayOfBoolean create(int capacity){
+        ArrayOfBoolean object = allocator().allocate();
+        if(object.init(capacity)) object.clean();
+        return object;
+    }
+
+    /**
+     * Create a ArrayOfBoolean with specified capacity.
+     * The object is managed by the allocator.<br>
+     * The array is never cleaned.
+     * @param capacity Capacity of the array
+     * @return A ArrayOfBoolean with given capacity
+     */
+    public static ArrayOfBoolean fastCreate(int capacity){
         ArrayOfBoolean object = allocator().allocate();
         object.init(capacity);
         return object;
     }
-
 
     //**************************************//
     //          SPECIAL FUNCTIONS           //
@@ -119,6 +138,21 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
     }
 
     /**
+     * Put all elements of the array to false
+     */
+    public void clean(){
+        for(int i = 0; i < length; i++) array[i] = false;
+    }
+
+    /**
+     * Put all n first elements of the array to false
+     * @param n Number of elements to put to false
+     */
+    public void clean(int n){
+        for(int i = 0; i < n; i++) array[i] = false;
+    }
+
+    /**
      * Set the length of the array. Similar to new E[length].
      * Create internally a new array if the current one isn't long enough.
      * @param length The length of the array
@@ -173,7 +207,6 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
 
     @Override
     public void free() {
-        for(int i = 0; i < length; i++) array[i] = false;
         allocator().free(this);
     }
 
@@ -189,7 +222,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
         return iterator;
     }
 
-    private class SuccessionOfBooleanIterator implements Iterator<Boolean> {
+    private class ArrayOfBooleanIterator implements Iterator<Boolean> {
         private int i = 0;
 
         @Override
@@ -205,7 +238,7 @@ public class ArrayOfBoolean implements Iterable<Boolean>, Allocable {
 
 
     /**
-     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * <b>The allocator that is in charge of the ArrayOfBoolean type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */

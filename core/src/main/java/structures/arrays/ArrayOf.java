@@ -22,9 +22,16 @@ public abstract class ArrayOf<E> implements Iterable<E>, Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(int capacity){
-        if(array() == null || size() < capacity) arrayAllocation(capacity);
+    /**
+     * Initialise the object.
+     * @param capacity The capacity of the array
+     * @return True if the array must be cleaned, false otherwise
+     */
+    public boolean init(int capacity){
         this.length = capacity;
+        if(array() != null && size() >= capacity) return true;
+        arrayAllocation(capacity);
+        return false;
     }
 
     //**************************************//
@@ -85,8 +92,23 @@ public abstract class ArrayOf<E> implements Iterable<E>, Allocable {
      * That is to say, put all its elements to null and its size to 0.
      */
     public void clear(){
-        Arrays.fill(array(), null);
+        clean(array().length);
         length = 0;
+    }
+
+    /**
+     * Put all n first elements of the array to null
+     */
+    public void clean(){
+        clean(length());
+    }
+
+    /**
+     * Put all n first elements of the array to null
+     * @param n Number of elements to put to null
+     */
+    public void clean(int n){
+        for(int i = 0; i < n; i++) set(i, null);
     }
 
     /**

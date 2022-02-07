@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * <b>Class to symbolize an array of int.</b> <br>
- * Similar to the SuccessionOf class, this one is specifically for the primitive type int. Works similarly.
+ * Similar to the ArrayOf class, this one is specifically for the primitive type int. Works similarly.
  */
 public class ArrayOfLong implements Iterable<Long>, Allocable {
 
@@ -18,7 +18,7 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
 
     private long[] array;
     public int length;
-    private final SuccessionOfIntIterator iterator = new SuccessionOfIntIterator();
+    private final ArrayOfLongIterator iterator = new ArrayOfLongIterator();
 
 
     //**************************************//
@@ -29,18 +29,33 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(int capacity){
-        this.array = new long[capacity];
+    private boolean init(int capacity){
         this.length = capacity;
+        if(array != null && array.length >= capacity) return true;
+        this.array = new long[capacity];
+        return false;
     }
 
     /**
-     * Create an SuccessionOfInt with specified capacity.
+     * Create an ArrayOfLong with specified capacity.
      * The object is managed by the allocator.
      * @param capacity Capacity of the array
-     * @return An SuccessionOfInt with given capacity
+     * @return An ArrayOfLong with given capacity
      */
     public static ArrayOfLong create(int capacity){
+        ArrayOfLong object = allocator().allocate();
+        if(object.init(capacity)) object.clean();
+        return object;
+    }
+
+    /**
+     * Create a ArrayOfLong with specified capacity.
+     * The object is managed by the allocator.<br>
+     * The array is never cleaned.
+     * @param capacity Capacity of the array
+     * @return A ArrayOfLong with given capacity
+     */
+    public static ArrayOfLong fastCreate(int capacity){
         ArrayOfLong object = allocator().allocate();
         object.init(capacity);
         return object;
@@ -119,6 +134,21 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
     }
 
     /**
+     * Put all elements of the array to 0
+     */
+    public void clean(){
+        for(int i = 0; i < length; i++) array[i] = 0;
+    }
+
+    /**
+     * Put all n first elements of the array to 0
+     * @param n Number of elements to put to 0
+     */
+    public void clean(int n){
+        for(int i = 0; i < n; i++) array[i] = 0;
+    }
+
+    /**
      * Set the length of the array. Similar to new E[length].
      * Create internally a new array if the current one isn't long enough.
      * @param length The length of the array
@@ -189,7 +219,7 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
         return iterator;
     }
 
-    private class SuccessionOfIntIterator implements Iterator<Long> {
+    private class ArrayOfLongIterator implements Iterator<Long> {
         private int i = 0;
 
         @Override
@@ -205,7 +235,7 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
 
 
     /**
-     * <b>The allocator that is in charge of the SuccessionOfInt type.</b><br>
+     * <b>The allocator that is in charge of the ArrayOfLong type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
