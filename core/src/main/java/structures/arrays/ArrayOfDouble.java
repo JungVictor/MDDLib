@@ -29,9 +29,16 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public void init(int capacity){
-        this.array = new double[capacity];
+    /**
+     * Initialise the object.
+     * @param capacity The capacity of the array
+     * @return True if the array must be cleaned, false otherwise
+     */
+    private boolean init(int capacity){
         this.length = capacity;
+        if(array != null && array.length >= capacity) return true;
+        this.array = new double[capacity];
+        return false;
     }
 
     /**
@@ -42,10 +49,22 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
      */
     public static ArrayOfDouble create(int capacity){
         ArrayOfDouble object = allocator().allocate();
-        object.init(capacity);
+        if(object.init(capacity)) object.clean();
         return object;
     }
 
+    /**
+     * Create a SuccessionOfDouble with specified capacity.
+     * The object is managed by the allocator.<br>
+     * The array is never cleaned.
+     * @param capacity Capacity of the array
+     * @return A SuccessionOfDouble with given capacity
+     */
+    public static ArrayOfDouble fastCreate(int capacity){
+        ArrayOfDouble object = allocator().allocate();
+        object.init(capacity);
+        return object;
+    }
 
     //**************************************//
     //          SPECIAL FUNCTIONS           //
@@ -115,7 +134,23 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
      * That is to say, put all its elements to null and its size to 0.
      */
     public void clear(){
+        clean(array.length);
         length = 0;
+    }
+
+    /**
+     * Put all elements of the array to 0
+     */
+    public void clean(){
+        for(int i = 0; i < length; i++) array[i] = 0;
+    }
+
+    /**
+     * Put all n first elements of the array to 0
+     * @param n Number of elements to put to 0
+     */
+    public void clean(int n){
+        for(int i = 0; i < n; i++) array[i] = 0;
     }
 
     /**
@@ -173,7 +208,6 @@ public class ArrayOfDouble implements Iterable<Double>, Allocable {
 
     @Override
     public void free() {
-        for(int i = 0; i < length; i++) array[i] = 0;
         allocator().free(this);
     }
 
