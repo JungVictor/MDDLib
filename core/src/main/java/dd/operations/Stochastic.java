@@ -718,6 +718,8 @@ public class Stochastic {
             //if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The constraint is impossible to satisfy");
             if (newMinCost > X[i].getMinValue()) bounds.set(i, newMinCost);
         }
+        Memory.free(maxPackingQuantities);
+        Memory.free(tmp);
         return bounds;
     }
 
