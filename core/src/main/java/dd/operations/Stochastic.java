@@ -5,7 +5,6 @@ import dd.mdd.components.Node;
 import memory.Memory;
 import structures.StochasticVariable;
 import structures.arrays.ArrayOfBoolean;
-import structures.arrays.ArrayOfInt;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
 import utils.SmallMath;
@@ -914,7 +913,7 @@ public class Stochastic {
      * @param k The index of the last variable to sort (included)
      */
     private static void sortByCi(StochasticVariable X[], ArrayOfLong p, int k){
-        for(int i = 0; i < X.length; i++){
+        for(int i = 0; i < k; i++){
             int j = i;
             StochasticVariable x = X[i];
             long pi = p.get(i);
