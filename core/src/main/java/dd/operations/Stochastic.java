@@ -376,7 +376,11 @@ public class Stochastic {
 
         for(int i = X.length - 1; i > lastComplete; i--){
             // Break
-            if(lastFilled == -1) break;
+            if(lastFilled == -1) {
+                // It means that we put everything we could in pivot
+                for(int j = i; j > lastComplete; j--) bounds[j][1] = X[j].getMaxQuantity();
+                break;
+            }
             if(i==lastFilled) lastFilled--;
             // If we try to go up but we can only go down, stop
             //if (currentValue < threshold) continue;
@@ -913,7 +917,7 @@ public class Stochastic {
      * @param k The index of the last variable to sort (included)
      */
     private static void sortByCi(StochasticVariable X[], ArrayOfLong p, int k){
-        for(int i = 0; i < k; i++){
+        for(int i = 0; i <= k; i++){
             int j = i;
             StochasticVariable x = X[i];
             long pi = p.get(i);
