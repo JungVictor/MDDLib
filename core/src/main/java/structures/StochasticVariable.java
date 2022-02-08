@@ -40,6 +40,12 @@ public class StochasticVariable implements Allocable {
         return create(0,0,0,0);
     }
 
+    public static StochasticVariable create(StochasticVariable var){
+        StochasticVariable X = create(var.getQuantity(), var.getValue());
+        X.precision = var.precision;
+        return X;
+    }
+
     public static StochasticVariable create(int precision){
         long one = (long) Math.pow(10, precision);
         StochasticVariable X = create(0, one, 0, one);

@@ -6,9 +6,17 @@ import java.io.*;
 
 public class StochasticVariablesManagements {
 
-    private static String directoryPath = "data/StochasticVariables/";
+    public final static String directoryPath = "data/StochasticVariables/";
 
-    public static StochasticVariable[] getStochasticVariables(String fileName){
+    public static StochasticVariable[] getStochasticVariables(String filename){
+        return getStochasticVariables(directoryPath, filename);
+    }
+
+    public static void saveStochasticVariables(String filename, StochasticVariable[] stochasticVariables, int precision){
+        saveStochasticVariables(directoryPath, filename, stochasticVariables, precision);
+    }
+
+    public static StochasticVariable[] getStochasticVariables(String directoryPath, String fileName){
         StochasticVariable[] stochasticVariables = new StochasticVariable[0]; //
         try{
             File file = new File(directoryPath + fileName);
@@ -40,7 +48,7 @@ public class StochasticVariablesManagements {
         return stochasticVariables;
     }
 
-    public static void saveStochasticVariables(String fileName, StochasticVariable[] stochasticVariables, int precision){
+    public static void saveStochasticVariables(String directoryPath, String fileName, StochasticVariable[] stochasticVariables, int precision){
         try {
             File file = new File(directoryPath + fileName);
 

@@ -203,7 +203,6 @@ public class ArrayOfLong implements Iterable<Long>, Allocable {
 
     @Override
     public void free() {
-        for(int i = 0; i < length; i++) array[i] = 0;
         allocator().free(this);
     }
 

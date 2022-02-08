@@ -561,7 +561,10 @@ public class Stochastic {
             stop = minCostFilteringStep(X, indices, p, bounds, lastNonFull, threshold, precision);
         }
 
-        for(int i = 0; i < X.length; i++) if(X[i].getMinValue() < bounds.get(i) || bounds.get(i) < 0) bounds.set(i, X[i].getMinValue());
+        for(int i = 0; i < X.length; i++) {
+            if(X[i].getMinValue() > bounds.get(i) || bounds.get(i) < 0) bounds.set(i, X[i].getMinValue());
+            if(X[i].getMaxValue() < bounds.get(i)) bounds.set(i, X[i].getMinValue());
+        }
 
         sortByCi(X, bounds, lastNonFull);
 
@@ -975,7 +978,7 @@ public class Stochastic {
         }
 
         //If the previous StochasticVariable is not full
-        if(quantities.get(current - 1) < X[current - 1].getMaxQuantity()) current--;
+        if(current > 0 && quantities.get(current - 1) < X[current - 1].getMaxQuantity()) current--;
 
         ArrayOfLong tuple = ArrayOfLong.create(2);
         tuple.set(0, totalCost);
