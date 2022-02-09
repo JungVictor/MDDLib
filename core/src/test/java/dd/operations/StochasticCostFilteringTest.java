@@ -27,18 +27,22 @@ class StochasticCostFilteringTest {
 
     private void testEquality(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
         //ArrayOfLong pseudolinear = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
-        ArrayOfLong polynomial = Stochastic.minCostFilteringPolynomial(X, threshold, totalQuantity, precision);
-        ArrayOfLong dichotomous = Stochastic.minCostFilteringDichotomous(X, threshold, totalQuantity, precision);
+        ArrayOfLong polynomial1 = Stochastic.minCostFilteringPolynomial(X, threshold, totalQuantity, precision);
+        ArrayOfLong dichotomous1 = Stochastic.minCostFilteringDichotomous(X, threshold, totalQuantity, precision);
+        ArrayOfLong dichotomous2 = Stochastic.minCostFilteringDichotomousV2(X, threshold, totalQuantity, precision);
 
         for(int i = 0; i < X.length; i++) {
-            assertEquals(polynomial.get(i), dichotomous.get(i));
+            assertEquals(polynomial1.get(i), dichotomous1.get(i));
+            assertEquals(dichotomous1.get(i), dichotomous2.get(i));
+            assertEquals(polynomial1.get(i), dichotomous2.get(i));
             //assertEquals(pseudolinear.get(i), polynomial.get(i));
             //assertEquals(pseudolinear.get(i), dichotomous.get(i));
         }
 
-        Memory.free(polynomial);
+        Memory.free(polynomial1);
         //Memory.free(pseudolinear);
-        Memory.free(dichotomous);
+        Memory.free(dichotomous1);
+        Memory.free(dichotomous2);
     }
 
     @Test

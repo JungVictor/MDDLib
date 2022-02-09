@@ -74,6 +74,6 @@ public class FilteringTest {
         if(showResult){
             for(int i = 0; i < X.length; i++) {System.out.println(i+" : "+X[i]);}
         }
-        System.out.println("Time  for "+repeat+" iteration(s) : "+(time2-time1)+" ms");
+        System.out.println("Time for "+repeat+" iteration(s) : "+(time2-time1)+" ms");
     }
 }
