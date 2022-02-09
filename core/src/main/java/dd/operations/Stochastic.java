@@ -674,7 +674,6 @@ public class Stochastic {
 
     /**
      * Compute the lower bounds of all variables' cost in polynomial time.<br>
-     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b><br>
      * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
@@ -707,7 +706,7 @@ public class Stochastic {
                 if (X[i].getMinQuantity() != maxPackingQuantities.get(i)) {
                     long swappableQuantity;
 
-                    //If the current
+                    //If the current is the firstNonFull
                     if (i == current) current++;
 
                     //While it is worth to exchange with the current-th StochasticVariable
@@ -721,8 +720,11 @@ public class Stochastic {
             }
             newMinCost = 0;
             if (filteredActualQuantity > 0) newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
-            //if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The constraint is impossible to satisfy");
+            if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
+
+            //Filtering
             if (newMinCost > X[i].getMinValue()) bounds.set(i, newMinCost);
+            else bounds.set(i, X[i].getMinValue());
         }
         Memory.free(maxPackingQuantities);
         Memory.free(tmp);
@@ -730,8 +732,120 @@ public class Stochastic {
     }
 
     /**
+     * Compute the lower bounds of all variables' cost in polynomial time.<br>
+     * This version can be faster than the other.
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * @param X The array of StochasticVariable to filter
+     * @param threshold The minimum threshold
+     * @param totalQuantity The maximum amount of quantity to give
+     * @param precision The precision of StochasticVariable
+     */
+    public static ArrayOfLong minCostFilteringPolynomialV2(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
+        ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
+        ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
+        ArrayOfLong bounds = ArrayOfLong.create(X.length);
+        long totalCost = tmp.get(0);
+        int firstNonFull = (int) tmp.get(1);
+        threshold = (long) (threshold * Math.pow(10 , precision));
+
+        long filteredActualQuantity;
+        long newCost;
+        int current;
+
+        long swappableQuantity;
+
+        long newMinCost;
+
+
+        /*==================================================================
+        The first step consists in filtering all the full StochasticVariable
+        ==================================================================*/
+        for (int i = 0; i < firstNonFull; i++) {
+            filteredActualQuantity = maxPackingQuantities.get(i);
+            //Total cost of max packing without X[i] and its given quantity
+            newCost = totalCost - filteredActualQuantity * X[i].getMaxValue();
+            current = firstNonFull;
+
+            //If it is not possible to satisfy the threshold without the i-th StochasticVariable
+            //and it is possible to exchange
+            if (newCost < threshold && X[i].getMinQuantity() != maxPackingQuantities.get(i)) {
+                //While it is worth to exchange with the current-th StochasticVariable
+                while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold) {
+                    swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
+                    newCost += swappableQuantity * X[current].getMaxValue();
+                    filteredActualQuantity -= swappableQuantity;
+                    current++;
+                }
+            }
+
+            newMinCost = 0;
+            if (filteredActualQuantity > 0) newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
+            if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
+
+            //Filtering
+            if (newMinCost > X[i].getMinValue()) bounds.set(i, newMinCost);
+            else bounds.set(i, X[i].getMinValue());
+        }
+
+        /*=======================================================================
+        The second step consists in filtering the firstNonFull StochasticVariable
+        =======================================================================*/
+        filteredActualQuantity = maxPackingQuantities.get(firstNonFull);
+        //Total cost of max packing without X[i] and its given quantity
+        newCost = totalCost - filteredActualQuantity * X[firstNonFull].getMaxValue();
+        current = firstNonFull+1;
+
+        //If it is not possible to satisfy the threshold without the firstNonFull StochasticVariable
+        //and it is possible to exchange
+        if (newCost < threshold && X[firstNonFull].getMinQuantity() != maxPackingQuantities.get(firstNonFull)) {
+            //While it is worth to exchange with the current-th StochasticVariable
+            while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold) {
+                swappableQuantity = Math.min((filteredActualQuantity - X[firstNonFull].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
+                newCost += swappableQuantity * X[current].getMaxValue();
+                filteredActualQuantity -= swappableQuantity;
+                current++;
+            }
+        }
+
+        newMinCost = 0;
+        if (filteredActualQuantity > 0) newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
+        if (newMinCost > X[firstNonFull].getMaxValue()) throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
+
+        //Filtering
+        if (newMinCost > X[firstNonFull].getMinValue()) bounds.set(firstNonFull, newMinCost);
+        else bounds.set(firstNonFull, X[firstNonFull].getMinValue());
+
+        /*======================================================================================
+        The third step consists in filtering the empty (fill until their min) StochasticVariable
+        ======================================================================================*/
+        for (int i = firstNonFull+1; i < X.length; i++) {
+            filteredActualQuantity = maxPackingQuantities.get(i);
+            //Total cost of max packing without X[i] and its given quantity
+            newCost = totalCost - filteredActualQuantity * X[i].getMaxValue();
+
+            //If it is not possible to satisfy the threshold without the i-th StochasticVariable
+            //and there is quantity in it
+            if (newCost < threshold && filteredActualQuantity > 0) {
+                newMinCost = (long) Math.floor(((threshold  - newCost)) / filteredActualQuantity);
+            }
+            else newMinCost = 0;
+
+            if (newMinCost > X[i].getMaxValue()) throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
+
+
+            //Filtering
+            if (newMinCost > X[i].getMinValue()) bounds.set(i, newMinCost);
+            else bounds.set(i, X[i].getMinValue());
+
+        }
+
+        Memory.free(maxPackingQuantities);
+        Memory.free(tmp);
+        return bounds;
+    }
+
+    /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
-     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b><br>
      * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
@@ -871,7 +985,6 @@ public class Stochastic {
     /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
      * This version can be faster than the other.
-     * <b> /!\ The array X gets its minValues modified during the filtering /!\ </b><br>
      * <b> /!\ The precision should be lower or equal to 8 /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
@@ -929,6 +1042,8 @@ public class Stochastic {
             int indexMax;
             int newIndex;
 
+            long swappableQuantity;
+
             long newMinCost;
 
             /*==================================================================
@@ -974,7 +1089,6 @@ public class Stochastic {
                         }
                         //End of the dichotomous search
 
-                        long swappableQuantity;
                         swappableQuantity = Math.min(filteredActualQuantity - X[i].getMinQuantity() - (quantityNeeded.get(indexMin)), X[firstNonFull + indexMin].getMaxQuantity() - maxPackingQuantities.get(firstNonFull + indexMin));
                         if ((filteredActualQuantity - (quantityNeeded.get(indexMin)) - swappableQuantity) != 0) {
                             newMinCost = (long) Math.floor((threshold - (newCost + (costReached.get(indexMin)) + swappableQuantity * X[firstNonFull + indexMin].getMaxValue())) / (filteredActualQuantity - (quantityNeeded.get(indexMin)) - swappableQuantity));
@@ -1042,7 +1156,6 @@ public class Stochastic {
                     }
                     //End of the dichotomous search
 
-                    long swappableQuantity;
                     swappableQuantity = Math.min(filteredActualQuantity - X[firstNonFull].getMinQuantity() - (quantityNeeded.get(indexMin) - nfneQuantity), X[firstNonFull + indexMin].getMaxQuantity() - maxPackingQuantities.get(firstNonFull + indexMin));
                     if ((filteredActualQuantity - (quantityNeeded.get(indexMin) - nfneQuantity) - swappableQuantity) != 0) {
                         newMinCost = (long) Math.floor((threshold - (newCost + (costReached.get(indexMin) - nfneCost) + swappableQuantity * X[firstNonFull + indexMin].getMaxValue())) / (filteredActualQuantity - (quantityNeeded.get(indexMin) - nfneQuantity) - swappableQuantity));
@@ -1065,7 +1178,6 @@ public class Stochastic {
             /*======================================================================================
             The third step consists in filtering the empty (fill until their min) StochasticVariable
             ======================================================================================*/
-
             for (int i = firstNonFull+1; i < X.length; i++) {
                 filteredActualQuantity = maxPackingQuantities.get(i);
                 //Total cost of max packing without X[i] and its given quantity
@@ -1087,7 +1199,6 @@ public class Stochastic {
                 }
             }
 
-
             Memory.free(costReached);
             Memory.free(quantityNeeded);
         }
@@ -1095,7 +1206,6 @@ public class Stochastic {
         Memory.free(tmp);
         return minBounds;
     }
-
 
     /**
      * Get the maximum quantity we can swap between X[i] and X[t].
