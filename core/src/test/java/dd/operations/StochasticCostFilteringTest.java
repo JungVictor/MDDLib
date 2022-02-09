@@ -26,11 +26,12 @@ class StochasticCostFilteringTest {
     }
 
     private void testEquality(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        //ArrayOfLong pseudolinear = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
+        ArrayOfLong pseudolinear = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
         ArrayOfLong polynomial1 = Stochastic.minCostFilteringPolynomial(X, threshold, totalQuantity, precision);
         ArrayOfLong polynomial2 = Stochastic.minCostFilteringPolynomialV2(X, threshold, totalQuantity, precision);
         ArrayOfLong dichotomous1 = Stochastic.minCostFilteringDichotomous(X, threshold, totalQuantity, precision);
         ArrayOfLong dichotomous2 = Stochastic.minCostFilteringDichotomousV2(X, threshold, totalQuantity, precision);
+
 
         for(int i = 0; i < X.length; i++) {
             assertEquals(polynomial1.get(i), polynomial2.get(i));
@@ -39,12 +40,16 @@ class StochasticCostFilteringTest {
             assertEquals(polynomial1.get(i), dichotomous2.get(i));
             assertEquals(polynomial2.get(i), dichotomous1.get(i));
             assertEquals(polynomial2.get(i), dichotomous2.get(i));
-            //assertEquals(pseudolinear.get(i), polynomial.get(i));
-            //assertEquals(pseudolinear.get(i), dichotomous.get(i));
+
+            assertEquals(pseudolinear.get(i), polynomial1.get(i));
+            assertEquals(pseudolinear.get(i), polynomial2.get(i));
+            assertEquals(pseudolinear.get(i), dichotomous1.get(i));
+            assertEquals(pseudolinear.get(i), dichotomous2.get(i));
         }
 
         Memory.free(polynomial1);
-        //Memory.free(pseudolinear);
+        Memory.free(polynomial2);
+        Memory.free(pseudolinear);
         Memory.free(dichotomous1);
         Memory.free(dichotomous2);
     }
@@ -58,7 +63,6 @@ class StochasticCostFilteringTest {
         StochasticVariable[] Y;
 
         for(String filename : testFiles) {
-            System.out.println(filename);
             // Load the data
             StochasticVariable[] X = StochasticVariablesManagements.getStochasticVariables(directory, filename);
 

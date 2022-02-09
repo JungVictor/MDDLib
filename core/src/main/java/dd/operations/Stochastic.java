@@ -7,6 +7,7 @@ import structures.StochasticVariable;
 import structures.arrays.ArrayOfBoolean;
 import structures.arrays.ArrayOfLong;
 import structures.generics.MapOf;
+import structures.tuples.TupleOfInt;
 import utils.SmallMath;
 
 public class Stochastic {
@@ -520,56 +521,87 @@ public class Stochastic {
      * @return The array of filtered costs
      */
     public static ArrayOfLong minCostFiltering(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        int lastNonFull = 0;
-        long swap = 0;
         long q, qt;
 
+        threshold *= (long) Math.pow(10, precision);
         ArrayOfLong p = ArrayOfLong.create(X.length);
         ArrayOfLong bounds = ArrayOfLong.create(X.length);
         ArrayOfLong knapsack = ArrayOfLong.create(X.length);
 
-        // All min
-        for(int i = 0; i < X.length; i++) {
-            knapsack.set(i, X[i].getMinQuantity());
-            totalQuantity -= knapsack.get(i);
-        }
+        ArrayOfLong maxPack = maxPacking(X, knapsack, totalQuantity);
+        long K = maxPack.get(0);
+        int lastNonFull = (int) maxPack.get(1);
+        Memory.free(maxPack);
 
-        // Knapsack
-        for(int i = 0; i < X.length; i++) {
-            if(totalQuantity == 0) {
-                if(i > 1 && knapsack.get(i-1) == X[i-1].getMaxQuantity()) lastNonFull = i;
-                else lastNonFull = i - 1;
-                break;
-            }
-            totalQuantity += knapsack.get(i);
-            knapsack.set(i, totalQuantity > X[i].getMaxQuantity() ? X[i].getMaxQuantity() : totalQuantity);
-            totalQuantity -= knapsack.get(i);
-        }
+        TupleOfInt idx = TupleOfInt.create();
+        idx.setFirst(lastNonFull+1);
 
         ArrayOfBoolean indices = ArrayOfBoolean.create(lastNonFull+1);
-        for(int i = 0; i <= lastNonFull; i++) indices.set(i, true);
+        for(int i = 0; i < indices.length; i++) indices.set(i, true);
 
         // Sort by ci*pi
-        sortByCiPi(X, knapsack, lastNonFull);
+        sortByMaxProduct(X, knapsack, 0, lastNonFull);
 
         // While we did not filter all variables, we filter
         boolean stop = false;
         int cpt = 0;
+
+        // Filtering variable that are empty in Knapsack
+        for(int i = lastNonFull; i < X.length; i++){
+            if(X[i].getMinQuantity() > 0) bounds.set(i, (threshold - K + X[i].getMaxValue() * X[i].getMinQuantity()) / X[i].getMinQuantity());
+        }
+
+        // Filtering non-empty
         while(!stop){
             // Reset the knapsack to each iteration
             p.copy(knapsack);
-            stop = minCostFilteringStep(X, indices, p, bounds, lastNonFull, threshold, precision);
+            stop = minCostFilteringStep(X, indices, p, bounds, lastNonFull, threshold, K, precision, idx);
         }
 
+
+
+        // Filtering variable that can be empty but are full on knapsack
+        if(idx.getFirst() < lastNonFull) {
+            sortByQuantity(X, knapsack, idx.getFirst(), lastNonFull-1);
+            int target = lastNonFull;
+            long swap, qi = 0;
+            for (int i = lastNonFull-1; i >= idx.getFirst(); i--) {
+                // Remove the value of X[i] in K
+                K -= knapsack.get(i) * X[i].getMaxValue();
+                while (knapsack.get(i) > X[i].getMinQuantity() && target < X.length) {
+                    // Swap between X[i] and variable with highest cost possible
+                    swap = maxSwapping(X, knapsack, i, target);
+                    knapsack.set(target, knapsack.get(target) + swap);
+                    knapsack.set(i, knapsack.get(i) - swap);
+
+                    qi += swap;
+
+                    // Add the swapped value to K
+                    K += X[target].getMaxValue() * swap;
+                    // If the target is full, we move to the next one
+                    if(knapsack.get(target) >= X[target].getMaxQuantity()) target++;
+                }
+                // Set the new lower bound
+                if(knapsack.get(i) > 0) bounds.set(i, (threshold - K) / knapsack.get(i));
+                if(i > 0) {
+                    K += X[i].getMaxValue() * (qi + X[i].getMinQuantity());
+                    K -= X[i-1].getMaxValue() * qi;
+                    knapsack.set(i-1, knapsack.get(i-1)-qi);
+                }
+            }
+        }
+
+        sortByMaxCost(X, bounds, 0, lastNonFull);
+
+
         for(int i = 0; i < X.length; i++) {
-            if(X[i].getMinValue() > bounds.get(i) || bounds.get(i) < 0) bounds.set(i, X[i].getMinValue());
+            if(X[i].getMinValue() > bounds.get(i)) bounds.set(i, X[i].getMinValue());
             if(X[i].getMaxValue() < bounds.get(i)) bounds.set(i, X[i].getMinValue());
         }
 
-        sortByCi(X, bounds, lastNonFull);
-
         Memory.free(p);
         Memory.free(knapsack);
+        Memory.free(idx);
         return bounds;
     }
 
@@ -586,13 +618,8 @@ public class Stochastic {
      */
     private static boolean minCostFilteringStep(
             StochasticVariable[] X, ArrayOfBoolean indices, ArrayOfLong p, ArrayOfLong result, int lastNonFull,
-            long threshold, int precision) {
-        int V = 0;
+            long threshold, long V, int precision, TupleOfInt idx) {
         long swap = 0;
-        long one = (long) Math.pow(10, precision);
-        long q, qt;
-
-        for(int i = 0; i < X.length; i++) V += (p.get(i) * X[i].getMaxValue()) / one;
 
         int target = lastNonFull;
         int i = 0;
@@ -604,17 +631,19 @@ public class Stochastic {
                 continue;
             }
 
-            V -= (X[i].getMaxValue() * p.get(i)) / one;
+            V -= (X[i].getMaxValue() * p.get(i));
 
+            if(i == target) target++;
             // If above the threshold without the value, skip everything else ?
             if(V > threshold) {
+                idx.setFirst(i);
                 while (i <= lastNonFull) indices.set(i++, false);
-                break;
+                return !skipped;
             }
-            while(p.get(i) > X[i].getMinQuantity() && target < X.length && X[i].worthSwappingWith(X[target], threshold, V, p.get(i), one)){
+            while(p.get(i) > X[i].getMinQuantity() && target < X.length && X[i].worthSwappingWith(X[target], threshold, V, p.get(i), 1)){
                 swap = maxSwapping(X, p, i, target);
 
-                V += (swap * X[target].getMaxValue()) / one;
+                V += (swap * X[target].getMaxValue());
                 p.set(target, p.get(target) + swap);
                 p.set(i, p.get(i) - swap);
 
@@ -622,7 +651,7 @@ public class Stochastic {
                 if(p.get(target) == X[target].getMaxQuantity()) target++;
             }
 
-            if(p.get(i) > 0) result.set(i, ((threshold - V) * one) / p.get(i));
+            if(p.get(i) > 0) result.set(i, (threshold - V) / p.get(i));
 
             indices.set(i, false);
 
@@ -633,7 +662,7 @@ public class Stochastic {
             // Search the next variable to filter
             while (i <= lastNonFull) {
                 if(!indices.get(i)) i++;
-                else if(mustResetKnapsack(X, V, threshold, p.get(current), swap, p.get(i), one, current, i, lastNonFull)) {
+                else if(mustResetKnapsack(X, V, threshold, p.get(current), swap, p.get(i), current, i, lastNonFull)) {
                     swap = maxSwapping(X, p, i, current);
                     i++;
                     skipped = true;
@@ -642,7 +671,7 @@ public class Stochastic {
 
             p.set(current, p.get(current) + swap);
             p.set(i, p.get(i) - swap);
-            V += (X[current].getMaxValue() * p.get(current)) / one;
+            V += (X[current].getMaxValue() * p.get(current));
         }
         Memory.free(p);
         return !skipped;
@@ -663,12 +692,12 @@ public class Stochastic {
      * @return True if we must reset the knapsack to compute the min cost, false otherwise
      */
     private static boolean mustResetKnapsack(StochasticVariable[] X,
-                                             long V, long K, long pi, long swap, long pnext, long one,
+                                             long V, long K, long pi, long swap, long pnext,
                                              int current, int next, int lastNonEmpty){
-        V = V + (X[current].getMaxValue() * (pi+swap) - X[next].getMaxValue() * pnext) / one;
+        V = V + (X[current].getMaxValue() * (pi+swap) - X[next].getMaxValue() * pnext);
         return  X[next].getMaxQuantity() - X[next].getMinQuantity() < X[current].getMaxQuantity() - pi &&
                 V < K &&
-                X[next].worthSwappingWith(X[lastNonEmpty], K, V, pnext, one);
+                X[next].worthSwappingWith(X[lastNonEmpty], K, V, pnext, 1);
 
     }
 
@@ -1230,22 +1259,22 @@ public class Stochastic {
      * @param p The quantity distribution
      * @param k The index of the last variable to sort (included)
      */
-    private static void sortByCiPi(StochasticVariable X[], ArrayOfLong p, int k){
-        ArrayOfLong cipi = ArrayOfLong.create(k+1);
-        for(int i = 0; i <= k; i++) cipi.set(i, X[i].getMaxValue() * X[i].getMaxQuantity());
+    private static void sortByMaxProduct(StochasticVariable X[], ArrayOfLong p, int start, int end){
+        ArrayOfLong cipi = ArrayOfLong.create(end+1-start);
+        for(int i = start; i <= end; i++) cipi.set(i-start, X[i].getMaxValue() * X[i].getMaxQuantity());
 
-        for(int i = 0; i < cipi.length; i++){
+        for(int i = start; i < cipi.length+start; i++){
             int j = i;
             StochasticVariable x = X[i];
             long pi = p.get(i);
-            long v = cipi.get(i);
-            while(j > 0 && cipi.get(j-1) < v) {
-                cipi.set(j, cipi.get(j-1));
+            long v = cipi.get(i-start);
+            while(j > 0 && cipi.get(j-1-start) < v) {
+                cipi.set(j-start, cipi.get(j-1-start));
                 X[j] = X[j-1];
                 p.set(j, p.get(j-1));
                 j -= 1;
             }
-            cipi.set(j, v);
+            cipi.set(j-start, v);
             X[j] = x;
             p.set(j, pi);
         }
@@ -1259,8 +1288,8 @@ public class Stochastic {
      * @param p The quantity distribution
      * @param k The index of the last variable to sort (included)
      */
-    private static void sortByCi(StochasticVariable X[], ArrayOfLong p, int k){
-        for(int i = 0; i <= k; i++){
+    private static void sortByMaxCost(StochasticVariable X[], ArrayOfLong p, int start, int end){
+        for(int i = start; i <= end; i++){
             int j = i;
             StochasticVariable x = X[i];
             long pi = p.get(i);
@@ -1272,6 +1301,28 @@ public class Stochastic {
             }
             X[j] = x;
             p.set(j, pi);
+        }
+    }
+
+    /**
+     * Sort the array X by non-increasing order of the value qmax[i] - qmin[i].
+     * @param X The array of StochasticVariables
+     * @param p The quantity distribution
+     * @param k The index of the last variable to sort (included)
+     */
+    private static void sortByQuantity(StochasticVariable X[], ArrayOfLong p, int start, int end){
+        for(int i = start; i <= end; i++){
+            int j = i;
+            StochasticVariable x = X[i];
+            long qi = p.get(i);
+            long v = X[i].getMaxQuantity() - X[i].getMinQuantity();
+            while(j > 0 && X[j-1].getMaxQuantity() - X[j-1].getMinQuantity() < v) {
+                X[j] = X[j-1];
+                p.set(j, p.get(j-1));
+                j -= 1;
+            }
+            X[j] = x;
+            p.set(j, qi);
         }
     }
 
