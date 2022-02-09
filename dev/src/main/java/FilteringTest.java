@@ -42,7 +42,7 @@ public class FilteringTest {
                     Stochastic.minCostFilteringDichotomousV2(X, minThreshold, maxThreshold, precision);
                 }
                 time2 = System.currentTimeMillis();
-                minBounds =  Stochastic.minCostFilteringDichotomous(X, minThreshold, maxThreshold, precision);
+                minBounds =  Stochastic.minCostFilteringDichotomousV2(X, minThreshold, maxThreshold, precision);
                 for(int i = 0; i < X.length; i++) X[i].setMinValue(minBounds.get(i));
                 break;
             case 2:
@@ -60,7 +60,7 @@ public class FilteringTest {
                     Stochastic.minCostFilteringPolynomialV2(X, minThreshold, maxThreshold, precision);
                 }
                 time2 = System.currentTimeMillis();
-                minBounds =  Stochastic.minCostFilteringPolynomial(X, minThreshold, maxThreshold, precision);
+                minBounds =  Stochastic.minCostFilteringPolynomialV2(X, minThreshold, maxThreshold, precision);
                 for(int i = 0; i < X.length; i++) X[i].setMinValue(minBounds.get(i));
                 break;
         }
