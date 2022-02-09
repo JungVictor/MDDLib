@@ -25,11 +25,6 @@ public class FilteringTest {
 
         ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
         ArrayOfLong tmp = Stochastic.maxPacking(X, maxPackingQuantities, maxThreshold);
-        System.out.println("Number of StochasticVariable : "+X.length);
-        System.out.println("Precision : "+precision);
-        System.out.println("Total cost of max packing : "+tmp.get(0));
-        System.out.println("First non full : "+tmp.get(1));
-        System.out.println("First non full quantity : "+maxPackingQuantities.get((int)tmp.get(1)));
 
         long[][] qBounds = Stochastic.computeBounds(X, minThreshold, maxThreshold, precision);
 
@@ -74,6 +69,31 @@ public class FilteringTest {
         if(showResult){
             for(int i = 0; i < X.length; i++) {System.out.println(i+" : "+X[i]);}
         }
+
+        System.out.println("\n========================================================");
+        switch(method){
+            case 1:
+                System.out.println("Resolution with the dichotomous method :");
+                break;
+            case 2:
+                System.out.println("Resolution with the n*k method :");
+                break;
+            default:
+                System.out.println("Resolution with the polynomial method :");
+                break;
+        }
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Data used : "+dataFile);
+        System.out.println("Number of StochasticVariable : "+X.length);
+        System.out.println("Precision : "+precision);
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Total cost of max packing : "+tmp.get(0));
+        System.out.println("Threshold :                 "+minThreshold*maxThreshold);
+        System.out.println("--------------------------------------------------------");
+        System.out.println("First non full : "+tmp.get(1));
+        System.out.println("First non full quantity : "+maxPackingQuantities.get((int)tmp.get(1)));
+        System.out.println("--------------------------------------------------------");
         System.out.println("Time for "+repeat+" iteration(s) : "+(time2-time1)+" ms");
+        System.out.println("========================================================");
     }
 }
