@@ -741,9 +741,9 @@ public class Stochastic {
      * @param precision The precision of StochasticVariable
      */
     public static ArrayOfLong minCostFilteringPolynomialV2(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
+        ArrayOfLong maxPackingQuantities = ArrayOfLong.fastCreate(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
-        ArrayOfLong bounds = ArrayOfLong.create(X.length);
+        ArrayOfLong bounds = ArrayOfLong.fastCreate(X.length);
         long totalCost = tmp.get(0);
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
@@ -992,8 +992,8 @@ public class Stochastic {
      * @param precision The precision of StochasticVariable
      */
     public static ArrayOfLong minCostFilteringDichotomousV2(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        ArrayOfLong minBounds = ArrayOfLong.create(X.length);
-        ArrayOfLong maxPackingQuantities = ArrayOfLong.create(X.length);
+        ArrayOfLong minBounds = ArrayOfLong.fastCreate(X.length);
+        ArrayOfLong maxPackingQuantities = ArrayOfLong.fastCreate(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
         long totalCost = tmp.get(0);
         int firstNonFull = (int) tmp.get(1);
@@ -1022,8 +1022,8 @@ public class Stochastic {
             from firstNonFull to the i-th (not included).
             */
             int dichotomousLength = X.length - firstNonFull;
-            ArrayOfLong quantityNeeded = ArrayOfLong.create(dichotomousLength);
-            ArrayOfLong costReached = ArrayOfLong.create(dichotomousLength);
+            ArrayOfLong quantityNeeded = ArrayOfLong.fastCreate(dichotomousLength);
+            ArrayOfLong costReached = ArrayOfLong.fastCreate(dichotomousLength);
 
             quantityNeeded.set(0, 0);
             costReached.set(0, 0);
