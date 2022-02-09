@@ -547,7 +547,7 @@ public class Stochastic {
         int cpt = 0;
 
         // Filtering variable that are empty in Knapsack
-        for(int i = lastNonFull; i < X.length; i++){
+        for(int i = lastNonFull+1; i < X.length; i++){
             if(X[i].getMinQuantity() > 0) bounds.set(i, (threshold - K + X[i].getMaxValue() * X[i].getMinQuantity()) / X[i].getMinQuantity());
         }
 
@@ -559,16 +559,20 @@ public class Stochastic {
         }
 
 
-
         // Filtering variable that can be empty but are full on knapsack
-        if(idx.getFirst() < lastNonFull) {
+        if(idx.getFirst() <= lastNonFull) {
             sortByQuantity(X, knapsack, idx.getFirst(), lastNonFull-1);
-            int target = lastNonFull;
+            int target = lastNonFull+1;
             long swap, qi = 0;
-            for (int i = lastNonFull-1; i >= idx.getFirst(); i--) {
+
+            for (int i = lastNonFull; i > idx.getFirst(); i--) {
                 // Remove the value of X[i] in K
                 K -= knapsack.get(i) * X[i].getMaxValue();
                 while (knapsack.get(i) > X[i].getMinQuantity() && target < X.length) {
+                    if(i == target) {
+                        target++;
+                        continue;
+                    }
                     // Swap between X[i] and variable with highest cost possible
                     swap = maxSwapping(X, knapsack, i, target);
                     knapsack.set(target, knapsack.get(target) + swap);
@@ -583,10 +587,19 @@ public class Stochastic {
                 }
                 // Set the new lower bound
                 if(knapsack.get(i) > 0) bounds.set(i, (threshold - K) / knapsack.get(i));
-                if(i > 0) {
-                    K += X[i].getMaxValue() * (qi + X[i].getMinQuantity());
+                if(i == lastNonFull){
+                    K += X[i].getMaxValue() * (qi + knapsack.get(i));
+                    while (target > lastNonFull) {
+                        if (target < X.length) knapsack.set(target, X[target].getMinQuantity());
+                        target--;
+                    }
+                    knapsack.set(i, knapsack.get(i)+qi);
+                    target--;
+                } else if(i > 0) {
+                    K += X[i].getMaxValue() * (qi + knapsack.get(i));
                     K -= X[i-1].getMaxValue() * qi;
                     knapsack.set(i-1, knapsack.get(i-1)-qi);
+                    knapsack.set(i, knapsack.get(i)+qi);
                 }
             }
         }
