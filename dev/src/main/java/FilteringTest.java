@@ -37,12 +37,12 @@ public class FilteringTest {
 
         switch(method){
             case 1:
-                System.out.println("Resolution with the dichotomous method V2...");
+                System.out.println("Resolution with the dichotomous method V3...");
                 for (int i = 0; i < repeat; i++) {
-                    Stochastic.minCostFilteringDichotomousV2(X, minThreshold, maxThreshold, precision);
+                    Stochastic.minCostFilteringDichotomousV3(X, minThreshold, maxThreshold, precision);
                 }
                 time2 = System.currentTimeMillis();
-                minBounds =  Stochastic.minCostFilteringDichotomousV2(X, minThreshold, maxThreshold, precision);
+                minBounds =  Stochastic.minCostFilteringDichotomousV3(X, minThreshold, maxThreshold, precision);
                 for(int i = 0; i < X.length; i++) X[i].setMinValue(minBounds.get(i));
                 break;
             case 2:

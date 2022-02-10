@@ -26,32 +26,25 @@ class StochasticCostFilteringTest {
     }
 
     private void testEquality(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
-        ArrayOfLong pseudolinear = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
-        ArrayOfLong polynomial1 = Stochastic.minCostFilteringPolynomial(X, threshold, totalQuantity, precision);
-        ArrayOfLong polynomial2 = Stochastic.minCostFilteringPolynomialV2(X, threshold, totalQuantity, precision);
-        ArrayOfLong dichotomous1 = Stochastic.minCostFilteringDichotomous(X, threshold, totalQuantity, precision);
-        ArrayOfLong dichotomous2 = Stochastic.minCostFilteringDichotomousV2(X, threshold, totalQuantity, precision);
+        ArrayOfLong[] methods = new ArrayOfLong[6];
+        methods[0] = Stochastic.minCostFiltering(X, threshold, totalQuantity, precision);
+        methods[1] = Stochastic.minCostFilteringPolynomial(X, threshold, totalQuantity, precision);
+        methods[2] = Stochastic.minCostFilteringPolynomialV2(X, threshold, totalQuantity, precision);
+        methods[3] = Stochastic.minCostFilteringDichotomous(X, threshold, totalQuantity, precision);
+        methods[4] = Stochastic.minCostFilteringDichotomousV2(X, threshold, totalQuantity, precision);
+        methods[5] = Stochastic.minCostFilteringDichotomousV3(X, threshold, totalQuantity, precision);
 
-
-        for(int i = 0; i < X.length; i++) {
-            assertEquals(polynomial1.get(i), polynomial2.get(i));
-            assertEquals(dichotomous1.get(i), dichotomous2.get(i));
-            assertEquals(polynomial1.get(i), dichotomous1.get(i));
-            assertEquals(polynomial1.get(i), dichotomous2.get(i));
-            assertEquals(polynomial2.get(i), dichotomous1.get(i));
-            assertEquals(polynomial2.get(i), dichotomous2.get(i));
-
-            assertEquals(pseudolinear.get(i), polynomial1.get(i));
-            assertEquals(pseudolinear.get(i), polynomial2.get(i));
-            assertEquals(pseudolinear.get(i), dichotomous1.get(i));
-            assertEquals(pseudolinear.get(i), dichotomous2.get(i));
+        for (int i = 0; i < methods.length; i++) {
+            for (int j = i+1; j < methods.length; j++) {
+                for (int k = 0; k < X.length; k++) {
+                    assertEquals(methods[i].get(k), methods[j].get(k));
+                }
+            }
         }
 
-        Memory.free(polynomial1);
-        Memory.free(polynomial2);
-        Memory.free(pseudolinear);
-        Memory.free(dichotomous1);
-        Memory.free(dichotomous2);
+        for (int i = 0; i < methods.length; i++) {
+            Memory.free(methods[i]);
+        }
     }
 
     @Test
