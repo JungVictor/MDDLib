@@ -37,7 +37,7 @@ public class FilteringTest {
 
         switch(method){
             case 1:
-                System.out.println("Resolution with the dichotomous method...");
+                System.out.println("Resolution with the dichotomous method V2...");
                 for (int i = 0; i < repeat; i++) {
                     Stochastic.minCostFilteringDichotomousV2(X, minThreshold, maxThreshold, precision);
                 }
@@ -55,7 +55,7 @@ public class FilteringTest {
                 for(int i = 0; i < X.length; i++) X[i].setMinValue(minBounds.get(i));
                 break;
             default:
-                System.out.println("Resolution with the polynomial method...");
+                System.out.println("Resolution with the polynomial method V2...");
                 for (int i = 0; i < repeat; i++) {
                     Stochastic.minCostFilteringPolynomialV2(X, minThreshold, maxThreshold, precision);
                 }
