@@ -33,7 +33,7 @@ public class Domains implements Allocable {
     }
     public static Domains create(int size){
         Domains D = allocator().allocate();
-        D.add(size);
+        D.add(size-1);
         return D;
     }
 
@@ -43,6 +43,18 @@ public class Domains implements Allocable {
      */
     private static Allocator allocator(){
         return localStorage.get();
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < size(); i++){
+            builder.append(i);
+            builder.append(": ");
+            builder.append(domains.get(i).toString());
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 
     //**************************************//

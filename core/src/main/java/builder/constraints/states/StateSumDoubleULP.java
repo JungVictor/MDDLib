@@ -96,9 +96,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
         double maxPotential = Math.nextDown(sum + doubleLabel + constraint.vMax(layer-1));
 
 
-        if(maxPotential < constraint.min() || constraint.max() < minPotential) return false;
-        if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return true;
-        return Math.nextDown(sum + doubleLabel) <= constraint.max();
+        return maxPotential >= constraint.min() && constraint.max() >= minPotential;
     }
 
     /**

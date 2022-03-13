@@ -92,9 +92,7 @@ public class StateSum extends NodeState {
         int maxPotential = sum + label + constraint.vMax(layer-1);
 
 
-        if(maxPotential < constraint.min() || constraint.max() < minPotential) return false;
-        if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return true;
-        return sum + label <= constraint.max();
+        return maxPotential >= constraint.min() && constraint.max() >= minPotential;
     }
 
     /**
