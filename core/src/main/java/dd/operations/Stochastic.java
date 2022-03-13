@@ -1308,8 +1308,8 @@ public class Stochastic {
             */
 
             int dichotomousLength = 0;
-            ArrayOfLong quantityNeeded = ArrayOfLong.create(0);
-            ArrayOfLong costReached = ArrayOfLong.create(0);
+            ArrayOfLong quantityNeeded = null;
+            ArrayOfLong costReached = null;
 
             //Then we filter the StochasticVariable
             long filteredActualQuantity;
@@ -1479,6 +1479,11 @@ public class Stochastic {
             //If it is possible to satisfy the threshold without the i-th StochasticVariable
             else {newMinCost = 0;}
 
+            if (dichotomousLength != 0) {
+                Memory.free(costReached);
+                Memory.free(quantityNeeded);
+            }
+
             //Filtering
             if (newMinCost > X[firstNonFull].getMinValue()) minBounds.set(firstNonFull, newMinCost);
             else minBounds.set(firstNonFull, X[firstNonFull].getMinValue());
@@ -1509,9 +1514,6 @@ public class Stochastic {
                     throw new IllegalArgumentException("The minimal cost is greater than the maximal cost");
                 }
             }
-
-            Memory.free(costReached);
-            Memory.free(quantityNeeded);
         }
         Memory.free(maxPackingQuantities);
         Memory.free(tmp);
