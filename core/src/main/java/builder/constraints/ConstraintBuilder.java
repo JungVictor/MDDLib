@@ -198,6 +198,7 @@ public class ConstraintBuilder {
             int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
             if(variables == null || variables.contains(i)) {
                 for (int v : D.get(i + 1)) {
+                    v = map.get(v);
                     if (v < vMin) vMin = v;
                     if (v > vMax) vMax = v;
                 }
