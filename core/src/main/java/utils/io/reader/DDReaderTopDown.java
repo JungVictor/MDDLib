@@ -4,7 +4,6 @@ import dd.AbstractNode;
 import dd.DecisionDiagram;
 import utils.io.MDDReader;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -19,7 +18,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    protected void saveNode(AbstractNode node, int nodeID, FileOutputStream file) throws IOException {
+    protected void saveNode(AbstractNode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfChildren();
         writeInt(file, MDDReader.NODE, nodeID);
         writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
@@ -35,7 +34,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    public void save(DecisionDiagram dd, FileOutputStream file) throws IOException {
+    public void save(DecisionDiagram dd, MDDFileWriter file) throws IOException {
         // Write the header nad initialise the elements array
         writeHeader(dd, file);
         // Write the size of the DD
@@ -62,7 +61,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    protected void loadNode(DecisionDiagram dd, AbstractNode node, int layer, FileInputStream file) throws IOException {
+    protected void loadNode(DecisionDiagram dd, AbstractNode node, int layer, MDDFileReader file) throws IOException {
         // Number of values
         int numberOfValues = readInt(file, MDDReader.VALUE_NUMBER);
 
@@ -81,7 +80,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    public void load(DecisionDiagram dd, FileInputStream file) throws IOException {
+    public void load(DecisionDiagram dd, MDDFileReader file) throws IOException {
         // Read the header and initialise the elements array
         readHeader(file);
         // Read and set the size of the DD

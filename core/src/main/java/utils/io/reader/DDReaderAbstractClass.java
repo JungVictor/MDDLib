@@ -5,8 +5,6 @@ import dd.DecisionDiagram;
 import utils.SmallMath;
 import utils.io.MDDReader;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -84,15 +82,15 @@ public abstract class DDReaderAbstractClass {
     protected AbstractNode getNode(int ID){
         return currentRead.get(ID);
     }
-    protected void writeInt(FileOutputStream file, byte element, int value) throws IOException {
+    protected void writeInt(MDDFileWriter file, byte element, int value) throws IOException {
         file.write(SmallMath.intToBytes(elements[element], value));
     }
-    protected int readInt(FileInputStream file, byte element) throws IOException {
+    protected int readInt(MDDFileReader file, byte element) throws IOException {
         file.read(elements[element]);
         return SmallMath.bytesToInt(elements[element]);
     }
 
-    protected void writeHeader(DecisionDiagram dd, FileOutputStream file) throws IOException {
+    protected void writeHeader(DecisionDiagram dd, MDDFileWriter file) throws IOException {
         int nodes = 0;
         for(int i = 0; i < dd.size(); i++) nodes = Math.max(nodes, dd.getLayerSize(i));
 
@@ -110,7 +108,7 @@ public abstract class DDReaderAbstractClass {
         file.write(elements[MDDReader.VALUE_NUMBER].length);
         file.write(elements[MDDReader.SIZE].length);
     }
-    protected void readHeader(FileInputStream file) throws IOException {
+    protected void readHeader(MDDFileReader file) throws IOException {
         if(elements == null) elements = new byte[5][];
         for(int i = 0; i < elements.length; i++){
             file.read(b);
@@ -118,8 +116,8 @@ public abstract class DDReaderAbstractClass {
         }
     }
 
-    protected abstract void saveNode(AbstractNode node, int nodeID, FileOutputStream file) throws IOException;
-    protected void saveLayer(DecisionDiagram dd, int layer, FileOutputStream file) throws IOException {
+    protected abstract void saveNode(AbstractNode node, int nodeID, MDDFileWriter file) throws IOException;
+    protected void saveLayer(DecisionDiagram dd, int layer, MDDFileWriter file) throws IOException {
         int numberOfNodes = dd.getLayerSize(layer);
         writeInt(file, MDDReader.NODE, numberOfNodes);
         Iterable<AbstractNode> nodes = dd.iterateOnLayer(layer);
@@ -128,10 +126,10 @@ public abstract class DDReaderAbstractClass {
             saveNode(node, nodeID, file);
         }
     }
-    public abstract void save(DecisionDiagram dd, FileOutputStream file) throws IOException;
+    public abstract void save(DecisionDiagram dd, MDDFileWriter file) throws IOException;
 
-    protected abstract void loadNode(DecisionDiagram dd, AbstractNode node, int layer, FileInputStream file) throws IOException;
-    protected void loadLayer(DecisionDiagram dd, int layer, FileInputStream file) throws IOException {
+    protected abstract void loadNode(DecisionDiagram dd, AbstractNode node, int layer, MDDFileReader file) throws IOException;
+    protected void loadLayer(DecisionDiagram dd, int layer, MDDFileReader file) throws IOException {
         // Number of nodes
         int numberOfNodes = readInt(file, MDDReader.NODE);
 
@@ -143,6 +141,6 @@ public abstract class DDReaderAbstractClass {
             loadNode(dd, node, layer, file);
         }
     }
-    public abstract void load(DecisionDiagram dd, FileInputStream file) throws IOException;
+    public abstract void load(DecisionDiagram dd, MDDFileReader file) throws IOException;
 
 }

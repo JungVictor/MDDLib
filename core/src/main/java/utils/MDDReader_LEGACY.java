@@ -66,13 +66,13 @@ public class MDDReader_LEGACY {
             Scanner reader = new Scanner(new File(directoryPath+file));
             while (reader.hasNextLine()){
                 loadLayer(mdd, line++, reader.nextLine(), currentBinding, nextBinding);
-                Logger.out.information("\rLOADING LAYER " + line);
+                //Logger.out.information("\rLOADING LAYER " + line);
                 tmp = currentBinding;
                 currentBinding = nextBinding;
                 nextBinding = tmp;
                 nextBinding.clear();
             }
-            mdd.reduce();
+            mdd.setTT();
             reader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
