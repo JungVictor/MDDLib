@@ -13,7 +13,6 @@ public abstract class DDReaderAbstractClass {
     private HashMap<AbstractNode, Integer> nextWrite, currentWrite;
     private HashMap<Integer, AbstractNode> nextRead, currentRead;
     private byte[][] elements;
-    private byte[] b = new byte[1];
     private int nID;
     private byte MODE;
 
@@ -111,8 +110,8 @@ public abstract class DDReaderAbstractClass {
     protected void readHeader(MDDFileReader file) throws IOException {
         if(elements == null) elements = new byte[5][];
         for(int i = 0; i < elements.length; i++){
-            file.read(b);
-            elements[i] = new byte[b[0]];
+            byte b = file.nextByte();
+            elements[i] = new byte[b];
         }
     }
 

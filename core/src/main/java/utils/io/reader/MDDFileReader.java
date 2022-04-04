@@ -46,6 +46,14 @@ public class MDDFileReader {
         return b;
     }
 
+    public byte nextByte() throws IOException {
+        if(position + 1 >= capacity) {
+            fill(0);
+            position = 0;
+        }
+        return DATA[position++];
+    }
+
     public void close() throws IOException {
         this.file.close();
     }
