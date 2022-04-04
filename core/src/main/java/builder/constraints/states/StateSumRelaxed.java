@@ -94,9 +94,7 @@ public strictfp class StateSumRelaxed extends NodeState {
         long maxPotential = sum + value + constraint.vMax(layer-1);
 
 
-        if(maxPotential < constraint.min() || constraint.max() < minPotential) return false;
-        if(constraint.min() <= minPotential && maxPotential <= constraint.max()) return true;
-        return sum + value <= constraint.max();
+        return maxPotential >= constraint.min() && constraint.max() >= minPotential;
     }
 
     /**

@@ -225,6 +225,11 @@ public class MDDBuilder {
         return mdd;
     }
 
+    public static MDD sum(MDD mdd, int s_min, int s_max, int n, Domains D, MapOf<Integer, Integer> map, SetOf<Integer> variables){
+        ConstraintBuilder.sum(mdd, D, map, s_min, s_max, n, variables);
+        return mdd;
+    }
+
     /**
      * Generate an MDD satisfying a sum constraint with given parameters.
      * @param mdd The MDD stocking the result

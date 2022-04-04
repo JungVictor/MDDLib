@@ -189,6 +189,38 @@ public class ConstraintBuilder {
      * @param variables The set of constrained variables
      * @return The DecisionDiagram corresponding to the sum constraint
      */
+    public static DecisionDiagram sum(DecisionDiagram result, Domains D, MapOf<Integer, Integer> map, int min, int max, int size, SetOf<Integer> variables){
+        SNode snode = SNode.create();
+        ArrayOfInt minValues = ArrayOfInt.create(size);
+        ArrayOfInt maxValues = ArrayOfInt.create(size);
+
+        for(int i = size - 2; i >= 0; i--){
+            int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            if(variables == null || variables.contains(i)) {
+                for (int v : D.get(i + 1)) {
+                    v = map.get(v);
+                    if (v < vMin) vMin = v;
+                    if (v > vMax) vMax = v;
+                }
+            } else {
+                vMin = 0; vMax = 0;
+            }
+            if(i < size - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersMapSum parameters = ParametersMapSum.create(min, max, minValues, maxValues, map, variables);
+        snode.setState(StateSum.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
     public static DecisionDiagram sum(DecisionDiagram result, Domains D, int min, int max, int size, SetOf<Integer> variables){
         SNode snode = SNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);

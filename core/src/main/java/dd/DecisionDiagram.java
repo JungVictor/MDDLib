@@ -4,6 +4,11 @@ import memory.Allocable;
 import memory.Memory;
 import structures.generics.MapOf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Stack;
+
 public abstract class DecisionDiagram implements Allocable {
 
     private int size;
@@ -233,6 +238,56 @@ public abstract class DecisionDiagram implements Allocable {
         return result;
     }
 
+    /**
+     * Extract all solutions of the DD.
+     * It is recommended that you check if the number of solutions is actually extractable.
+     * @return The list of all solutions in the DD.
+     */
+    public ArrayList<int[]> extractSolutions(){
+        ArrayList<int[]> solutions = new ArrayList<>();
+        // solution
+        int[] currentSolution = new int[size()-1];
+        // Node on the path of solution
+        AbstractNode[] currentNodes = new AbstractNode[size()-1];
+        // labels to visit
+        HashMap<AbstractNode, Stack<Integer>> notVisited = new HashMap<>();
+
+        int layer = 0;
+        currentNodes[layer] = getRoot();
+        addChildrenLabels(getRoot(), notVisited);
+
+        AbstractNode current;
+        Stack<Integer> labels;
+
+        while (layer >= 0){
+            current = currentNodes[layer];
+            labels = notVisited.get(current);
+            if(labels.isEmpty()) {
+                currentNodes[layer] = null;
+                notVisited.remove(current);
+                layer--;
+                continue;
+            }
+            currentSolution[layer] = labels.pop();
+            // End of the solution
+            if(layer+1 >= size()-1) {
+                solutions.add(Arrays.copyOf(currentSolution, currentSolution.length));
+                continue;
+            }
+
+            // Next node
+            currentNodes[layer+1] = current.getChild(currentSolution[layer]);
+            addChildrenLabels(currentNodes[layer+1], notVisited);
+            layer++;
+        }
+        return solutions;
+    }
+
+    private void addChildrenLabels(AbstractNode node, HashMap<AbstractNode, Stack<Integer>> notVisited){
+        Stack<Integer> labels = new Stack<>();
+        for(int value : node.iterateOnChildLabel()) labels.add(value);
+        notVisited.put(node, labels);
+    }
 
     //**************************************//
     //              MANAGE DD               //

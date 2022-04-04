@@ -10,6 +10,7 @@ target/
 # MDDs
 *.mdd
 dot/
+data/
 
 # Log file
 *.log

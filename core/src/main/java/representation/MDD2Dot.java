@@ -2,6 +2,7 @@ package representation;
 
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
+import structures.generics.MapOf;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,7 +33,7 @@ public class MDD2Dot {
      * @return The newly created .dot file
      * @throws IOException Error during the creation of the file
      */
-    public static File convert(MDD mdd, String filename) throws IOException {
+    public static File convert(MDD mdd, String filename, HashMap<Integer, String> labelToString) throws IOException {
         int node_number = 0;
         HashMap<Node, Integer> names = new HashMap<>();
         mkdir();
@@ -71,7 +72,8 @@ public class MDD2Dot {
                     graph.print("->");
                     graph.print(names.get(node.getChild(label)));
                     graph.print(" [label=\"");
-                    graph.print(label);
+                    if(labelToString != null) graph.print(labelToString.get(label));
+                    else graph.println(label);
                     graph.println("\"]");
                 }
             }
@@ -80,6 +82,10 @@ public class MDD2Dot {
         graph.print("}");
         graph.close();
         return file;
+    }
+
+    public static File convert(MDD mdd, String filename) throws IOException{
+        return convert(mdd, filename, null);
     }
 
     /**
