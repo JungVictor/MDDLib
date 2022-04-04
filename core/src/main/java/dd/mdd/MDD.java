@@ -422,6 +422,14 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
+    public int getMaxValue(){
+        return D.getMaxValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean domainContains(int i, int v){
         return D.get(i).contains(v);
     }

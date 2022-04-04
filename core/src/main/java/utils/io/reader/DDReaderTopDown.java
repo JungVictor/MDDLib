@@ -4,7 +4,6 @@ import dd.AbstractNode;
 import dd.DecisionDiagram;
 import utils.io.MDDReader;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class DDReaderTopDown extends DDReaderAbstractClass {
@@ -20,8 +19,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
     @Override
     protected void saveNode(AbstractNode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfChildren();
-        writeInt(file, MDDReader.NODE, nodeID);
-        writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
+        writeInt(file, MDDReader.MAX_OUT_DEGREE, numberOfValues);
         for(int value : node.iterateOnChildLabel()){
             writeInt(file, MDDReader.VALUE, value);
             AbstractNode child = node.getChild(value);
@@ -49,6 +47,8 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
         // Bind the tt to the current map
         bindCurrentWrite(dd.getRoot());
 
+        resetIDCounter();
+
         // Save each layer
         for (int i = 0; i < size; i++) {
             saveLayer(dd, i, file);
@@ -63,7 +63,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
     @Override
     protected void loadNode(DecisionDiagram dd, AbstractNode node, int layer, MDDFileReader file) throws IOException {
         // Number of values
-        int numberOfValues = readInt(file, MDDReader.VALUE_NUMBER);
+        int numberOfValues = readInt(file, MDDReader.MAX_OUT_DEGREE);
 
         for(int i = 0; i < numberOfValues; i++){
             // value

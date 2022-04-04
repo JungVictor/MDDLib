@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public abstract class MDDReader {
 
-    public static final byte NODE = 0, VALUE = 1, PARENT_NUMBER = 2, VALUE_NUMBER = 3, SIZE = 4;
+    public static final byte NODE = 0, VALUE = 1, PARENT_NUMBER = 2, VALUE_NUMBER = 3, SIZE = 4, MAX_OUT_DEGREE = 5;
     public static final byte BOTTOM_UP = 0, TOP_DOWN = 1;
 
     private static final DDReaderBottomUp readerBottomUp = new DDReaderBottomUp();

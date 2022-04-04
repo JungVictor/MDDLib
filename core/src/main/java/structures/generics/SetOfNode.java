@@ -43,8 +43,8 @@ public class SetOfNode<E extends AbstractNode> implements MemoryObject, Collecti
      * Add an element to the set
      * @param object The element to add
      */
-    public void add(E object){
-        set.add(object);
+    public boolean add(E object){
+        return set.add(object);
     }
 
     /**

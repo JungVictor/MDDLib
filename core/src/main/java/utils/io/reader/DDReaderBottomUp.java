@@ -20,7 +20,6 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
     @Override
     protected void saveNode(AbstractNode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfParentsLabel();
-        writeInt(file, MDDReader.NODE, nodeID);
         writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
         for(int value : node.iterateOnParentLabel()){
             int numberOfParents = node.numberOfParents(value);
@@ -50,6 +49,9 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
 
         // Bind the tt to the current map
         bindCurrentWrite(dd.getTt());
+
+        resetIDCounter();
+
 
         // Save each layer
         for (int i = size - 1; i > 0; i--) {

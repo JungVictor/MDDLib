@@ -171,6 +171,12 @@ public abstract class DecisionDiagram implements Allocable {
     public abstract int getDomainSize(int i);
 
     /**
+     * Get the maximum value across all domains.<br>
+     * @return The maximum value across all domains.
+     */
+    public abstract int getMaxValue();
+
+    /**
      * Check if the value v is contained in the domain of the ith variable
      * @param i The index of the variable
      * @param v The value to check

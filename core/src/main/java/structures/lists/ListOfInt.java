@@ -94,7 +94,7 @@ public class ListOfInt implements Allocable, CollectionOf<Integer> {
      * Add the element at the end of the list
      * @param element Element to add
      */
-    public void add(int element){
+    public boolean add(int element){
         if(size >= list.length) {
             int[] newlist = new int[size + size / 3];
             System.arraycopy(list, 0, newlist, 0, list.length);
@@ -102,14 +102,15 @@ public class ListOfInt implements Allocable, CollectionOf<Integer> {
         }
         fIsSorted = false;
         list[size++] = element;
+        return true;
     }
 
     /**
      * Add the element at the end of the list
      * @param element Element to add
      */
-    public void add(Integer element){
-        add(element.intValue());
+    public boolean add(Integer element){
+        return add(element.intValue());
     }
 
     /**

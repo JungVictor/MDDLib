@@ -313,6 +313,14 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
+    public int getMaxValue() {
+        return 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean domainContains(int i, int v){
         return v == 0 || v == 1;
     }

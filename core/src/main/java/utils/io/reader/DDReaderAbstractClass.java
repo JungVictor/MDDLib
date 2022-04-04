@@ -10,76 +10,78 @@ import java.util.HashMap;
 
 public abstract class DDReaderAbstractClass {
 
-    private HashMap<AbstractNode, Integer> nextWrite, currentWrite;
-    private HashMap<Integer, AbstractNode> nextRead, currentRead;
+    private HashMap<AbstractNode, Integer> next, current;
+    private HashMap<Integer, AbstractNode> nextR, currentR;
     private byte[][] elements;
     private int nID;
     private byte MODE;
 
     protected void initMaps(){
-        if(nextWrite == null) nextWrite = new HashMap<>();
-        else nextWrite.clear();
-        if(currentWrite == null) currentWrite = new HashMap<>();
-        else currentWrite.clear();
-        if(nextRead == null) nextRead = new HashMap<>();
-        else nextRead.clear();
-        if(currentRead == null) currentRead = new HashMap<>();
-        else currentRead.clear();
+        if(next == null) next = new HashMap<>();
+        else next.clear();
+        if(current == null) current = new HashMap<>();
+        else current.clear();
+        if(nextR == null) nextR = new HashMap<>();
+        else nextR.clear();
+        if(currentR == null) currentR = new HashMap<>();
+        else currentR.clear();
     }
     protected void resetIDCounter(){
         nID = 0;
     }
     protected void swapWriteBinding(){
-        HashMap<AbstractNode, Integer> tmpWrite = currentWrite;
-        currentWrite = nextWrite;
-        nextWrite = tmpWrite;
-        nextWrite.clear();
+        swapReadBinding();
+        HashMap<AbstractNode, Integer> tmp = current;
+        current = next;
+        next = tmp;
+        next.clear();
     }
     protected void swapReadBinding(){
-        HashMap<Integer, AbstractNode> tmpWrite = currentRead;
-        currentRead = nextRead;
-        nextRead = tmpWrite;
-        nextRead.clear();
+        HashMap<Integer, AbstractNode> tmp = currentR;
+        currentR = nextR;
+        nextR = tmp;
+        nextR.clear();
     }
 
     protected void setMODE(byte MODE){
         this.MODE = MODE;
     }
 
-    protected int safeBind(AbstractNode node, HashMap<AbstractNode, Integer> map){
+    protected int safeBind(AbstractNode node, HashMap<AbstractNode, Integer> map, HashMap<Integer, AbstractNode> mapR){
         Integer value = map.get(node);
         if(value != null) return value;
-        map.put(node, nID++);
+        map.put(node, nID);
+        mapR.put(nID++, node);
         return nID-1;
     }
     protected int bindCurrentWrite(AbstractNode node){
-        return safeBind(node, currentWrite);
+        return safeBind(node, current, currentR);
     }
     protected int bindNextWrite(AbstractNode node){
-        return safeBind(node, nextWrite);
+        return safeBind(node, next, nextR);
     }
 
     protected void bindCurrentRead(int ID, AbstractNode node){
-        currentRead.put(ID, node);
+        currentR.put(ID, node);
     }
     protected void bindNextRead(int ID, AbstractNode node){
-        nextRead.put(ID, node);
+        nextR.put(ID, node);
     }
     protected AbstractNode addNodeToDD(DecisionDiagram dd, int layer, int ID){
-        AbstractNode node = nextRead.get(ID);
+        AbstractNode node = nextR.get(ID);
         if(node == null) {
             node = dd.Node();
-            nextRead.put(ID, node);
+            nextR.put(ID, node);
             dd.addNode(node, layer);
         }
         return node;
     }
 
     protected int getID(AbstractNode node){
-        return currentWrite.get(node);
+        return current.get(node);
     }
     protected AbstractNode getNode(int ID){
-        return currentRead.get(ID);
+        return currentR.get(ID);
     }
     protected void writeInt(MDDFileWriter file, byte element, int value) throws IOException {
         file.write(SmallMath.intToBytes(elements[element], value));
@@ -91,14 +93,23 @@ public abstract class DDReaderAbstractClass {
 
     protected void writeHeader(DecisionDiagram dd, MDDFileWriter file) throws IOException {
         int nodes = 0;
-        for(int i = 0; i < dd.size(); i++) nodes = Math.max(nodes, dd.getLayerSize(i));
+        int max_degree = 0;
+        int value_number = 0;
+        for(int i = 0; i < dd.size(); i++) {
+            nodes = Math.max(nodes, dd.getLayerSize(i));
+            for(AbstractNode node : dd.iterateOnLayer(i)) {
+                max_degree = Math.max(max_degree, node.numberOfChildren());
+                value_number = Math.max(value_number, node.numberOfParentsLabel());
+            }
+        }
 
-        if(elements == null) elements = new byte[5][];
+        if(elements == null) elements = new byte[6][];
         elements[MDDReader.NODE] =            new byte[SmallMath.nBytes(nodes)];
-        elements[MDDReader.VALUE] =           new byte[2];
+        elements[MDDReader.VALUE] =           new byte[SmallMath.nBytes(dd.getMaxValue())];
         elements[MDDReader.PARENT_NUMBER] =   new byte[1];
-        elements[MDDReader.VALUE_NUMBER] =    new byte[2];
+        elements[MDDReader.VALUE_NUMBER] =    new byte[SmallMath.nBytes(value_number)];
         elements[MDDReader.SIZE] =            new byte[1];
+        elements[MDDReader.MAX_OUT_DEGREE] =  new byte[SmallMath.nBytes(max_degree)];
 
         file.write(MODE);
         file.write(elements[MDDReader.NODE].length);
@@ -106,9 +117,10 @@ public abstract class DDReaderAbstractClass {
         file.write(elements[MDDReader.PARENT_NUMBER].length);
         file.write(elements[MDDReader.VALUE_NUMBER].length);
         file.write(elements[MDDReader.SIZE].length);
+        file.write(elements[MDDReader.MAX_OUT_DEGREE].length);
     }
     protected void readHeader(MDDFileReader file) throws IOException {
-        if(elements == null) elements = new byte[5][];
+        if(elements == null) elements = new byte[6][];
         for(int i = 0; i < elements.length; i++){
             byte b = file.nextByte();
             elements[i] = new byte[b];
@@ -119,11 +131,14 @@ public abstract class DDReaderAbstractClass {
     protected void saveLayer(DecisionDiagram dd, int layer, MDDFileWriter file) throws IOException {
         int numberOfNodes = dd.getLayerSize(layer);
         writeInt(file, MDDReader.NODE, numberOfNodes);
-        Iterable<AbstractNode> nodes = dd.iterateOnLayer(layer);
-        for(AbstractNode node : nodes){
-            int nodeID = currentWrite.get(node);
+
+        for(int nodeID = 0; nodeID < numberOfNodes; nodeID++){
+            AbstractNode node = currentR.get(nodeID);
             saveNode(node, nodeID, file);
         }
+
+
+
     }
     public abstract void save(DecisionDiagram dd, MDDFileWriter file) throws IOException;
 
@@ -133,10 +148,7 @@ public abstract class DDReaderAbstractClass {
         int numberOfNodes = readInt(file, MDDReader.NODE);
 
         for(int i = 0; i < numberOfNodes; i++) {
-            // Node ID
-            int nodeID = readInt(file, MDDReader.NODE);
-
-            AbstractNode node = getNode(nodeID);
+            AbstractNode node = getNode(i);
             loadNode(dd, node, layer, file);
         }
     }

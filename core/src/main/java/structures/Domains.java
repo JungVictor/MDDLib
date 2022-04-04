@@ -13,6 +13,7 @@ public class Domains implements Allocable {
     private final int allocatedIndex;
     //
 
+    private int maxValue = Integer.MIN_VALUE;
     private final ArrayList<SetOf<Integer>> domains = new ArrayList<>();
 
 
@@ -76,7 +77,7 @@ public class Domains implements Allocable {
      */
     public void put(int index, int value){
         if(domains.size() <= index) add(index);
-        domains.get(index).add(value);
+        if(domains.get(index).add(value) && value > maxValue) maxValue = value;
     }
 
     /**
@@ -188,6 +189,14 @@ public class Domains implements Allocable {
      */
     public void fillAll(int idx, SetOf<Integer> V){
         for(int i = 0; i < idx; i++) fill(i, V);
+    }
+
+    /**
+     * Get the number of different values in all domains
+     * @return The number of different values in all domains
+     */
+    public int getMaxValue(){
+        return maxValue;
     }
 
     //**************************************//

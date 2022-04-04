@@ -42,16 +42,16 @@ public class SetOf<E> implements MemoryObject, CollectionOf<E> {
      * Add an element to the set
      * @param object The element to add
      */
-    public void add(E object){
-        set.add(object);
+    public boolean add(E object){
+        return set.add(object);
     }
 
     /**
      * Add all elements in the given set to this set
      * @param set The set of elements to add
      */
-    public void add(SetOf<E> set){
-        this.set.addAll(set.set);
+    public boolean add(SetOf<E> set){
+        return this.set.addAll(set.set);
     }
 
     /**
