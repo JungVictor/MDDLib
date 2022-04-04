@@ -752,7 +752,7 @@ public class Stochastic {
                     if (i == current) current++;
 
                     //While it is worth to exchange with the current-th StochasticVariable
-                    while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold) {
+                    while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() >= threshold) {
                         swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
                         newCost += swappableQuantity * X[current].getMaxValue();
                         filteredActualQuantity -= swappableQuantity;
@@ -826,7 +826,7 @@ public class Stochastic {
                 //and it is possible to exchange
                 if (newCost < threshold && X[i].getMinQuantity() != maxPackingQuantities.get(i)) {
                     //While it is worth to exchange with the current-th StochasticVariable
-                    while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold && filteredActualQuantity > X[i].getMinQuantity()) {
+                    while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() >= threshold && filteredActualQuantity > X[i].getMinQuantity()) {
                         swappableQuantity = Math.min((filteredActualQuantity - X[i].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
                         newCost += swappableQuantity * X[current].getMaxValue();
                         filteredActualQuantity -= swappableQuantity;
@@ -857,7 +857,7 @@ public class Stochastic {
             //and it is possible to exchange
             if (newCost < threshold && X[firstNonFull].getMinQuantity() != maxPackingQuantities.get(firstNonFull)) {
                 //While it is worth to exchange with the current-th StochasticVariable
-                while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() > threshold && filteredActualQuantity > X[firstNonFull].getMinQuantity()) {
+                while (current < X.length && newCost + filteredActualQuantity * X[current].getMaxValue() >= threshold && filteredActualQuantity > X[firstNonFull].getMinQuantity()) {
                     swappableQuantity = Math.min((filteredActualQuantity - X[firstNonFull].getMinQuantity()), (X[current].getMaxQuantity() - maxPackingQuantities.get(current)));
                     newCost += swappableQuantity * X[current].getMaxValue();
                     filteredActualQuantity -= swappableQuantity;
