@@ -264,6 +264,22 @@ public class Node extends AbstractNode {
         return children.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int numberOfParentsLabel() {
+        return parents.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int numberOfParents(int label) {
+        return parents.get(label).size();
+    }
+
 
     // ******
     // TEST

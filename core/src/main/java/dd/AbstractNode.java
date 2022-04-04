@@ -76,6 +76,19 @@ public abstract class AbstractNode implements Allocable {
     public abstract int numberOfChildren();
 
     /**
+     * The number of ingoing arcs labels
+     * @return the number of ingoing arcs labels
+     */
+    public abstract int numberOfParentsLabel();
+
+
+    /**
+     * The number of ingoing arcs with given label
+     * @return the number of ingoing with given label
+     */
+    public abstract int numberOfParents(int label);
+
+    /**
      * Get the out-going labels
      * @return All out-going labels
      */

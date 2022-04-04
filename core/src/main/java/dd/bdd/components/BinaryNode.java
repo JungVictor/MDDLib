@@ -203,6 +203,21 @@ public class BinaryNode extends AbstractNode {
         return children;
     }
 
+    @Override
+    public int numberOfParentsLabel() {
+        int parents = 0;
+        if (parent0 != null) parents++;
+        if (parent1 != null) parents++;
+        return parents;
+    }
+
+    @Override
+    public int numberOfParents(int label) {
+        if(label == 0 && parent0 != null) return parent0.size();
+        if(label == 1 && parent1 != null) return parent1.size();
+        return 0;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -34,7 +34,7 @@ public abstract class DecisionDiagram implements Allocable {
     /**
      * Automatically set the terminal node.
      */
-    protected abstract void setTT();
+    public abstract void setTT();
 
 
     //**************************************//

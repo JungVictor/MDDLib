@@ -110,7 +110,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    protected void setTT(){
+    public void setTT(){
         if(getLayer(size() - 1).size() == 1) this.tt = getLayer(size() - 1).getNode();
         else {
             Node newTT = Node();

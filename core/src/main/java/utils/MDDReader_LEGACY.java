@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class MDDReader {
+public class MDDReader_LEGACY {
 
     private static String directoryPath = "data/mdds/";
 
@@ -17,6 +17,9 @@ public class MDDReader {
     private static void saveLayer(MDD mdd, int layer, PrintWriter writer, HashMap<Node, String> currentBinding, HashMap<Node, String> nextBinding){
         for(Node node : mdd.getLayer(layer)){
             HashMap<Node, ArrayList<Integer>> reduced = new HashMap<>();
+
+            FileInputStream fileInputStream ;
+
             for(int arc : node.getChildren()) {
                 if(!reduced.containsKey(node.getChild(arc))) reduced.put(node.getChild(arc), new ArrayList<>());
                 reduced.get(node.getChild(arc)).add(arc);

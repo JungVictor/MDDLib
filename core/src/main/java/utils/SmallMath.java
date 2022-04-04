@@ -9,6 +9,44 @@ public class SmallMath {
 
     private SmallMath(){}
 
+    /**
+     * Convert the given integer to an array of bytes
+     * @param array The array to fill
+     * @param data The integer
+     * @return The array of bytes corresponding to the given integer
+     */
+    public static byte[] intToBytes(byte[] array, final int data){
+        for(int i = array.length - 1, offset = 0; i >= 0; i--, offset += 8){
+            array[i] = (byte)((data >> offset) & 0xff);
+        }
+        return array;
+    }
+
+    /**
+     * Convert an array of bytes to its integer value
+     * @param array The array of bytes to convert
+     * @return The integer corresponding to the given array
+     */
+    public static int bytesToInt(byte[] array){
+        int n = 0;
+        for(int i = array.length - 1, offset = 0; i >= 0; i--, offset+=8) n |= (array[i] & 0xFF) << offset;
+        return n;
+    }
+
+    /**
+     * Computes the number of bytes needed to represent the given integer
+     * @param value
+     * @return The number of bytes needed to represent the given integer
+     */
+    public static byte nBytes(int value){
+        byte b = 0;
+        while(value > 0) {
+            value >>= 8;
+            b++;
+        }
+        return b;
+    }
+
     public static double multiplyCeil(double x, double y, double divisor){
         return Math.ceil((x * y) / divisor);
     }
