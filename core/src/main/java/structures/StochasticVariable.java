@@ -246,7 +246,7 @@ public class StochasticVariable implements Allocable {
 
     @Override
     public int allocatedIndex() {
-        return 0;
+        return allocatedIndex;
     }
 
     @Override

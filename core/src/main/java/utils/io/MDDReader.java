@@ -18,6 +18,8 @@ import java.io.IOException;
  */
 public abstract class MDDReader {
 
+    public static final String DIRECTORY = "./data/mdds/";
+
     public static final byte NODE = 0, VALUE = 1, PARENT_NUMBER = 2, VALUE_NUMBER = 3, SIZE = 4, MAX_OUT_DEGREE = 5;
     public static final byte BOTTOM_UP = 0, TOP_DOWN = 1;
 
@@ -40,7 +42,7 @@ public abstract class MDDReader {
     public static boolean save(DecisionDiagram dd, String filename, int bufferSize){
         try {
             // Open the file to write
-            MDDFileWriter fileWriter = new MDDFileWriter(new FileOutputStream(filename+".mdd"), bufferSize);
+            MDDFileWriter fileWriter = new MDDFileWriter(new FileOutputStream(filename), bufferSize);
             reader.save(dd, fileWriter);
             fileWriter.close();
             return true;
@@ -71,7 +73,7 @@ public abstract class MDDReader {
     public static boolean load(DecisionDiagram dd, String filename, int bufferSize){
         try {
             // Open the file to read
-            FileInputStream file = new FileInputStream(filename+".mdd");
+            FileInputStream file = new FileInputStream(filename);
 
             // Set the reader corresponding to the mode used to write the file
             byte[] MODE = file.readNBytes(1);

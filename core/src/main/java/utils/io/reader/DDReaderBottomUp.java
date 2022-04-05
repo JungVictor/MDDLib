@@ -4,7 +4,6 @@ import dd.AbstractNode;
 import dd.DecisionDiagram;
 import utils.io.MDDReader;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class DDReaderBottomUp extends DDReaderAbstractClass{
@@ -48,15 +47,12 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
         resetIDCounter();
 
         // Bind the tt to the current map
-        bindCurrentWrite(dd.getTt());
-
-        resetIDCounter();
-
+        firstBind(dd.getTt());
 
         // Save each layer
         for (int i = size - 1; i > 0; i--) {
             saveLayer(dd, i, file);
-            swapWriteBinding();
+            swapMaps();
             resetIDCounter();
         }
     }
@@ -114,7 +110,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
         // Load each layer
         for (int i = size - 1; i > 0; i--) {
             loadLayer(dd, i, file);
-            swapReadBinding();
+            swapMaps();
         }
         // Set the TT node of the DD
         dd.setTT();

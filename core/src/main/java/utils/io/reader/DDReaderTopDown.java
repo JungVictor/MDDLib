@@ -45,14 +45,12 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
         resetIDCounter();
 
         // Bind the tt to the current map
-        bindCurrentWrite(dd.getRoot());
-
-        resetIDCounter();
+        firstBind(dd.getRoot());
 
         // Save each layer
         for (int i = 0; i < size; i++) {
             saveLayer(dd, i, file);
-            swapWriteBinding();
+            swapMaps();
             resetIDCounter();
         }
     }
@@ -95,7 +93,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
         // Load each layer
         for (int i = 0; i < size; i++) {
             loadLayer(dd, i, file);
-            swapReadBinding();
+            swapMaps();
         }
         // Set the TT node of the DD
         dd.setTT();
