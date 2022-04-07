@@ -1,11 +1,12 @@
-package csp;
+package csp.constraint;
 
+import csp.structures.arrays.ArrayOfIntervalVariable;
+import csp.IntervalVariable;
+import csp.structures.lists.ListOfIntervalVariable;
 import memory.Allocable;
-import structures.arrays.ArrayOfBoolean;
 
 public abstract class IntervalConstraint implements Allocable {
 
-    private int id;  //The id of the IntervalConstraint
     private ArrayOfIntervalVariable variables; //The array of IntervalVariable concerned by the IntervalConstraint
     private int index; //The current number of IntervalVariable added to the array variables.
 
@@ -25,10 +26,8 @@ public abstract class IntervalConstraint implements Allocable {
 
     /**
      * Initialise the IntervalConstraint.
-     * @param id The id of the IntervalConstraint.
      */
-    protected void init(int id){
-        this.id = id;
+    protected void init(){
         this.index = 0;
     }
 
@@ -44,14 +43,14 @@ public abstract class IntervalConstraint implements Allocable {
      * @return The number of IntervalVariable concerned by the IntervalConstraint.
      */
     public int numberOfVariables(){
-        return variables.size();
+        return variables.length();
     }
 
     /**
      * Apply the IntervalConstraint to filter the intervals of the concerned IntervalVariable objects.
      * @return An array of boolean indicating which IntervalVariable objects get their interval changed by the filtering.
      */
-    public abstract ArrayOfBoolean apply();
+    public abstract ListOfIntervalVariable apply();
 
     /**
      * Add properly an IntervalVariable to the array variables.<br>
@@ -84,7 +83,6 @@ public abstract class IntervalConstraint implements Allocable {
 
     @Override
     public void free(){
-        this.id = -1;
         this.variables = null;
         this.index = 0;
     }

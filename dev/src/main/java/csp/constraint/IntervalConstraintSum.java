@@ -1,10 +1,10 @@
-package csp;
+package csp.constraint;
 
+import csp.IntervalVariable;
+import csp.structures.lists.ListOfIntervalVariable;
 import memory.AllocatorOf;
-import structures.arrays.ArrayOfBoolean;
-import structures.tuples.TupleOfLong;
 
-public class IntervalConstraintSum  extends IntervalConstraint {
+public class IntervalConstraintSum extends IntervalConstraint {
 
     private IntervalVariable a;
     private IntervalVariable x;
@@ -27,28 +27,26 @@ public class IntervalConstraintSum  extends IntervalConstraint {
     /**
      * Get an IntervalConstraintSum object from the allocator.
      * Constraint sum : a = x + y.
-     * @param id The id of the constraint.
      * @param a An IntervalVariable.
      * @param x An IntervalVariable.
      * @param y An IntervalVariable.
      * @return An IntervalConstraintSum
      */
-    public static IntervalConstraintSum create(int id, IntervalVariable a, IntervalVariable x, IntervalVariable y){
+    public static IntervalConstraintSum create(IntervalVariable a, IntervalVariable x, IntervalVariable y){
         IntervalConstraintSum constraint = allocator().allocate();
         constraint.prepare(3);
-        constraint.init(id, a, x, y);
+        constraint.init(a, x, y);
         return constraint;
     }
 
     /**
      * Initialisation of the IntervalConstraintSum.
-     * @param id The id of the constraint.
      * @param a An IntervalVariable.
      * @param x An IntervalVariable.
      * @param y An IntervalVariable.
      */
-    private void init(int id, IntervalVariable a, IntervalVariable x, IntervalVariable y){
-        super.init(id);
+    private void init(IntervalVariable a, IntervalVariable x, IntervalVariable y){
+        super.init();
         this.a = a;
         this.addVariable(a);
         this.x = x;
@@ -65,12 +63,16 @@ public class IntervalConstraintSum  extends IntervalConstraint {
      * Apply the IntervalConstraintSum to filter the intervals of the concerned IntervalVariable objects.
      * @return An array of boolean indicating which IntervalVariable objects get their interval changed by the filtering.
      */
-    public ArrayOfBoolean apply(){
-        ArrayOfBoolean change = ArrayOfBoolean.create(this.numberOfVariables());
-        change.set(0, a.intersect(x.getMin() + y.getMin(), x.getMax() + y.getMax()));
-        change.set(1, x.intersect(a.getMin() - y.getMax(), a.getMax() - y.getMin()));
-        change.set(2, y.intersect(a.getMin() - x.getMax(), a.getMax() - x.getMin()));
-        return change;
+    public ListOfIntervalVariable apply(){
+        ListOfIntervalVariable changedVariables = ListOfIntervalVariable.create();
+        boolean change;
+        change = a.intersect(x.getMin() + y.getMin(), x.getMax() + y.getMax());
+        if (change) changedVariables.add(a);
+        change = x.intersect(a.getMin() - y.getMax(), a.getMax() - y.getMin());
+        if (change) changedVariables.add(x);
+        change = y.intersect(a.getMin() - x.getMax(), a.getMax() - x.getMin());
+        if (change) changedVariables.add(y);
+        return changedVariables;
     }
 
     //**************************************//
@@ -107,5 +109,4 @@ public class IntervalConstraintSum  extends IntervalConstraint {
             return new IntervalConstraintSum(index);
         }
     }
-
 }

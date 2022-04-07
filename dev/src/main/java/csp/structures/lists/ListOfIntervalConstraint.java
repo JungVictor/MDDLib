@@ -1,12 +1,11 @@
-package csp;
+package csp.structures.lists;
 
-import dd.mdd.components.Layer;
+import csp.constraint.IntervalConstraint;
 import memory.AllocatorOf;
 import structures.lists.ListOf;
-import structures.lists.ListOfLayer;
 
 public class ListOfIntervalConstraint extends ListOf<IntervalConstraint> {
-    // Thread safe allocator
+
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     private IntervalConstraint[] list;
