@@ -199,10 +199,10 @@ public class MDD extends DecisionDiagram {
     public MDD copy(MDD copy, int offset, int start, int stop){
         for(int i = start; i < stop; i++){
             for(Node original : getLayer(i)) {
-                Node copyNode = original.getX1();
+                AbstractNode copyNode = original.getX1();
                 for(int arc : original.getChildren()){
                     Node child = original.getChild(arc);
-                    Node copyChild = child.getX1();
+                    AbstractNode copyChild = child.getX1();
                     // Child node is not yet copied
                     if(copyChild == null) {
                         copyChild = copy.Node();

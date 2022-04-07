@@ -7,14 +7,13 @@ import dd.DecisionDiagram;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.Memory;
-import structures.Domains;
 import structures.Binder;
 import structures.arrays.ArrayOfAbstractNode;
 import structures.arrays.ArrayOfBoolean;
 import structures.arrays.ArrayOfMDD;
 import structures.generics.CollectionOf;
 import structures.generics.SetOf;
-import structures.successions.SuccessionOfAbstractNode;
+import structures.successions.AbstractSuccessionOfAbstractNode;
 import utils.Logger;
 
 /**
@@ -156,10 +155,9 @@ public class Operation {
         for(int i = start+1; i < stop; i++){
             for(AbstractNode x : result.iterateOnLayer(i-1)){
                 AbstractNode x1 = x.getX1(), x2 = x.getX2();
-                for(int v : mdd1.iterateOnDomain(i-1)){
-                    boolean a1 = x1.containsLabel(v), a2 = a1;
-                    if(x2 != x1) a2 = x2.containsLabel(v);
-                    if(apply(a1, a2, Operator.INTERSECTION, i == stop - 1)) {
+                for(int v : x1.iterateOnChildLabel()){
+                    boolean a2 = x2.containsLabel(v);
+                    if(apply(true, a2, Operator.INTERSECTION, i == stop - 1)) {
                         addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);
                     }
                 }
@@ -589,7 +587,7 @@ public class Operation {
         for(int i = 1; i < r; i++){
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
-                SuccessionOfAbstractNode xs = x.getAssociations();
+                AbstractSuccessionOfAbstractNode xs = x.getAssociations();
                 for(int v : rule.successors(successors, i-1, x)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {

@@ -7,6 +7,7 @@ import structures.arrays.ArrayOfAbstractNode;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import structures.generics.SetOfNode;
+import structures.successions.SuccessionOfAbstractNode;
 import structures.successions.SuccessionOfNode;
 
 import java.util.Random;
@@ -28,7 +29,7 @@ public class Node extends AbstractNode {
 
     private OutArcs children;
     private InArcs parents;
-    private SuccessionOfNode associations;
+    private SuccessionOfAbstractNode associations;
 
 
     //**************************************//
@@ -128,7 +129,8 @@ public class Node extends AbstractNode {
      */
     @Override
     public void associate(AbstractNode x1, AbstractNode x2){
-        associate((Node) x1, (Node) x2);
+        associations.set(0, x1);
+        associations.set(1, x2);
     }
 
     /**
@@ -136,9 +138,9 @@ public class Node extends AbstractNode {
      * @param node The node to associate
      * @param position The position of the node
      */
-    public void associate(Node node, int position){
+    public void associate(AbstractNode node, int position){
         if(position >= associations.length) {
-            SuccessionOfNode associations = SuccessionOfNode.create(position + 1);
+            SuccessionOfAbstractNode associations = SuccessionOfAbstractNode.create(position + 1);
             for(int i = 0; i < this.associations.length; i++) associations.set(i, this.associations.get(i));
             Memory.free(this.associations);
             this.associations = associations;
@@ -162,7 +164,7 @@ public class Node extends AbstractNode {
      * Get all the nodes associated with this node
      * @return All the nodes associated with this node
      */
-    public SuccessionOfNode getAssociations(){
+    public SuccessionOfAbstractNode getAssociations(){
         return associations;
     }
 
@@ -204,7 +206,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public Node getX(int i){
+    public AbstractNode getX(int i){
         return associations.get(i);
     }
 
@@ -212,7 +214,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public Node getX1(){
+    public AbstractNode getX1(){
         return associations.get(0);
     }
 
@@ -220,7 +222,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public Node getX2(){
+    public AbstractNode getX2(){
         return associations.get(1);
     }
 
@@ -513,7 +515,7 @@ public class Node extends AbstractNode {
      */
     public void prepare() {
         allocateArcs();
-        associations = SuccessionOfNode.create(2);
+        associations = SuccessionOfAbstractNode.create(2);
     }
 
     /**

@@ -2,10 +2,10 @@ package dd.proxy;
 
 import dd.AbstractNode;
 import memory.AllocatorOf;
+import memory.Memory;
 import structures.arrays.ArrayOfAbstractNode;
 import structures.generics.MapOf;
-import structures.generics.SetOf;
-import structures.successions.SuccessionOfAbstractNode;
+import structures.successions.AbstractSuccessionOfAbstractNode;
 
 public class NodeProxy extends AbstractNode {
 
@@ -19,17 +19,8 @@ public class NodeProxy extends AbstractNode {
     private DDProxy parentDD;
 
     private MapOf<Integer, Integer> children;
-    private boolean loaded = false;
+    private boolean loaded;
 
-    // Loading a node when getting the child?
-    // First ask the MDD if it knows the node, then load it if not
-    // getChild must return a reference, so only need to create a new object, but then load when?
-    // During the getChild call, call the DDProxy to load all nodes of the layer
-
-    // Only one function : getChild !!
-
-    // To get a "new" object, you will have to ask the allocator first.
-    // Because we made the allocator Thread Safe, you must implement a function that will return the allocator.
     private static Allocator allocator(){ return localStorage.get(); }
 
     // Private constructor
@@ -37,29 +28,37 @@ public class NodeProxy extends AbstractNode {
         this.allocatedIndex = allocatedIndex;
     }
 
-    public static NodeProxy create(){
+    public static NodeProxy create(DDProxy parentDD){
         NodeProxy node = allocator().allocate();
+        node.parentDD = parentDD;
+        node.children = Memory.MapOfIntegerInteger();
+        node.loaded = false;
         return node;
+    }
+
+    public void setLoaded(boolean loaded){
+        this.loaded = loaded;
     }
 
     @Override
     public AbstractNode Node() {
-        return create();
-    }
-
-    public int getChildID(int label){
-        return children.get(label);
+        return create(parentDD);
     }
 
     @Override
     public AbstractNode getChild(int label) {
-        if(!loaded) parentDD.loadNodes();
+        if(!loaded) {
+            parentDD.loadNodes();
+        }
+        if(children.get(label) == null) {
+            return null;
+        }
         return parentDD.getNode(children.get(label));
     }
 
     @Override
     public boolean containsLabel(int label){
-        return children.contains(label);
+        return getChild(label) != null;
     }
 
     @Override
@@ -90,7 +89,8 @@ public class NodeProxy extends AbstractNode {
     public void free() {
         // clean all references and
         // free the variables you have to
-
+        Memory.free(children);
+        parentDD = null;
         allocator().free(this); // Free the object
     }
 
@@ -117,7 +117,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public SuccessionOfAbstractNode getAssociations() {
+    public AbstractSuccessionOfAbstractNode getAssociations() {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 

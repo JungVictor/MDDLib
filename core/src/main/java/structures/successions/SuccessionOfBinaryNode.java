@@ -3,7 +3,7 @@ package structures.successions;
 import dd.bdd.components.BinaryNode;
 import memory.AllocatorOf;
 
-public class SuccessionOfBinaryNode extends SuccessionOfAbstractNode<BinaryNode> {
+public class SuccessionOfBinaryNode extends AbstractSuccessionOfAbstractNode<BinaryNode> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);

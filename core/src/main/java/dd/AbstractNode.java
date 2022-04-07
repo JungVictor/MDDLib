@@ -2,7 +2,7 @@ package dd;
 
 import memory.Allocable;
 import structures.arrays.ArrayOfAbstractNode;
-import structures.successions.SuccessionOfAbstractNode;
+import structures.successions.AbstractSuccessionOfAbstractNode;
 
 public abstract class AbstractNode implements Allocable {
 
@@ -52,7 +52,7 @@ public abstract class AbstractNode implements Allocable {
      * Get the set of all associated nodes
      * @return The set of all associated nodes
      */
-    public abstract SuccessionOfAbstractNode getAssociations();
+    public abstract AbstractSuccessionOfAbstractNode getAssociations();
 
 
     //**************************************//

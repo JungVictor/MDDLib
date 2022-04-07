@@ -5,7 +5,7 @@ import dd.AbstractNode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
-import structures.successions.SuccessionOfAbstractNode;
+import structures.successions.AbstractSuccessionOfAbstractNode;
 
 /**
  * The SuccessionRule for the union operator. <br>
@@ -49,7 +49,7 @@ public class SuccessionRuleUnion extends SuccessionRule {
     @Override
     public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
         successors.clear();
-        SuccessionOfAbstractNode associations = x.getAssociations();
+        AbstractSuccessionOfAbstractNode associations = x.getAssociations();
         for(int i = 0; i < associations.length(); i++) {
             AbstractNode n = associations.get(i);
             if(n != null) successors.add(n.iterateOnChildLabel());

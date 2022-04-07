@@ -27,11 +27,14 @@ public class DDProxy extends DecisionDiagram {
 
     // The position of the reader in the DATA array
     private int position;
+    private int size;
 
     // Map between ProxyNodes and their ID
     private MapOf<Integer, AbstractNode> previousNodes;
     private MapOf<Integer, AbstractNode> nodes;
     private ListOfInt nodesID;
+
+    private NodeProxy root;
 
     private DDProxy(int allocatedIndex){
         this.allocatedIndex = allocatedIndex;
@@ -42,18 +45,30 @@ public class DDProxy extends DecisionDiagram {
 
         try {
             proxy.DATA = file.readAllBytes();
-            proxy.elements = new byte[6][];
+            proxy.position = 0;
+            // Mode
+            byte b = proxy.DATA[proxy.position++];
+            if(b != MDDReader.TOP_DOWN) throw new IllegalArgumentException("The DD must be top-down defined !");
+            if(proxy.elements == null) proxy.elements = new byte[6][];
+            for(int i = 0; i < proxy.elements.length; i++){
+                b = proxy.DATA[proxy.position++];
+                proxy.elements[i] = new byte[b];
+            }
+            // Skip the size
+            proxy.size = proxy.read(MDDReader.SIZE);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //proxy.previousNodes = Memory.MapOfIntegerAbstractNode();
-        //proxy.nodes = Memory.MapOfIntegerAbstractNode();
+        proxy.previousNodes = Memory.MapOfIntegerAbstractNode();
+        proxy.nodes = Memory.MapOfIntegerAbstractNode();
         proxy.nodesID = ListOfInt.create();
 
-        proxy.currentLayerNumber = 0;
-        proxy.nodePosition = 0;
-        proxy.position = 0;
+        proxy.nodes.put(0, NodeProxy.create(proxy));
+        proxy.nodesID.add(0);
+        proxy.loadNodes();
+        proxy.root = (NodeProxy) proxy.previousNodes.get(0);
+
         return proxy;
     }
 
@@ -83,8 +98,8 @@ public class DDProxy extends DecisionDiagram {
      * Create a NodeProxy corresponding to the definition of the node at the given ID.
      * @param nodeID The ID of the node to load
      */
-    private void loadNode(int nodeID){
-        NodeProxy node = NodeProxy.create();
+    private NodeProxy loadNode(int nodeID){
+        NodeProxy node = (NodeProxy) nodes.get(nodeID);
         // MAX_OUT_DEGREE VALUE CHILD_ID
         int max_out_degree = read(MDDReader.MAX_OUT_DEGREE);
         for(int i = 0; i < max_out_degree; i++){
@@ -92,8 +107,9 @@ public class DDProxy extends DecisionDiagram {
             int childID = read(MDDReader.NODE);
             node.addChild(value, childID);
         }
-        nodes.put(nodeID, node);
+        node.setLoaded(true);
         nodePosition++;
+        return node;
     }
 
     /**
@@ -114,6 +130,7 @@ public class DDProxy extends DecisionDiagram {
         currentLayerNumber = read(MDDReader.NODE);
 
         // ID are ordered
+        nodesID.sort();
         for(int nodeID : nodesID){
             while (nodePosition < nodeID) goToNextNode();
             loadNode(nodeID);
@@ -132,22 +149,26 @@ public class DDProxy extends DecisionDiagram {
     protected AbstractNode getNode(int nodeID){
         AbstractNode node = nodes.get(nodeID);
         if(node == null) {
-            node = NodeProxy.create();
+            node = NodeProxy.create(this);
             nodes.put(nodeID, node);
             nodesID.add(nodeID);
         }
         return node;
     }
 
+    @Override
+    public int size(){
+        return size;
+    }
 
     @Override
     public void setRoot(AbstractNode root) {
-
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override
     public void setTT() {
-
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override
@@ -167,7 +188,7 @@ public class DDProxy extends DecisionDiagram {
 
     @Override
     public AbstractNode getRoot() {
-        return null;
+        return root;
     }
 
     @Override
@@ -207,17 +228,17 @@ public class DDProxy extends DecisionDiagram {
 
     @Override
     public void addNode(AbstractNode node, int layer) {
-
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override
     public void removeNode(AbstractNode node, int layer) {
-
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override
     public void reduce() {
-
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override

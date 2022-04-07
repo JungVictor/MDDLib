@@ -10,7 +10,7 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     // The array
-    private Node[] array;
+    private AbstractNode[] array;
 
     /**
      * Get the allocator. Thread safe.
@@ -42,13 +42,13 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
     }
 
     @Override
-    protected Node[] array() {
+    protected AbstractNode[] array() {
         return array;
     }
 
     @Override
     protected void arrayAllocation(int capacity) {
-        array = new Node[capacity];
+        array = new AbstractNode[capacity];
     }
 
     @Override

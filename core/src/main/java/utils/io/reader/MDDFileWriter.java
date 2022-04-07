@@ -34,7 +34,10 @@ public class MDDFileWriter {
     public void write(byte[] b) throws IOException {
         // If we are trying to write more than we can, flush the buffer
         if(position + b.length >= capacity) flush();
-        for(int i = 0; i < b.length; i++) DATA[position+i] = b[i];
+        for(int i = 0; i < b.length; i++) {
+            DATA[position+i] = b[i];
+            if(position+i >= capacity) flush();
+        }
         position += b.length;
     }
 

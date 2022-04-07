@@ -148,6 +148,17 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<MapOf<Integer, AbstractNode>> mapOfIntegerAbstractNode = new MemoryPool<>();
+    public static MapOf<Integer, AbstractNode> MapOfIntegerAbstractNode() {
+        MapOf<Integer, AbstractNode> object = mapOfIntegerAbstractNode.get();
+        if(object == null){
+            object = new MapOf<>(mapOfIntegerAbstractNode);
+            mapOfIntegerAbstractNode.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
     //**************************************//
     //                SETS                  //
     //**************************************//

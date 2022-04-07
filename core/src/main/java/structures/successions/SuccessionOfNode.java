@@ -3,7 +3,7 @@ package structures.successions;
 import dd.mdd.components.Node;
 import memory.AllocatorOf;
 
-public class SuccessionOfNode extends SuccessionOfAbstractNode<Node> {
+public class SuccessionOfNode extends AbstractSuccessionOfAbstractNode<Node> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);

@@ -1,6 +1,7 @@
 package builder.constraints;
 
 import builder.MDDBuilder;
+import dd.AbstractNode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.operations.Operation;
@@ -130,7 +131,7 @@ public class MDDGCC {
         for(int i = 1; i < result.size(); i++){
             Logger.out.information("\rLAYER " + i);
             for(Node x : result.getLayer(i-1)) {
-                Node x1 = x.getX1();
+                AbstractNode x1 = x.getX1();
                 ArrayOfInt domain = values.get(x.getX2());
                 for(int j = 0; j < domain.length; j++){
                     if(!x1.containsLabel(j)) continue;
