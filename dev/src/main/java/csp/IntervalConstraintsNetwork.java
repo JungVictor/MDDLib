@@ -1,6 +1,6 @@
 package csp;
 
-import csp.constraint.IntervalConstraint;
+import csp.constraints.IntervalConstraint;
 import csp.structures.lists.ListOfIntervalVariable;
 import memory.Allocable;
 import memory.AllocatorOf;
@@ -44,11 +44,19 @@ public class IntervalConstraintsNetwork implements Allocable {
     //               METHODS                //
     //**************************************//
 
+    /**
+     * Add a constraint to the constraint network.
+     * @param constraint The IntervalConstraint to add.
+     */
     public void addConstraint(IntervalConstraint constraint){
         constraintsToApply.add(constraint);
         isInQueue.add(constraint);
     }
 
+    /**
+     * Propagate the changes in the constraint network.
+     * @param changedVariables The variables that changed during the resolution
+     */
     private void propagate(ListOfIntervalVariable changedVariables){
         int numberOfVariables = changedVariables.size();
         int numberOfConstraints;
@@ -66,6 +74,9 @@ public class IntervalConstraintsNetwork implements Allocable {
         }
     }
 
+    /**
+     * Run the resolution of the constraint network
+     */
     public void resolve(){
         IntervalConstraint constraint = constraintsToApply.poll();
         isInQueue.remove(constraint);
@@ -93,9 +104,6 @@ public class IntervalConstraintsNetwork implements Allocable {
 
     @Override
     public void free(){
-        constraintsToApply.clear();
-        isInQueue.clear();
-
         allocator().free(this); // Free the object
     }
 

@@ -1,4 +1,4 @@
-package csp.constraint;
+package csp.constraints;
 
 import csp.structures.arrays.ArrayOfIntervalVariable;
 import csp.IntervalVariable;
@@ -83,7 +83,7 @@ public abstract class IntervalConstraint implements Allocable {
 
     @Override
     public void free(){
-        this.variables = null;
+        this.variables.free();
         this.index = 0;
     }
 }

@@ -1,6 +1,6 @@
 package csp;
 
-import csp.constraint.IntervalConstraint;
+import csp.constraints.IntervalConstraint;
 import csp.structures.lists.ListOfIntervalConstraint;
 import memory.Allocable;
 import memory.AllocatorOf;
@@ -128,6 +128,23 @@ public class IntervalVariable implements Allocable {
         return this.intersect(interval.getFirst(), interval.getSecond());
     }
 
+    /**
+     * Intersects the IntervalVariable with an interval [<b>threshold</b>, +INFINITY].
+     * @param threshold A value.
+     * @return A boolean indicating if the intersection changer anything.
+     */
+    public boolean intersectGeq(long threshold){
+        return this.intersect(threshold, this.getMax());
+    }
+
+    /**
+     * Intersects the IntervalVariable with an interval [-INFINITY, <b>threshold</b>].
+     * @param threshold A value.
+     * @return A boolean indicating if the intersection changer anything.
+     */
+    public boolean intersectLeq(long threshold){
+        return this.intersect(this.getMin(), threshold);
+    }
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//
@@ -147,7 +164,6 @@ public class IntervalVariable implements Allocable {
     public void free(){
         interval.free();
         constraints.free();
-
         allocator().free(this); // Free the object
     }
 

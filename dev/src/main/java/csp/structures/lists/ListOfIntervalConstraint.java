@@ -1,6 +1,6 @@
 package csp.structures.lists;
 
-import csp.constraint.IntervalConstraint;
+import csp.constraints.IntervalConstraint;
 import memory.AllocatorOf;
 import structures.lists.ListOf;
 
