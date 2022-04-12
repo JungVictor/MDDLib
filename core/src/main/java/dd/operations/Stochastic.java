@@ -254,7 +254,9 @@ public class Stochastic {
 
     /**
      * Compute all bounds of the StochasticVariables in X in a way that we respect the two thresholds.<br>
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable ordered by non increasing cost
      * @param minThreshold The minimum threshold value
      * @param maxThreshold The maximum threshold value
@@ -303,8 +305,10 @@ public class Stochastic {
         // lastFilled is the last variable that was filled
         // it means that all variable AFTER lastFilled already have their lowerbound (= 0), so no need to
         // compute it again
-        long lastFilled = upperboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
-        lastFilled = lowerboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
+        if (maxQuantity > 0) {
+            long lastFilled = upperboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
+            lastFilled = lowerboundAll(X, bounds, minThreshold - minValueMax, maxQuantity, precision);
+        }
 
         // Compute the lowerbound of biggest value, up to lastFilled
         //for(int i = 0; i <= lastFilled; i++) bounds[i][0] = lowerbound(X, i, minThreshold - minValueMax, maxQuantity, precision);
@@ -330,7 +334,7 @@ public class Stochastic {
      * Compute all upperbounds of the variables in X in linear time.
      * This algorithm doesn't use a pivot.<br>
      * <b> /!\ The precision should be lower or equal to 8 /!\</b>
-     * @param X The array of StochasticVariable ordered by non increasing cost
+     * @param X The array of StochasticVariable ordered by non-increasing cost
      * @param bounds The array containing all current bounds of variables in X (that will be updated)
      * @param threshold The minimum threshold value
      * @param totalQuantity The total amount of quantity we can put
@@ -344,6 +348,8 @@ public class Stochastic {
         double one = Math.pow(10, precision);
         // The current value of the distribution
         long currentValue = 0;
+
+        //if(totalQuantity == 0) return 0;
 
         long maxQuantity = totalQuantity;
 
@@ -379,7 +385,9 @@ public class Stochastic {
             // Break
             if(lastFilled == -1) {
                 // It means that we put everything we could in pivot
-                for(int j = i; j > lastComplete; j--) bounds[j][1] = X[j].getMaxQuantity();
+                for(int j = i; j > lastComplete; j--) {
+                    bounds[j][1] = X[j].getMaxQuantity();
+                }
                 break;
             }
             if(i==lastFilled) lastFilled--;
@@ -430,6 +438,8 @@ public class Stochastic {
         long currentValue = 0;
 
         long maxQuantity = totalQuantity;
+
+        //if(totalQuantity == 0) return 0;
 
         int lastFilled = -1;
 
@@ -716,7 +726,9 @@ public class Stochastic {
 
     /**
      * Compute the lower bounds of all variables' cost in polynomial time.<br>
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -776,7 +788,9 @@ public class Stochastic {
     /**
      * Compute the lower bounds of all variables' cost in polynomial time.<br>
      * This version can be faster than the other.
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -785,7 +799,7 @@ public class Stochastic {
     public static ArrayOfLong minCostFilteringPolynomialV2(StochasticVariable[] X, long threshold, long totalQuantity, int precision){
         ArrayOfLong maxPackingQuantities = ArrayOfLong.fastCreate(X.length);
         ArrayOfLong tmp = maxPacking(X, maxPackingQuantities, totalQuantity);
-        ArrayOfLong minBounds = ArrayOfLong.fastCreate(X.length);
+         ArrayOfLong minBounds = ArrayOfLong.fastCreate(X.length);
         long totalCost = tmp.get(0);
         int firstNonFull = (int) tmp.get(1);
         threshold = (long) (threshold * Math.pow(10 , precision));
@@ -906,7 +920,9 @@ public class Stochastic {
 
     /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -1045,7 +1061,9 @@ public class Stochastic {
     /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
      * This version can be faster than the other.
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -1270,7 +1288,9 @@ public class Stochastic {
     /**
      * Compute the lower bounds of all variables' cost with a complexity n log(n).<br>
      * This version creates the arrays for the dichotomous search only if it is really necessary.
-     * <b> /!\ The precision should be lower or equal to 8 /!\</b>
+     * <b> /!\ The precision should be lower or equal to 8 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariable to filter
      * @param threshold The minimum threshold
      * @param totalQuantity The maximum amount of quantity to give
@@ -1614,7 +1634,9 @@ public class Stochastic {
      * Distribute the quantity in order to get the maximal total cost of
      * an array of StochasticVariables, and put that distribution in the
      * the array quantities. <br>
-     * <b> /!\ The total cost returned has a precision * 2 /!\</b>
+     * <b> /!\ The total cost returned has a precision * 2 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
      * @param X The array of StochasticVariables
      * @param quantities The array which will get the distribution
      * @param totalQuantity The quantity that can be distributed

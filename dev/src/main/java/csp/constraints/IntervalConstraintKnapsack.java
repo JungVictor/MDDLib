@@ -32,11 +32,13 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
 
     /**
      * Get an IntervalConstraintKnapsack object from the allocator.<br>
-     * Constraint mochila : (sum of all quantities[i] * costs[i]) >= threshold subjet to <br>
+     * Constraint knapsack : (sum of all quantities[i] * costs[i]) >= threshold subjet to
      * (sum of all quantities[i]) <= maxQuantity. <br>
-     * The <b>precision</b> helps to apply this constraint on floating-point numbers<br>
+     * The <b>precision</b> helps to apply this constraint on floating-point numbers
      * represented by integers : an integer <b>x</b> with the precision <b>p</b> represents <br>
-     * the floating-point number <b>x</b> * 10^(-<b>p</b>)
+     * the floating-point number <b>x</b> * 10^(-<b>p</b>).<br>
+     * <b> /!\ The costs (and the associated quantities) must be sort in decreasing order
+     * (according to their max value) /!\ </b><br>
      * @param quantities An array of IntervalVariable.
      * @param costs An array of IntervalVariable.
      * @param threshold The threshold to satisfy.

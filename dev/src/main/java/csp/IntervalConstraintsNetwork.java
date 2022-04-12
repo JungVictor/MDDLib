@@ -81,7 +81,10 @@ public class IntervalConstraintsNetwork implements Allocable {
         IntervalConstraint constraint = constraintsToApply.poll();
         isInQueue.remove(constraint);
         ListOfIntervalVariable changedVariables;
+        int count = 0;
         while (constraint != null){
+            count++;
+            System.out.println("Count : "+count);
             changedVariables = constraint.apply();
             propagate(changedVariables);
             changedVariables.free();
