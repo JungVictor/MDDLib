@@ -45,6 +45,15 @@ public class CostNode extends Node {
     //**************************************//
 
     /**
+     * Set the cost to the arc corresponding to the given label
+     * @param label Label of the arc
+     * @param cost Cost of the arc
+     */
+    public void setArcCost(int label, int cost){
+        ((OutCostArcs) getChildren()).setCost(label, cost);
+    }
+
+    /**
      * Add a child to this node with the given label
      * @param label Label of the arc
      * @param child Node to add as a child

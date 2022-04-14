@@ -55,6 +55,15 @@ public class OutCostArcs extends OutArcs {
     }
 
     /**
+     * Set the cost to the arc corresponding to the given label
+     * @param label Label of the arc
+     * @param cost Cost of the arc
+     */
+    public void setCost(int label, int cost){
+        costs.put(label, cost);
+    }
+
+    /**
      * Get the cost associated with the given arc
      * @param label Label of the arc
      * @return the cost associated with the given arc
