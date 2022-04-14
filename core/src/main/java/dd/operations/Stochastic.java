@@ -370,7 +370,7 @@ public class Stochastic {
 
         // If the current value is below the threshold, then no solution
         if (currentValue < threshold){
-            throw new IllegalArgumentException("The constraint is impossible to satisfy");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(Without minimum quantities : threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (currentValue / Math.pow(10, precision)))+")");
         }
 
         // The amount that can be swapped
@@ -395,7 +395,7 @@ public class Stochastic {
             //if (currentValue < threshold) continue;
 
             // While we didn't filled the variable or got to the lowerbound
-            while(currentValue > threshold && X[i].getMaxQuantity() > quantities.get(i)) {
+            while(currentValue >= threshold && X[i].getMaxQuantity() > quantities.get(i)) {
                 // Min between what I can take and what I can receive
                 swappable = Math.min(quantities.get(lastFilled), X[i].getMaxQuantity()- quantities.get(i));
                 // if(swappable == 0) continue;
@@ -455,7 +455,8 @@ public class Stochastic {
 
         // If the current value is below the threshold, then no solution
         if (currentValue < threshold) {
-            throw new IllegalArgumentException("The constraint is impossible to satisfy");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(Without minimum quantities : threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (currentValue / Math.pow(10, precision)))+")");
+
         }
 
         // The amount that can be swapped
@@ -480,7 +481,7 @@ public class Stochastic {
             else pivot = X[lastFilled];
 
             // While we didn't filled the variable or got to the lowerbound
-            while(currentValue > threshold && quantities.get(i) > 0) {
+            while(currentValue >= threshold && quantities.get(i) > 0) {
                 // Min between what I can take and what I can receive
                 swappable = Math.min(quantities.get(i), pivot.getMaxQuantity() - quantities.get(lastFilled));
                 // if(swappable == 0) continue;
@@ -805,7 +806,7 @@ public class Stochastic {
         threshold = (long) (threshold * Math.pow(10 , precision));
 
         if(totalCost < threshold){
-            throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (totalCost / Math.pow(10, precision)))+")");
         }
 
         //If there is no swapping possible
@@ -937,7 +938,7 @@ public class Stochastic {
         threshold = (long) (threshold * Math.pow(10 , precision));
 
         if(totalCost < threshold){
-            throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (totalCost / Math.pow(10, precision)))+")");
         }
 
 
@@ -1078,7 +1079,7 @@ public class Stochastic {
         threshold = (long) (threshold * Math.pow(10 , precision));
 
         if(totalCost < threshold){
-            throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (totalCost / Math.pow(10, precision)))+")");
         }
 
         //If there is no swapping possible
@@ -1305,7 +1306,7 @@ public class Stochastic {
         threshold = (long) (threshold * Math.pow(10 , precision));
 
         if(totalCost < threshold){
-            throw new IllegalArgumentException("The constraint is impossible to satisfy (threshold : "+((long) (threshold / Math.pow(10, precision)))+", max packing total cost : "+((long) (totalCost / Math.pow(10, precision)))+")");
+            throw new IllegalArgumentException("The constraint is impossible to satisfy \n(threshold = "+((long) (threshold / Math.pow(10, precision)))+"; max packing total cost = "+((long) (totalCost / Math.pow(10, precision)))+")");
         }
 
         //If there is no swapping possible
