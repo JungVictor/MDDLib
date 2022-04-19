@@ -201,7 +201,7 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      * @param relaxation True if you perform a relaxation on the constraint, false otherwise
      */
-    static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint, boolean relaxation){
+    public static void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint, boolean relaxation){
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
 
