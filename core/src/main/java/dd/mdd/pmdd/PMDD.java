@@ -1,8 +1,10 @@
 package dd.mdd.pmdd;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
+import dd.interfaces.PropertyNodeInterface;
 import memory.AllocatorOf;
 import dd.mdd.pmdd.components.PNode;
 import dd.mdd.pmdd.components.properties.NodeProperty;
@@ -69,8 +71,8 @@ public class PMDD extends MDD {
      */
     @Override
     public void setRoot(Node node){
-        if(node instanceof PNode) super.setRoot(node);
-        else throw new InputMismatchException("Expected the root to be at least a PNode !");
+        if(node instanceof PropertyNodeInterface) super.setRoot(node);
+        else throw new InputMismatchException("Expected the root to implement at least PropertyNodeInterface !");
     }
 
     /**
@@ -94,7 +96,7 @@ public class PMDD extends MDD {
      * {@inheritDoc}
      */
     @Override
-    public PMDD DD(AbstractNode root){
+    public PMDD DD(NodeInterface root){
         return MDD((Node) root);
     }
 

@@ -1,11 +1,11 @@
 package builder.rules.operations;
 
 import builder.rules.SuccessionRule;
-import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
-import structures.successions.AbstractSuccessionOfAbstractNode;
+import structures.successions.SuccessionOfNodeInterface;
 
 /**
  * The SuccessionRule for the union operator. <br>
@@ -47,11 +47,11 @@ public class SuccessionRuleUnion extends SuccessionRule {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
         successors.clear();
-        AbstractSuccessionOfAbstractNode associations = x.getAssociations();
+        SuccessionOfNodeInterface associations = x.getAssociations();
         for(int i = 0; i < associations.length(); i++) {
-            AbstractNode n = associations.get(i);
+            NodeInterface n = associations.get(i);
             if(n != null) successors.add(n.iterateOnChildLabel());
         }
         return successors;

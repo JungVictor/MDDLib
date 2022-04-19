@@ -5,6 +5,7 @@ import builder.constraints.parameters.*;
 import builder.constraints.states.*;
 import dd.AbstractNode;
 import dd.DecisionDiagram;
+import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.mdd.components.SNode;
@@ -215,9 +216,9 @@ public class ConstraintOperation {
 
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(AbstractNode node : result.iterateOnLayer(i-1)){
+            for(NodeInterface node : result.iterateOnLayer(i-1)){
                 SNode x2 = (SNode) node.getX2();
-                AbstractNode x1 = node.getX1();
+                NodeInterface x1 = node.getX1();
                 for(int value : x1.iterateOnChildLabel()) {
                     NodeState state = x2.getState();
                     if(state.isValid(value, i, mdd.size())) {

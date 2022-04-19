@@ -1,16 +1,15 @@
 package structures.arrays;
 
-import dd.AbstractNode;
-import dd.mdd.components.Node;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 
-public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
+public class ArrayOfNodeInterface extends ArrayOf<NodeInterface> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     // The array
-    private AbstractNode[] array;
+    private NodeInterface[] array;
 
     /**
      * Get the allocator. Thread safe.
@@ -26,8 +25,8 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
      * @param capacity Capacity of the array
      * @return An ArrayOfAbstractNode with given capacity
      */
-    public static ArrayOfAbstractNode create(int capacity){
-        ArrayOfAbstractNode object = allocator().allocate();
+    public static ArrayOfNodeInterface create(int capacity){
+        ArrayOfNodeInterface object = allocator().allocate();
         object.init(capacity);
         return object;
     }
@@ -37,18 +36,18 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
      * It will be put at the specified index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    private ArrayOfAbstractNode(int allocatedIndex) {
+    private ArrayOfNodeInterface(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     @Override
-    protected AbstractNode[] array() {
+    protected NodeInterface[] array() {
         return array;
     }
 
     @Override
     protected void arrayAllocation(int capacity) {
-        array = new AbstractNode[capacity];
+        array = new NodeInterface[capacity];
     }
 
     @Override
@@ -67,7 +66,7 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<ArrayOfAbstractNode> {
+    static final class Allocator extends AllocatorOf<ArrayOfNodeInterface> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -78,13 +77,13 @@ public class ArrayOfAbstractNode extends ArrayOf<AbstractNode> {
         }
 
         @Override
-        protected ArrayOfAbstractNode[] arrayCreation(int capacity) {
-            return new ArrayOfAbstractNode[capacity];
+        protected ArrayOfNodeInterface[] arrayCreation(int capacity) {
+            return new ArrayOfNodeInterface[capacity];
         }
 
         @Override
-        protected ArrayOfAbstractNode createObject(int index) {
-            return new ArrayOfAbstractNode(index);
+        protected ArrayOfNodeInterface createObject(int index) {
+            return new ArrayOfNodeInterface(index);
         }
     }
 

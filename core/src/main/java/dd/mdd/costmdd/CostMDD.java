@@ -1,9 +1,11 @@
 package dd.mdd.costmdd;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import dd.mdd.costmdd.components.CostNode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
+import dd.interfaces.CostNodeInterface;
 import memory.AllocatorOf;
 
 import java.util.InputMismatchException;
@@ -66,8 +68,8 @@ public class CostMDD extends MDD {
      */
     @Override
     public void setRoot(Node node){
-        if(node instanceof CostNode) super.setRoot(node);
-        else throw new InputMismatchException("Expected the root to be at least a CostNode !");
+        if(node instanceof CostNodeInterface) super.setRoot(node);
+        else throw new InputMismatchException("Expected the root to at least implement CostNodeInterface !");
     }
 
     /**
@@ -91,7 +93,7 @@ public class CostMDD extends MDD {
      * {@inheritDoc}
      */
     @Override
-    public CostMDD DD(AbstractNode root){
+    public CostMDD DD(NodeInterface root){
         return MDD((Node) root);
     }
 
@@ -126,8 +128,8 @@ public class CostMDD extends MDD {
      * @param layer The layer of the PARENT node (source)
      */
     public void addArc(Node source, int value, Node destination, int cost, int layer){
-        ((CostNode) source).addChild(value, destination, cost);
-        ((CostNode) destination).addParent(value, source, cost);
+        ((CostNodeInterface) source).addChild(value, destination, cost);
+        ((CostNodeInterface) destination).addParent(value, source, cost);
         addValue(value, layer);
     }
 

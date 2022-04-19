@@ -112,9 +112,7 @@ public class StochasticVariable implements Allocable {
             // Error : -1 ?
             return 0;
         }
-        if(res > quantity) {
-            return quantity;
-        }
+        if(res > quantity) return quantity;
         return res;
     }
 

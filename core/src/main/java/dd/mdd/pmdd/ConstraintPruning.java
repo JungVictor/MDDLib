@@ -1,6 +1,7 @@
 package dd.mdd.pmdd;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import dd.mdd.pmdd.components.properties.PropertySumDouble;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
@@ -60,8 +61,8 @@ public strictfp class ConstraintPruning {
                     // If the value obtained by the lower bound is below the threshold
                     if (property.get(0) + vInf < min) {
                         // We mark the arc as suspect, update its value if necessary and push it to the queue
-                        AbstractNode associate = node.getX1();
-                        AbstractNode associateChild = child.getX1();
+                        NodeInterface associate = node.getX1();
+                        NodeInterface associateChild = child.getX1();
                         if(associateChild == null) {
                             associateChild = marked.Node();
                             child.associate(associateChild, 0);

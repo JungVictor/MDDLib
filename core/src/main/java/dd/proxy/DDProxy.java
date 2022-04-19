@@ -2,6 +2,7 @@ package dd.proxy;
 
 import dd.AbstractNode;
 import dd.DecisionDiagram;
+import dd.interfaces.NodeInterface;
 import memory.Memory;
 import structures.generics.MapOf;
 import structures.lists.ListOfInt;
@@ -162,7 +163,7 @@ public class DDProxy extends DecisionDiagram {
     }
 
     @Override
-    public void setRoot(AbstractNode root) {
+    public void setRoot(NodeInterface root) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
@@ -182,7 +183,7 @@ public class DDProxy extends DecisionDiagram {
     }
 
     @Override
-    public DecisionDiagram DD(AbstractNode root) {
+    public DecisionDiagram DD(NodeInterface root) {
         return null;
     }
 
@@ -197,7 +198,7 @@ public class DDProxy extends DecisionDiagram {
     }
 
     @Override
-    public Iterable<AbstractNode> iterateOnLayer(int i) {
+    public Iterable<NodeInterface> iterateOnLayer(int i) {
         return null;
     }
 
@@ -227,12 +228,12 @@ public class DDProxy extends DecisionDiagram {
     }
 
     @Override
-    public void addNode(AbstractNode node, int layer) {
+    public void addNode(NodeInterface node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
     @Override
-    public void removeNode(AbstractNode node, int layer) {
+    public void removeNode(NodeInterface node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 

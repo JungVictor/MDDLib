@@ -2,6 +2,8 @@ package memory;
 
 import dd.bdd.components.BinaryNode;
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
+import dd.interfaces.StateNodeInterface;
 import dd.mdd.components.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -125,12 +127,12 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<MapOf<AbstractNode, Double>> mapOfAbstractNodeDoublePool = new MemoryPool<>();
-    public static MapOf<AbstractNode, Double> MapOfAbstractNodeDouble(){
-        MapOf<AbstractNode, Double> object = mapOfAbstractNodeDoublePool.get();
+    private static final MemoryPool<MapOf<NodeInterface, Double>> mapOfNodeInterfaceDoublePool = new MemoryPool<>();
+    public static MapOf<NodeInterface, Double> MapOfNodeInterfaceDouble(){
+        MapOf<NodeInterface, Double> object = mapOfNodeInterfaceDoublePool.get();
         if(object == null){
-            object = new MapOf<>(mapOfAbstractNodeDoublePool);
-            mapOfAbstractNodeDoublePool.add(object);
+            object = new MapOf<>(mapOfNodeInterfaceDoublePool);
+            mapOfNodeInterfaceDoublePool.add(object);
         }
         object.prepare();
         return object;
@@ -162,6 +164,17 @@ public class Memory {
     //**************************************//
     //                SETS                  //
     //**************************************//
+
+    private static final MemoryPool<SetOfNode<StateNodeInterface>> setOfStateNodePool = new MemoryPool<>();
+    public static SetOfNode<StateNodeInterface> SetOfStateNode(){
+        SetOfNode<StateNodeInterface> object = setOfStateNodePool.get();
+        if(object == null) {
+            object = new SetOfNode<>(setOfStateNodePool);
+            setOfStateNodePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
 
     private static final MemoryPool<SetOfNode<Node>> setOfNodePool = new MemoryPool<>();
     public static SetOfNode<Node> SetOfNode(){

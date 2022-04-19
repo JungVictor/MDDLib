@@ -1,16 +1,15 @@
 package structures.successions;
 
-import dd.AbstractNode;
-import dd.bdd.components.BinaryNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 
-public class SuccessionOfAbstractNode extends AbstractSuccessionOfAbstractNode<AbstractNode> {
+public class SuccessionOfAbstractNode extends SuccessionOfNodeInterface<NodeInterface> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     // The array
-    private AbstractNode[] array;
+    private NodeInterface[] array;
 
     /**
      * Get the allocator. Thread safe.
@@ -42,13 +41,13 @@ public class SuccessionOfAbstractNode extends AbstractSuccessionOfAbstractNode<A
     }
 
     @Override
-    protected AbstractNode[] array() {
+    protected NodeInterface[] array() {
         return array;
     }
 
     @Override
     protected void arrayAllocation(int capacity) {
-        array = new AbstractNode[capacity];
+        array = new NodeInterface[capacity];
     }
 
     @Override

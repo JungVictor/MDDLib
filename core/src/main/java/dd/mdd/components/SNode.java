@@ -1,10 +1,11 @@
 package dd.mdd.components;
 
 import builder.constraints.states.NodeState;
+import dd.interfaces.StateNodeInterface;
 import memory.AllocatorOf;
 import memory.Memory;
 
-public class SNode extends Node {
+public class SNode extends Node implements StateNodeInterface {
 
     // Allocable variables
     // Thread safe allocator
@@ -59,16 +60,14 @@ public class SNode extends Node {
     //**************************************//
 
     /**
-     * Set the state of the node
-     * @param state The state of the node
+     * {@inheritDoc}
      */
     public void setState(NodeState state){
         this.state = state;
     }
 
     /**
-     * Get the state of the node
-     * @return The state of the node
+     * {@inheritDoc}
      */
     public NodeState getState(){
         return state;

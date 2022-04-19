@@ -1,7 +1,7 @@
 package utils.io.reader;
 
-import dd.AbstractNode;
 import dd.DecisionDiagram;
+import dd.interfaces.NodeInterface;
 import utils.io.MDDReader;
 
 import java.io.IOException;
@@ -17,12 +17,12 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    protected void saveNode(AbstractNode node, int nodeID, MDDFileWriter file) throws IOException {
+    protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfChildren();
         writeInt(file, MDDReader.MAX_OUT_DEGREE, numberOfValues);
         for(int value : node.iterateOnChildLabel()){
             writeInt(file, MDDReader.VALUE, value);
-            AbstractNode child = node.getChild(value);
+            NodeInterface child = node.getChild(value);
             int childID = bindNextWrite(child);
             writeInt(file, MDDReader.NODE, childID);
         }
@@ -59,7 +59,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
      * {@inheritDoc}
      */
     @Override
-    protected void loadNode(DecisionDiagram dd, AbstractNode node, int layer, MDDFileReader file) throws IOException {
+    protected void loadNode(DecisionDiagram dd, NodeInterface node, int layer, MDDFileReader file) throws IOException {
         // Number of values
         int numberOfValues = readInt(file, MDDReader.MAX_OUT_DEGREE);
 
@@ -69,7 +69,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
             // child ID
             int childID = readInt(file, MDDReader.NODE);
 
-            AbstractNode child = addNodeToDD(dd, layer+1, childID);
+            NodeInterface child = addNodeToDD(dd, layer+1, childID);
             dd.addArc(node, value, child, layer);
         }
     }

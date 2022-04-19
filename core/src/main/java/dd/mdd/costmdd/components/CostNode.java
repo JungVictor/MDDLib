@@ -1,9 +1,10 @@
 package dd.mdd.costmdd.components;
 
 import dd.mdd.components.Node;
+import dd.interfaces.CostNodeInterface;
 import memory.AllocatorOf;
 
-public class CostNode extends Node {
+public class CostNode extends Node implements CostNodeInterface {
     // Allocable variables
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -45,9 +46,7 @@ public class CostNode extends Node {
     //**************************************//
 
     /**
-     * Set the cost to the arc corresponding to the given label
-     * @param label Label of the arc
-     * @param cost Cost of the arc
+     * {@inheritDoc}
      */
     public void setArcCost(int label, int cost){
         ((OutCostArcs) getChildren()).setCost(label, cost);
@@ -55,20 +54,14 @@ public class CostNode extends Node {
     }
 
     /**
-     * Add a child to this node with the given label
-     * @param label Label of the arc
-     * @param child Node to add as a child
-     * @param cost Cost of the arc
+     * {@inheritDoc}
      */
     public void addChild(int label, Node child, int cost){
         ((OutCostArcs) getChildren()).add(label, child, cost);
     }
 
     /**
-     * Add a parent to this node with the given label
-     * @param label Label of the ingoing arc
-     * @param parent Node to add as a parent
-     * @param cost Cost of the arc
+     * {@inheritDoc}
      */
     public void addParent(int label, Node parent, int cost){
         ((InCostArcs) getParents()).add(label, parent, cost);

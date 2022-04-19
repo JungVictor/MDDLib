@@ -1,6 +1,6 @@
 package builder.rules;
 
-import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 import structures.Domains;
 import structures.generics.CollectionOf;
@@ -49,7 +49,7 @@ public class SuccessionRuleDefault extends SuccessionRule {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
         return D.get(layer);
     }
 

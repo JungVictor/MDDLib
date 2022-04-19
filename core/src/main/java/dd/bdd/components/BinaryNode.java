@@ -1,9 +1,10 @@
 package dd.bdd.components;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 import memory.Memory;
-import structures.arrays.ArrayOfAbstractNode;
+import structures.arrays.ArrayOfNodeInterface;
 import structures.arrays.ArrayOfInt;
 import structures.lists.UnorderedListOfAbstractNode;
 import structures.lists.UnorderedListOfBinaryNode;
@@ -95,7 +96,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void associate(AbstractNode x1, AbstractNode x2){
+    public void associate(NodeInterface x1, NodeInterface x2){
         associate((BinaryNode) x1, (BinaryNode) x2);
     }
 
@@ -103,7 +104,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void associate(ArrayOfAbstractNode associations){
+    public void associate(ArrayOfNodeInterface associations){
         if(this.associations.length() < associations.length()) this.associations.setLength(associations.length());
         for(int i = 0; i < associations.length(); i++) this.associations.set(i, (BinaryNode) associations.get(i));
     }
@@ -120,7 +121,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void setX(AbstractNode node, int i){
+    public void setX(NodeInterface node, int i){
         setX((BinaryNode) node, i);
     }
 
@@ -344,7 +345,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addChild(int label, AbstractNode child){
+    public void addChild(int label, NodeInterface child){
         addChild(label, (BinaryNode) child);
     }
 
@@ -352,7 +353,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addParent(int label, AbstractNode parent){
+    public void addParent(int label, NodeInterface parent){
         addParent(label, (BinaryNode) parent);
     }
 
@@ -369,7 +370,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void removeParent(int label, AbstractNode parent){
+    public void removeParent(int label, NodeInterface parent){
         removeParent(label, (BinaryNode) parent);
     }
 

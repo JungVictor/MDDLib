@@ -6,9 +6,11 @@ import builder.rules.SuccessionRule;
 import builder.rules.SuccessionRuleDefault;
 import dd.AbstractNode;
 import dd.DecisionDiagram;
+import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.mdd.components.SNode;
+import dd.interfaces.StateNodeInterface;
 import memory.Memory;
 import structures.Domains;
 import structures.arrays.ArrayOfBigInteger;
@@ -37,7 +39,7 @@ public class ConstraintBuilder {
      * @param size The size of the DD
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, Domains D, int size){
+    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, Domains D, int size){
         return build(result, constraint, D, size, false);
     }
 
@@ -51,7 +53,7 @@ public class ConstraintBuilder {
      * @param relaxation True if the constraint must be relaxed when building, false otherwise
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, Domains D, int size, boolean relaxation){
+    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, Domains D, int size, boolean relaxation){
         SuccessionRuleDefault rule = SuccessionRuleDefault.create(D);
         build(result, constraint, rule, size, relaxation);
         Memory.free(rule);
@@ -67,27 +69,27 @@ public class ConstraintBuilder {
      * @param relaxation True if the constraint must be relaxed when building, false otherwise
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, SNode constraint, SuccessionRule rule, int size, boolean relaxation){
+    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, SuccessionRule rule, int size, boolean relaxation){
         result.setSize(size+1);
         result.setRoot(constraint);
 
         CollectionOf<Integer> successors = rule.getCollection();
-        HashMap<String, SNode> bindings = new HashMap<>();
-        SetOfNode<Node> currentNodesConstraint = Memory.SetOfNode(),
-                nextNodesConstraint = Memory.SetOfNode(),
+        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
+        SetOfNode<StateNodeInterface> currentNodesConstraint = Memory.SetOfStateNode(),
+                nextNodesConstraint = Memory.SetOfStateNode(),
                 tmp;
         int node_constraint = 0;
 
         for(int i = 1; i < result.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(AbstractNode node : result.iterateOnLayer(i-1)){
-                SNode x = (SNode) node;
+            for(NodeInterface node : result.iterateOnLayer(i-1)){
+                StateNodeInterface x = (StateNodeInterface) node;
                 for(int value : rule.successors(successors,i - 1, x)) {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
                             String hash = state.signature(value, i, result.size());
-                            SNode y = bindings.get(hash);
+                            StateNodeInterface y = bindings.get(hash);
                             if (y == null) {
                                 y = SNode.create();
                                 y.setState(state.createState(value, i, result.size()));

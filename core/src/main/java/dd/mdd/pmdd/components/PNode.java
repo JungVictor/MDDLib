@@ -1,6 +1,7 @@
 package dd.mdd.pmdd.components;
 
 import dd.mdd.components.Node;
+import dd.interfaces.PropertyNodeInterface;
 import memory.AllocatorOf;
 import memory.Memory;
 import dd.mdd.pmdd.components.properties.NodeProperty;
@@ -10,7 +11,7 @@ import structures.generics.MapOf;
  * <b>The Node containing properties</b> <br>
  * It extends the basic function of Node and add functions relative to properties
  */
-public class PNode extends Node {
+public class PNode extends Node implements PropertyNodeInterface {
 
     // Allocable variables
     // Thread safe allocator

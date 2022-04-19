@@ -1,12 +1,12 @@
 package structures.successions;
 
-import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.Allocable;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public abstract class AbstractSuccessionOfAbstractNode<E extends AbstractNode> implements Iterable<E>, Allocable {
+public abstract class SuccessionOfNodeInterface<E extends NodeInterface> implements Iterable<E>, Allocable {
 
     // Index in Memory
     private final int allocatedIndex;
@@ -19,7 +19,7 @@ public abstract class AbstractSuccessionOfAbstractNode<E extends AbstractNode> i
     //           INITIALISATION             //
     //**************************************//
 
-    public AbstractSuccessionOfAbstractNode(int allocatedIndex){
+    public SuccessionOfNodeInterface(int allocatedIndex){
         this.allocatedIndex = allocatedIndex;
     }
 
@@ -112,7 +112,7 @@ public abstract class AbstractSuccessionOfAbstractNode<E extends AbstractNode> i
      * Create internally a new array if the current one isn't long enough.
      * @param array The array to copy
      */
-    public void copy(AbstractSuccessionOfAbstractNode<E> array){
+    public void copy(SuccessionOfNodeInterface<E> array){
         if(array.length > this.array().length) arrayAllocation(array.length);
         System.arraycopy(array.array(), 0, this.array(), 0, array.length);
         this.length = array.length;

@@ -1,6 +1,7 @@
 package structures.generics;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.MemoryObject;
 import memory.MemoryPool;
 
@@ -12,7 +13,7 @@ import java.util.Iterator;
  * Use this over the Java's sets because this one can be "free" from the memory and reused.
  * @param <E> The type of object you want to store in the set
  */
-public class SetOfNode<E extends AbstractNode> implements MemoryObject, CollectionOf<E> {
+public class SetOfNode<E extends NodeInterface> implements MemoryObject, CollectionOf<E> {
 
     // MemoryObject variables
     private final MemoryPool<SetOfNode<E>> pool;

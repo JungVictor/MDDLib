@@ -3,6 +3,7 @@ package builder.rules;
 import builder.rules.operations.SuccessionRuleIntersection;
 import builder.rules.operations.SuccessionRuleUnion;
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.Allocable;
 import structures.generics.CollectionOf;
 import structures.lists.ListOfInt;
@@ -45,7 +46,7 @@ public abstract class SuccessionRule implements Allocable {
      * @param x The node
      * @return The Iterable of all possible successor values
      */
-    public abstract Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x);
+    public abstract Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x);
 
     //**************************************//
     //           MEMORY FUNCTIONS           //

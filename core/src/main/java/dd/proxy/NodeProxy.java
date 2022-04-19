@@ -1,11 +1,12 @@
 package dd.proxy;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 import memory.Memory;
-import structures.arrays.ArrayOfAbstractNode;
+import structures.arrays.ArrayOfNodeInterface;
 import structures.generics.MapOf;
-import structures.successions.AbstractSuccessionOfAbstractNode;
+import structures.successions.SuccessionOfNodeInterface;
 
 public class NodeProxy extends AbstractNode {
 
@@ -41,12 +42,12 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public AbstractNode Node() {
+    public NodeInterface Node() {
         return create(parentDD);
     }
 
     @Override
-    public AbstractNode getChild(int label) {
+    public NodeInterface getChild(int label) {
         if(!loaded) {
             parentDD.loadNodes();
         }
@@ -97,32 +98,32 @@ public class NodeProxy extends AbstractNode {
     // =======================================
 
     @Override
-    public void addChild(int label, AbstractNode child) {
+    public void addChild(int label, NodeInterface child) {
         throw new UnsupportedOperationException("NodeProxy only support having ID as children");
     }
 
     @Override
-    public void setX(AbstractNode node, int i) {
+    public void setX(NodeInterface node, int i) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
     @Override
-    public void associate(ArrayOfAbstractNode nodes) {
+    public void associate(ArrayOfNodeInterface nodes) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
     @Override
-    public void associate(AbstractNode x1, AbstractNode x2) {
+    public void associate(NodeInterface x1, NodeInterface x2) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
     @Override
-    public AbstractSuccessionOfAbstractNode getAssociations() {
+    public SuccessionOfNodeInterface getAssociations() {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
     @Override
-    public AbstractNode getX(int i) {
+    public NodeInterface getX(int i) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
@@ -137,7 +138,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public Iterable<AbstractNode> iterateOnParents(int label) {
+    public Iterable<NodeInterface> iterateOnParents(int label) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 
@@ -157,12 +158,12 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public void addParent(int label, AbstractNode parent) {
+    public void addParent(int label, NodeInterface parent) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 
     @Override
-    public void removeParent(int label, AbstractNode parent) {
+    public void removeParent(int label, NodeInterface parent) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 

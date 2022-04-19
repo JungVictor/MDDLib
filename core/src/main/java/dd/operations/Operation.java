@@ -2,18 +2,18 @@ package dd.operations;
 
 import builder.MDDBuilder;
 import builder.rules.SuccessionRule;
-import dd.AbstractNode;
 import dd.DecisionDiagram;
+import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.Memory;
 import structures.Binder;
-import structures.arrays.ArrayOfAbstractNode;
+import structures.arrays.ArrayOfNodeInterface;
 import structures.arrays.ArrayOfBoolean;
 import structures.arrays.ArrayOfMDD;
 import structures.generics.CollectionOf;
 import structures.generics.SetOf;
-import structures.successions.AbstractSuccessionOfAbstractNode;
+import structures.successions.SuccessionOfNodeInterface;
 import utils.Logger;
 
 /**
@@ -140,7 +140,7 @@ public class Operation {
 
         // Binding all nodes in layer start to the root of mdd2
         if(start > 0)
-            for(AbstractNode node : mdd1.iterateOnLayer(start))
+            for(NodeInterface node : mdd1.iterateOnLayer(start))
                 node.getX1().associate(node, mdd2.getRoot());
         else result.getRoot().associate(mdd1.getRoot(), mdd2.getRoot());
 
@@ -153,8 +153,8 @@ public class Operation {
         // V.intersect(mdd2.getV());
 
         for(int i = start+1; i < stop; i++){
-            for(AbstractNode x : result.iterateOnLayer(i-1)){
-                AbstractNode x1 = x.getX1(), x2 = x.getX2();
+            for(NodeInterface x : result.iterateOnLayer(i-1)){
+                NodeInterface x1 = x.getX1(), x2 = x.getX2();
                 for(int v : x1.iterateOnChildLabel()){
                     boolean a2 = x2.containsLabel(v);
                     if(apply(true, a2, Operator.INTERSECTION, i == stop - 1)) {
@@ -179,11 +179,11 @@ public class Operation {
             if(stop < mdd1.size()){
                 // mdd2 is contained in the intersection
                 // Therefore, we need to construct the rest of the dd.mdd from mdd1
-                for(AbstractNode node : result.iterateOnLayer(stop-1)) node.getX1().associate(node, null);
+                for(NodeInterface node : result.iterateOnLayer(stop-1)) node.getX1().associate(node, null);
                 mdd1.copy(result, 0, stop-1, mdd1.size());
             } else if (stop >= mdd1.size()){
                 // We need to construct the rest of the dd.mdd from mdd2
-                for(AbstractNode node : result.iterateOnLayer(stop-1)) node.getX2().associate(node, null);
+                for(NodeInterface node : result.iterateOnLayer(stop-1)) node.getX2().associate(node, null);
                 mdd2.copy(result, start, stop - start - 1, mdd2.size());
             }
         }
@@ -324,7 +324,7 @@ public class Operation {
      * @param size The size of both sub-MDDs
      * @return true if there is an inclusion, false otherwise
      */
-    public static boolean inclusion(AbstractNode root1, AbstractNode root2, int size){
+    public static boolean inclusion(NodeInterface root1, NodeInterface root2, int size){
         MDD inclusion = MDD.create();
         boolean result = perform(inclusion, root1, root2, size, SuccessionRule.INTERSECTION, Operator.INCLUSION) != null;
         Memory.free(inclusion);
@@ -366,7 +366,7 @@ public class Operation {
      * @param OP The type of operation
      * @return The MDD resulting from the operation
      */
-    private static DecisionDiagram perform(DecisionDiagram result, AbstractNode root1, AbstractNode root2, int size, SuccessionRule rule, Operator OP){
+    private static DecisionDiagram perform(DecisionDiagram result, NodeInterface root1, NodeInterface root2, int size, SuccessionRule rule, Operator OP){
         result.setSize(size);
         Binder binder = Binder.create();
 
@@ -376,9 +376,9 @@ public class Operation {
 
         for(int i = 1; i < size; i++){
             Logger.out.information("\rLAYER " + i);
-            for(AbstractNode x : result.iterateOnLayer(i-1)){
-                AbstractNode x1 = x.getX1(), x2 = x.getX2();
-                AbstractNode y1, y2;
+            for(NodeInterface x : result.iterateOnLayer(i-1)){
+                NodeInterface x1 = x.getX1(), x2 = x.getX2();
+                NodeInterface y1, y2;
                 for(int v : rule.successors(successors, i-1, x)){
                     boolean a1, a2;
                     a1 = x1 != null && x1.containsLabel(v);
@@ -447,14 +447,14 @@ public class Operation {
      * @param binder The binder
      * @return The node added
      */
-    public static AbstractNode addArcAndNode(DecisionDiagram mdd, AbstractNode x, AbstractNode y1, AbstractNode y2, int label, int layer, Binder binder){
-        AbstractNode y;
+    public static NodeInterface addArcAndNode(DecisionDiagram mdd, NodeInterface x, NodeInterface y1, NodeInterface y2, int label, int layer, Binder binder){
+        NodeInterface y;
         if(binder == null){
             y = x.Node();
             y.associate(y1, y2);
             mdd.addNode(y, layer);
         } else {
-            ArrayOfAbstractNode nodes = ArrayOfAbstractNode.create(2);
+            ArrayOfNodeInterface nodes = ArrayOfNodeInterface.create(2);
             nodes.set(0, y1); nodes.set(1, y2);
             Binder lastBinder = binder.path(nodes);
             y = lastBinder.getLeaf();
@@ -560,9 +560,8 @@ public class Operation {
      * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
      */
     private static MDD perform(MDD result, ArrayOfMDD mdds, Operator OP){
-
         // Allocations : Need to be free
-        ArrayOfAbstractNode ys = ArrayOfAbstractNode.create(mdds.length());
+        ArrayOfNodeInterface ys = ArrayOfNodeInterface.create(mdds.length());
         ArrayOfBoolean a = ArrayOfBoolean.create(mdds.length());
         Binder binder = Binder.create();
         //
@@ -587,7 +586,7 @@ public class Operation {
         for(int i = 1; i < r; i++){
             Logger.out.information("\rCurrent layer : " + i);
             for(Node x : result.getLayer(i-1)){
-                AbstractSuccessionOfAbstractNode xs = x.getAssociations();
+                SuccessionOfNodeInterface xs = x.getAssociations();
                 for(int v : rule.successors(successors, i-1, x)){
                     for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
@@ -618,8 +617,8 @@ public class Operation {
      * @param layer index of the layer where the node will be added
      * @param binder The binder
      */
-    public static void addArcAndNode(MDD mdd, Node x, ArrayOfAbstractNode ys, int label, int layer, Binder binder){
-        AbstractNode y;
+    public static void addArcAndNode(MDD mdd, Node x, ArrayOfNodeInterface ys, int label, int layer, Binder binder){
+        NodeInterface y;
         if(binder == null){
             y = Node.create();
             y.associate(ys);

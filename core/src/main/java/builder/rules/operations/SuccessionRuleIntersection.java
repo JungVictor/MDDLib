@@ -1,7 +1,7 @@
 package builder.rules.operations;
 
 import builder.rules.SuccessionRule;
-import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 import structures.generics.CollectionOf;
 
@@ -37,7 +37,7 @@ public class SuccessionRuleIntersection extends SuccessionRule {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, AbstractNode x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
         return x.getX1().iterateOnChildLabel();
     }
     //**************************************//

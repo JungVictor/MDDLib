@@ -1,8 +1,8 @@
 package dd.bdd;
 
-import dd.AbstractNode;
 import dd.DecisionDiagram;
 import dd.bdd.components.BinaryNode;
+import dd.interfaces.NodeInterface;
 import dd.operations.HashReduce;
 import memory.AllocatorOf;
 import memory.Memory;
@@ -125,7 +125,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void setRoot(AbstractNode root){
+    public void setRoot(NodeInterface root){
         if(root instanceof BinaryNode) setRoot((BinaryNode) root);
         else throw new InputMismatchException("Expected the root to be at least of BinaryNode class !");
     }
@@ -156,9 +156,9 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public BDD DD(AbstractNode root){
+    public BDD DD(NodeInterface root){
         if(root instanceof BinaryNode) return BDD((BinaryNode) root);
-        throw new InputMismatchException("Expected the root to be at least of Node class !");
+        throw new InputMismatchException("Expected the root to be at least of BinaryNode class !");
     }
 
     /**
@@ -359,7 +359,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void addNode(AbstractNode node, int layer){
+    public void addNode(NodeInterface node, int layer){
         addNode((BinaryNode) node, layer);
     }
 
@@ -378,7 +378,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(AbstractNode node, int layer){
+    public void removeNode(NodeInterface node, int layer){
         removeNode((BinaryNode) node, layer);
     }
 

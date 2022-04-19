@@ -1,6 +1,7 @@
 package builder.constraints;
 
 import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.Memory;
@@ -87,7 +88,7 @@ public class MDDAllDifferent {
 
         for(int i = 1; i < result.size(); i++){
             for(Node x : result.getLayer(i-1)) {
-                AbstractNode x1 = x.getX1();
+                NodeInterface x1 = x.getX1();
                 ArrayOfInt domain = values.get(x);
                 for(int j = 0; j < domain.length; j++){
                     if(!x1.containsLabel(domain.get(j))) continue;
