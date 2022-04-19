@@ -56,6 +56,13 @@ public class CostNode extends Node implements CostNodeInterface {
     /**
      * {@inheritDoc}
      */
+    public int getArcCost(int label){
+        return ((OutCostArcs) getChildren()).getCost(label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void addChild(int label, Node child, int cost){
         ((OutCostArcs) getChildren()).add(label, child, cost);
     }
