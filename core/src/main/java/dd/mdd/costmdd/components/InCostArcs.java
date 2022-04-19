@@ -60,6 +60,10 @@ public class InCostArcs extends InArcs {
         costs.get(label).put(node, cost);
     }
 
+    public void setCost(int label, Node parent, int cost){
+        costs.get(label).put(parent, cost);
+    }
+
     /**
      * Get the cost associated with the given arc
      * @param node The parent

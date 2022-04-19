@@ -1,12 +1,15 @@
 package dd.mdd.costmdd.components;
 
 import dd.mdd.components.Node;
+import dd.mdd.components.SNode;
 import memory.AllocatorOf;
 
-public class CostNode extends Node {
+public class SCostNode extends SNode {
+
     // Allocable variables
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
 
     //**************************************//
     //           INITIALISATION             //
@@ -24,17 +27,17 @@ public class CostNode extends Node {
      * Constructor. Initialise the index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    public CostNode(int allocatedIndex) {
+    public SCostNode(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     /**
-     * Create a CostNode.
+     * Create a SCostNode.
      * The object is managed by the allocator.
      * @return A fresh CostNode
      */
-    public static CostNode create(){
-        CostNode node = allocator().allocate();
+    public static SCostNode create(){
+        SCostNode node = allocator().allocate();
         node.prepare();
         return node;
     }
@@ -97,11 +100,11 @@ public class CostNode extends Node {
     }
 
     /**
-     * <b>The allocator that is in charge of the CostNode type.</b><br>
+     * <b>The allocator that is in charge of the SCostNode type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<CostNode> {
+    static final class Allocator extends AllocatorOf<SCostNode> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -115,16 +118,17 @@ public class CostNode extends Node {
          * {@inheritDoc}
          */
         @Override
-        protected CostNode[] arrayCreation(int capacity) {
-            return new CostNode[capacity];
+        protected SCostNode[] arrayCreation(int capacity) {
+            return new SCostNode[capacity];
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected CostNode createObject(int index) {
-            return new CostNode(index);
+        protected SCostNode createObject(int index) {
+            return new SCostNode(index);
         }
     }
+
 }
