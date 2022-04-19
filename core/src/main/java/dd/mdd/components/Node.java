@@ -1,5 +1,6 @@
 package dd.mdd.components;
 
+import csp.IntervalVariable;
 import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import memory.*;
@@ -11,6 +12,7 @@ import structures.generics.SetOfNode;
 import structures.successions.SuccessionOfAbstractNode;
 import structures.successions.SuccessionOfNode;
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -91,6 +93,14 @@ public class Node extends AbstractNode {
      */
     public void sortChildren(){
         children.sort();
+    }
+
+    /**
+     * Sort the children by the upper bound of their corresponding IntervalVariable.
+     * @param intervalCosts The link between the children and their corresponding IntervalVariable.
+     */
+    public void sortChildren(HashMap<Node, IntervalVariable> intervalCosts){
+        children.sort(this, intervalCosts);
     }
 
     //**************************************//
