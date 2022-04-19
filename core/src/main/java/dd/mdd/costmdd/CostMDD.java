@@ -18,7 +18,7 @@ public class CostMDD extends MDD {
 
     // Allocable variables
     // Thread safe allocator
-    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+    public final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     //**************************************//
     //           INITIALISATION             //

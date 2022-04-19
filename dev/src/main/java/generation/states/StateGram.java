@@ -216,6 +216,57 @@ public class StateGram extends NodeState {
         return  toKeyWithLabel(label);
     }
 
+
+    public double proba(int label) {
+        ArrayOfInt history = this.ngram;
+        if (label == 0) return 1;
+        for (int i = 1; i < history.length() - 1; i++) {
+            if (history.get(i) != 0) {
+                sb.append(reverso.IntToWord(history.get(i)));
+
+                sb.append(" ");
+            }
+        }
+        sb.append(reverso.IntToWord(history.get(history.length - 1)));
+
+        return prob(reverso.IntToWord(label), sb.toString());
+    }
+    public static double prob(String word, String history) {
+
+        String numerateur = history.concat(" ").concat(word);
+        String denominateur = history;
+
+
+
+        int valeurNum;
+        int valeurDeno;
+        try{
+            valeurNum = reverso.getCount(numerateur);
+        }
+        catch (Exception e){
+
+            //System.out.println("\n"+numerateur);
+            valeurNum = 0;
+        }
+        try{
+            valeurDeno =reverso.getCount(denominateur);
+        }
+        catch (Exception e){
+
+            //System.out.println(denominateur);
+            return (double) 0;
+        }
+        double d = (double) valeurNum / (double) valeurDeno;
+        //  a   if(Double.isInfinite(d)) return 0;
+        System.out.println("\n Methode porba : WORD, HISTORY");
+        System.out.println("WORD ="+word+" HISTORY="+history);
+        System.out.println("la probabilité ="+d);
+        System.out.println(word);
+        return d;
+
+    }
+
+
     /***
      * Libere l'objet dans l'allocator
      */

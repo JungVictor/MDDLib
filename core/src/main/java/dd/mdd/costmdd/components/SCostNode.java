@@ -77,7 +77,6 @@ public class SCostNode extends SNode implements CostNodeInterface {
         ((InCostArcs) getParents()).add(label, parent, cost);
     }
 
-
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

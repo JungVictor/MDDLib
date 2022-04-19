@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dd.mdd.MDD;
 import dd.mdd.components.SNode;
 import dd.mdd.costmdd.CostMDD;
+import dd.mdd.costmdd.components.SCostNode;
 import dd.operations.ConstraintOperation;
+import generation.MarkovianCostMDD;
 import generation.states.StateGram;
 import generation.utils.Reverso;
 import utils.io.MDDReader;
@@ -37,20 +39,21 @@ public class NgramGenerationMarkovian {
 
 
         StateGram.reverso = reverso;
-        StateGram.SIZE=5;
+        StateGram.SIZE=4;
 
         MDD UMDD = MDD.create();
         MDDReader.load(UMDD, "src/main/resources/mdds/UMDD.mdd");
 
-        SNode constraint = SNode.create();
+        SCostNode constraint = SCostNode.create();
         constraint.setState(StateGram.create());
-        CostMDD myMDD = CostMDD.create();
+        MarkovianCostMDD myMDD = MarkovianCostMDD.create();
+        myMDD.setRoot(SCostNode.create());
 
         System.out.println("");
         System.out.println("MDD_universelle /\\ MDD_mots");
         ConstraintOperation.intersection(myMDD, UMDD, constraint, false);
         myMDD.reduce();
-
+        myMDD.AddMarkovianCost(reverso);
         System.out.println("\n ________  n solutions __________");
         System.out.println(myMDD.nSolutions());
 

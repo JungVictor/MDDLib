@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Reverso {
+    private HashMap<String,Integer> ngram;
     private HashMap<String, Integer> wordToInt = new HashMap<String, Integer>();
     private HashMap<Integer, String> intToWord = new HashMap<Integer, String>();
     private HashMap<Integer,String> intToPOS = new HashMap<>();
@@ -25,6 +26,7 @@ public class Reverso {
     public HashSet<String> isValid = new HashSet<>();
 
     public Reverso(HashMap<String, Integer> ngram) {
+        this.ngram=ngram;
         int k = 3;
         wordToInt.put("", 0); //mots vide
         intToWord.put(0, "");
@@ -52,6 +54,9 @@ public class Reverso {
         this.intToWord = intToWord;
     }
 
+    public int getCount(String ngram){
+        return this.ngram.get(ngram);
+    }
     public void buildCost() {
 
         for (String k : wordToInt.keySet()) {
