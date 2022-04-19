@@ -1,8 +1,7 @@
-package csp.structures.arrays;
+package structures.arrays;
 
 import csp.IntervalVariable;
 import memory.AllocatorOf;
-import structures.arrays.ArrayOf;
 
 public class ArrayOfIntervalVariable extends ArrayOf<IntervalVariable> {
     // Thread safe allocator

@@ -1,8 +1,7 @@
-package csp.structures.lists;
+package structures.lists;
 
 import csp.IntervalVariable;
 import memory.AllocatorOf;
-import structures.lists.ListOf;
 
 public class ListOfIntervalVariable extends ListOf<IntervalVariable> {
 

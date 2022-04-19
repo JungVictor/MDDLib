@@ -1,13 +1,14 @@
 package csp.constraints;
 
 import csp.IntervalVariable;
-import csp.structures.lists.ListOfIntervalVariable;
+import structures.lists.ListOfIntervalVariable;
 import memory.AllocatorOf;
 
-public class IntervalConstraintEqual extends IntervalConstraint {
+public class IntervalConstraintSum extends IntervalConstraint {
 
     private IntervalVariable a;
-    private IntervalVariable b;
+    private IntervalVariable x;
+    private IntervalVariable y;
 
     //**************************************//
     //       ALLOCATION AND CREATION        //
@@ -19,35 +20,39 @@ public class IntervalConstraintEqual extends IntervalConstraint {
      * Constructor. Initialise the allocated index in the allocator.
      * @param allocatedIndex Allocated index in the allocator.
      */
-    private IntervalConstraintEqual(int allocatedIndex){ super(allocatedIndex); }
+    private IntervalConstraintSum(int allocatedIndex){ super(allocatedIndex); }
 
     private static Allocator allocator(){ return localStorage.get(); }
 
     /**
-     * Get an IntervalConstraintEqual object from the allocator.
-     * Constraint equal : a = b.
+     * Get an IntervalConstraintSum object from the allocator.
+     * Constraint sum : a = x + y.
      * @param a An IntervalVariable.
-     * @param b An IntervalVariable.
-     * @return An IntervalConstraintEqual
+     * @param x An IntervalVariable.
+     * @param y An IntervalVariable.
+     * @return An IntervalConstraintSum
      */
-    public static IntervalConstraintEqual create(IntervalVariable a, IntervalVariable b){
-        IntervalConstraintEqual constraint = allocator().allocate();
-        constraint.prepare(2);
-        constraint.init(a, b);
+    public static IntervalConstraintSum create(IntervalVariable a, IntervalVariable x, IntervalVariable y){
+        IntervalConstraintSum constraint = allocator().allocate();
+        constraint.prepare(3);
+        constraint.init(a, x, y);
         return constraint;
     }
 
     /**
-     * Initialisation of the IntervalConstraintEqual.
+     * Initialisation of the IntervalConstraintSum.
      * @param a An IntervalVariable.
-     * @param b An IntervalVariable.
+     * @param x An IntervalVariable.
+     * @param y An IntervalVariable.
      */
-    protected void init(IntervalVariable a, IntervalVariable b){
+    private void init(IntervalVariable a, IntervalVariable x, IntervalVariable y){
         super.init();
         this.a = a;
         this.addVariable(a);
-        this.b = b;
-        this.addVariable(b);
+        this.x = x;
+        this.addVariable(x);
+        this.y = y;
+        this.addVariable(y);
     }
 
     //**************************************//
@@ -55,16 +60,18 @@ public class IntervalConstraintEqual extends IntervalConstraint {
     //**************************************//
 
     /**
-     * Apply the IntervalConstraintEqual to filter the intervals of the concerned IntervalVariable objects.
+     * Apply the IntervalConstraintSum to filter the intervals of the concerned IntervalVariable objects.
      * @return An array of boolean indicating which IntervalVariable objects get their interval changed by the filtering.
      */
     public ListOfIntervalVariable apply(){
         ListOfIntervalVariable changedVariables = ListOfIntervalVariable.create();
         boolean change;
-        change = a.intersect(b.getMin(), b.getMax());
+        change = a.intersect(x.getMin() + y.getMin(), x.getMax() + y.getMax());
         if (change) changedVariables.add(a);
-        change = b.intersect(a.getMin(), a.getMax());
-        if (change) changedVariables.add(b);
+        change = x.intersect(a.getMin() - y.getMax(), a.getMax() - y.getMin());
+        if (change) changedVariables.add(x);
+        change = y.intersect(a.getMin() - x.getMax(), a.getMax() - x.getMin());
+        if (change) changedVariables.add(y);
         return changedVariables;
     }
 
@@ -78,7 +85,7 @@ public class IntervalConstraintEqual extends IntervalConstraint {
         allocator().free(this);
     }
 
-    static final class Allocator extends AllocatorOf<IntervalConstraintEqual> {
+    static final class Allocator extends AllocatorOf<IntervalConstraintSum> {
 
         // You can specify the initial capacity. Default : 10.
         Allocator(int capacity) {
@@ -90,13 +97,13 @@ public class IntervalConstraintEqual extends IntervalConstraint {
         }
 
         @Override
-        protected IntervalConstraintEqual[] arrayCreation(int capacity) {
-            return new IntervalConstraintEqual[capacity];
+        protected IntervalConstraintSum[] arrayCreation(int capacity) {
+            return new IntervalConstraintSum[capacity];
         }
 
         @Override
-        protected IntervalConstraintEqual createObject(int index) {
-            return new IntervalConstraintEqual(index);
+        protected IntervalConstraintSum createObject(int index) {
+            return new IntervalConstraintSum(index);
         }
     }
 }

@@ -1,8 +1,8 @@
 package csp.constraints;
 
-import csp.structures.arrays.ArrayOfIntervalVariable;
+import structures.arrays.ArrayOfIntervalVariable;
 import csp.IntervalVariable;
-import csp.structures.lists.ListOfIntervalVariable;
+import structures.lists.ListOfIntervalVariable;
 import memory.Allocable;
 
 public abstract class IntervalConstraint implements Allocable {

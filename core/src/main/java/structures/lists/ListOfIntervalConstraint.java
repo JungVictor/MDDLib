@@ -1,8 +1,7 @@
-package csp.structures.lists;
+package structures.lists;
 
 import csp.constraints.IntervalConstraint;
 import memory.AllocatorOf;
-import structures.lists.ListOf;
 
 public class ListOfIntervalConstraint extends ListOf<IntervalConstraint> {
 

@@ -1,7 +1,7 @@
 package csp;
 
 import csp.constraints.IntervalConstraint;
-import csp.structures.lists.ListOfIntervalConstraint;
+import structures.lists.ListOfIntervalConstraint;
 import memory.Allocable;
 import memory.AllocatorOf;
 import structures.tuples.TupleOfLong;
