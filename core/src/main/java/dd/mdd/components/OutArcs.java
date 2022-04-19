@@ -1,5 +1,6 @@
 package dd.mdd.components;
 
+import csp.IntervalVariable;
 import memory.Allocable;
 import memory.AllocatorOf;
 import representation.MDDVisitor;
@@ -215,6 +216,26 @@ public class OutArcs implements Allocable, Iterable<Integer> {
         if(isSorted) return;
         Collections.sort(values);
         isSorted = true;
+    }
+
+    /**
+     * Sort the out-going arcs in decreasing order depending of the upper bound of their corresponding IntervalVariable
+     * @param intervalCosts The link between the children and their corresponding IntervalVariable.
+     */
+    public void sort(Node parent, HashMap<Node, IntervalVariable> intervalCosts){
+        int x;
+        long value;
+        int j;
+        for (int i = 1; i < values.size(); i++) {
+            x = values.get(i);
+            value = intervalCosts.get(parent.getChild(x)).getMax();
+            j = i;
+            while (j > 0 && intervalCosts.get(parent.getChild(values.get(j-1))).getMax() < value){
+                values.set(j, values.get(j-1));
+                j--;
+            }
+            values.set(j, x);
+        }
     }
 
     /**
