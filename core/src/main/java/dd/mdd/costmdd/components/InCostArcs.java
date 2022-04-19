@@ -3,6 +3,8 @@ package dd.mdd.costmdd.components;
 import dd.mdd.components.InArcs;
 import dd.mdd.components.Node;
 import memory.AllocatorOf;
+import memory.Memory;
+import structures.generics.MapOf;
 
 import java.util.HashMap;
 
@@ -12,7 +14,7 @@ public class InCostArcs extends InArcs {
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private final HashMap<Integer, HashMap<Node, Integer>> costs = new HashMap<>();
+    private final HashMap<Integer, MapOf<Node, Integer>> costs = new HashMap<>();
 
 
     //**************************************//
@@ -60,8 +62,19 @@ public class InCostArcs extends InArcs {
         costs.get(label).put(node, cost);
     }
 
+    /**
+     * Set the cost corresponding to the given arc
+     * @param label Label of the arc
+     * @param parent Parent node
+     * @param cost The value of the cost
+     */
     public void setCost(int label, Node parent, int cost){
-        costs.get(label).put(parent, cost);
+        MapOf<Node, Integer> map = costs.get(label);
+        if(map == null) {
+            map = Memory.MapOfNodeInteger();
+            costs.put(label, map);
+        }
+        map.put(parent, cost);
     }
 
     /**
@@ -81,6 +94,16 @@ public class InCostArcs extends InArcs {
 
     public void dealloc() {
         allocator().free(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void free(){
+        // Free all maps
+        for(MapOf<Node, Integer> map : costs.values()) Memory.free(map);
+        super.free();
     }
 
     /**
