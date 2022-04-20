@@ -254,6 +254,43 @@ public class ConstraintOperation {
         Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
     }
 
+    public static void stateIntersection(DecisionDiagram result, DecisionDiagram dd, StateNodeInterface constraint, boolean relaxation){
+        result.setSize(dd.size());
+        result.setRoot(constraint);
+        result.getRoot().setX1(dd.getRoot());
+
+        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
+
+        int node_constraint = 0;
+
+        for(int i = 1; i < dd.size(); i++){
+            Logger.out.information("\rLAYER " + i);
+            for(NodeInterface node : result.iterateOnLayer(i-1)){
+                StateNodeInterface stateNode = (StateNodeInterface) node;
+                NodeInterface x1 = node.getX1();
+                for(int value : x1.iterateOnChildLabels()) {
+                    NodeState state = stateNode.getState();
+                    if(state.isValid(value, i, dd.size())) {
+                        StateNodeInterface child = (StateNodeInterface) node.getChild(value);
+                        if(child == null) {
+                            String hash = state.signature(value, i, dd.size());
+                            child = bindings.get(hash);
+                            if (child == null) {
+                                child = stateNode.Node();
+                                node_constraint++;
+                                child.setState(state.createState(value, i, dd.size()));
+                                bindings.put(hash, child);
+                                result.addNode(child, i);
+                            } else if(relaxation) child.getState().merge(state, value, i, result.size());
+                        }
+                        result.addArc(node, value, child, i-1);
+                    }
+                }
+            }
+            bindings.clear();
+        }
+        Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
+    }
 
     //*************************//
     //      CONFIDENCE         //
