@@ -155,7 +155,7 @@ public class Operation {
         for(int i = start+1; i < stop; i++){
             for(NodeInterface x : result.iterateOnLayer(i-1)){
                 NodeInterface x1 = x.getX1(), x2 = x.getX2();
-                for(int v : x1.iterateOnChildLabel()){
+                for(int v : x1.iterateOnChildLabels()){
                     boolean a2 = x2.containsLabel(v);
                     if(apply(true, a2, Operator.INTERSECTION, i == stop - 1)) {
                         addArcAndNode(result, x, x1.getChild(v), x2.getChild(v), v, i, binder);

@@ -76,7 +76,7 @@ public abstract class DecisionDiagram implements Allocable {
         for(int i = start; i < stop; i++){
             for(NodeInterface original : iterateOnLayer(i)) {
                 NodeInterface copyNode = original.getX1();
-                for(int arc : original.iterateOnChildLabel()){
+                for(int arc : original.iterateOnChildLabels()){
                     NodeInterface child = original.getChild(arc);
                     NodeInterface copyChild = child.getX1();
                     // Child node is not yet copied
@@ -229,7 +229,7 @@ public abstract class DecisionDiagram implements Allocable {
         for(int i = size() - 2; i >= 0; i--){
             for(NodeInterface x : iterateOnLayer(i)){
                 double sum = 0;
-                for(int arc : x.iterateOnChildLabel()) sum += currentLayer.get(x.getChild(arc));
+                for(int arc : x.iterateOnChildLabels()) sum += currentLayer.get(x.getChild(arc));
                 next.put(x, sum);
             }
             currentLayer.clear();
@@ -292,7 +292,7 @@ public abstract class DecisionDiagram implements Allocable {
 
     private void addChildrenLabels(NodeInterface node, HashMap<NodeInterface, Stack<Integer>> notVisited){
         Stack<Integer> labels = new Stack<>();
-        for(int value : node.iterateOnChildLabel()) labels.add(value);
+        for(int value : node.iterateOnChildLabels()) labels.add(value);
         notVisited.put(node, labels);
     }
 

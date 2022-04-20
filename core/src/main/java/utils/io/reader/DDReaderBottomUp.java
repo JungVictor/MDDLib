@@ -1,6 +1,5 @@
 package utils.io.reader;
 
-import dd.AbstractNode;
 import dd.DecisionDiagram;
 import dd.interfaces.NodeInterface;
 import utils.io.MDDReader;
@@ -21,7 +20,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
     protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfParentsLabel();
         writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
-        for(int value : node.iterateOnParentLabel()){
+        for(int value : node.iterateOnParentLabels()){
             int numberOfParents = node.numberOfParents(value);
             writeInt(file, MDDReader.VALUE, value);
             writeInt(file, MDDReader.PARENT_NUMBER, numberOfParents);

@@ -5,6 +5,12 @@ import dd.mdd.components.Node;
 public interface CostNodeInterface extends NodeInterface {
 
     /**
+     * Return a new node of the same type as this node implementing CostNodeInterface.
+     * @return A new node implementing CostNodeInterface
+     */
+    CostNodeInterface Node();
+
+    /**
      * Set the cost to the arc corresponding to the given label
      * @param label Label of the arc
      * @param cost Cost of the arc

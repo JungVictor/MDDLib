@@ -38,7 +38,7 @@ public class SuccessionRuleIntersection extends SuccessionRule {
      */
     @Override
     public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
-        return x.getX1().iterateOnChildLabel();
+        return x.getX1().iterateOnChildLabels();
     }
     //**************************************//
     //          SPECIAL FUNCTIONS           //

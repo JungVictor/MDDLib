@@ -50,7 +50,7 @@ public class SNode extends Node implements StateNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public Node Node(){
+    public StateNodeInterface Node(){
         return create();
     }
 

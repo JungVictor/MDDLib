@@ -84,7 +84,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public Node Node(){
+    public NodeInterface Node(){
         return Node.create();
     }
 
@@ -249,7 +249,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public OutArcs iterateOnChildLabel(){
+    public OutArcs iterateOnChildLabels(){
         return children;
     }
 
@@ -257,7 +257,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> iterateOnParentLabel(){
+    public Iterable<Integer> iterateOnParentLabels(){
         return parents.values();
     }
 
@@ -448,9 +448,9 @@ public class Node extends AbstractNode {
      */
     public void replace(MapOf<Integer, SetOf<Integer>> mapping, SetOf<Integer> added){
         OutArcs new_children = OutArcs.create();
-        for(int v : iterateOnChildLabel()) getChild(v).removeParent(v, this);
+        for(int v : this.iterateOnChildLabels()) getChild(v).removeParent(v, this);
 
-        for(int v : iterateOnChildLabel()) {
+        for(int v : this.iterateOnChildLabels()) {
             if(mapping.contains(v)) {
                 for (int arc : mapping.get(v)) {
                     new_children.add(arc, getChild(v));

@@ -172,7 +172,7 @@ public abstract class DDReaderAbstractClass {
             for(NodeInterface node : dd.iterateOnLayer(i)) {
                 max_degree = Math.max(max_degree, node.numberOfChildren());
                 value_number = Math.max(value_number, node.numberOfParentsLabel());
-                for(int value : node.iterateOnParentLabel()) {
+                for(int value : node.iterateOnParentLabels()) {
                     int in_degree = node.numberOfParents(value);
                     if(in_degree > max_in_degree) max_in_degree = in_degree;
                 }

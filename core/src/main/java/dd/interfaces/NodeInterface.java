@@ -1,9 +1,10 @@
 package dd.interfaces;
 
+import memory.Freeable;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.successions.SuccessionOfNodeInterface;
 
-public interface NodeInterface {
+public interface NodeInterface extends Freeable {
 
     //**************************************//
     //           INITIALISATION             //
@@ -103,14 +104,14 @@ public interface NodeInterface {
      *
      * @return All out-going labels
      */
-    Iterable<Integer> iterateOnChildLabel();
+    Iterable<Integer> iterateOnChildLabels();
 
     /**
      * Get the in-going labels
      *
      * @return All in-going labels
      */
-    Iterable<Integer> iterateOnParentLabel();
+    Iterable<Integer> iterateOnParentLabels();
 
     /**
      * Get all parents corresponding to the given label

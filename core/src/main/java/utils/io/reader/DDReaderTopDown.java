@@ -20,7 +20,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
     protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfChildren();
         writeInt(file, MDDReader.MAX_OUT_DEGREE, numberOfValues);
-        for(int value : node.iterateOnChildLabel()){
+        for(int value : node.iterateOnChildLabels()){
             writeInt(file, MDDReader.VALUE, value);
             NodeInterface child = node.getChild(value);
             int childID = bindNextWrite(child);

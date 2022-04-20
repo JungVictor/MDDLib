@@ -6,6 +6,12 @@ import structures.generics.MapOf;
 public interface PropertyNodeInterface extends NodeInterface {
 
     /**
+     * Return a new node of the same type as this node implementing PropertyNodeInterface.
+     * @return A new node implementing PropertyNodeInterface
+     */
+    PropertyNodeInterface Node();
+
+    /**
      * Transfer all properties to all children
      */
     void transferProperties();

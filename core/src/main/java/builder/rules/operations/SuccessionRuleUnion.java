@@ -52,7 +52,7 @@ public class SuccessionRuleUnion extends SuccessionRule {
         SuccessionOfNodeInterface associations = x.getAssociations();
         for(int i = 0; i < associations.length(); i++) {
             NodeInterface n = associations.get(i);
-            if(n != null) successors.add(n.iterateOnChildLabel());
+            if(n != null) successors.add(n.iterateOnChildLabels());
         }
         return successors;
     }

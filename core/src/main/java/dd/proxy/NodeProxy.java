@@ -68,7 +68,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public Iterable<Integer> iterateOnChildLabel() {
+    public Iterable<Integer> iterateOnChildLabels() {
         return children.keySet();
     }
 
@@ -143,7 +143,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public Iterable<Integer> iterateOnParentLabel() {
+    public Iterable<Integer> iterateOnParentLabels() {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 

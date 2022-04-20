@@ -223,7 +223,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public ArrayOfInt iterateOnChildLabel(){
+    public ArrayOfInt iterateOnChildLabels(){
         return getChildren();
     }
 
@@ -231,7 +231,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public ArrayOfInt iterateOnParentLabel(){
+    public ArrayOfInt iterateOnParentLabels(){
         return getParents();
     }
 

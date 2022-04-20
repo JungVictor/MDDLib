@@ -43,6 +43,13 @@ public class SCostNode extends SNode implements CostNodeInterface {
         return node;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SCostNode Node(){
+        return create();
+    }
 
     //**************************************//
     //           NODE MANAGEMENT            //

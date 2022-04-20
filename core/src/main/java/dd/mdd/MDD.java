@@ -142,7 +142,7 @@ public class MDD extends DecisionDiagram {
      * @return a Node the same type as the root Node.
      */
     public Node Node(){
-        if(root != null) return root.Node();
+        if(root != null) return (Node) root.Node();
         return Node.create();
     }
 

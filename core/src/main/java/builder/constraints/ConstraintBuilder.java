@@ -91,7 +91,7 @@ public class ConstraintBuilder {
                             String hash = state.signature(value, i, result.size());
                             StateNodeInterface y = bindings.get(hash);
                             if (y == null) {
-                                y = SNode.create();
+                                y = x.Node();
                                 y.setState(state.createState(value, i, result.size()));
                                 bindings.put(hash, y);
                                 nextNodesConstraint.add(y);

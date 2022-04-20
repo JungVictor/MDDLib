@@ -2,12 +2,10 @@ package generation;
 
 import dd.AbstractNode;
 import dd.mdd.components.Node;
-import dd.mdd.components.SNode;
 import dd.mdd.costmdd.CostMDD;
 import dd.mdd.costmdd.components.SCostNode;
 import generation.states.StateGram;
 import generation.utils.Reverso;
-import jdk.dynalink.beans.StaticClass;
 import memory.AllocatorOf;
 import utils.Logger;
 
@@ -71,7 +69,7 @@ public class MarkovianCostMDD extends CostMDD {
             for (AbstractNode node : super.getLayer(i - 1)) {
                 SCostNode Sn = (SCostNode) node;
                 StateGram myState = (StateGram) Sn.getState();
-                for (int label : Sn.iterateOnChildLabel()) {
+                for (int label : Sn.iterateOnChildLabels()) {
                     if(i == 0) {
                         probabilité=1;
                     }

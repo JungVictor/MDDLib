@@ -93,13 +93,13 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Get the out-going labels
      * @return All out-going labels
      */
-    public abstract Iterable<Integer> iterateOnChildLabel();
+    public abstract Iterable<Integer> iterateOnChildLabels();
 
     /**
      * Get the in-going labels
      * @return All in-going labels
      */
-    public abstract Iterable<Integer> iterateOnParentLabel();
+    public abstract Iterable<Integer> iterateOnParentLabels();
 
     /**
      * Get all parents corresponding to the given label
@@ -196,7 +196,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param node Node to replace this node
      */
     public void replaceParentsReferencesBy(NodeInterface node){
-        for(int value : iterateOnParentLabel()){
+        for(int value : iterateOnParentLabels()){
             for(NodeInterface parent : iterateOnParents(value)) {
                 parent.addChild(value, node);
                 node.addParent(value, parent);
@@ -210,7 +210,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param node Node to replace this node
      */
     public void replaceChildrenReferencesBy(NodeInterface node){
-        for(int value : iterateOnChildLabel()){
+        for(int value : iterateOnChildLabels()){
             NodeInterface child = getChild(value);
             child.removeParent(value, this);
             child.addParent(value, node);
@@ -242,8 +242,8 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Remove all references of this node from nodes referenced by this node
      */
     public void remove(){
-        for(int value : iterateOnChildLabel()) getChild(value).removeParent(value, this);
-        for(int value : iterateOnParentLabel()) for(NodeInterface node : iterateOnParents(value)) node.removeChild(value);
+        for(int value : iterateOnChildLabels()) getChild(value).removeParent(value, this);
+        for(int value : iterateOnParentLabels()) for(NodeInterface node : iterateOnParents(value)) node.removeChild(value);
     }
 
     /**

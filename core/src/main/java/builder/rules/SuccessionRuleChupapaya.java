@@ -35,7 +35,7 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
     public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
         successors.clear();
 
-        for (int inLabel : x.iterateOnParentLabel()) {
+        for (int inLabel : x.iterateOnParentLabels()) {
             // successors.add(successeurs de inLabel)
         }
 

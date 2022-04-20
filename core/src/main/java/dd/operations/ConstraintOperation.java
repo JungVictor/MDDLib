@@ -3,9 +3,9 @@ package dd.operations;
 import builder.MDDBuilder;
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
-import dd.AbstractNode;
 import dd.DecisionDiagram;
 import dd.interfaces.NodeInterface;
+import dd.interfaces.StateNodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import dd.mdd.components.SNode;
@@ -202,14 +202,14 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      * @param relaxation True if you perform a relaxation on the constraint, false otherwise
      */
-    public static void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint, boolean relaxation){
+    public static void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNodeInterface constraint, boolean relaxation){
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
 
         Binder binder = Binder.create();
-        HashMap<String, SNode> bindings = new HashMap<>();
-        SetOfNode<Node> currentNodesConstraint = Memory.SetOfNode(),
-                nextNodesConstraint = Memory.SetOfNode(),
+        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
+        SetOfNode<StateNodeInterface> currentNodesConstraint = Memory.SetOfStateNode(),
+                nextNodesConstraint = Memory.SetOfStateNode(),
                 tmp;
 
         int node_constraint = 0;
@@ -217,16 +217,16 @@ public class ConstraintOperation {
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
             for(NodeInterface node : result.iterateOnLayer(i-1)){
-                SNode x2 = (SNode) node.getX2();
+                StateNodeInterface x2 = (StateNodeInterface) node.getX2();
                 NodeInterface x1 = node.getX1();
-                for(int value : x1.iterateOnChildLabel()) {
+                for(int value : x1.iterateOnChildLabels()) {
                     NodeState state = x2.getState();
                     if(state.isValid(value, i, mdd.size())) {
                         if(!x2.containsLabel(value)) {
                             String hash = state.signature(value, i, mdd.size());
-                            SNode y2 = bindings.get(hash);
+                            StateNodeInterface y2 = bindings.get(hash);
                             if (y2 == null) {
-                                y2 = SNode.create();
+                                y2 = x2.Node();
                                 node_constraint++;
                                 y2.setState(state.createState(value, i, mdd.size()));
                                 bindings.put(hash, y2);
@@ -238,7 +238,7 @@ public class ConstraintOperation {
                     }
                 }
             }
-            for(Node node : currentNodesConstraint) Memory.free(node);
+            for(NodeInterface node : currentNodesConstraint) Memory.free(node);
             currentNodesConstraint.clear();
             tmp = currentNodesConstraint;
             currentNodesConstraint = nextNodesConstraint;

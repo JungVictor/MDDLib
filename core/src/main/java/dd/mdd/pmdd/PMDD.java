@@ -80,7 +80,7 @@ public class PMDD extends MDD {
      */
     @Override
     public Node Node(){
-        if(getRoot() != null) return getRoot().Node();
+        if(getRoot() != null) return (Node) getRoot().Node();
         return PNode.create();
     }
 
