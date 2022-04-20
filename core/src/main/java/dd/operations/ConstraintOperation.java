@@ -279,6 +279,7 @@ public class ConstraintOperation {
                                 child = stateNode.Node();
                                 node_constraint++;
                                 child.setState(state.createState(value, i, dd.size()));
+                                child.setX1(x1.getChild(value));
                                 bindings.put(hash, child);
                                 result.addNode(child, i);
                             } else if(relaxation) child.getState().merge(state, value, i, result.size());

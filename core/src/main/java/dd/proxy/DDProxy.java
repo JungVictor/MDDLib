@@ -157,81 +157,129 @@ public class DDProxy extends DecisionDiagram {
         return node;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size(){
         return size;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setRoot(NodeInterface root) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTT() {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractNode Node() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DecisionDiagram DD() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DecisionDiagram DD(NodeInterface root) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractNode getRoot() {
         return root;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractNode getTt() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterable<NodeInterface> iterateOnLayer(int i) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLayerSize(int i) {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterable<Integer> iterateOnDomain(int i) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDomainSize(int i) {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxValue() {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean domainContains(int i, int v) {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addNode(NodeInterface node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNode(NodeInterface node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
@@ -242,6 +290,17 @@ public class DDProxy extends DecisionDiagram {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void cleanup() {
+        throw new UnsupportedOperationException("Proxy DDs are read only !");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         previousNodes.clear();
@@ -252,11 +311,17 @@ public class DDProxy extends DecisionDiagram {
         position = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int allocatedIndex() {
         return allocatedIndex;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void free() {
         Memory.free(previousNodes);

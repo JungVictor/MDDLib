@@ -1,9 +1,12 @@
 package dd;
 
 import dd.interfaces.NodeInterface;
+import dd.mdd.components.Node;
 import memory.Allocable;
 import memory.Memory;
 import structures.generics.MapOf;
+import structures.lists.UnorderedListOfNode;
+import structures.lists.UnorderedListOfNodeInterface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -355,6 +358,21 @@ public abstract class DecisionDiagram implements Allocable {
      * Transform the DD into a normal form (delete useless nodes, merge leaves, reduce).
      */
     public abstract void reduce();
+
+    /**
+     * Delete useless nodes, merge leaves without reducing
+     */
+    public void cleanup() {
+        UnorderedListOfNodeInterface removed = UnorderedListOfNodeInterface.create();
+        for (int i = size() - 2; i >= 0; i--) {
+            for (NodeInterface node : iterateOnLayer(i)) {
+                if (node.numberOfChildren() == 0) removed.add(node);
+            }
+            for (NodeInterface node : removed) removeNode(node, i);
+        }
+        Memory.free(removed);
+        setTT();
+    }
 
     /**
      * Clear all nodes' associations
