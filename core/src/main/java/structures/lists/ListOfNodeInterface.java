@@ -1,19 +1,19 @@
 package structures.lists;
 
-import dd.AbstractNode;
+import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 
-public class ListOfAbstractNode extends ListOf<AbstractNode> {
+public class ListOfNodeInterface extends ListOf<NodeInterface> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private AbstractNode[] list;
+    private NodeInterface[] list;
 
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
-    private ListOfAbstractNode(int allocatedIndex){
+    private ListOfNodeInterface(int allocatedIndex){
         super(allocatedIndex);
     }
 
@@ -31,9 +31,9 @@ public class ListOfAbstractNode extends ListOf<AbstractNode> {
      * @param capacity Initial capacity of the array
      * @return An UnorderedListOfLayer with given initial capacity
      */
-    public static ListOfAbstractNode create(int capacity){
-        ListOfAbstractNode object = allocator().allocate();
-        if(object.list == null || object.list.length < capacity) object.list = new AbstractNode[capacity];
+    public static ListOfNodeInterface create(int capacity){
+        ListOfNodeInterface object = allocator().allocate();
+        if(object.list == null || object.list.length < capacity) object.list = new NodeInterface[capacity];
         return object;
     }
 
@@ -42,7 +42,7 @@ public class ListOfAbstractNode extends ListOf<AbstractNode> {
      * The object is managed by the allocator.
      * @return An UnorderedListOfLayer with initial capacity of 16.
      */
-    public static ListOfAbstractNode create(){
+    public static ListOfNodeInterface create(){
         return create(16);
     }
 
@@ -51,17 +51,17 @@ public class ListOfAbstractNode extends ListOf<AbstractNode> {
     //**************************************//
 
     @Override
-    public AbstractNode[] list() {
+    public NodeInterface[] list() {
         return list;
     }
 
     @Override
-    protected AbstractNode[] createList(int capacity) {
-        return new AbstractNode[capacity];
+    protected NodeInterface[] createList(int capacity) {
+        return new NodeInterface[capacity];
     }
 
     @Override
-    protected void setList(AbstractNode[] list) {
+    protected void setList(NodeInterface[] list) {
         this.list = list;
     }
 
@@ -75,7 +75,7 @@ public class ListOfAbstractNode extends ListOf<AbstractNode> {
         allocator().free(this);
     }
 
-    static final class Allocator extends AllocatorOf<ListOfAbstractNode> {
+    static final class Allocator extends AllocatorOf<ListOfNodeInterface> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -86,13 +86,13 @@ public class ListOfAbstractNode extends ListOf<AbstractNode> {
         }
 
         @Override
-        protected ListOfAbstractNode[] arrayCreation(int capacity) {
-            return new ListOfAbstractNode[capacity];
+        protected ListOfNodeInterface[] arrayCreation(int capacity) {
+            return new ListOfNodeInterface[capacity];
         }
 
         @Override
-        protected ListOfAbstractNode createObject(int index) {
-            return new ListOfAbstractNode(index);
+        protected ListOfNodeInterface createObject(int index) {
+            return new ListOfNodeInterface(index);
         }
     }
 }

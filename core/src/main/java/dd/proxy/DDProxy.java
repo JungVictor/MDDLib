@@ -1,6 +1,5 @@
 package dd.proxy;
 
-import dd.AbstractNode;
 import dd.DecisionDiagram;
 import dd.interfaces.NodeInterface;
 import memory.Memory;
@@ -31,8 +30,8 @@ public class DDProxy extends DecisionDiagram {
     private int size;
 
     // Map between ProxyNodes and their ID
-    private MapOf<Integer, AbstractNode> previousNodes;
-    private MapOf<Integer, AbstractNode> nodes;
+    private MapOf<Integer, NodeInterface> previousNodes;
+    private MapOf<Integer, NodeInterface> nodes;
     private ListOfInt nodesID;
 
     private NodeProxy root;
@@ -61,8 +60,8 @@ public class DDProxy extends DecisionDiagram {
             e.printStackTrace();
         }
 
-        proxy.previousNodes = Memory.MapOfIntegerAbstractNode();
-        proxy.nodes = Memory.MapOfIntegerAbstractNode();
+        proxy.previousNodes = Memory.MapOfIntegerNodeInterface();
+        proxy.nodes = Memory.MapOfIntegerNodeInterface();
         proxy.nodesID = ListOfInt.create();
 
         proxy.nodes.put(0, NodeProxy.create(proxy));
@@ -118,7 +117,7 @@ public class DDProxy extends DecisionDiagram {
      */
     protected void loadNodes(){
         // Free the memory
-        for(AbstractNode node : previousNodes.values()){
+        for(NodeInterface node : previousNodes.values()){
             Memory.free(node);
         }
         previousNodes.clear();
@@ -137,7 +136,7 @@ public class DDProxy extends DecisionDiagram {
             loadNode(nodeID);
         }
         nodesID.clear();
-        MapOf<Integer, AbstractNode> tmp = previousNodes;
+        MapOf<Integer, NodeInterface> tmp = previousNodes;
         previousNodes = nodes;
         nodes = tmp;
     }
@@ -147,8 +146,8 @@ public class DDProxy extends DecisionDiagram {
      * @param nodeID
      * @return
      */
-    protected AbstractNode getNode(int nodeID){
-        AbstractNode node = nodes.get(nodeID);
+    protected NodeInterface getNode(int nodeID){
+        NodeInterface node = nodes.get(nodeID);
         if(node == null) {
             node = NodeProxy.create(this);
             nodes.put(nodeID, node);
@@ -185,7 +184,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNode Node() {
+    public NodeInterface Node() {
         return null;
     }
 
@@ -209,7 +208,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNode getRoot() {
+    public NodeInterface getRoot() {
         return root;
     }
 
@@ -217,7 +216,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNode getTt() {
+    public NodeInterface getTt() {
         return null;
     }
 

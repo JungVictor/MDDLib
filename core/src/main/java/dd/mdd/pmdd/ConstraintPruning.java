@@ -1,6 +1,5 @@
 package dd.mdd.pmdd;
 
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import dd.mdd.pmdd.components.properties.PropertySumDouble;
 import dd.mdd.MDD;

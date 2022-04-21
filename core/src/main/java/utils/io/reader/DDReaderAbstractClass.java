@@ -1,7 +1,11 @@
 package utils.io.reader;
 
 import dd.DecisionDiagram;
+import dd.bdd.BDD;
+import dd.interfaces.CostNodeInterface;
 import dd.interfaces.NodeInterface;
+import dd.mdd.MDD;
+import dd.mdd.costmdd.CostMDD;
 import utils.SmallMath;
 import utils.io.MDDReader;
 
@@ -167,6 +171,7 @@ public abstract class DDReaderAbstractClass {
         int max_degree = 0;
         int max_in_degree = 0;
         int value_number = 0;
+        int cost = 0;
         for(int i = 0; i < dd.size(); i++) {
             nodes = Math.max(nodes, dd.getLayerSize(i));
             for(NodeInterface node : dd.iterateOnLayer(i)) {
@@ -176,16 +181,26 @@ public abstract class DDReaderAbstractClass {
                     int in_degree = node.numberOfParents(value);
                     if(in_degree > max_in_degree) max_in_degree = in_degree;
                 }
+                if(node instanceof CostNodeInterface) {
+                    CostNodeInterface costNode = (CostNodeInterface) node;
+                    for(int value : costNode.iterateOnChildLabels()) cost = Math.max(cost, costNode.getArcCost(value));
+                }
             }
         }
 
-        if(elements == null) elements = new byte[6][];
+        if(elements == null || elements.length < 7) elements = new byte[7][];
         elements[MDDReader.NODE] =            new byte[SmallMath.nBytes(nodes)];
         elements[MDDReader.VALUE] =           new byte[SmallMath.nBytes(dd.getMaxValue())];
         elements[MDDReader.PARENT_NUMBER] =   new byte[SmallMath.nBytes(max_in_degree)];
         elements[MDDReader.VALUE_NUMBER] =    new byte[SmallMath.nBytes(value_number)];
         elements[MDDReader.SIZE] =            new byte[SmallMath.nBytes(dd.size())];
         elements[MDDReader.MAX_OUT_DEGREE] =  new byte[SmallMath.nBytes(max_degree)];
+        elements[MDDReader.COST] =            new byte[SmallMath.nBytes(cost)];
+
+        // Write the type of DD saved
+        if(dd instanceof CostMDD) file.write(MDDReader.COST_MDD);
+        else if (dd instanceof MDD) file.write(MDDReader.MDD);
+        else if (dd instanceof BDD) file.write(MDDReader.BDD);
 
         file.write(MODE);
         for(int i = 0; i < elements.length; i++) file.write(elements[i].length);
@@ -198,7 +213,7 @@ public abstract class DDReaderAbstractClass {
      * @throws IOException
      */
     protected void readHeader(MDDFileReader file) throws IOException {
-        if(elements == null) elements = new byte[6][];
+        if(elements == null) elements = new byte[7][];
         for(int i = 0; i < elements.length; i++){
             byte b = file.nextByte();
             elements[i] = new byte[b];

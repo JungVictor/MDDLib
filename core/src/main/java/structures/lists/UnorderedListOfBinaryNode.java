@@ -3,7 +3,7 @@ package structures.lists;
 import dd.bdd.components.BinaryNode;
 import memory.AllocatorOf;
 
-public class UnorderedListOfBinaryNode extends UnorderedListOfAbstractNode<BinaryNode> {
+public class UnorderedListOfBinaryNode extends AbstractUnorderedListOfNodes<BinaryNode> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);

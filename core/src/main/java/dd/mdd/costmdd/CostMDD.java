@@ -1,6 +1,5 @@
 package dd.mdd.costmdd;
 
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import dd.mdd.costmdd.components.CostNode;
 import dd.mdd.MDD;

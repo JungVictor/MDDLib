@@ -12,6 +12,7 @@ import structures.MDDTable;
 import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
+import structures.generics.SetOfNode;
 import structures.lists.ListOfInt;
 import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfNode;

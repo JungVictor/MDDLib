@@ -1,13 +1,12 @@
 package structures.lists;
 
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import memory.Allocable;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public abstract class UnorderedListOfAbstractNode<E extends NodeInterface> implements Allocable, Iterable<E> {
+public abstract class AbstractUnorderedListOfNodes<E extends NodeInterface> implements Allocable, Iterable<E> {
 
     // Index in Memory
     private final int allocatedIndex;
@@ -19,7 +18,7 @@ public abstract class UnorderedListOfAbstractNode<E extends NodeInterface> imple
     //**************************************//
     //           INITIALISATION             //
     //**************************************//
-    protected UnorderedListOfAbstractNode(int allocatedIndex){
+    protected AbstractUnorderedListOfNodes(int allocatedIndex){
         this.allocatedIndex = allocatedIndex;
     }
 

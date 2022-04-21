@@ -258,7 +258,7 @@ public abstract class DecisionDiagram implements Allocable {
         // solution
         int[] currentSolution = new int[size()-1];
         // Node on the path of solution
-        NodeInterface[] currentNodes = new AbstractNode[size()-1];
+        NodeInterface[] currentNodes = new NodeInterface[size()-1];
         // labels to visit
         HashMap<NodeInterface, Stack<Integer>> notVisited = new HashMap<>();
 

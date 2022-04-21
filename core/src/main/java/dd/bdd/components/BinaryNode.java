@@ -6,7 +6,7 @@ import memory.AllocatorOf;
 import memory.Memory;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.arrays.ArrayOfInt;
-import structures.lists.UnorderedListOfAbstractNode;
+import structures.lists.AbstractUnorderedListOfNodes;
 import structures.lists.UnorderedListOfBinaryNode;
 import structures.successions.SuccessionOfBinaryNode;
 
@@ -239,7 +239,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public UnorderedListOfAbstractNode iterateOnParents(int label){
+    public AbstractUnorderedListOfNodes iterateOnParents(int label){
         if(label == 0) return parent0;
         return parent1;
     }

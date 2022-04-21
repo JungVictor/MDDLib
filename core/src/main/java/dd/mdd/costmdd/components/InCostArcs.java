@@ -59,6 +59,11 @@ public class InCostArcs extends InArcs {
      */
     public void add(int label, Node node, int cost){
         add(label, node);
+        MapOf<Node, Integer> map = costs.get(label);
+        if(map == null) {
+            map = Memory.MapOfNodeInteger();
+            costs.put(label, map);
+        }
         costs.get(label).put(node, cost);
     }
 

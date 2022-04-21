@@ -2,7 +2,6 @@ package builder.rules;
 
 import builder.rules.operations.SuccessionRuleIntersection;
 import builder.rules.operations.SuccessionRuleUnion;
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import memory.Allocable;
 import structures.generics.CollectionOf;

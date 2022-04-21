@@ -1,6 +1,5 @@
 package structures.generics;
 
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import memory.MemoryObject;
 import memory.MemoryPool;

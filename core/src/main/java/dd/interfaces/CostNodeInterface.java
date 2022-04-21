@@ -25,6 +25,14 @@ public interface CostNodeInterface extends NodeInterface {
     int getArcCost(int label);
 
     /**
+     * Get the cost of the in-going arc corresponding to the given label and parent
+     * @param parent Parent node
+     * @param label Label of the arc
+     * @return The cost of the arc
+     */
+    int getArcCost(NodeInterface parent, int label);
+
+    /**
      * Add a child to this node with the given label
      * @param label Label of the arc
      * @param child Node to add as a child

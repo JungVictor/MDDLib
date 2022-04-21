@@ -1,7 +1,6 @@
 package memory;
 
 import dd.bdd.components.BinaryNode;
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import dd.interfaces.StateNodeInterface;
 import dd.mdd.components.*;
@@ -150,12 +149,12 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<MapOf<Integer, AbstractNode>> mapOfIntegerAbstractNode = new MemoryPool<>();
-    public static MapOf<Integer, AbstractNode> MapOfIntegerAbstractNode() {
-        MapOf<Integer, AbstractNode> object = mapOfIntegerAbstractNode.get();
+    private static final MemoryPool<MapOf<Integer, NodeInterface>> mapOfIntegerNodeInterface = new MemoryPool<>();
+    public static MapOf<Integer, NodeInterface> MapOfIntegerNodeInterface() {
+        MapOf<Integer, NodeInterface> object = mapOfIntegerNodeInterface.get();
         if(object == null){
-            object = new MapOf<>(mapOfIntegerAbstractNode);
-            mapOfIntegerAbstractNode.add(object);
+            object = new MapOf<>(mapOfIntegerNodeInterface);
+            mapOfIntegerNodeInterface.add(object);
         }
         object.prepare();
         return object;

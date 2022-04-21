@@ -3,7 +3,7 @@ package structures.lists;
 import dd.interfaces.NodeInterface;
 import memory.AllocatorOf;
 
-public class UnorderedListOfNodeInterface extends UnorderedListOfAbstractNode<NodeInterface> {
+public class UnorderedListOfNodeInterface extends AbstractUnorderedListOfNodes<NodeInterface> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);

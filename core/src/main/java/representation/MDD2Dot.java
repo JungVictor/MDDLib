@@ -1,7 +1,9 @@
 package representation;
 
+import dd.interfaces.CostNodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
+import dd.mdd.costmdd.components.CostNode;
 import structures.generics.MapOf;
 
 import java.io.File;
@@ -73,7 +75,12 @@ public class MDD2Dot {
                     graph.print(names.get(node.getChild(label)));
                     graph.print(" [label=\"");
                     if(labelToString != null) graph.print(labelToString.get(label));
-                    else graph.println(label);
+                    else graph.print(label);
+                    if(node instanceof CostNodeInterface){
+                        graph.print(" (");
+                        graph.print(((CostNodeInterface) node).getArcCost(label));
+                        graph.print(")");
+                    }
                     graph.println("\"]");
                 }
             }

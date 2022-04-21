@@ -1,6 +1,11 @@
 package utils.io;
 
 import dd.DecisionDiagram;
+import dd.bdd.BDD;
+import dd.mdd.MDD;
+import dd.mdd.costmdd.CostMDD;
+import structures.generics.MapOf;
+import utils.Logger;
 import utils.io.reader.*;
 
 import java.io.FileInputStream;
@@ -20,11 +25,17 @@ public abstract class MDDReader {
 
     public static final String DIRECTORY = "./data/mdds/";
 
-    public static final byte NODE = 0, VALUE = 1, PARENT_NUMBER = 2, VALUE_NUMBER = 3, SIZE = 4, MAX_OUT_DEGREE = 5;
+    // Indices of elements in the array
+    public static final byte NODE = 0, VALUE = 1, PARENT_NUMBER = 2, VALUE_NUMBER = 3, SIZE = 4, MAX_OUT_DEGREE = 5, COST = 6;
+    // Type of representation
     public static final byte BOTTOM_UP = 0, TOP_DOWN = 1;
+    // Type of DD
+    public static final byte MDD = 0, BDD = 1, COST_MDD = 2;
 
     private static final DDReaderBottomUp readerBottomUp = new DDReaderBottomUp();
     private static final DDReaderTopDown readerTopDown = new DDReaderTopDown();
+    private static final DDReaderBottomUp costReaderBottomUp = new CostDDReaderBottomUp();
+    private static final DDReaderTopDown costReaderTopDown = new CostDDReaderTopDown();
     private static DDReaderAbstractClass reader = readerBottomUp;
 
     public static void setMode(byte MODE){
@@ -43,6 +54,10 @@ public abstract class MDDReader {
         try {
             // Open the file to write
             MDDFileWriter fileWriter = new MDDFileWriter(new FileOutputStream(filename), bufferSize);
+            if(dd instanceof CostMDD) {
+                if(reader == readerBottomUp) reader = costReaderBottomUp;
+                else reader = costReaderTopDown;
+            }
             reader.save(dd, fileWriter);
             fileWriter.close();
             return true;
@@ -75,11 +90,27 @@ public abstract class MDDReader {
             // Open the file to read
             FileInputStream file = new FileInputStream(filename);
 
+            // Type of DD loaded
+            byte[] MODE = new byte[1];
+
+            file.readNBytes(MODE, 0, 1);
+
+            byte TYPE = MODE[0];
+            if((TYPE == MDD || TYPE == COST_MDD) && !(dd instanceof dd.mdd.MDD)) throw new ClassCastException("Given DD cannot be cast as an MDD!");
+            if(TYPE == BDD && !(dd instanceof dd.bdd.BDD)) Logger.out.information("WARNING : Loading a BDD in a MDD.");
+            if(TYPE == COST_MDD && !(dd instanceof CostMDD)) Logger.out.information("WARNING : Loading a CostMDD in a MDD.");
+
             // Set the reader corresponding to the mode used to write the file
-            byte[] MODE = file.readNBytes(1);
+            file.readNBytes(MODE, 0, 1);
             MDDFileReader mddFile = new MDDFileReader(file, bufferSize);
-            if(MODE[0] == BOTTOM_UP) readerBottomUp.load(dd, mddFile);
-            else if(MODE[0] == TOP_DOWN) readerTopDown.load(dd, mddFile);
+            if(MODE[0] == BOTTOM_UP) {
+                if(TYPE == COST_MDD) costReaderBottomUp.load(dd, mddFile);
+                else readerBottomUp.load(dd, mddFile);
+            }
+            else if(MODE[0] == TOP_DOWN) {
+                if(TYPE == COST_MDD) costReaderTopDown.load(dd, mddFile);
+                else readerTopDown.load(dd, mddFile);
+            }
             else {
                 mddFile.close();
                 return false;

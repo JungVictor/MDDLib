@@ -1,7 +1,6 @@
 package builder.constraints;
 
 import builder.MDDBuilder;
-import dd.AbstractNode;
 import dd.interfaces.NodeInterface;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;

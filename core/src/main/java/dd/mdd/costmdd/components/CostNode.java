@@ -1,5 +1,6 @@
 package dd.mdd.costmdd.components;
 
+import dd.interfaces.NodeInterface;
 import dd.mdd.components.Node;
 import dd.interfaces.CostNodeInterface;
 import memory.AllocatorOf;
@@ -63,6 +64,7 @@ public class CostNode extends Node implements CostNodeInterface {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getArcCost(int label){
         return ((OutCostArcs) getChildren()).getCost(label);
     }
@@ -70,6 +72,15 @@ public class CostNode extends Node implements CostNodeInterface {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public int getArcCost(NodeInterface parent, int label) {
+        return ((InCostArcs) getParents()).getCost((Node) parent, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addChild(int label, Node child, int cost){
         ((OutCostArcs) getChildren()).add(label, child, cost);
     }
@@ -77,6 +88,7 @@ public class CostNode extends Node implements CostNodeInterface {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addParent(int label, Node parent, int cost){
         ((InCostArcs) getParents()).add(label, parent, cost);
     }
