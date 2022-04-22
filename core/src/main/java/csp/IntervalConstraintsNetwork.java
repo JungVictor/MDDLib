@@ -84,7 +84,7 @@ public class IntervalConstraintsNetwork implements Allocable {
         int count = 0;
         while (constraint != null){
             count++;
-            System.out.println("Count : "+count);
+            //System.out.println("Count : "+count);
             changedVariables = constraint.apply();
             propagate(changedVariables);
             changedVariables.free();

@@ -1684,4 +1684,41 @@ public class Stochastic {
 
         return tuple;
     }
+
+    /**
+     * Distribute the quantity in order to get the maximal total cost of
+     * an array of StochasticVariables.
+     * <b> /!\ The total cost returned has a precision * 2 /!\</b><br>
+     * <b> /!\ The array of StochasticVariable must be sorted by decreasing
+     * order according to the max cost /!\</b>
+     * @param X The array of StochasticVariables
+     * @param totalQuantity The quantity that can be distributed
+     * @return The maximal total cost of the array of StochasticVariable
+     */
+    public static long maxPacking(StochasticVariable[] X, long totalQuantity){
+        long availableQuantity = totalQuantity;
+        long totalCost = 0;
+
+        //First we fill the minimal values
+        for(int i = 0; i < X.length; i++){
+            totalCost += X[i].getMinQuantity() * X[i].getMaxValue();
+            availableQuantity -= X[i].getMinQuantity();
+            if (availableQuantity < 0){
+                throw new IllegalArgumentException("There is no enough quantity to fill the min");
+            }
+        }
+
+        long tmp = totalCost;
+
+        //Then we put the remaining quantity, starting by the highest values
+        int current = 0;
+        while(availableQuantity > 0 && current < X.length){
+            long swappableQuantity = Math.min(availableQuantity, (X[current].getMaxQuantity() - X[current].getMinQuantity()));
+            totalCost += swappableQuantity * X[current].getMaxValue();
+            availableQuantity -= swappableQuantity;
+            current++;
+        }
+
+        return totalCost;
+    }
 }
