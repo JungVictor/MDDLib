@@ -48,7 +48,7 @@ public abstract class IntervalConstraint implements Allocable {
 
     /**
      * Apply the IntervalConstraint to filter the intervals of the concerned IntervalVariable objects.
-     * @return An array of boolean indicating which IntervalVariable objects get their interval changed by the filtering.
+     * @return An list of IntervalVariable which get their interval changed by the filtering.
      */
     public abstract ListOfIntervalVariable apply();
 

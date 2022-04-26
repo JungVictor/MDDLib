@@ -7,6 +7,7 @@ import dd.mdd.components.Layer;
 import dd.mdd.components.Node;
 import dd.mdd.components.OutArcs;
 import dd.operations.Stochastic;
+import representation.MDDPrinter;
 import structures.StochasticVariable;
 import structures.arrays.ArrayOfIntervalVariable;
 import structures.arrays.ArrayOfLong;
@@ -21,7 +22,7 @@ public class MDDProbabilityFiltering {
 
     /**
      * Propagate the intervals of probability through the nodes from the bottom to
-     * the top of a MDD.<br>
+     * the top of an MDD.<br>
      * The IntervalVariable linked to a node represents the interval of probability
      * of all the path from the node to tt. <br>
      * If a node is already linked to an IntervalVariable with <b>intervalCosts</b>,
@@ -40,6 +41,9 @@ public class MDDProbabilityFiltering {
         long one = (long) Math.pow(10, precision);
         if (!intervalCosts.containsKey(mdd.getTt())) {
             intervalCosts.put(mdd.getTt(), IntervalVariable.create(one, one));
+        }
+        else {
+            intervalCosts.get(mdd.getTt()).intersect(one, one);
         }
         Node currentNode;
         Iterator<Node> iterator;
@@ -188,7 +192,7 @@ public class MDDProbabilityFiltering {
             }
 
             //Adding the Knapsack constraint to the constraints network
-            constraintsNetwork.addConstraint(IntervalConstraintKnapsack.create(finalProbabilities, finalCosts, intervalCosts.get(currentNode).getMin(), one, precision, false));
+            constraintsNetwork.addConstraint(IntervalConstraintKnapsack.create(finalProbabilities, finalCosts, intervalCosts.get(currentNode), one, precision, false));
         }
 
         return constraintsNetwork;
@@ -199,11 +203,31 @@ public class MDDProbabilityFiltering {
         ArrayOfLong minProbabilities = ArrayOfLong.create(intervalProbabilities.length);
         long currentMin;
         long one = (long) Math.pow(10, precision);
+
+        IntervalConstraintsNetwork[] constraintsNetworks = new IntervalConstraintsNetwork[mdd.size() - 1];
+
+        //Initialisation of the costs of the nodes
         HashMap<Node, IntervalVariable> intervalCosts = new HashMap<>();
         intervalCosts.put(mdd.getRoot(), IntervalVariable.create(threshold, one));
+        for (int i = 1; i < mdd.size(); i++) {
+            for(Node node : mdd.getLayer(i).getNodes()){
+                intervalCosts.put(node, IntervalVariable.create(0, one));
+            }
+        }
 
-        for (int j = 0; j < 100; j++) {
+        boolean isFiltered = true;
+        boolean change;
 
+        for (int i = 0; i < constraintsNetworks.length; i++) {
+            constraintsNetworks[i] = layerModelling(mdd.getLayer(i), intervalProbabilities[i], intervalCosts, precision);
+        }
+
+        int count = 1;
+        //While there is a IntervalVariable that get filtered
+        while (isFiltered) {
+            isFiltered = false;
+
+            //Compute the minimal probability for each layer
             for (int i = 0; i < minProbabilities.length(); i++) {
                 currentMin = 0;
                 for (Integer key : intervalProbabilities[i].keySet()) {
@@ -212,19 +236,33 @@ public class MDDProbabilityFiltering {
                 minProbabilities.set(i, currentMin);
             }
 
+            //Propagation of the costs of the nodes from the bottom to the top
             propagationBottomUp(mdd, intervalProbabilities, intervalCosts, minProbabilities, precision);
 
-            IntervalConstraintsNetwork constraintsNetwork;
-            for (int i = 0; i < mdd.size() - 1; i++) {
-                constraintsNetwork = layerModelling(mdd.getLayer(i), intervalProbabilities[i], intervalCosts, precision);
-                constraintsNetwork.resolve();
-                System.out.println("==================================");
+            System.out.println("====================================================================");
+            System.out.println("====================================================================");
+            System.out.println("LOOP "+count);
+            count++;
+
+            MDDPrinter printer = new MDDPrinter();
+
+            //For each layer of the mdd
+            for (int i = 0; i < mdd.size(); i++) {
+                System.out.println("--------------------------------");
                 System.out.println("LAYER " + i + " :");
                 for (Node node : mdd.getLayer(i).getNodes()) {
-                    System.out.println(node + " : " + intervalCosts.get(node));
+                    node.accept(printer);
+                    System.out.println("Cost : " + intervalCosts.get(node));
+                    System.out.println("--");
                 }
-                for (Integer key : intervalProbabilities[i].keySet()) {
-                    System.out.println("Label " + key + " : " + intervalProbabilities[i].get(key));
+                if (i < mdd.size() - 1) {
+                    for (Integer key : intervalProbabilities[i].keySet()) {
+                        change = constraintsNetworks[i].resolve();
+                        if (change) {
+                            isFiltered = true;
+                        }
+                        System.out.println("Label " + key + " : " + intervalProbabilities[i].get(key));
+                    }
                 }
             }
 

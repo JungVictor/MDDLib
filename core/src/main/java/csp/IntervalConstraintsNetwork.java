@@ -1,6 +1,7 @@
 package csp;
 
 import csp.constraints.IntervalConstraint;
+import structures.lists.ListOfIntervalConstraint;
 import structures.lists.ListOfIntervalVariable;
 import memory.Allocable;
 import memory.AllocatorOf;
@@ -11,6 +12,8 @@ import java.util.Queue;
 
 public class IntervalConstraintsNetwork implements Allocable {
 
+
+    ListOfIntervalConstraint constraints = ListOfIntervalConstraint.create(); //The constraint concerned by the constraints network
     Queue<IntervalConstraint> constraintsToApply = new LinkedList<>(); //The queue of constraint to apply
     HashSet<IntervalConstraint> isInQueue = new HashSet<>(); //The set of constraint that are in the queue
 
@@ -49,6 +52,10 @@ public class IntervalConstraintsNetwork implements Allocable {
      * @param constraint The IntervalConstraint to add.
      */
     public void addConstraint(IntervalConstraint constraint){
+        constraints.add(constraint);
+    }
+
+    private void addToQueue(IntervalConstraint constraint){
         constraintsToApply.add(constraint);
         isInQueue.add(constraint);
     }
@@ -68,7 +75,7 @@ public class IntervalConstraintsNetwork implements Allocable {
             for (int j = 0; j < numberOfConstraints; j++) {
                 currentConstraint = currentVariable.getConstraints(j);
                 if (!isInQueue.contains(currentConstraint)){
-                    addConstraint(currentConstraint);
+                    addToQueue(currentConstraint);
                 }
             }
         }
@@ -77,20 +84,30 @@ public class IntervalConstraintsNetwork implements Allocable {
     /**
      * Run the resolution of the constraint network
      */
-    public void resolve(){
+    public boolean resolve(){
+        boolean res = false;
+
+        for (int i = 0; i < constraints.size(); i++) {
+            addToQueue(constraints.get(i));
+        }
+
         IntervalConstraint constraint = constraintsToApply.poll();
         isInQueue.remove(constraint);
         ListOfIntervalVariable changedVariables;
-        int count = 0;
+        //int count = 0;
         while (constraint != null){
-            count++;
+            //count++;
             //System.out.println("Count : "+count);
             changedVariables = constraint.apply();
+            if (changedVariables.size() > 0){
+                res = true;
+            }
             propagate(changedVariables);
             changedVariables.free();
             constraint = constraintsToApply.poll();
             isInQueue.remove(constraint);
         }
+        return res;
     }
 
     //**************************************//

@@ -10,10 +10,9 @@ import structures.arrays.ArrayOfLong;
 
 public class IntervalConstraintKnapsack extends IntervalConstraint {
 
-    private IntervalVariable minThreshold;
     private ArrayOfIntervalVariable quantities;
     private ArrayOfIntervalVariable costs;
-    private long threshold;
+    private IntervalVariable minThreshold;
     private long maxQuantity;
     private int precision;
     private boolean propagateCost;
@@ -34,7 +33,7 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
 
     /**
      * Get an IntervalConstraintKnapsack object from the allocator.<br>
-     * Constraint knapsack : (sum of all quantities[i] * costs[i]) >= threshold subjet to
+     * Constraint knapsack : (sum of all quantities[i] * costs[i]) >= minThreshold.getMin() subjet to
      * (sum of all quantities[i]) <= maxQuantity. <br>
      * The <b>precision</b> helps to apply this constraint on floating-point numbers
      * represented by integers : an integer <b>x</b> with the precision <b>p</b> represents <br>
@@ -43,15 +42,15 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
      * (according to their max value) /!\ </b><br>
      * @param quantities An array of IntervalVariable.
      * @param costs An array of IntervalVariable.
-     * @param threshold The threshold to satisfy.
+     * @param minThreshold The interval to which we want to be greater.
      * @param maxQuantity The maximum quantity available.
      * @param precision The number of decimal digit (after the decimal separator).
      * @return An IntervalConstraintKnapsack
      */
-    public static IntervalConstraintKnapsack create(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, long threshold, long maxQuantity, int precision){
+    public static IntervalConstraintKnapsack create(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, IntervalVariable minThreshold, long maxQuantity, int precision){
         IntervalConstraintKnapsack constraint = allocator().allocate();
         constraint.prepare(quantities.length() + costs.length());
-        constraint.init(quantities, costs, threshold, maxQuantity, precision, true);
+        constraint.init(quantities, costs, minThreshold, maxQuantity, precision, true);
         return constraint;
     }
 
@@ -66,16 +65,16 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
      * (according to their max value) /!\ </b><br>
      * @param quantities An array of IntervalVariable.
      * @param costs An array of IntervalVariable.
-     * @param threshold The threshold to satisfy.
+     * @param minThreshold The interval to which we want to be greater.
      * @param maxQuantity The maximum quantity available.
      * @param precision The number of decimal digit (after the decimal separator).
      * @param propagateCost A boolean that indicates if the costs have to propagate their changes.
      * @return An IntervalConstraintKnapsack
      */
-    public static IntervalConstraintKnapsack create(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, long threshold, long maxQuantity, int precision, boolean propagateCost){
+    public static IntervalConstraintKnapsack create(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, IntervalVariable minThreshold, long maxQuantity, int precision, boolean propagateCost){
         IntervalConstraintKnapsack constraint = allocator().allocate();
         constraint.prepare(quantities.length() + costs.length());
-        constraint.init(quantities, costs, threshold, maxQuantity, precision, propagateCost);
+        constraint.init(quantities, costs, minThreshold, maxQuantity, precision, propagateCost);
         return constraint;
     }
 
@@ -83,11 +82,11 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
      * Initialisation of the IntervalConstraintKnapsack.
      * @param quantities An array of IntervalVariable.
      * @param costs An array of IntervalVariable.
-     * @param threshold The threshold to satisfy.
+     * @param minThreshold The interval to which we want to be greater.
      * @param maxQuantity The maximum quantity available.
      * @param precision The number of decimal digit (after the decimal separator).
      */
-    protected void init(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, long threshold, long maxQuantity, int precision, boolean propagateCost){
+    protected void init(ArrayOfIntervalVariable quantities, ArrayOfIntervalVariable costs, IntervalVariable minThreshold, long maxQuantity, int precision, boolean propagateCost){
         super.init();
         if(quantities.length() != costs.length()){
             throw new IllegalArgumentException("The array quantities and costs must have the same size. Size of quantities = "+quantities.length()+", size of costs = "+costs.length());
@@ -100,7 +99,7 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
         for (int i = 0; i < costs.length; i++) {
             this.addVariable(costs.get(i));
         }
-        this.threshold = threshold;
+        this.minThreshold = minThreshold;
         this.maxQuantity = maxQuantity;
         this.precision = precision;
         this.propagateCost = propagateCost;
@@ -119,6 +118,8 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
         boolean change;
         int size = quantities.length();
 
+        sort();
+
         //Creation of the StochasticVariable
         StochasticVariable[] stochasticVariables = new StochasticVariable[size];
         StochasticVariable current;
@@ -130,10 +131,10 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
         }
 
         //Filtering
-        long[][] qBounds = Stochastic.computeBounds(stochasticVariables, threshold, maxQuantity, precision);
+        long[][] qBounds = Stochastic.computeBounds(stochasticVariables, minThreshold.getMin(), maxQuantity, precision);
         for(int i = 0; i < stochasticVariables.length; i++) stochasticVariables[i].setQuantity(qBounds[i][0], qBounds[i][1]);
 
-        ArrayOfLong minBounds = Stochastic.minCostFilteringPolynomialV2(stochasticVariables, threshold, maxQuantity, precision);
+        ArrayOfLong minBounds = Stochastic.minCostFilteringPolynomialV2(stochasticVariables, minThreshold.getMin(), maxQuantity, precision);
 
         //Intersection with the old intervals
         for (int i = 0; i < size; i++) {
@@ -153,6 +154,27 @@ public class IntervalConstraintKnapsack extends IntervalConstraint {
             }
         }
         return changedVariables;
+    }
+
+    /**
+     * Sort the arrays costs (and corresponding quantity) by decreasing order
+     */
+    private void sort(){
+        IntervalVariable currentCost;
+        IntervalVariable currentQuantity;
+        int j;
+        for (int i = 1; i < costs.length(); i++) {
+            currentCost = costs.get(i);
+            currentQuantity = quantities.get(i);
+            j = i;
+            while (j > 0 && costs.get(j-1).getMax() < currentCost.getMax()){
+                costs.set(j, costs.get(j-1));
+                quantities.set(j, quantities.get(j-1));
+                j--;
+            }
+            costs.set(j, currentCost);
+            quantities.set(j, currentQuantity);
+        }
     }
 
     //**************************************//
