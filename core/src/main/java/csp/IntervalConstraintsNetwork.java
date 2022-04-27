@@ -92,7 +92,7 @@ public class IntervalConstraintsNetwork implements Allocable {
         }
 
         IntervalConstraint constraint = constraintsToApply.poll();
-        isInQueue.remove(constraint);
+
         ListOfIntervalVariable changedVariables;
         //int count = 0;
         while (constraint != null){
@@ -104,8 +104,8 @@ public class IntervalConstraintsNetwork implements Allocable {
             }
             propagate(changedVariables);
             changedVariables.free();
-            constraint = constraintsToApply.poll();
             isInQueue.remove(constraint);
+            constraint = constraintsToApply.poll();
         }
         return res;
     }
