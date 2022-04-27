@@ -53,6 +53,30 @@ public class ConstraintOperation {
     }
 
     /**
+     * Perform the intersection operation between mdd and an alldifferent constraint with memory
+     * @param result The MDD that will store the result
+     * @param mdd The MDD on which to perform the operation
+     * @param memory The maximum memory capacity
+     * @param V The set of constrained values
+     * @param variables The set of constrained variables
+     * @return the MDD resulting from the intersection between mdd and the alldiff constraint
+     */
+    static public DecisionDiagram allDiff(DecisionDiagram result, DecisionDiagram mdd, int memory, SetOf<Integer> V, SetOf<Integer> variables){
+        SNode constraint = SNode.create();
+        ParametersAllDiffMem parameters = ParametersAllDiffMem.create(memory, V, variables);
+        constraint.setState(StateAllDiffMem.create(parameters));
+
+        result.getRoot().associate(mdd.getRoot(), constraint);
+
+        intersection(result, mdd, constraint);
+
+        Memory.free(constraint);
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    /**
      * Perform the intersection operation between mdd and a sum constraint
      * @param result The MDD that will store the result
      * @param mdd The MDD on which to perform the operation

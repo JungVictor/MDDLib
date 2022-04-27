@@ -71,10 +71,12 @@ public class PNode extends Node implements PropertyNodeInterface {
      */
     public void transferProperties(){
         for(String property : properties.keySet()) {
+            NodeProperty parentProperty = getProperty(property);
+            if(parentProperty == null) continue;
             for (Integer label : getChildren()) {
                 PNode child = (PNode) getChild(label);
-                if (child.hasProperty(property)) getProperty(property).mergeWithProperty(label, child.getProperty(property));
-                else child.addProperty(property, getProperty(property).createProperty(label));
+                if (child.hasProperty(property)) parentProperty.mergeWithProperty(label, child.getProperty(property));
+                else child.addProperty(property, parentProperty.createProperty(label));
             }
         }
     }
@@ -144,7 +146,7 @@ public class PNode extends Node implements PropertyNodeInterface {
      * Free them from memory
      */
     public void clearProperties(){
-        for(String property : properties) Memory.free(properties.get(property));
+        for(String property : properties) if(properties.get(property) != null) Memory.free(properties.get(property));
         properties.clear();
     }
 
