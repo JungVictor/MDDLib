@@ -47,8 +47,14 @@ public class BinaryNode extends AbstractNode {
      * Constructor. Initialise the index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    private BinaryNode(int allocatedIndex){
+    public BinaryNode(int allocatedIndex){
         this.allocatedIndex = allocatedIndex;
+    }
+
+    public void prepare(){
+        parent0 = UnorderedListOfBinaryNode.create();
+        parent1 = UnorderedListOfBinaryNode.create();
+        associations = SuccessionOfBinaryNode.create(2);
     }
 
     /**
@@ -58,9 +64,7 @@ public class BinaryNode extends AbstractNode {
      */
     public static BinaryNode create(){
         BinaryNode node = allocator().allocate();
-        node.parent0 = UnorderedListOfBinaryNode.create();
-        node.parent1 = UnorderedListOfBinaryNode.create();
-        node.associations = SuccessionOfBinaryNode.create(2);
+        node.prepare();
         return node;
     }
 
@@ -417,6 +421,14 @@ public class BinaryNode extends AbstractNode {
     @Override
     public int allocatedIndex(){ return allocatedIndex; }
 
+
+    /**
+     * Call the allocator to free this object
+     */
+    protected void dealloc(){
+        allocator().free(this);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -426,7 +438,7 @@ public class BinaryNode extends AbstractNode {
         clearParents();
         Memory.free(parent0);
         Memory.free(parent1);
-        allocator().free(this); // Free the object
+        dealloc();
     }
 
 
