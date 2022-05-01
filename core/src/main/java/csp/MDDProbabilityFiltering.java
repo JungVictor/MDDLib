@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 public class MDDProbabilityFiltering {
-
     /**
      * Propagate the intervals of probability through the nodes from the bottom to
      * the top of an MDD.<br>
@@ -104,7 +103,7 @@ public class MDDProbabilityFiltering {
     }
 
     /**
-     * Create the constraints network to filter the probability of all the labels of a layer of a MDD
+     * Create the constraints network to filter the probability of all the labels of a layer of an MDD
      * @param layer The layer to filter.
      * @param intervalProbabilities The interval probability of each label of the layer.
      * @param intervalCosts The cost associated to the node (must run <b>propagationBottomUp</b> before)
@@ -198,6 +197,15 @@ public class MDDProbabilityFiltering {
         return constraintsNetwork;
     }
 
+    /**
+     * Filter the interval probabilities of the labels of an MDD to remove probability for which
+     * it is impossible to satisfy the following constraint : <br>
+     * (sum of probabilities of all path of the MDD) >= <b>threshold</b>
+     * @param mdd The MDD to filter.
+     * @param intervalProbabilities The interval probabilities of each label depending on the layer
+     * @param threshold The threshold to respect.
+     * @param precision The number of decimal digit (after the decimal separator) represented by the values of intervals.
+     */
     public static void filter(MDD mdd, HashMap<Integer, IntervalVariable>[] intervalProbabilities, long threshold, int precision){
         //Preparation
         ArrayOfLong minProbabilities = ArrayOfLong.create(intervalProbabilities.length);
@@ -218,6 +226,7 @@ public class MDDProbabilityFiltering {
         boolean isFiltered = true;
         boolean change;
 
+        //Creation of the constraints networks for each layer
         for (int i = 0; i < constraintsNetworks.length; i++) {
             constraintsNetworks[i] = layerModelling(mdd.getLayer(i), intervalProbabilities[i], intervalCosts, precision);
         }
