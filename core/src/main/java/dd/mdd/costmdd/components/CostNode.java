@@ -1,11 +1,11 @@
 package dd.mdd.costmdd.components;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.components.Node;
-import dd.interfaces.CostNodeInterface;
+import dd.interfaces.ICostNode;
 import memory.AllocatorOf;
 
-public class CostNode extends Node implements CostNodeInterface {
+public class CostNode extends Node implements ICostNode {
     // Allocable variables
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
@@ -73,7 +73,7 @@ public class CostNode extends Node implements CostNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public int getArcCost(NodeInterface parent, int label) {
+    public int getArcCost(INode parent, int label) {
         return ((InCostArcs) getParents()).getCost((Node) parent, label);
     }
 

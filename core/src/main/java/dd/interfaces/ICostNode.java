@@ -2,13 +2,13 @@ package dd.interfaces;
 
 import dd.mdd.components.Node;
 
-public interface CostNodeInterface extends NodeInterface {
+public interface ICostNode extends INode {
 
     /**
      * Return a new node of the same type as this node implementing CostNodeInterface.
      * @return A new node implementing CostNodeInterface
      */
-    CostNodeInterface Node();
+    ICostNode Node();
 
     /**
      * Set the cost to the arc corresponding to the given label
@@ -30,7 +30,7 @@ public interface CostNodeInterface extends NodeInterface {
      * @param label Label of the arc
      * @return The cost of the arc
      */
-    int getArcCost(NodeInterface parent, int label);
+    int getArcCost(INode parent, int label);
 
     /**
      * Add a child to this node with the given label

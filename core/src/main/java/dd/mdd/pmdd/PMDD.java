@@ -1,11 +1,11 @@
 package dd.mdd.pmdd;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
-import dd.interfaces.PropertyNodeInterface;
+import dd.interfaces.IPropertyNode;
 import memory.AllocatorOf;
-import dd.mdd.pmdd.components.PNode;
+import dd.mdd.pmdd.components.PropertyNode;
 import dd.mdd.pmdd.components.properties.NodeProperty;
 import structures.generics.MapOf;
 
@@ -70,7 +70,7 @@ public class PMDD extends MDD {
      */
     @Override
     public void setRoot(Node node){
-        if(node instanceof PropertyNodeInterface) super.setRoot(node);
+        if(node instanceof IPropertyNode) super.setRoot(node);
         else throw new InputMismatchException("Expected the root to implement at least PropertyNodeInterface !");
     }
 
@@ -80,7 +80,7 @@ public class PMDD extends MDD {
     @Override
     public Node Node(){
         if(getRoot() != null) return (Node) getRoot().Node();
-        return PNode.create();
+        return PropertyNode.create();
     }
 
     /**
@@ -95,7 +95,7 @@ public class PMDD extends MDD {
      * {@inheritDoc}
      */
     @Override
-    public PMDD DD(NodeInterface root){
+    public PMDD DD(INode root){
         return MDD((Node) root);
     }
 
@@ -142,11 +142,11 @@ public class PMDD extends MDD {
     public MapOf<String, NodeProperty> propagateProperties(boolean clean) {
         for(int i = 0; i < size() - 1; i++){
             for(Node node : getLayer(i)) {
-                ((PNode) node).transferProperties();
-                if(clean) ((PNode) node).clearProperties();
+                ((PropertyNode) node).transferProperties();
+                if(clean) ((PropertyNode) node).clearProperties();
             }
         }
-        return ((PNode) getTt()).getProperties();
+        return ((PropertyNode) getTt()).getProperties();
     }
 
     /**
@@ -169,11 +169,11 @@ public class PMDD extends MDD {
     public MapOf<String, NodeProperty> reversePropagateProperties(boolean clean) {
         for(int i = size() - 1; i > 0; i--){
             for(Node node : getLayer(i)) {
-                ((PNode) node).reverseTransferProperties();
-                if(clean) ((PNode) node).clearProperties();
+                ((PropertyNode) node).reverseTransferProperties();
+                if(clean) ((PropertyNode) node).clearProperties();
             }
         }
-        return ((PNode) getRoot()).getProperties();
+        return ((PropertyNode) getRoot()).getProperties();
     }
 
 
@@ -183,7 +183,7 @@ public class PMDD extends MDD {
      * @param property The property to add
      */
     public void addRootProperty(String propertyName, NodeProperty property){
-        ((PNode) getRoot()).addProperty(propertyName, property);
+        ((PropertyNode) getRoot()).addProperty(propertyName, property);
     }
 
     /**
@@ -192,7 +192,7 @@ public class PMDD extends MDD {
      * @param property The property to add
      */
     public void addTtProperty(String propertyName, NodeProperty property){
-        ((PNode) getTt()).addProperty(propertyName, property);
+        ((PropertyNode) getTt()).addProperty(propertyName, property);
     }
 
     /**
@@ -201,7 +201,7 @@ public class PMDD extends MDD {
      * @return the property removed (null if none)
      */
     public NodeProperty removeRootProperty(String propertyName){
-        return ((PNode) getRoot()).removeProperty(propertyName);
+        return ((PropertyNode) getRoot()).removeProperty(propertyName);
     }
 
     /**
@@ -210,7 +210,7 @@ public class PMDD extends MDD {
      * @return the property removed (null if none)
      */
     public NodeProperty removeTtProperty(String propertyName){
-        return ((PNode) getTt()).removeProperty(propertyName);
+        return ((PropertyNode) getTt()).removeProperty(propertyName);
     }
 
     /**
@@ -221,7 +221,7 @@ public class PMDD extends MDD {
      * @return the specified property from the tt node.
      */
     public NodeProperty getTtProperty(String propertyName){
-        return ((PNode) getTt()).getProperty(propertyName);
+        return ((PropertyNode) getTt()).getProperty(propertyName);
     }
 
     /**
@@ -232,7 +232,7 @@ public class PMDD extends MDD {
      * @return the specified property from the tt node.
      */
     public NodeProperty getRootProperty(String propertyName){
-        return ((PNode) getRoot()).getProperty(propertyName);
+        return ((PropertyNode) getRoot()).getProperty(propertyName);
     }
 
     //**************************************//

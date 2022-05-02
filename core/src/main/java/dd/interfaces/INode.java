@@ -4,7 +4,7 @@ import memory.Freeable;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.successions.SuccessionOfNodeInterface;
 
-public interface NodeInterface extends Freeable {
+public interface INode extends Freeable {
 
     //**************************************//
     //           INITIALISATION             //
@@ -15,7 +15,7 @@ public interface NodeInterface extends Freeable {
      *
      * @return A new node corresponding to the same type as this node
      */
-    NodeInterface Node();
+    INode Node();
 
     /**
      * Set the ith associated node to node
@@ -23,21 +23,21 @@ public interface NodeInterface extends Freeable {
      * @param node The node to associate
      * @param i    The index of the association
      */
-    void setX(NodeInterface node, int i);
+    void setX(INode node, int i);
 
     /**
      * Set the first associated node to x1
      *
      * @param x1 The node to associate
      */
-    void setX1(NodeInterface x1);
+    void setX1(INode x1);
 
     /**
      * Set the second associated node to x2
      *
      * @param x2 The node to associate
      */
-    void setX2(NodeInterface x2);
+    void setX2(INode x2);
 
     /**
      * Associate the node to all given nodes
@@ -52,7 +52,7 @@ public interface NodeInterface extends Freeable {
      * @param x1 The first node associated
      * @param x2 The second node associated
      */
-    void associate(NodeInterface x1, NodeInterface x2);
+    void associate(INode x1, INode x2);
 
     /**
      * Get the set of all associated nodes
@@ -75,7 +75,7 @@ public interface NodeInterface extends Freeable {
      * @param label The value of the label
      * @return The node associated with the given label
      */
-    NodeInterface getChild(int label);
+    INode getChild(int label);
 
     /**
      * The number of outgoing arcs
@@ -119,7 +119,7 @@ public interface NodeInterface extends Freeable {
      * @param label The label of the in-going arcs
      * @return The UnorderedListOfBinaryNode of parents
      */
-    Iterable<NodeInterface> iterateOnParents(int label);
+    Iterable<INode> iterateOnParents(int label);
 
     /**
      * Get the ith node associated with this node.
@@ -127,7 +127,7 @@ public interface NodeInterface extends Freeable {
      * @param i The index of the associated node
      * @return The ith node associated with this node, null if there is none
      */
-    NodeInterface getX(int i);
+    INode getX(int i);
 
     // ---------------------
     //      DEFAULT
@@ -145,14 +145,14 @@ public interface NodeInterface extends Freeable {
      *
      * @return the first node associated
      */
-    NodeInterface getX1();
+    INode getX1();
 
     /**
      * Get the second node associated
      *
      * @return the second node associated
      */
-    NodeInterface getX2();
+    INode getX2();
 
 
     //**************************************//
@@ -168,7 +168,7 @@ public interface NodeInterface extends Freeable {
      * @param label Label of the arc
      * @param child Node to add as a child
      */
-    void addChild(int label, NodeInterface child);
+    void addChild(int label, INode child);
 
     /**
      * Remove the child corresponding to the given label
@@ -183,7 +183,7 @@ public interface NodeInterface extends Freeable {
      * @param label  Label of the ingoing arc
      * @param parent Node to add as a parent
      */
-    void addParent(int label, NodeInterface parent);
+    void addParent(int label, INode parent);
 
     /**
      * Remove the given node from the parents' list corresponding to the given arc's label
@@ -191,7 +191,7 @@ public interface NodeInterface extends Freeable {
      * @param label  Label of the ingoing arc
      * @param parent The parent node to remove
      */
-    void removeParent(int label, NodeInterface parent);
+    void removeParent(int label, INode parent);
 
     /**
      * Clear all parents references
@@ -211,21 +211,21 @@ public interface NodeInterface extends Freeable {
      *
      * @param node Node to replace this node
      */
-    void replaceParentsReferencesBy(NodeInterface node);
+    void replaceParentsReferencesBy(INode node);
 
     /**
      * Replace all children's references of this node by the given node
      *
      * @param node Node to replace this node
      */
-    void replaceChildrenReferencesBy(NodeInterface node);
+    void replaceChildrenReferencesBy(INode node);
 
     /**
      * Replace all references of this node by the given node
      *
      * @param node Node to replace this node
      */
-    void replaceReferencesBy(NodeInterface node);
+    void replaceReferencesBy(INode node);
 
 
     //**************************************//

@@ -1,7 +1,7 @@
 package dd.proxy;
 
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.Memory;
 import structures.generics.MapOf;
 import structures.lists.ListOfInt;
@@ -30,8 +30,8 @@ public class DDProxy extends DecisionDiagram {
     private int size;
 
     // Map between ProxyNodes and their ID
-    private MapOf<Integer, NodeInterface> previousNodes;
-    private MapOf<Integer, NodeInterface> nodes;
+    private MapOf<Integer, INode> previousNodes;
+    private MapOf<Integer, INode> nodes;
     private ListOfInt nodesID;
 
     private NodeProxy root;
@@ -117,7 +117,7 @@ public class DDProxy extends DecisionDiagram {
      */
     protected void loadNodes(){
         // Free the memory
-        for(NodeInterface node : previousNodes.values()){
+        for(INode node : previousNodes.values()){
             Memory.free(node);
         }
         previousNodes.clear();
@@ -136,7 +136,7 @@ public class DDProxy extends DecisionDiagram {
             loadNode(nodeID);
         }
         nodesID.clear();
-        MapOf<Integer, NodeInterface> tmp = previousNodes;
+        MapOf<Integer, INode> tmp = previousNodes;
         previousNodes = nodes;
         nodes = tmp;
     }
@@ -146,8 +146,8 @@ public class DDProxy extends DecisionDiagram {
      * @param nodeID
      * @return
      */
-    protected NodeInterface getNode(int nodeID){
-        NodeInterface node = nodes.get(nodeID);
+    protected INode getNode(int nodeID){
+        INode node = nodes.get(nodeID);
         if(node == null) {
             node = NodeProxy.create(this);
             nodes.put(nodeID, node);
@@ -168,7 +168,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void setRoot(NodeInterface root) {
+    public void setRoot(INode root) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
@@ -184,7 +184,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface Node() {
+    public INode Node() {
         return null;
     }
 
@@ -200,7 +200,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public DecisionDiagram DD(NodeInterface root) {
+    public DecisionDiagram DD(INode root) {
         return null;
     }
 
@@ -208,7 +208,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface getRoot() {
+    public INode getRoot() {
         return root;
     }
 
@@ -216,7 +216,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface getTt() {
+    public INode getTt() {
         return null;
     }
 
@@ -224,7 +224,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeInterface> iterateOnLayer(int i) {
+    public Iterable<INode> iterateOnLayer(int i) {
         return null;
     }
 
@@ -272,7 +272,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void addNode(NodeInterface node, int layer) {
+    public void addNode(INode node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 
@@ -280,7 +280,7 @@ public class DDProxy extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(NodeInterface node, int layer) {
+    public void removeNode(INode node, int layer) {
         throw new UnsupportedOperationException("Proxy DDs are read only !");
     }
 

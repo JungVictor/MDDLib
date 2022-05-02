@@ -1,8 +1,8 @@
 package utils.io.reader;
 
 import dd.DecisionDiagram;
-import dd.interfaces.CostNodeInterface;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.ICostNode;
+import dd.interfaces.INode;
 import dd.mdd.components.Node;
 import dd.mdd.costmdd.CostMDD;
 import utils.io.MDDReader;
@@ -15,15 +15,15 @@ public class CostDDReaderBottomUp extends DDReaderBottomUp {
      * {@inheritDoc}
      */
     @Override
-    protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
+    protected void saveNode(INode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfParentsLabel();
         writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
-        CostNodeInterface costNode = (CostNodeInterface) node;
+        ICostNode costNode = (ICostNode) node;
         for(int value : node.iterateOnParentLabels()){
             int numberOfParents = node.numberOfParents(value);
             writeInt(file, MDDReader.VALUE, value);
             writeInt(file, MDDReader.PARENT_NUMBER, numberOfParents);
-            for(NodeInterface parent : node.iterateOnParents(value)) {
+            for(INode parent : node.iterateOnParents(value)) {
                 writeInt(file, MDDReader.COST, costNode.getArcCost(parent, value));
                 writeInt(file, MDDReader.NODE, bindNextWrite(parent));
             }
@@ -34,7 +34,7 @@ public class CostDDReaderBottomUp extends DDReaderBottomUp {
      * {@inheritDoc}
      */
     @Override
-    protected void loadNode(DecisionDiagram dd, NodeInterface node, int layer, MDDFileReader file) throws IOException {
+    protected void loadNode(DecisionDiagram dd, INode node, int layer, MDDFileReader file) throws IOException {
         // Number of values
         int numberOfValues = readInt(file, MDDReader.VALUE_NUMBER);
 

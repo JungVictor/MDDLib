@@ -1,7 +1,7 @@
 package dd.proxy;
 
 import dd.AbstractNode;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.arrays.ArrayOfNodeInterface;
@@ -42,12 +42,12 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public NodeInterface Node() {
+    public INode Node() {
         return create(parentDD);
     }
 
     @Override
-    public NodeInterface getChild(int label) {
+    public INode getChild(int label) {
         if(!loaded) {
             parentDD.loadNodes();
         }
@@ -98,12 +98,12 @@ public class NodeProxy extends AbstractNode {
     // =======================================
 
     @Override
-    public void addChild(int label, NodeInterface child) {
+    public void addChild(int label, INode child) {
         throw new UnsupportedOperationException("NodeProxy only support having ID as children");
     }
 
     @Override
-    public void setX(NodeInterface node, int i) {
+    public void setX(INode node, int i) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
@@ -113,7 +113,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public void associate(NodeInterface x1, NodeInterface x2) {
+    public void associate(INode x1, INode x2) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
@@ -123,7 +123,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public NodeInterface getX(int i) {
+    public INode getX(int i) {
         throw new UnsupportedOperationException("NodeProxy are read only !");
     }
 
@@ -138,7 +138,7 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public Iterable<NodeInterface> iterateOnParents(int label) {
+    public Iterable<INode> iterateOnParents(int label) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 
@@ -158,12 +158,12 @@ public class NodeProxy extends AbstractNode {
     }
 
     @Override
-    public void addParent(int label, NodeInterface parent) {
+    public void addParent(int label, INode parent) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 
     @Override
-    public void removeParent(int label, NodeInterface parent) {
+    public void removeParent(int label, INode parent) {
         throw new UnsupportedOperationException("NodeProxy does not have access to the parents !");
     }
 

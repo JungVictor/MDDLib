@@ -1,11 +1,11 @@
 package dd;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.Allocable;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.successions.SuccessionOfNodeInterface;
 
-public abstract class AbstractNode implements Allocable, NodeInterface {
+public abstract class AbstractNode implements Allocable, INode {
 
     //**************************************//
     //           INITIALISATION             //
@@ -15,26 +15,26 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Get a new node corresponding to the same type as this node
      * @return A new node corresponding to the same type as this node
      */
-    public abstract NodeInterface Node();
+    public abstract INode Node();
 
     /**
      * Set the ith associated node to node
      * @param node The node to associate
      * @param i The index of the association
      */
-    public abstract void setX(NodeInterface node, int i);
+    public abstract void setX(INode node, int i);
 
     /**
      * Set the first associated node to x1
      * @param x1 The node to associate
      */
-    public void setX1(NodeInterface x1){ setX(x1,0); }
+    public void setX1(INode x1){ setX(x1,0); }
 
     /**
      * Set the second associated node to x2
      * @param x2 The node to associate
      */
-    public void setX2(NodeInterface x2){ setX(x2,1); }
+    public void setX2(INode x2){ setX(x2,1); }
 
     /**
      * Associate the node to all given nodes
@@ -47,7 +47,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param x1 The first node associated
      * @param x2 The second node associated
      */
-    public abstract void associate(NodeInterface x1, NodeInterface x2);
+    public abstract void associate(INode x1, INode x2);
 
     /**
      * Get the set of all associated nodes
@@ -68,7 +68,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param label The value of the label
      * @return The node associated with the given label
      */
-    public abstract NodeInterface getChild(int label);
+    public abstract INode getChild(int label);
 
     /**
      * The number of outgoing arcs
@@ -106,14 +106,14 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param label The label of the in-going arcs
      * @return The UnorderedListOfBinaryNode of parents
      */
-    public abstract Iterable<NodeInterface> iterateOnParents(int label);
+    public abstract Iterable<INode> iterateOnParents(int label);
 
     /**
      * Get the ith node associated with this node.
      * @param i The index of the associated node
      * @return The ith node associated with this node, null if there is none
      */
-    public abstract NodeInterface getX(int i);
+    public abstract INode getX(int i);
 
     // ---------------------
     //      DEFAULT
@@ -131,7 +131,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Get the first node associated
      * @return the first node associated
      */
-    public NodeInterface getX1() {
+    public INode getX1() {
         return getX(0);
     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Get the second node associated
      * @return the second node associated
      */
-    public NodeInterface getX2(){
+    public INode getX2(){
         return getX(1);
     }
 
@@ -156,7 +156,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param label Label of the arc
      * @param child Node to add as a child
      */
-    public abstract void addChild(int label, NodeInterface child);
+    public abstract void addChild(int label, INode child);
 
     /**
      * Remove the child corresponding to the given label
@@ -169,14 +169,14 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * @param label Label of the ingoing arc
      * @param parent Node to add as a parent
      */
-    public abstract void addParent(int label, NodeInterface parent);
+    public abstract void addParent(int label, INode parent);
 
     /**
      * Remove the given node from the parents' list corresponding to the given arc's label
      * @param label Label of the ingoing arc
      * @param parent The parent node to remove
      */
-    public abstract void removeParent(int label, NodeInterface parent);
+    public abstract void removeParent(int label, INode parent);
 
     /**
      * Clear all parents references
@@ -195,9 +195,9 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Replace all parents' references of this node by the given node
      * @param node Node to replace this node
      */
-    public void replaceParentsReferencesBy(NodeInterface node){
+    public void replaceParentsReferencesBy(INode node){
         for(int value : iterateOnParentLabels()){
-            for(NodeInterface parent : iterateOnParents(value)) {
+            for(INode parent : iterateOnParents(value)) {
                 parent.addChild(value, node);
                 node.addParent(value, parent);
             }
@@ -209,9 +209,9 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Replace all children's references of this node by the given node
      * @param node Node to replace this node
      */
-    public void replaceChildrenReferencesBy(NodeInterface node){
+    public void replaceChildrenReferencesBy(INode node){
         for(int value : iterateOnChildLabels()){
-            NodeInterface child = getChild(value);
+            INode child = getChild(value);
             child.removeParent(value, this);
             child.addParent(value, node);
             node.addChild(value, child);
@@ -223,7 +223,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      * Replace all references of this node by the given node
      * @param node Node to replace this node
      */
-    public void replaceReferencesBy(NodeInterface node){
+    public void replaceReferencesBy(INode node){
         replaceChildrenReferencesBy(node);
         replaceParentsReferencesBy(node);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractNode implements Allocable, NodeInterface {
      */
     public void remove(){
         for(int value : iterateOnChildLabels()) getChild(value).removeParent(value, this);
-        for(int value : iterateOnParentLabels()) for(NodeInterface node : iterateOnParents(value)) node.removeChild(value);
+        for(int value : iterateOnParentLabels()) for(INode node : iterateOnParents(value)) node.removeChild(value);
     }
 
     /**

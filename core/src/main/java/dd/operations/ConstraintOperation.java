@@ -4,11 +4,10 @@ import builder.MDDBuilder;
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
-import dd.interfaces.StateNodeInterface;
+import dd.interfaces.INode;
+import dd.interfaces.IStateNode;
 import dd.mdd.MDD;
-import dd.mdd.components.Node;
-import dd.mdd.components.SNode;
+import dd.mdd.components.StateNode;
 import memory.Memory;
 import structures.Binder;
 import structures.Domains;
@@ -38,7 +37,7 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
     static public DecisionDiagram allDiff(DecisionDiagram result, DecisionDiagram mdd, SetOf<Integer> V, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
 
@@ -62,7 +61,7 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
     static public DecisionDiagram allDiff(DecisionDiagram result, DecisionDiagram mdd, int memory, SetOf<Integer> V, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersAllDiffMem parameters = ParametersAllDiffMem.create(memory, V, variables);
         constraint.setState(StateAllDiffMem.create(parameters));
 
@@ -104,7 +103,7 @@ public class ConstraintOperation {
             maxValues.set(i, vMax);
         }
 
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues, variables);
         constraint.setState(StateSum.create(parameters));
 
@@ -147,7 +146,7 @@ public class ConstraintOperation {
             maxValues.set(i, vMax);
         }
 
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersMapSum parameters = ParametersMapSum.create(min, max, minValues, maxValues, map, variables);
         constraint.setState(StateSum.create(parameters));
 
@@ -168,7 +167,7 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the gcc constraint
      */
     static public DecisionDiagram gcc(DecisionDiagram result, DecisionDiagram mdd, MapOf<Integer, TupleOfInt> maxValues, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersGCC parameters = ParametersGCC.create(maxValues, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
@@ -197,7 +196,7 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the sequence constraint
      */
     static public DecisionDiagram sequence(DecisionDiagram result, DecisionDiagram mdd, int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         constraint.setState(StateAmong.create(parameters));
 
@@ -215,7 +214,7 @@ public class ConstraintOperation {
      * @param mdd The MDD on which to perform the operation
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
-    static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, SNode constraint){
+    static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNode constraint){
         intersection(result, mdd, constraint, false);
     }
 
@@ -226,13 +225,13 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      * @param relaxation True if you perform a relaxation on the constraint, false otherwise
      */
-    public static void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNodeInterface constraint, boolean relaxation){
+    public static void intersection(DecisionDiagram result, DecisionDiagram mdd, IStateNode constraint, boolean relaxation){
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
 
         Binder binder = Binder.create();
-        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
-        SetOfNode<StateNodeInterface> currentNodesConstraint = Memory.SetOfStateNode(),
+        HashMap<String, IStateNode> bindings = new HashMap<>();
+        SetOfNode<IStateNode> currentNodesConstraint = Memory.SetOfStateNode(),
                 nextNodesConstraint = Memory.SetOfStateNode(),
                 tmp;
 
@@ -240,15 +239,15 @@ public class ConstraintOperation {
 
         for(int i = 1; i < mdd.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(NodeInterface node : result.iterateOnLayer(i-1)){
-                StateNodeInterface x2 = (StateNodeInterface) node.getX2();
-                NodeInterface x1 = node.getX1();
+            for(INode node : result.iterateOnLayer(i-1)){
+                IStateNode x2 = (IStateNode) node.getX2();
+                INode x1 = node.getX1();
                 for(int value : x1.iterateOnChildLabels()) {
                     NodeState state = x2.getState();
                     if(state.isValid(value, i, mdd.size())) {
                         if(!x2.containsLabel(value)) {
                             String hash = state.signature(value, i, mdd.size());
-                            StateNodeInterface y2 = bindings.get(hash);
+                            IStateNode y2 = bindings.get(hash);
                             if (y2 == null) {
                                 y2 = x2.Node();
                                 node_constraint++;
@@ -262,7 +261,7 @@ public class ConstraintOperation {
                     }
                 }
             }
-            for(NodeInterface node : currentNodesConstraint) Memory.free(node);
+            for(INode node : currentNodesConstraint) Memory.free(node);
             currentNodesConstraint.clear();
             tmp = currentNodesConstraint;
             currentNodesConstraint = nextNodesConstraint;
@@ -278,24 +277,24 @@ public class ConstraintOperation {
         Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
     }
 
-    public static void stateIntersection(DecisionDiagram result, DecisionDiagram dd, StateNodeInterface constraint, boolean relaxation){
+    public static void stateIntersection(DecisionDiagram result, DecisionDiagram dd, IStateNode constraint, boolean relaxation){
         result.setSize(dd.size());
         result.setRoot(constraint);
         result.getRoot().setX1(dd.getRoot());
 
-        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
+        HashMap<String, IStateNode> bindings = new HashMap<>();
 
         int node_constraint = 0;
 
         for(int i = 1; i < dd.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(NodeInterface node : result.iterateOnLayer(i-1)){
-                StateNodeInterface stateNode = (StateNodeInterface) node;
-                NodeInterface x1 = node.getX1();
+            for(INode node : result.iterateOnLayer(i-1)){
+                IStateNode stateNode = (IStateNode) node;
+                INode x1 = node.getX1();
                 for(int value : x1.iterateOnChildLabels()) {
                     NodeState state = stateNode.getState();
                     if(state.isValid(value, i, dd.size())) {
-                        StateNodeInterface child = (StateNodeInterface) node.getChild(value);
+                        IStateNode child = (IStateNode) node.getChild(value);
                         if(child == null) {
                             String hash = state.signature(value, i, dd.size());
                             child = bindings.get(hash);
@@ -375,7 +374,7 @@ public class ConstraintOperation {
 
     public static strictfp MDD mulRelaxed(MDD result, MDD mdd, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size) {
         // CHECK MyConstraintBuilder mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -424,7 +423,7 @@ public class ConstraintOperation {
 
     public static strictfp MDD sumDouble(MDD result, MDD mdd, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size) {
         // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -459,7 +458,7 @@ public class ConstraintOperation {
 
     public static strictfp MDD sumDoubleULP(MDD result, MDD mdd, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size) {
         // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -494,7 +493,7 @@ public class ConstraintOperation {
 
     public static MDD sumRelaxed(MDD result, MDD mdd, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size) {
         // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfLong minValues = ArrayOfLong.create(size);
         ArrayOfLong maxValues = ArrayOfLong.create(size);
 

@@ -6,7 +6,7 @@ import confidence.states.*;
 import confidence.structures.PrimeFactorization;
 import confidence.structures.arrays.ArrayOfPrimeFactorization;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
+import dd.mdd.components.StateNode;
 import memory.Memory;
 import structures.Domains;
 import structures.generics.MapOf;
@@ -14,7 +14,7 @@ import structures.generics.MapOf;
 public class MyConstraintBuilder extends ConstraintBuilder {
 
     public static MDD mulPF(MDD result, Domains D, double min, double max, MapOf<Integer, PrimeFactorization> mapPrimeFact, int size){
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfPrimeFactorization minValues = ArrayOfPrimeFactorization.create(size);
         ArrayOfPrimeFactorization maxValues = ArrayOfPrimeFactorization.create(size);
 

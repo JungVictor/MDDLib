@@ -1,10 +1,10 @@
 package dd.mdd.pmdd;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.pmdd.components.properties.PropertySumDouble;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
-import dd.mdd.pmdd.components.PNode;
+import dd.mdd.pmdd.components.PropertyNode;
 import structures.generics.MapOf;
 
 public strictfp class ConstraintPruning {
@@ -28,7 +28,7 @@ public strictfp class ConstraintPruning {
         marked.setSize(mdd.size());
 
         // Initialisation. SUM neutral = [0, 0]
-        PNode start = (PNode) mdd.getRoot();
+        PropertyNode start = (PropertyNode) mdd.getRoot();
         start.value[0] = 0;
         start.value[1] = 0;
 
@@ -38,7 +38,7 @@ public strictfp class ConstraintPruning {
         for(int layer = 0; layer < mdd.size(); layer++) {
             for (Node current : mdd.getLayer(layer)) {
 
-                PNode node = (PNode) current;
+                PropertyNode node = (PropertyNode) current;
                 //if(!node.isMarked()) continue;
 
                 // For all its in-going arcs
@@ -48,7 +48,7 @@ public strictfp class ConstraintPruning {
                     // For every parent corresponding to an in-going arc of current label
 
                     // Get the property of the parent
-                    PNode child = (PNode) node.getChild(label);
+                    PropertyNode child = (PropertyNode) node.getChild(label);
                     MapOf<Integer, Double> property = (MapOf<Integer, Double>) child.getProperty(propertyName).getData();
 
                     // Compute the sum stocked in the node
@@ -60,8 +60,8 @@ public strictfp class ConstraintPruning {
                     // If the value obtained by the lower bound is below the threshold
                     if (property.get(0) + vInf < min) {
                         // We mark the arc as suspect, update its value if necessary and push it to the queue
-                        NodeInterface associate = node.getX1();
-                        NodeInterface associateChild = child.getX1();
+                        INode associate = node.getX1();
+                        INode associateChild = child.getX1();
                         if(associateChild == null) {
                             associateChild = marked.Node();
                             child.associate(associateChild, 0);

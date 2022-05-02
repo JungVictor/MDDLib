@@ -2,7 +2,7 @@ package dd.bdd;
 
 import dd.DecisionDiagram;
 import dd.bdd.components.BinaryNode;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.operations.HashReduce;
 import memory.AllocatorOf;
 import memory.Memory;
@@ -56,7 +56,10 @@ public class BDD extends DecisionDiagram {
      * @return A fresh BDD
      */
     public static BDD create(){
-        return allocator().allocate();
+        BDD bdd = allocator().allocate();
+        bdd.setSize(1);
+        bdd.setRoot(bdd.Node());
+        return bdd;
     }
 
     /**
@@ -79,6 +82,7 @@ public class BDD extends DecisionDiagram {
      */
     public static BDD create(BinaryNode root){
         BDD bdd = create();
+        bdd.setSize(1);
         bdd.setRoot(root);
         return bdd;
     }
@@ -103,7 +107,9 @@ public class BDD extends DecisionDiagram {
      * @param root The node to set as root
      */
     public void setRoot(BinaryNode root){
+        if(this.root != null) removeNode(this.root, 0);
         this.root = root;
+        addNode(root, 0);
     }
 
     /**
@@ -125,7 +131,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void setRoot(NodeInterface root){
+    public void setRoot(INode root){
         if(root instanceof BinaryNode) setRoot((BinaryNode) root);
         else throw new InputMismatchException("Expected the root to be at least of BinaryNode class !");
     }
@@ -156,7 +162,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public BDD DD(NodeInterface root){
+    public BDD DD(INode root){
         if(root instanceof BinaryNode) return BDD((BinaryNode) root);
         throw new InputMismatchException("Expected the root to be at least of BinaryNode class !");
     }
@@ -359,7 +365,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void addNode(NodeInterface node, int layer){
+    public void addNode(INode node, int layer){
         addNode((BinaryNode) node, layer);
     }
 
@@ -378,7 +384,7 @@ public class BDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(NodeInterface node, int layer){
+    public void removeNode(INode node, int layer){
         removeNode((BinaryNode) node, layer);
     }
 

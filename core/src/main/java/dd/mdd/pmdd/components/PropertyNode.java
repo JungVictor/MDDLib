@@ -1,7 +1,7 @@
 package dd.mdd.pmdd.components;
 
 import dd.mdd.components.Node;
-import dd.interfaces.PropertyNodeInterface;
+import dd.interfaces.IPropertyNode;
 import memory.AllocatorOf;
 import memory.Memory;
 import dd.mdd.pmdd.components.properties.NodeProperty;
@@ -11,7 +11,7 @@ import structures.generics.MapOf;
  * <b>The Node containing properties</b> <br>
  * It extends the basic function of Node and add functions relative to properties
  */
-public class PNode extends Node implements PropertyNodeInterface {
+public class PropertyNode extends Node implements IPropertyNode {
 
     // Allocable variables
     // Thread safe allocator
@@ -39,7 +39,7 @@ public class PNode extends Node implements PropertyNodeInterface {
      * Constructor. Initialise the index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    public PNode(int allocatedIndex) {
+    public PropertyNode(int allocatedIndex) {
         super(allocatedIndex);
     }
 
@@ -48,8 +48,8 @@ public class PNode extends Node implements PropertyNodeInterface {
      * The object is managed by the allocator.
      * @return A fresh PNode
      */
-    public static PNode create(){
-        PNode node = allocator().allocate();
+    public static PropertyNode create(){
+        PropertyNode node = allocator().allocate();
         node.prepare();
         return node;
     }
@@ -58,7 +58,7 @@ public class PNode extends Node implements PropertyNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public PNode Node(){
+    public PropertyNode Node(){
         return create();
     }
 
@@ -74,7 +74,7 @@ public class PNode extends Node implements PropertyNodeInterface {
             NodeProperty parentProperty = getProperty(property);
             if(parentProperty == null) continue;
             for (Integer label : getChildren()) {
-                PNode child = (PNode) getChild(label);
+                PropertyNode child = (PropertyNode) getChild(label);
                 if (child.hasProperty(property)) parentProperty.mergeWithProperty(label, child.getProperty(property));
                 else child.addProperty(property, parentProperty.createProperty(label));
             }
@@ -88,7 +88,7 @@ public class PNode extends Node implements PropertyNodeInterface {
         for(String property : properties.keySet()) {
             for (Integer label : getParents()) {
                 for (Node p : getParents().get(label)) {
-                    PNode parent = (PNode) p;
+                    PropertyNode parent = (PropertyNode) p;
                     if (parent.hasProperty(property))
                         getProperty(property).mergeWithProperty(label, parent.getProperty(property));
                     else parent.addProperty(property, getProperty(property).createProperty(label));
@@ -188,7 +188,7 @@ public class PNode extends Node implements PropertyNodeInterface {
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<PNode> {
+    static final class Allocator extends AllocatorOf<PropertyNode> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -202,16 +202,16 @@ public class PNode extends Node implements PropertyNodeInterface {
          * {@inheritDoc}
          */
         @Override
-        protected PNode[] arrayCreation(int capacity) {
-            return new PNode[capacity];
+        protected PropertyNode[] arrayCreation(int capacity) {
+            return new PropertyNode[capacity];
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected PNode createObject(int index) {
-            return new PNode(index);
+        protected PropertyNode createObject(int index) {
+            return new PropertyNode(index);
         }
     }
 

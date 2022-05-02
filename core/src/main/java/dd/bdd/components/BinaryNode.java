@@ -1,7 +1,7 @@
 package dd.bdd.components;
 
 import dd.AbstractNode;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.arrays.ArrayOfNodeInterface;
@@ -12,10 +12,10 @@ import structures.successions.SuccessionOfBinaryNode;
 
 public class BinaryNode extends AbstractNode {
 
-    public final static ArrayOfInt NONE = ArrayOfInt.create(),
-            ZERO = ArrayOfInt.create(0),
-            ONE = ArrayOfInt.create(1),
-            BOTH = ArrayOfInt.create(0, 1);
+    public final static ArrayOfInt NONE = ArrayOfInt.create(0),
+            ZERO = ArrayOfInt.create(true, 0),
+            ONE = ArrayOfInt.create(true, 1),
+            BOTH = ArrayOfInt.create(true, 0, 1);
 
     // Allocable variables
     // Thread safe allocator
@@ -100,7 +100,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void associate(NodeInterface x1, NodeInterface x2){
+    public void associate(INode x1, INode x2){
         associate((BinaryNode) x1, (BinaryNode) x2);
     }
 
@@ -125,7 +125,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void setX(NodeInterface node, int i){
+    public void setX(INode node, int i){
         setX((BinaryNode) node, i);
     }
 
@@ -328,6 +328,7 @@ public class BinaryNode extends AbstractNode {
     public void replaceChildrenReferencesBy(BinaryNode node){
         for(int value = 0; value < 2; value++){
             BinaryNode child = getChild(value);
+            if(child == null) continue;
             child.removeParent(value, this);
             child.addParent(value, node);
             node.addChild(value, child);
@@ -349,7 +350,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addChild(int label, NodeInterface child){
+    public void addChild(int label, INode child){
         addChild(label, (BinaryNode) child);
     }
 
@@ -357,7 +358,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addParent(int label, NodeInterface parent){
+    public void addParent(int label, INode parent){
         addParent(label, (BinaryNode) parent);
     }
 
@@ -374,7 +375,7 @@ public class BinaryNode extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void removeParent(int label, NodeInterface parent){
+    public void removeParent(int label, INode parent){
         removeParent(label, (BinaryNode) parent);
     }
 

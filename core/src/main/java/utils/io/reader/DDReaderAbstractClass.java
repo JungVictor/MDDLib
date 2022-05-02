@@ -2,8 +2,8 @@ package utils.io.reader;
 
 import dd.DecisionDiagram;
 import dd.bdd.BDD;
-import dd.interfaces.CostNodeInterface;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.ICostNode;
+import dd.interfaces.INode;
 import dd.mdd.MDD;
 import dd.mdd.costmdd.CostMDD;
 import utils.SmallMath;
@@ -14,8 +14,8 @@ import java.util.HashMap;
 
 public abstract class DDReaderAbstractClass {
 
-    private HashMap<NodeInterface, Integer> next, current;
-    private HashMap<Integer, NodeInterface> nextR, currentR;
+    private HashMap<INode, Integer> next, current;
+    private HashMap<Integer, INode> nextR, currentR;
     private byte[][] elements;
     private int nID;
     private byte MODE;
@@ -47,12 +47,12 @@ public abstract class DDReaderAbstractClass {
      * Clear the next maps.
      */
     protected void swapMaps(){
-        HashMap<Integer, NodeInterface> tmp = currentR;
+        HashMap<Integer, INode> tmp = currentR;
         currentR = nextR;
         nextR = tmp;
         nextR.clear();
 
-        HashMap<NodeInterface, Integer> tmpR = current;
+        HashMap<INode, Integer> tmpR = current;
         current = next;
         next = tmpR;
         next.clear();
@@ -74,7 +74,7 @@ public abstract class DDReaderAbstractClass {
      * @param mapR Reverse of the map
      * @return The ID of the given node.
      */
-    private int safeBind(NodeInterface node, HashMap<NodeInterface, Integer> map, HashMap<Integer, NodeInterface> mapR){
+    private int safeBind(INode node, HashMap<INode, Integer> map, HashMap<Integer, INode> mapR){
         Integer value = map.get(node);
         if(value != null) return value;
         map.put(node, nID);
@@ -87,7 +87,7 @@ public abstract class DDReaderAbstractClass {
      * @param node The node to bind
      * @return The ID of the given node
      */
-    protected void firstBind(NodeInterface node){
+    protected void firstBind(INode node){
         current.put(node, 0);
         currentR.put(0, node);
     }
@@ -97,7 +97,7 @@ public abstract class DDReaderAbstractClass {
      * @param node The node to bind
      * @return The ID of the given node
      */
-    protected int bindNextWrite(NodeInterface node){
+    protected int bindNextWrite(INode node){
         return safeBind(node, next, nextR);
     }
 
@@ -106,7 +106,7 @@ public abstract class DDReaderAbstractClass {
      * @param ID The ID of the node
      * @param node The node to associate the ID with
      */
-    protected void bindCurrentRead(int ID, NodeInterface node){
+    protected void bindCurrentRead(int ID, INode node){
         currentR.put(ID, node);
     }
 
@@ -117,8 +117,8 @@ public abstract class DDReaderAbstractClass {
      * @param ID The ID of the node to add
      * @return The node added.
      */
-    protected NodeInterface addNodeToDD(DecisionDiagram dd, int layer, int ID){
-        NodeInterface node = nextR.get(ID);
+    protected INode addNodeToDD(DecisionDiagram dd, int layer, int ID){
+        INode node = nextR.get(ID);
         if(node == null) {
             node = dd.Node();
             nextR.put(ID, node);
@@ -132,7 +132,7 @@ public abstract class DDReaderAbstractClass {
      * @param ID The ID of the node
      * @return The node associated with the given ID
      */
-    protected NodeInterface getNode(int ID){
+    protected INode getNode(int ID){
         return currentR.get(ID);
     }
 
@@ -174,15 +174,15 @@ public abstract class DDReaderAbstractClass {
         int cost = 0;
         for(int i = 0; i < dd.size(); i++) {
             nodes = Math.max(nodes, dd.getLayerSize(i));
-            for(NodeInterface node : dd.iterateOnLayer(i)) {
+            for(INode node : dd.iterateOnLayer(i)) {
                 max_degree = Math.max(max_degree, node.numberOfChildren());
                 value_number = Math.max(value_number, node.numberOfParentsLabel());
                 for(int value : node.iterateOnParentLabels()) {
                     int in_degree = node.numberOfParents(value);
                     if(in_degree > max_in_degree) max_in_degree = in_degree;
                 }
-                if(node instanceof CostNodeInterface) {
-                    CostNodeInterface costNode = (CostNodeInterface) node;
+                if(node instanceof ICostNode) {
+                    ICostNode costNode = (ICostNode) node;
                     for(int value : costNode.iterateOnChildLabels()) cost = Math.max(cost, costNode.getArcCost(value));
                 }
             }
@@ -227,7 +227,7 @@ public abstract class DDReaderAbstractClass {
      * @param file The file in which the node is saved.
      * @throws IOException
      */
-    protected abstract void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException;
+    protected abstract void saveNode(INode node, int nodeID, MDDFileWriter file) throws IOException;
 
     /**
      * Save a layer of the DecisionDiagram in the given file.
@@ -241,7 +241,7 @@ public abstract class DDReaderAbstractClass {
         writeInt(file, MDDReader.NODE, numberOfNodes);
 
         for(int nodeID = 0; nodeID < numberOfNodes; nodeID++){
-            NodeInterface node = currentR.get(nodeID);
+            INode node = currentR.get(nodeID);
             saveNode(node, nodeID, file);
         }
     }
@@ -262,7 +262,7 @@ public abstract class DDReaderAbstractClass {
      * @param file The file from which the node is loaded
      * @throws IOException
      */
-    protected abstract void loadNode(DecisionDiagram dd, NodeInterface node, int layer, MDDFileReader file) throws IOException;
+    protected abstract void loadNode(DecisionDiagram dd, INode node, int layer, MDDFileReader file) throws IOException;
 
     /**
      * Load a layer from the given file and add it to the given DecisionDiagram
@@ -276,7 +276,7 @@ public abstract class DDReaderAbstractClass {
         int numberOfNodes = readInt(file, MDDReader.NODE);
 
         for(int i = 0; i < numberOfNodes; i++) {
-            NodeInterface node = getNode(i);
+            INode node = getNode(i);
             loadNode(dd, node, layer, file);
         }
     }

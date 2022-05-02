@@ -2,9 +2,7 @@ package generation.bench;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
-import dd.mdd.costmdd.CostMDD;
-import dd.mdd.costmdd.components.SCostNode;
+import dd.mdd.costmdd.components.StateCostNode;
 import dd.operations.ConstraintOperation;
 import generation.MarkovianCostMDD;
 import generation.states.StateGram;
@@ -44,15 +42,15 @@ public class NgramGenerationMarkovian {
         MDD UMDD = MDD.create();
         MDDReader.load(UMDD, "src/main/resources/mdds/UMDD.mdd");
 
-        SCostNode constraint = SCostNode.create();
+        StateCostNode constraint = StateCostNode.create();
         constraint.setState(StateGram.create());
         MarkovianCostMDD myMDD = MarkovianCostMDD.create();
-        myMDD.setRoot(SCostNode.create());
+        myMDD.setRoot(StateCostNode.create());
 
         System.out.println("");
         System.out.println("MDD_universelle /\\ MDD_mots");
-        ConstraintOperation.intersection(myMDD, UMDD, constraint, false);
-        myMDD.reduce();
+        ConstraintOperation.stateIntersection(myMDD, UMDD, constraint, false);
+        myMDD.cleanup();
         myMDD.AddMarkovianCost(reverso);
         System.out.println("\n ________  n solutions __________");
         System.out.println(myMDD.nSolutions());
@@ -62,8 +60,6 @@ public class NgramGenerationMarkovian {
         for(int i=0;i<10;i++){
             resulat = myMDD.randomWalk(); // precedenty myMDD
             reverso.pretty(resulat,reverso);
-
-
         }
     }
 }

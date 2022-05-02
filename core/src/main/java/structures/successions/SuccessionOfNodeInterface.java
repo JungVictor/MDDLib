@@ -1,12 +1,12 @@
 package structures.successions;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.Allocable;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public abstract class SuccessionOfNodeInterface<E extends NodeInterface> implements Iterable<E>, Allocable {
+public abstract class SuccessionOfNodeInterface<E extends INode> implements Iterable<E>, Allocable {
 
     // Index in Memory
     private final int allocatedIndex;

@@ -1,9 +1,9 @@
 package generation;
 
-import dd.AbstractNode;
+import dd.interfaces.INode;
 import dd.mdd.components.Node;
 import dd.mdd.costmdd.CostMDD;
-import dd.mdd.costmdd.components.SCostNode;
+import dd.mdd.costmdd.components.StateCostNode;
 import generation.states.StateGram;
 import generation.utils.Reverso;
 import memory.AllocatorOf;
@@ -66,8 +66,8 @@ public class MarkovianCostMDD extends CostMDD {
         double probabilité=0;
         for (int i = 1; i < size(); i++) {
             Logger.out.information("\rLAYER " + i);
-            for (AbstractNode node : super.getLayer(i - 1)) {
-                SCostNode Sn = (SCostNode) node;
+            for (INode node : super.getLayer(i - 1)) {
+                StateCostNode Sn = (StateCostNode) node;
                 StateGram myState = (StateGram) Sn.getState();
                 for (int label : Sn.iterateOnChildLabels()) {
                     if(i == 0) {
@@ -94,7 +94,7 @@ public class MarkovianCostMDD extends CostMDD {
      * @return
      */
     public int[] stochasticRandomWalk(HashMap<Integer, Double> probabilities){
-        SCostNode current = (SCostNode) super.getRoot();
+        StateCostNode current = (StateCostNode) super.getRoot();
         Random random = new Random();
         int[] path = new int[super.size()-1];
         int i=0;
@@ -112,7 +112,7 @@ public class MarkovianCostMDD extends CostMDD {
                 idx++;
             }
             path[i++] = current.getValue(idx-1);
-            current = (SCostNode) current.getChild(path[i-1]);
+            current = (StateCostNode) current.getChild(path[i-1]);
         }
         return path;
     }

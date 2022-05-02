@@ -2,7 +2,7 @@ package dd.mdd.components;
 
 import csp.IntervalVariable;
 import dd.AbstractNode;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.*;
 import representation.MDDVisitor;
 import structures.arrays.ArrayOfNodeInterface;
@@ -84,7 +84,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface Node(){
+    public INode Node(){
         return Node.create();
     }
 
@@ -139,7 +139,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void associate(NodeInterface x1, NodeInterface x2){
+    public void associate(INode x1, INode x2){
         associations.set(0, x1);
         associations.set(1, x2);
     }
@@ -149,7 +149,7 @@ public class Node extends AbstractNode {
      * @param node The node to associate
      * @param position The position of the node
      */
-    public void associate(NodeInterface node, int position){
+    public void associate(INode node, int position){
         if(position >= associations.length) {
             SuccessionOfAbstractNode associations = SuccessionOfAbstractNode.create(position + 1);
             for(int i = 0; i < this.associations.length; i++) associations.set(i, this.associations.get(i));
@@ -163,7 +163,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void setX(NodeInterface node, int i){
+    public void setX(INode node, int i){
         associate((Node) node, i);
     }
 
@@ -217,7 +217,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface getX(int i){
+    public INode getX(int i){
         return associations.get(i);
     }
 
@@ -225,7 +225,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface getX1(){
+    public INode getX1(){
         return associations.get(0);
     }
 
@@ -233,7 +233,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public NodeInterface getX2(){
+    public INode getX2(){
         return associations.get(1);
     }
 
@@ -347,7 +347,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addChild(int label, NodeInterface child){
+    public void addChild(int label, INode child){
         addChild(label, (Node) child);
     }
 
@@ -372,7 +372,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void addParent(int label, NodeInterface parent){
+    public void addParent(int label, INode parent){
         addParent(label, (Node) parent);
     }
 
@@ -389,7 +389,7 @@ public class Node extends AbstractNode {
      * {@inheritDoc}
      */
     @Override
-    public void removeParent(int label, NodeInterface parent){
+    public void removeParent(int label, INode parent){
         removeParent(label, (Node) parent);
     }
 

@@ -1,7 +1,7 @@
 package builder.rules.operations;
 
 import builder.rules.SuccessionRule;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
@@ -47,11 +47,11 @@ public class SuccessionRuleUnion extends SuccessionRule {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, INode x) {
         successors.clear();
         SuccessionOfNodeInterface associations = x.getAssociations();
         for(int i = 0; i < associations.length(); i++) {
-            NodeInterface n = associations.get(i);
+            INode n = associations.get(i);
             if(n != null) successors.add(n.iterateOnChildLabels());
         }
         return successors;

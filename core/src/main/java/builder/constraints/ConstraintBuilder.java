@@ -5,10 +5,10 @@ import builder.constraints.states.*;
 import builder.rules.SuccessionRule;
 import builder.rules.SuccessionRuleDefault;
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
-import dd.interfaces.StateNodeInterface;
+import dd.mdd.components.StateNode;
+import dd.interfaces.IStateNode;
 import memory.Memory;
 import structures.Domains;
 import structures.arrays.ArrayOfBigInteger;
@@ -37,7 +37,7 @@ public class ConstraintBuilder {
      * @param size The size of the DD
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, Domains D, int size){
+    public static DecisionDiagram build(DecisionDiagram result, IStateNode constraint, Domains D, int size){
         return build(result, constraint, D, size, false);
     }
 
@@ -51,7 +51,7 @@ public class ConstraintBuilder {
      * @param relaxation True if the constraint must be relaxed when building, false otherwise
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, Domains D, int size, boolean relaxation){
+    public static DecisionDiagram build(DecisionDiagram result, IStateNode constraint, Domains D, int size, boolean relaxation){
         SuccessionRuleDefault rule = SuccessionRuleDefault.create(D);
         build(result, constraint, rule, size, relaxation);
         Memory.free(rule);
@@ -67,27 +67,27 @@ public class ConstraintBuilder {
      * @param relaxation True if the constraint must be relaxed when building, false otherwise
      * @return The DD corresponding to the given constraint
      */
-    public static DecisionDiagram build(DecisionDiagram result, StateNodeInterface constraint, SuccessionRule rule, int size, boolean relaxation){
+    public static DecisionDiagram build(DecisionDiagram result, IStateNode constraint, SuccessionRule rule, int size, boolean relaxation){
         result.setSize(size+1);
         result.setRoot(constraint);
 
         CollectionOf<Integer> successors = rule.getCollection();
-        HashMap<String, StateNodeInterface> bindings = new HashMap<>();
-        SetOfNode<StateNodeInterface> currentNodesConstraint = Memory.SetOfStateNode(),
+        HashMap<String, IStateNode> bindings = new HashMap<>();
+        SetOfNode<IStateNode> currentNodesConstraint = Memory.SetOfStateNode(),
                 nextNodesConstraint = Memory.SetOfStateNode(),
                 tmp;
         int node_constraint = 0;
 
         for(int i = 1; i < result.size(); i++){
             Logger.out.information("\rLAYER " + i);
-            for(NodeInterface node : result.iterateOnLayer(i-1)){
-                StateNodeInterface x = (StateNodeInterface) node;
+            for(INode node : result.iterateOnLayer(i-1)){
+                IStateNode x = (IStateNode) node;
                 for(int value : rule.successors(successors,i - 1, x)) {
                     NodeState state = x.getState();
                     if(state.isValid(value, i, result.size())) {
                         if(!x.containsLabel(value)) {
                             String hash = state.signature(value, i, result.size());
-                            StateNodeInterface y = bindings.get(hash);
+                            IStateNode y = bindings.get(hash);
                             if (y == null) {
                                 y = x.Node();
                                 y.setState(state.createState(value, i, result.size()));
@@ -125,7 +125,7 @@ public class ConstraintBuilder {
      */
     public static DecisionDiagram subset(DecisionDiagram result, ArrayOfInt letters, SetOf<Integer> D, SetOf<Integer> variables) {
         D.add(-1);
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ParametersSubset parameters = ParametersSubset.create(letters, D.size(), letters.length, variables);
         snode.setState(StateSubset.create(parameters, 0));
 
@@ -167,7 +167,7 @@ public class ConstraintBuilder {
      * @return The DecisionDiagram corresponding to the sequence constraint
      */
     public static DecisionDiagram sequence(DecisionDiagram result, Domains D, SetOf<Integer> V, int q, int min, int max, int size, SetOf<Integer> variables){
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ParametersAmong parameters = ParametersAmong.create(q, min, max, V, variables);
         snode.setState(StateAmong.create(parameters));
 
@@ -190,7 +190,7 @@ public class ConstraintBuilder {
      * @return The DecisionDiagram corresponding to the sum constraint
      */
     public static DecisionDiagram sum(DecisionDiagram result, Domains D, MapOf<Integer, Integer> map, int min, int max, int size, SetOf<Integer> variables){
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);
         ArrayOfInt maxValues = ArrayOfInt.create(size);
 
@@ -222,7 +222,7 @@ public class ConstraintBuilder {
         return result;
     }
     public static DecisionDiagram sum(DecisionDiagram result, Domains D, int min, int max, int size, SetOf<Integer> variables){
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);
         ArrayOfInt maxValues = ArrayOfInt.create(size);
 
@@ -264,7 +264,7 @@ public class ConstraintBuilder {
      * @return The DecisionDiagram corresponding to the GCC constraint
      */
     public static DecisionDiagram gcc(DecisionDiagram result, Domains D, MapOf<Integer, TupleOfInt> maxValues, int violations, int size, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersGCC parameters = ParametersGCC.create(maxValues, violations, variables);
         StateGCC state = StateGCC.create(parameters);
         state.initV();
@@ -287,7 +287,7 @@ public class ConstraintBuilder {
      * @return The DecisionDiagram corresponding to the AllDifferent constraint
      */
     public static DecisionDiagram allDifferent(DecisionDiagram result, Domains D, SetOf<Integer> V, int size, SetOf<Integer> variables){
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
         constraint.setState(StateAllDiff.create(parameters));
 
@@ -306,7 +306,7 @@ public class ConstraintBuilder {
     // TODO : new min/max values
     public static strictfp MDD mulRelaxed(MDD result, Domains D, double min, double max, double maxProbaDomains, double maxProbaEpsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation mulRelaxed IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -353,7 +353,7 @@ public class ConstraintBuilder {
     }
 
     public static MDD mul(MDD result, Domains D, BigInteger min, BigInteger max, int size, SetOf<Integer> variables){
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfBigInteger minValues = ArrayOfBigInteger.create(size);
         ArrayOfBigInteger maxValues = ArrayOfBigInteger.create(size);
 
@@ -400,7 +400,7 @@ public class ConstraintBuilder {
 
     public static strictfp MDD sumDouble(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -434,7 +434,7 @@ public class ConstraintBuilder {
 
     public static strictfp MDD sumDoubleULP(MDD result, Domains D, double min, double max, MapOf<Integer, Double> mapDouble, int epsilon, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDoubleULP IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfDouble minValues = ArrayOfDouble.create(size);
         ArrayOfDouble maxValues = ArrayOfDouble.create(size);
 
@@ -468,7 +468,7 @@ public class ConstraintBuilder {
 
     public static strictfp MDD sumRelaxed(MDD result, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size, SetOf<Integer> variables){
         // CHECK MyConstraintOperation sumDouble IF MAKING CHANGE TO THIS FUNCTION !
-        SNode snode = SNode.create();
+        StateNode snode = StateNode.create();
         ArrayOfLong minValues = ArrayOfLong.create(size);
         ArrayOfLong maxValues = ArrayOfLong.create(size);
 

@@ -1,8 +1,8 @@
 package utils.io.reader;
 
 import dd.DecisionDiagram;
-import dd.interfaces.CostNodeInterface;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.ICostNode;
+import dd.interfaces.INode;
 import dd.mdd.components.Node;
 import dd.mdd.costmdd.CostMDD;
 import utils.io.MDDReader;
@@ -15,17 +15,17 @@ public class CostDDReaderTopDown extends DDReaderTopDown {
      * {@inheritDoc}
      */
     @Override
-    protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
+    protected void saveNode(INode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfChildren();
         writeInt(file, MDDReader.MAX_OUT_DEGREE, numberOfValues);
-        CostNodeInterface costNode = (CostNodeInterface) node;
+        ICostNode costNode = (ICostNode) node;
         for(int value : node.iterateOnChildLabels()){
             // Label
             writeInt(file, MDDReader.VALUE, value);
             // Cost
             writeInt(file, MDDReader.COST, costNode.getArcCost(value));
             // Child
-            NodeInterface child = node.getChild(value);
+            INode child = node.getChild(value);
             int childID = bindNextWrite(child);
             writeInt(file, MDDReader.NODE, childID);
         }
@@ -35,7 +35,7 @@ public class CostDDReaderTopDown extends DDReaderTopDown {
      * {@inheritDoc}
      */
     @Override
-    protected void loadNode(DecisionDiagram dd, NodeInterface node, int layer, MDDFileReader file) throws IOException {
+    protected void loadNode(DecisionDiagram dd, INode node, int layer, MDDFileReader file) throws IOException {
         // Number of values
         int numberOfValues = readInt(file, MDDReader.MAX_OUT_DEGREE);
 

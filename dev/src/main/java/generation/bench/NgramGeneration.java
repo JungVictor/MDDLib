@@ -2,14 +2,13 @@ package generation.bench;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
+import dd.mdd.components.StateNode;
 import dd.operations.ConstraintOperation;
 import generation.states.StateGram;
 import generation.utils.Reverso;
 import utils.io.MDDReader;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class NgramGeneration {
         MDD UMDD = MDD.create();
         MDDReader.load(UMDD, "src/main/resources/mdds/UMDD.mdd");
 
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         constraint.setState(StateGram.create());
         MDD myMDD = MDD.create();
 

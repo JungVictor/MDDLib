@@ -2,7 +2,7 @@ package generation.bench;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
+import dd.mdd.components.StateNode;
 import dd.operations.ConstraintOperation;
 import generation.states.StateGCCgram;
 import generation.states.StateGram;
@@ -10,7 +10,6 @@ import generation.utils.Reverso;
 import utils.io.MDDReader;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +46,7 @@ public class GCCpos {
         MDDReader.load(UMDD, "src/main/resources/mdds/UMDD.mdd");
 
 
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         constraint.setState(StateGCCgram.create());
         MDD myMDD = MDD.create();
         System.out.println("");
@@ -56,7 +55,7 @@ public class GCCpos {
         myMDD.reduce();
 
 
-        constraint = SNode.create();
+        constraint = StateNode.create();
         constraint.setState(StateGram.create());
         MDD myMDD2 = MDD.create();
         System.out.println("");

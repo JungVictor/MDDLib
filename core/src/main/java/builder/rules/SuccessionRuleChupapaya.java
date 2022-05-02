@@ -1,6 +1,6 @@
 package builder.rules;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.generics.CollectionOf;
@@ -32,7 +32,7 @@ public class SuccessionRuleChupapaya extends SuccessionRule {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, NodeInterface x) {
+    public Iterable<Integer> successors(CollectionOf<Integer> successors, int layer, INode x) {
         successors.clear();
 
         for (int inLabel : x.iterateOnParentLabels()) {

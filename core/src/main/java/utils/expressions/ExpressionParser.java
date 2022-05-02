@@ -1,5 +1,6 @@
 package utils.expressions;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import static utils.expressions.Expression.*;
 
@@ -150,6 +151,7 @@ public class ExpressionParser {
         String parenthesis_replaced = parenthesis;
         if(parenthesis.contains(OPEN_ABS +"")) parenthesis_replaced = absolute_replace(parenthesis_replaced);
         Expression parenthesisExpression = createExpr(parenthesis_replaced);
+        parenthesisExpression.priority = true;
         String name = this.variable_name+(variable_count++);
         this.parenthesisExpressions.put(name, parenthesisExpression);
         expression = expression.replace(OPEN_PAR+parenthesis+CLOSE_PAR, name);
@@ -172,10 +174,10 @@ public class ExpressionParser {
         }
         if (expr.contains(MINUS)) {
             lastOperator = MINUS;
-            String[] splited = expr.split("\\"+MINUS, 2);
+            String[] split = expr.split("\\"+MINUS, 2);
             // -x
-            if(splited[0].isEmpty()) return new String[]{"0", splited[1]};
-            return splited;
+            if(split[0].isEmpty()) return new String[]{"0", split[1]};
+            return split;
         }
         if (expr.contains(MUL)) {
             lastOperator = MUL;
@@ -188,6 +190,21 @@ public class ExpressionParser {
         if (expr.contains(POW)){
             lastOperator = POW;
             return expr.split("\\"+POW, 2);
+        }
+        if (expr.contains(AND)){
+            lastOperator = AND;
+            return expr.split(AND, 2);
+        }
+        if (expr.contains(OR)){
+            lastOperator = OR;
+            return expr.split(OR, 2);
+        }
+        if (expr.contains(NOT)){
+            lastOperator = MINUS;
+            String[] split = expr.split(NOT, 2);
+            if(!split[0].isEmpty()) split[1] = split[0];
+            split[0] = "1";
+            return split;
         }
         lastOperator = null;
         return new String[]{expr};
@@ -213,7 +230,9 @@ public class ExpressionParser {
         } else {
             Expression left = createExpr(split[0]);
             Expression right = createExpr(split[1]);
-            if(current_op.equals(MINUS)) right.changeSign();
+            if(current_op.equals(MINUS) && !right.priority) {
+                right.changeSign();
+            }
             return new Expression(left, current_op, right);
         }
     }

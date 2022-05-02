@@ -66,7 +66,7 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
      * @param array The array
      * @return An ArrayOfInt corresponding to the given array
      */
-    public static ArrayOfInt create(int... array){
+    public static ArrayOfInt create(boolean immutable, int... array){
         ArrayOfInt object = new ArrayOfInt(-1);
         object.array = array;
         object.length = array.length;
@@ -230,7 +230,7 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
     }
 
     private class ArrayOfIntIterator implements Iterator<Integer> {
-        private int i = 0;
+        private int i;
 
         @Override
         public boolean hasNext() {

@@ -1,11 +1,9 @@
 package dd;
 
-import dd.interfaces.NodeInterface;
-import dd.mdd.components.Node;
+import dd.interfaces.INode;
 import memory.Allocable;
 import memory.Memory;
 import structures.generics.MapOf;
-import structures.lists.UnorderedListOfNode;
 import structures.lists.UnorderedListOfNodeInterface;
 
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ public abstract class DecisionDiagram implements Allocable {
      * Set the node root of the DD
      * @param root New root node
      */
-    public abstract void setRoot(NodeInterface root);
+    public abstract void setRoot(INode root);
 
     /**
      * Automatically set the terminal node.
@@ -49,7 +47,7 @@ public abstract class DecisionDiagram implements Allocable {
      * If there is no root, return a default Node type associated with the BDD type
      * @return a Node the same type as the root Node.
      */
-    public abstract NodeInterface Node();
+    public abstract INode Node();
 
     /**
      * Create a DD the same type as the current DD, with the same Node type as the root for default Node
@@ -62,7 +60,7 @@ public abstract class DecisionDiagram implements Allocable {
      * @param root The node to set as root
      * @return a DD the same type as the current DD with the given node as a root
      */
-    public abstract DecisionDiagram DD(NodeInterface root);
+    public abstract DecisionDiagram DD(INode root);
 
     /**
      * Create a copy of the given DD from layer start to stop onto the given DD.
@@ -77,11 +75,11 @@ public abstract class DecisionDiagram implements Allocable {
      */
     public DecisionDiagram copy(DecisionDiagram copy, int offset, int start, int stop){
         for(int i = start; i < stop; i++){
-            for(NodeInterface original : iterateOnLayer(i)) {
-                NodeInterface copyNode = original.getX1();
+            for(INode original : iterateOnLayer(i)) {
+                INode copyNode = original.getX1();
                 for(int arc : original.iterateOnChildLabels()){
-                    NodeInterface child = original.getChild(arc);
-                    NodeInterface copyChild = child.getX1();
+                    INode child = original.getChild(arc);
+                    INode copyChild = child.getX1();
                     // Child node is not yet copied
                     if(copyChild == null) {
                         copyChild = copy.Node();
@@ -104,7 +102,7 @@ public abstract class DecisionDiagram implements Allocable {
      * @param offset The offset of the copy
      * @return A copy of the current DD from root to tt
      */
-    public DecisionDiagram copy(DecisionDiagram copy, NodeInterface root, int offset){
+    public DecisionDiagram copy(DecisionDiagram copy, INode root, int offset){
         getRoot().setX1(root);
         copy(copy, offset, 0, size());
         copy.setTT();
@@ -138,20 +136,20 @@ public abstract class DecisionDiagram implements Allocable {
      * Get the root of the DD
      * @return The root of the DD
      */
-    public abstract NodeInterface getRoot();
+    public abstract INode getRoot();
 
     /**
      * Get the terminal node of the DD
      * @return The terminal node of the DD
      */
-    public abstract NodeInterface getTt();
+    public abstract INode getTt();
 
     /**
      * Iterable on the nodes of the ith layer
      * @param i depth of the layer
      * @return Iterable on the nodes of the ith layer
      */
-    public abstract Iterable<NodeInterface> iterateOnLayer(int i);
+    public abstract Iterable<INode> iterateOnLayer(int i);
 
     /**
      * Get the number of nodes in the ith layer
@@ -212,7 +210,7 @@ public abstract class DecisionDiagram implements Allocable {
      */
     public int arcs(){
         int n = 0;
-        for(int i = 0; i < size; i++) for(NodeInterface x : iterateOnLayer(i)) n += x.numberOfChildren();
+        for(int i = 0; i < size; i++) for(INode x : iterateOnLayer(i)) n += x.numberOfChildren();
         return n;
     }
 
@@ -224,13 +222,13 @@ public abstract class DecisionDiagram implements Allocable {
         if(getLayerSize(size() - 1) == 0) return 0;
         if(getRoot() == getTt()) return 0;
 
-        MapOf<NodeInterface, Double> currentLayer = Memory.MapOfNodeInterfaceDouble();
-        MapOf<NodeInterface, Double> next = Memory.MapOfNodeInterfaceDouble(), tmp;
+        MapOf<INode, Double> currentLayer = Memory.MapOfNodeInterfaceDouble();
+        MapOf<INode, Double> next = Memory.MapOfNodeInterfaceDouble(), tmp;
 
-        for(NodeInterface x : iterateOnLayer(size() - 1)) currentLayer.put(x, 1.0);
+        for(INode x : iterateOnLayer(size() - 1)) currentLayer.put(x, 1.0);
 
         for(int i = size() - 2; i >= 0; i--){
-            for(NodeInterface x : iterateOnLayer(i)){
+            for(INode x : iterateOnLayer(i)){
                 double sum = 0;
                 for(int arc : x.iterateOnChildLabels()) sum += currentLayer.get(x.getChild(arc));
                 next.put(x, sum);
@@ -258,15 +256,15 @@ public abstract class DecisionDiagram implements Allocable {
         // solution
         int[] currentSolution = new int[size()-1];
         // Node on the path of solution
-        NodeInterface[] currentNodes = new NodeInterface[size()-1];
+        INode[] currentNodes = new INode[size()-1];
         // labels to visit
-        HashMap<NodeInterface, Stack<Integer>> notVisited = new HashMap<>();
+        HashMap<INode, Stack<Integer>> notVisited = new HashMap<>();
 
         int layer = 0;
         currentNodes[layer] = getRoot();
         addChildrenLabels(getRoot(), notVisited);
 
-        NodeInterface current;
+        INode current;
         Stack<Integer> labels;
 
         while (layer >= 0){
@@ -293,7 +291,7 @@ public abstract class DecisionDiagram implements Allocable {
         return solutions;
     }
 
-    private void addChildrenLabels(NodeInterface node, HashMap<NodeInterface, Stack<Integer>> notVisited){
+    private void addChildrenLabels(INode node, HashMap<INode, Stack<Integer>> notVisited){
         Stack<Integer> labels = new Stack<>();
         for(int value : node.iterateOnChildLabels()) labels.add(value);
         notVisited.put(node, labels);
@@ -308,14 +306,14 @@ public abstract class DecisionDiagram implements Allocable {
      * @param node The node to add
      * @param layer The index of the layer
      */
-    public abstract void addNode(NodeInterface node, int layer);
+    public abstract void addNode(INode node, int layer);
 
     /**
      * Remove a node from the given layer
      * @param node The node to remove
      * @param layer The index of the layer
      */
-    public abstract void removeNode(NodeInterface node, int layer);
+    public abstract void removeNode(INode node, int layer);
 
     /**
      * Add an arc between the source node and the destination node with the given value as label.
@@ -325,7 +323,7 @@ public abstract class DecisionDiagram implements Allocable {
      * @param destination The destination node (child)
      * @param layer The layer of the PARENT node (source)
      */
-    public void addArc(NodeInterface source, int value, NodeInterface destination, int layer){
+    public void addArc(INode source, int value, INode destination, int layer){
         source.addChild(value, destination);
         destination.addParent(value, source);
     }
@@ -336,7 +334,7 @@ public abstract class DecisionDiagram implements Allocable {
      * @param source The source node
      * @param value The value of the arc's label.
      */
-    public void removeArc(NodeInterface source, int value){
+    public void removeArc(INode source, int value){
         source.getChild(value).removeParent(value, source);
         source.removeChild(value);
     }
@@ -349,7 +347,7 @@ public abstract class DecisionDiagram implements Allocable {
      * @param destination The destination node - node to add in the DD
      * @param layer The layer of the DD where the node destination will be added
      */
-    public void addArcAndNode(NodeInterface source, int value, NodeInterface destination, int layer){
+    public void addArcAndNode(INode source, int value, INode destination, int layer){
         addArc(source, value, destination, layer-1);
         addNode(destination, layer);
     }
@@ -365,10 +363,10 @@ public abstract class DecisionDiagram implements Allocable {
     public void cleanup() {
         UnorderedListOfNodeInterface removed = UnorderedListOfNodeInterface.create();
         for (int i = size() - 2; i >= 0; i--) {
-            for (NodeInterface node : iterateOnLayer(i)) {
+            for (INode node : iterateOnLayer(i)) {
                 if (node.numberOfChildren() == 0) removed.add(node);
             }
-            for (NodeInterface node : removed) removeNode(node, i);
+            for (INode node : removed) removeNode(node, i);
         }
         Memory.free(removed);
         setTT();
@@ -378,7 +376,7 @@ public abstract class DecisionDiagram implements Allocable {
      * Clear all nodes' associations
      */
     public void clearAllAssociations(){
-        for(int i = 0; i < size(); i++) for(NodeInterface node : iterateOnLayer(i)) node.clearAssociations();
+        for(int i = 0; i < size(); i++) for(INode node : iterateOnLayer(i)) node.clearAssociations();
     }
 
     /**

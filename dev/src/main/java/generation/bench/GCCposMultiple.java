@@ -2,7 +2,7 @@ package generation.bench;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dd.mdd.MDD;
-import dd.mdd.components.SNode;
+import dd.mdd.components.StateNode;
 import dd.operations.ConstraintOperation;
 import generation.states.StateGCCgram;
 import generation.states.StateGram;
@@ -48,7 +48,7 @@ public class GCCposMultiple {
 
         StateGCCgram.maxCardinality=1;
         StateGCCgram.tagPOS="VER";
-        SNode constraint = SNode.create();
+        StateNode constraint = StateNode.create();
         constraint.setState(StateGCCgram.create());
         MDD myMDD = MDD.create();
         System.out.println("");
@@ -58,7 +58,7 @@ public class GCCposMultiple {
 
         StateGCCgram.maxCardinality=1;
         StateGCCgram.tagPOS="VER:pre";
-        constraint = SNode.create();
+        constraint = StateNode.create();
         constraint.setState(StateGCCgram.create());
         MDD myMDD2 = MDD.create();
         System.out.println("");
@@ -68,7 +68,7 @@ public class GCCposMultiple {
 
         StateGCCgram.maxCardinality=0;
         StateGCCgram.tagPOS="KON";
-        constraint = SNode.create();
+        constraint = StateNode.create();
         constraint.setState(StateGCCgram.create());
         myMDD = MDD.create();
         System.out.println("");
@@ -77,7 +77,7 @@ public class GCCposMultiple {
         myMDD.reduce();
 
 
-        constraint = SNode.create();
+        constraint = StateNode.create();
         constraint.setState(StateGram.create());
         MDD myMDDf = MDD.create();
         System.out.println("");

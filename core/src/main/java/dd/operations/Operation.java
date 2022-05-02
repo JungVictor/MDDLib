@@ -3,7 +3,7 @@ package dd.operations;
 import builder.MDDBuilder;
 import builder.rules.SuccessionRule;
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.MDD;
 import dd.mdd.components.Node;
 import memory.Memory;
@@ -140,7 +140,7 @@ public class Operation {
 
         // Binding all nodes in layer start to the root of mdd2
         if(start > 0)
-            for(NodeInterface node : mdd1.iterateOnLayer(start))
+            for(INode node : mdd1.iterateOnLayer(start))
                 node.getX1().associate(node, mdd2.getRoot());
         else result.getRoot().associate(mdd1.getRoot(), mdd2.getRoot());
 
@@ -153,8 +153,8 @@ public class Operation {
         // V.intersect(mdd2.getV());
 
         for(int i = start+1; i < stop; i++){
-            for(NodeInterface x : result.iterateOnLayer(i-1)){
-                NodeInterface x1 = x.getX1(), x2 = x.getX2();
+            for(INode x : result.iterateOnLayer(i-1)){
+                INode x1 = x.getX1(), x2 = x.getX2();
                 for(int v : x1.iterateOnChildLabels()){
                     boolean a2 = x2.containsLabel(v);
                     if(apply(true, a2, Operator.INTERSECTION, i == stop - 1)) {
@@ -179,11 +179,11 @@ public class Operation {
             if(stop < mdd1.size()){
                 // mdd2 is contained in the intersection
                 // Therefore, we need to construct the rest of the dd.mdd from mdd1
-                for(NodeInterface node : result.iterateOnLayer(stop-1)) node.getX1().associate(node, null);
+                for(INode node : result.iterateOnLayer(stop-1)) node.getX1().associate(node, null);
                 mdd1.copy(result, 0, stop-1, mdd1.size());
             } else if (stop >= mdd1.size()){
                 // We need to construct the rest of the dd.mdd from mdd2
-                for(NodeInterface node : result.iterateOnLayer(stop-1)) node.getX2().associate(node, null);
+                for(INode node : result.iterateOnLayer(stop-1)) node.getX2().associate(node, null);
                 mdd2.copy(result, start, stop - start - 1, mdd2.size());
             }
         }
@@ -324,7 +324,7 @@ public class Operation {
      * @param size The size of both sub-MDDs
      * @return true if there is an inclusion, false otherwise
      */
-    public static boolean inclusion(NodeInterface root1, NodeInterface root2, int size){
+    public static boolean inclusion(INode root1, INode root2, int size){
         MDD inclusion = MDD.create();
         boolean result = perform(inclusion, root1, root2, size, SuccessionRule.INTERSECTION, Operator.INCLUSION) != null;
         Memory.free(inclusion);
@@ -366,7 +366,7 @@ public class Operation {
      * @param OP The type of operation
      * @return The MDD resulting from the operation
      */
-    private static DecisionDiagram perform(DecisionDiagram result, NodeInterface root1, NodeInterface root2, int size, SuccessionRule rule, Operator OP){
+    private static DecisionDiagram perform(DecisionDiagram result, INode root1, INode root2, int size, SuccessionRule rule, Operator OP){
         result.setSize(size);
         Binder binder = Binder.create();
 
@@ -376,9 +376,9 @@ public class Operation {
 
         for(int i = 1; i < size; i++){
             Logger.out.information("\rLAYER " + i);
-            for(NodeInterface x : result.iterateOnLayer(i-1)){
-                NodeInterface x1 = x.getX1(), x2 = x.getX2();
-                NodeInterface y1, y2;
+            for(INode x : result.iterateOnLayer(i-1)){
+                INode x1 = x.getX1(), x2 = x.getX2();
+                INode y1, y2;
                 for(int v : rule.successors(successors, i-1, x)){
                     boolean a1, a2;
                     a1 = x1 != null && x1.containsLabel(v);
@@ -447,8 +447,8 @@ public class Operation {
      * @param binder The binder
      * @return The node added
      */
-    public static NodeInterface addArcAndNode(DecisionDiagram mdd, NodeInterface x, NodeInterface y1, NodeInterface y2, int label, int layer, Binder binder){
-        NodeInterface y;
+    public static INode addArcAndNode(DecisionDiagram mdd, INode x, INode y1, INode y2, int label, int layer, Binder binder){
+        INode y;
         if(binder == null){
             y = x.Node();
             y.associate(y1, y2);
@@ -618,7 +618,7 @@ public class Operation {
      * @param binder The binder
      */
     public static void addArcAndNode(MDD mdd, Node x, ArrayOfNodeInterface ys, int label, int layer, Binder binder){
-        NodeInterface y;
+        INode y;
         if(binder == null){
             y = Node.create();
             y.associate(ys);

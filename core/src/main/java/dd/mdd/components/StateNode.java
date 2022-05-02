@@ -1,16 +1,18 @@
-package dd.mdd.costmdd.components;
+package dd.mdd.components;
 
-import dd.interfaces.NodeInterface;
-import dd.mdd.components.Node;
-import dd.mdd.components.SNode;
-import dd.interfaces.CostNodeInterface;
+import builder.constraints.states.NodeState;
+import dd.interfaces.IStateNode;
 import memory.AllocatorOf;
+import memory.Memory;
 
-public class SCostNode extends SNode implements CostNodeInterface {
+public class StateNode extends Node implements IStateNode {
 
     // Allocable variables
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
+
+    // State of the node
+    private NodeState state;
 
 
     //**************************************//
@@ -29,17 +31,17 @@ public class SCostNode extends SNode implements CostNodeInterface {
      * Constructor. Initialise the index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    public SCostNode(int allocatedIndex) {
+    public StateNode(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     /**
-     * Create a SCostNode.
+     * Create a SNode.
      * The object is managed by the allocator.
-     * @return A fresh SCostNode
+     * @return A fresh SNode
      */
-    public static SCostNode create(){
-        SCostNode node = allocator().allocate();
+    public static StateNode create(){
+        StateNode node = allocator().allocate();
         node.prepare();
         return node;
     }
@@ -48,54 +50,29 @@ public class SCostNode extends SNode implements CostNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public SCostNode Node(){
+    public IStateNode Node(){
         return create();
     }
 
+
     //**************************************//
-    //           NODE MANAGEMENT            //
+    //          STATES MANAGEMENT           //
     //**************************************//
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void setArcCost(int label, int cost){
-        ((OutCostArcs) getChildren()).setCost(label, cost);
-        ((InCostArcs) getChild(label).getParents()).setCost(label, this, cost);
+    public void setState(NodeState state){
+        this.state = state;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public int getArcCost(int label){
-        return ((OutCostArcs) getChildren()).getCost(label);
+    public NodeState getState(){
+        return state;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getArcCost(NodeInterface parent, int label) {
-        return ((InCostArcs) getParents()).getCost((Node) parent, label);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addChild(int label, Node child, int cost){
-        ((OutCostArcs) getChildren()).add(label, child, cost);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addParent(int label, Node parent, int cost){
-        ((InCostArcs) getParents()).add(label, parent, cost);
-    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
@@ -113,17 +90,18 @@ public class SCostNode extends SNode implements CostNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    protected void allocateArcs(){
-        setChildren(OutCostArcs.create());
-        setParents(InCostArcs.create());
+    public void free(){
+        if(state != null) Memory.free(state);
+        state = null;
+        super.free();
     }
 
     /**
-     * <b>The allocator that is in charge of the SCostNode type.</b><br>
+     * <b>The allocator that is in charge of the SNode type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<SCostNode> {
+    static final class Allocator extends AllocatorOf<StateNode> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -137,16 +115,16 @@ public class SCostNode extends SNode implements CostNodeInterface {
          * {@inheritDoc}
          */
         @Override
-        protected SCostNode[] arrayCreation(int capacity) {
-            return new SCostNode[capacity];
+        protected StateNode[] arrayCreation(int capacity) {
+            return new StateNode[capacity];
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected SCostNode createObject(int index) {
-            return new SCostNode(index);
+        protected StateNode createObject(int index) {
+            return new StateNode(index);
         }
     }
 

@@ -3,13 +3,13 @@ package dd.interfaces;
 import dd.mdd.pmdd.components.properties.NodeProperty;
 import structures.generics.MapOf;
 
-public interface PropertyNodeInterface extends NodeInterface {
+public interface IPropertyNode extends INode {
 
     /**
      * Return a new node of the same type as this node implementing PropertyNodeInterface.
      * @return A new node implementing PropertyNodeInterface
      */
-    PropertyNodeInterface Node();
+    IPropertyNode Node();
 
     /**
      * Transfer all properties to all children

@@ -1,18 +1,16 @@
-package dd.bdd.components;
+package dd.mdd.costmdd.components;
 
-import builder.constraints.states.NodeState;
-import dd.interfaces.StateNodeInterface;
+import dd.interfaces.INode;
+import dd.mdd.components.Node;
+import dd.mdd.components.StateNode;
+import dd.interfaces.ICostNode;
 import memory.AllocatorOf;
-import memory.Memory;
 
-public class BinarySNode extends BinaryNode implements StateNodeInterface {
+public class StateCostNode extends StateNode implements ICostNode {
 
     // Allocable variables
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
-
-    // State of the node
-    private NodeState state;
 
 
     //**************************************//
@@ -31,17 +29,17 @@ public class BinarySNode extends BinaryNode implements StateNodeInterface {
      * Constructor. Initialise the index in the allocator.
      * @param allocatedIndex Index of the object in the allocator
      */
-    public BinarySNode(int allocatedIndex) {
+    public StateCostNode(int allocatedIndex) {
         super(allocatedIndex);
     }
 
     /**
-     * Create a BinarySNode.
+     * Create a SCostNode.
      * The object is managed by the allocator.
-     * @return A fresh BinarySNode
+     * @return A fresh SCostNode
      */
-    public static BinarySNode create(){
-        BinarySNode node = allocator().allocate();
+    public static StateCostNode create(){
+        StateCostNode node = allocator().allocate();
         node.prepare();
         return node;
     }
@@ -50,29 +48,54 @@ public class BinarySNode extends BinaryNode implements StateNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public BinarySNode Node(){
+    public StateCostNode Node(){
         return create();
     }
 
-
     //**************************************//
-    //          STATES MANAGEMENT           //
+    //           NODE MANAGEMENT            //
     //**************************************//
 
     /**
      * {@inheritDoc}
      */
-    public void setState(NodeState state){
-        this.state = state;
+    @Override
+    public void setArcCost(int label, int cost){
+        ((OutCostArcs) getChildren()).setCost(label, cost);
+        ((InCostArcs) getChild(label).getParents()).setCost(label, this, cost);
     }
 
     /**
      * {@inheritDoc}
      */
-    public NodeState getState(){
-        return state;
+    @Override
+    public int getArcCost(int label){
+        return ((OutCostArcs) getChildren()).getCost(label);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getArcCost(INode parent, int label) {
+        return ((InCostArcs) getParents()).getCost((Node) parent, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addChild(int label, Node child, int cost){
+        ((OutCostArcs) getChildren()).add(label, child, cost);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addParent(int label, Node parent, int cost){
+        ((InCostArcs) getParents()).add(label, parent, cost);
+    }
 
     //**************************************//
     //           MEMORY FUNCTIONS           //
@@ -90,18 +113,17 @@ public class BinarySNode extends BinaryNode implements StateNodeInterface {
      * {@inheritDoc}
      */
     @Override
-    public void free(){
-        if(state != null) Memory.free(state);
-        state = null;
-        super.free();
+    protected void allocateArcs(){
+        setChildren(OutCostArcs.create());
+        setParents(InCostArcs.create());
     }
 
     /**
-     * <b>The allocator that is in charge of the BinarySNode type.</b><br>
+     * <b>The allocator that is in charge of the SCostNode type.</b><br>
      * When not specified, the allocator has an initial capacity of 16. This number is arbitrary, and
      * can be change if needed (might improve/decrease performance and/or memory usage).
      */
-    static final class Allocator extends AllocatorOf<BinarySNode> {
+    static final class Allocator extends AllocatorOf<StateCostNode> {
 
         Allocator(int capacity) {
             super.init(capacity);
@@ -115,16 +137,17 @@ public class BinarySNode extends BinaryNode implements StateNodeInterface {
          * {@inheritDoc}
          */
         @Override
-        protected BinarySNode[] arrayCreation(int capacity) {
-            return new BinarySNode[capacity];
+        protected StateCostNode[] arrayCreation(int capacity) {
+            return new StateCostNode[capacity];
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected BinarySNode createObject(int index) {
-            return new BinarySNode(index);
+        protected StateCostNode createObject(int index) {
+            return new StateCostNode(index);
         }
     }
+
 }

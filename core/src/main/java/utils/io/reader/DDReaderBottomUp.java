@@ -1,7 +1,7 @@
 package utils.io.reader;
 
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import utils.io.MDDReader;
 
 import java.io.IOException;
@@ -17,14 +17,14 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
      * {@inheritDoc}
      */
     @Override
-    protected void saveNode(NodeInterface node, int nodeID, MDDFileWriter file) throws IOException {
+    protected void saveNode(INode node, int nodeID, MDDFileWriter file) throws IOException {
         int numberOfValues = node.numberOfParentsLabel();
         writeInt(file, MDDReader.VALUE_NUMBER, numberOfValues);
         for(int value : node.iterateOnParentLabels()){
             int numberOfParents = node.numberOfParents(value);
             writeInt(file, MDDReader.VALUE, value);
             writeInt(file, MDDReader.PARENT_NUMBER, numberOfParents);
-            for(NodeInterface parent : node.iterateOnParents(value)) {
+            for(INode parent : node.iterateOnParents(value)) {
                 writeInt(file, MDDReader.NODE, bindNextWrite(parent));
             }
         }
@@ -61,7 +61,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
      * {@inheritDoc}
      */
     @Override
-    protected NodeInterface addNodeToDD(DecisionDiagram dd, int layer, int ID){
+    protected INode addNodeToDD(DecisionDiagram dd, int layer, int ID){
         if(layer == 0) return dd.getRoot(); // Add root case for bottom-up
         return super.addNodeToDD(dd, layer, ID);
     }
@@ -70,7 +70,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
      * {@inheritDoc}
      */
     @Override
-    protected void loadNode(DecisionDiagram dd, NodeInterface node, int layer, MDDFileReader file) throws IOException {
+    protected void loadNode(DecisionDiagram dd, INode node, int layer, MDDFileReader file) throws IOException {
         // Number of values
         int numberOfValues = readInt(file, MDDReader.VALUE_NUMBER);
 
@@ -83,7 +83,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
 
             for(int n = 0; n < numberOfParents; n++){
                 int parentID = readInt(file, MDDReader.NODE);
-                NodeInterface parent = addNodeToDD(dd, layer-1, parentID);
+                INode parent = addNodeToDD(dd, layer-1, parentID);
                 dd.addArc(parent, value, node, layer-1);
             }
         }
@@ -103,7 +103,7 @@ public class DDReaderBottomUp extends DDReaderAbstractClass{
         initMaps();
 
         // Create a tt node, add it to the DD and bind it
-        NodeInterface tt = dd.Node();
+        INode tt = dd.Node();
         dd.addNode(tt, size - 1);
         bindCurrentRead(0, tt);
 

@@ -1,15 +1,15 @@
 package structures.arrays;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 
-public class ArrayOfNodeInterface extends ArrayOf<NodeInterface> {
+public class ArrayOfNodeInterface extends ArrayOf<INode> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
     // The array
-    private NodeInterface[] array;
+    private INode[] array;
 
     /**
      * Get the allocator. Thread safe.
@@ -41,13 +41,13 @@ public class ArrayOfNodeInterface extends ArrayOf<NodeInterface> {
     }
 
     @Override
-    protected NodeInterface[] array() {
+    protected INode[] array() {
         return array;
     }
 
     @Override
     protected void arrayAllocation(int capacity) {
-        array = new NodeInterface[capacity];
+        array = new INode[capacity];
     }
 
     @Override

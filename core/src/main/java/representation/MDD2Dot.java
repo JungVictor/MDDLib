@@ -1,10 +1,8 @@
 package representation;
 
-import dd.interfaces.CostNodeInterface;
-import dd.mdd.MDD;
-import dd.mdd.components.Node;
-import dd.mdd.costmdd.components.CostNode;
-import structures.generics.MapOf;
+import dd.DecisionDiagram;
+import dd.interfaces.ICostNode;
+import dd.interfaces.INode;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,9 +33,9 @@ public class MDD2Dot {
      * @return The newly created .dot file
      * @throws IOException Error during the creation of the file
      */
-    public static File convert(MDD mdd, String filename, HashMap<Integer, String> labelToString) throws IOException {
+    public static File convert(DecisionDiagram mdd, String filename, HashMap<Integer, String> labelToString) throws IOException {
         int node_number = 0;
-        HashMap<Node, Integer> names = new HashMap<>();
+        HashMap<INode, Integer> names = new HashMap<>();
         mkdir();
         File file = new File(path+filename+extension);
         PrintWriter graph = new PrintWriter(new FileWriter(file));
@@ -49,7 +47,7 @@ public class MDD2Dot {
         graph.println();
 
         for(int i = 0; i < mdd.size(); i++){
-            for(Node node : mdd.getLayer(i)) {
+            for(INode node : mdd.iterateOnLayer(i)) {
                 names.put(node, node_number);
                 graph.print("\t");
                 graph.print(node_number);
@@ -66,9 +64,9 @@ public class MDD2Dot {
 
         int source;
         for(int i = 0; i < mdd.size(); i++){
-            for(Node node : mdd.getLayer(i)) {
+            for(INode node : mdd.iterateOnLayer(i)) {
                 source = names.get(node);
-                for(int label : node.getChildren()) {
+                for(int label : node.iterateOnChildLabels()) {
                     graph.print("\t");
                     graph.print(source);
                     graph.print("->");
@@ -76,9 +74,9 @@ public class MDD2Dot {
                     graph.print(" [label=\"");
                     if(labelToString != null) graph.print(labelToString.get(label));
                     else graph.print(label);
-                    if(node instanceof CostNodeInterface){
+                    if(node instanceof ICostNode){
                         graph.print(" (");
-                        graph.print(((CostNodeInterface) node).getArcCost(label));
+                        graph.print(((ICostNode) node).getArcCost(label));
                         graph.print(")");
                     }
                     graph.println("\"]");
@@ -91,7 +89,7 @@ public class MDD2Dot {
         return file;
     }
 
-    public static File convert(MDD mdd, String filename) throws IOException{
+    public static File convert(DecisionDiagram mdd, String filename) throws IOException{
         return convert(mdd, filename, null);
     }
 

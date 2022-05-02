@@ -11,10 +11,11 @@ import java.util.HashMap;
 public class Expression {
 
     // All possible operations
-    public static String LT = "<", LEQ = "<=", GT = ">",  GEQ = ">=", EQ = "=", NEQ = "!=";
-    public static String PLUS = "+", MINUS = "-", MUL = "*", DIV = "/", POW = "^";
-    public static String ABS = "|", MODULO = "%";
-    public static char OPEN_PAR = '(', CLOSE_PAR = ')';
+    public static final String LT = "<", LEQ = "<=", GT = ">",  GEQ = ">=", EQ = "=", NEQ = "!=";
+    public static final String PLUS = "+", MINUS = "-", MUL = "*", DIV = "/", POW = "^";
+    public static final String ABS = "|", MODULO = "%";
+    public static final String OR = "OR", AND = "AND", NOT = "NOT";
+    public static final char OPEN_PAR = '(', CLOSE_PAR = ')';
 
     // Bindings of variables names => int layer
     private HashMap<String, Integer> binding;
@@ -24,6 +25,7 @@ public class Expression {
     private Expression left;
     private Expression right;
     private String operator;
+    public boolean priority;
 
     // Leaf values
     private String variable;
@@ -42,7 +44,7 @@ public class Expression {
             return variable;
         }
         String left = this.left.toString();
-        if(this.right != null) return "(" + left + " " + operator  + " " + this.right.toString() + ")";
+        if(this.right != null) return "(" + left + " " + operator  + " " + this.right + ")";
         return operator + left + operator;
     }
 
@@ -116,6 +118,7 @@ public class Expression {
             } else if(right.right.nVar == 0){
                 if((operator.equals(PLUS) || operator.equals(MINUS)) && (right.operator.equals(MUL) || right.operator.equals(DIV))) return;
                 if((right.operator.equals(MODULO)) || right.operator.equals(POW)) return;
+                System.out.println("!");
                 value = localEvaluation(left.constant, operator, localEvaluation(right.neutralValue(), right.operator, right.right.constant));
                 this.left = new Expression(value);
                 this.right = right.left;
@@ -322,6 +325,8 @@ public class Expression {
         else if(operator.equals(DIV)) return left / right;
         else if(operator.equals(MODULO)) return left % right;
         else if(operator.equals(POW)) return (int) Math.pow(left, right);
+        else if(operator.equals(OR)) return left != 0 || right != 0 ? 1 : 0;
+        else if(operator.equals(AND)) return left != 0 && right != 0 ? 1 : 0;
         // ABS
         if(left < 0) return -left;
         return left;

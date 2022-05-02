@@ -1,7 +1,7 @@
 package dd.mdd;
 
 import dd.DecisionDiagram;
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import dd.mdd.components.Layer;
 import dd.mdd.components.Node;
 import dd.operations.Pack;
@@ -12,7 +12,6 @@ import structures.MDDTable;
 import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.generics.SetOfNode;
 import structures.lists.ListOfInt;
 import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfNode;
@@ -102,7 +101,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void setRoot(NodeInterface root){
+    public void setRoot(INode root){
         if(root instanceof Node) setRoot((Node) root);
         else throw new InputMismatchException("Expected the root to be at least of Node class !");
     }
@@ -176,7 +175,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public MDD DD(NodeInterface root){
+    public MDD DD(INode root){
         if(root instanceof Node) MDD((Node) root);
         else throw new InputMismatchException("Expected the root to be at least of Node class !");
         return null;
@@ -200,10 +199,10 @@ public class MDD extends DecisionDiagram {
     public MDD copy(MDD copy, int offset, int start, int stop){
         for(int i = start; i < stop; i++){
             for(Node original : getLayer(i)) {
-                NodeInterface copyNode = original.getX1();
+                INode copyNode = original.getX1();
                 for(int arc : original.getChildren()){
                     Node child = original.getChild(arc);
-                    NodeInterface copyChild = child.getX1();
+                    INode copyChild = child.getX1();
                     // Child node is not yet copied
                     if(copyChild == null) {
                         copyChild = copy.Node();
@@ -483,7 +482,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void addNode(NodeInterface node, int layer){
+    public void addNode(INode node, int layer){
         addNode((Node) node, layer);
     }
 
@@ -491,7 +490,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(NodeInterface node, int layer){
+    public void removeNode(INode node, int layer){
         removeNode((Node) node, layer);
     }
 
@@ -548,7 +547,7 @@ public class MDD extends DecisionDiagram {
      * {@inheritDoc}
      */
     @Override
-    public void addArc(NodeInterface source, int value, NodeInterface destination, int layer){
+    public void addArc(INode source, int value, INode destination, int layer){
         addArc((Node) source, value, (Node) destination, layer);
     }
 

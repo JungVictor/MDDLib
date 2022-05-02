@@ -1,8 +1,8 @@
 package memory;
 
 import dd.bdd.components.BinaryNode;
-import dd.interfaces.NodeInterface;
-import dd.interfaces.StateNodeInterface;
+import dd.interfaces.INode;
+import dd.interfaces.IStateNode;
 import dd.mdd.components.*;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
@@ -126,9 +126,9 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<MapOf<NodeInterface, Double>> mapOfNodeInterfaceDoublePool = new MemoryPool<>();
-    public static MapOf<NodeInterface, Double> MapOfNodeInterfaceDouble(){
-        MapOf<NodeInterface, Double> object = mapOfNodeInterfaceDoublePool.get();
+    private static final MemoryPool<MapOf<INode, Double>> mapOfNodeInterfaceDoublePool = new MemoryPool<>();
+    public static MapOf<INode, Double> MapOfNodeInterfaceDouble(){
+        MapOf<INode, Double> object = mapOfNodeInterfaceDoublePool.get();
         if(object == null){
             object = new MapOf<>(mapOfNodeInterfaceDoublePool);
             mapOfNodeInterfaceDoublePool.add(object);
@@ -149,9 +149,9 @@ public class Memory {
         return object;
     }
 
-    private static final MemoryPool<MapOf<Integer, NodeInterface>> mapOfIntegerNodeInterface = new MemoryPool<>();
-    public static MapOf<Integer, NodeInterface> MapOfIntegerNodeInterface() {
-        MapOf<Integer, NodeInterface> object = mapOfIntegerNodeInterface.get();
+    private static final MemoryPool<MapOf<Integer, INode>> mapOfIntegerNodeInterface = new MemoryPool<>();
+    public static MapOf<Integer, INode> MapOfIntegerNodeInterface() {
+        MapOf<Integer, INode> object = mapOfIntegerNodeInterface.get();
         if(object == null){
             object = new MapOf<>(mapOfIntegerNodeInterface);
             mapOfIntegerNodeInterface.add(object);
@@ -164,9 +164,9 @@ public class Memory {
     //                SETS                  //
     //**************************************//
 
-    private static final MemoryPool<SetOfNode<StateNodeInterface>> setOfStateNodePool = new MemoryPool<>();
-    public static SetOfNode<StateNodeInterface> SetOfStateNode(){
-        SetOfNode<StateNodeInterface> object = setOfStateNodePool.get();
+    private static final MemoryPool<SetOfNode<IStateNode>> setOfStateNodePool = new MemoryPool<>();
+    public static SetOfNode<IStateNode> SetOfStateNode(){
+        SetOfNode<IStateNode> object = setOfStateNodePool.get();
         if(object == null) {
             object = new SetOfNode<>(setOfStateNodePool);
             setOfStateNodePool.add(object);

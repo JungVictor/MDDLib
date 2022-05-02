@@ -1,14 +1,14 @@
 package structures.lists;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.AllocatorOf;
 
-public class UnorderedListOfNodeInterface extends AbstractUnorderedListOfNodes<NodeInterface> {
+public class UnorderedListOfNodeInterface extends AbstractUnorderedListOfNodes<INode> {
 
     // Thread safe allocator
     private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
 
-    private NodeInterface[] list;
+    private INode[] list;
 
     //**************************************//
     //           INITIALISATION             //
@@ -33,7 +33,7 @@ public class UnorderedListOfNodeInterface extends AbstractUnorderedListOfNodes<N
      */
     public static UnorderedListOfNodeInterface create(int capacity){
         UnorderedListOfNodeInterface object = allocator().allocate();
-        if(object.list == null || object.list.length < capacity) object.list = new NodeInterface[capacity];
+        if(object.list == null || object.list.length < capacity) object.list = new INode[capacity];
         return object;
     }
 
@@ -51,17 +51,17 @@ public class UnorderedListOfNodeInterface extends AbstractUnorderedListOfNodes<N
     //**************************************//
 
     @Override
-    public NodeInterface[] list() {
+    public INode[] list() {
         return list;
     }
 
     @Override
-    protected NodeInterface[] createList(int capacity) {
-        return new NodeInterface[capacity];
+    protected INode[] createList(int capacity) {
+        return new INode[capacity];
     }
 
     @Override
-    protected void setList(NodeInterface[] list) {
+    protected void setList(INode[] list) {
         this.list = list;
     }
 

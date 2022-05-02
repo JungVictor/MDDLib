@@ -1,6 +1,6 @@
 package structures;
 
-import dd.interfaces.NodeInterface;
+import dd.interfaces.INode;
 import memory.*;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.generics.MapOf;
@@ -19,8 +19,8 @@ public class Binder implements Allocable {
     private final int allocatedIndex;
     //
 
-    private final MapOf<NodeInterface, Binder> reduction = new MapOf<>(null);
-    private NodeInterface leaf;
+    private final MapOf<INode, Binder> reduction = new MapOf<>(null);
+    private INode leaf;
     private int depth;
 
     //**************************************//
@@ -76,7 +76,7 @@ public class Binder implements Allocable {
      * Set the leaf of the LayerReduction
      * @param leaf Node that will be the leaf
      */
-    public void setLeaf(NodeInterface leaf){
+    public void setLeaf(INode leaf){
         this.leaf = leaf;
     }
 
@@ -84,7 +84,7 @@ public class Binder implements Allocable {
      * Get the leaf
      * @return (Node) The leaf
      */
-    public NodeInterface getLeaf(){
+    public INode getLeaf(){
         return leaf;
     }
 

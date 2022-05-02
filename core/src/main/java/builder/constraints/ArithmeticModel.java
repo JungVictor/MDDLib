@@ -3,7 +3,10 @@ package builder.constraints;
 import builder.constraints.parameters.ParametersExpression;
 import builder.constraints.states.StateExpression;
 import dd.DecisionDiagram;
-import dd.mdd.components.SNode;
+import dd.bdd.BDD;
+import dd.bdd.components.BinaryStateNode;
+import dd.interfaces.IStateNode;
+import dd.mdd.components.StateNode;
 import memory.Memory;
 import structures.Domains;
 import structures.arrays.ArrayOfInt;
@@ -59,10 +62,13 @@ public class ArithmeticModel {
         ParametersExpression parameters = ParametersExpression.create(variables, expressions, min, max);
         StateExpression expression = StateExpression.create(parameters);
 
-        SNode constraint = SNode.create();
+        IStateNode constraint;
+        if(result instanceof BDD) constraint = BinaryStateNode.create();
+        else constraint = StateNode.create();
         constraint.setState(expression);
 
         ConstraintBuilder.build(result, constraint, D, size);
+
         result.reduce();
 
         Memory.free(min);
