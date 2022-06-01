@@ -186,6 +186,19 @@ public class Memory {
         return object;
     }
 
+    private static final MemoryPool<SetOfNode<INode>> setOfINodePool = new MemoryPool<>();
+    public static SetOfNode<INode> SetOfINode(){
+        SetOfNode<INode> object = setOfINodePool.get();
+        if(object == null) {
+            object = new SetOfNode<>(setOfINodePool);
+            setOfINodePool.add(object);
+        }
+        object.prepare();
+        return object;
+    }
+
+
+
     private static final MemoryPool<SetOf<BinaryNode>> setOfBinaryNodePool = new MemoryPool<>();
     public static SetOf<BinaryNode> SetOfBinaryNode(){
         SetOf<BinaryNode> object = setOfBinaryNodePool.get();
