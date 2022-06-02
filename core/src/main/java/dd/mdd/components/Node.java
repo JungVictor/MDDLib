@@ -164,7 +164,7 @@ public class Node extends AbstractNode {
      */
     @Override
     public void setX(INode node, int i){
-        associate((Node) node, i);
+        associate(node, i);
     }
 
     //**************************************//

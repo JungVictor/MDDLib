@@ -512,6 +512,23 @@ public class MDD extends DecisionDiagram {
     }
 
     /**
+     * Add the path corresponding to the given values from the MDD's root.
+     * @param values Labels of the path
+     */
+    public void addPath(int... values){
+        Node current = getRoot();
+        for(int i = 0; i < values.length; i++) {
+            int v = values[i];
+            if(current.containsLabel(v)) current = current.getChild(v);
+            else{
+                Node next = Node();
+                addArcAndNode(current, v, next, i+1);
+                current = next;
+            }
+        }
+    }
+
+    /**
      * Add the given Node to the given layer.
      * @param node The node to add
      * @param layer The index of the layer
