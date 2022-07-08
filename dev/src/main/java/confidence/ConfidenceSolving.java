@@ -16,7 +16,43 @@ import utils.Logger;
 
 import java.math.BigInteger;
 
-public strictfp class ConfidenceResolution {
+public strictfp class ConfidenceSolving {
+
+    //**************************************//
+    //            EXACT PRODUCT             //
+    //**************************************//
+
+    public static MDD exactProduct(int gamma, int precision, int n, Domains domains, boolean construction){
+
+        long time1;
+        long time2;
+
+        System.out.println("=================================================");
+        System.out.println("=================================================");
+
+        printParameters("Résolution avec le produit exact (BigInteger) :", gamma, precision, -1);
+
+        Logger.out.setInformation(construction);
+        time1 = System.currentTimeMillis();
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        time2 = System.currentTimeMillis();
+        Logger.out.setInformation(true);
+
+        System.out.println();
+        printInformation("Résultats :", confidence);
+        Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+
+        System.out.println("=================================================");
+        System.out.println("=================================================");
+
+        System.out.println();
+
+        return confidence;
+    }
+
+    public static MDD exactProduct(int gamma, int precision, int n, Domains domains){
+        return exactProduct(gamma, precision, n, domains, false);
+    }
 
     //**************************************//
     //           RELAXED PRODUCT            //
@@ -28,7 +64,7 @@ public strictfp class ConfidenceResolution {
 
         if (information) {
             System.out.println("\n-------------------------------------------------");
-            printInformation("Résolution avec le produit relâché", gamma, precision, epsilon);
+            printParameters("Résolution avec le produit relâché :", gamma, precision, epsilon);
         }
         Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
@@ -40,7 +76,15 @@ public strictfp class ConfidenceResolution {
         time2 = System.currentTimeMillis();
         Logger.out.setInformation(true);
         if(information) {
-            printResult(confidence, time2-time1);
+            System.out.println();
+            if(previous != null){
+                printInformation("Raffinement des solutions incertaines :", confidence);
+            }
+            else {
+                printInformation("Résultats :", confidence);
+            }
+            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -68,7 +112,6 @@ public strictfp class ConfidenceResolution {
                 Memory.free(extract);
                 extract = null;
             }
-
             if(confidence.nSolutions() == 0) break;
             else if(i == epsilon) {
                 if(result == null) {
@@ -104,7 +147,6 @@ public strictfp class ConfidenceResolution {
                 }
                 break;
             }
-
             MDD diff = Operation.minus(confidence, extract);
             Memory.free(confidence);
             confidence = null;
@@ -132,7 +174,8 @@ public strictfp class ConfidenceResolution {
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
 
-            printResult(result, time);
+            printInformation("Résultats :", result);
+            Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
         System.out.println("=================================================");
@@ -156,19 +199,28 @@ public strictfp class ConfidenceResolution {
 
         if (information){
             System.out.println("\n-------------------------------------------------");
-            printInformation("Résolution avec le logarithme flottant", gamma, precision, epsilon);
+            printParameters("Résolution avec le logarithme flottant :", gamma, precision, epsilon);
         }
         Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
+
         double gammaDouble = gamma * Math.pow(10, -precision);
         if(previous != null) ConstraintOperation.confidence(confidence, previous, gammaDouble, precision, epsilon, n, domains);
         else MyMDDBuilder.confidence(confidence, gammaDouble, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
         Logger.out.setInformation(true);
-        if(information){
-            printResult(confidence, time2-time1);
+        if(information) {
+            System.out.println();
+            if(previous != null){
+                printInformation("Raffinement des solutions incertaines :", confidence);
+            }
+            else {
+                printInformation("Résultats :", confidence);
+            }
+            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -261,7 +313,8 @@ public strictfp class ConfidenceResolution {
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
 
-            printResult(result, time);
+            printInformation("Résultats :", result);
+            Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
         System.out.println("=================================================");
@@ -276,17 +329,18 @@ public strictfp class ConfidenceResolution {
     }
 
     //**************************************//
-    //        RELAXED LOGARITHM ULP         //
+    //        RELAXED ULP LOGARITHM         //
     //**************************************//
-    //Relaxed method
-    public static MDD testLogULP2(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+
+    public static MDD relaxedULPLogarithm(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction){
         long time1;
         long time2;
 
-        Logger.out.information("Test avec le logarithme ULP\n");
-        Logger.out.information("Epsilon = " + epsilon + "\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
-
+        if (information) {
+            System.out.println("\n-------------------------------------------------");
+            printParameters("Résolution avec le logarithme ULP :", gamma, precision, epsilon);
+        }
+        Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
@@ -294,12 +348,18 @@ public strictfp class ConfidenceResolution {
         else MyMDDBuilder.confidenceULP(confidence, gamma, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        Logger.out.setInformation(true);
+        if(information) {
+            System.out.println();
+            if(previous != null){
+                printInformation("Raffinement des solutions incertaines :", confidence);
+            }
+            else {
+                printInformation("Résultats :", confidence);
+            }
+            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            System.out.println("-------------------------------------------------");
+        }
 
         //precision(confidence, domains, n, precision);
 
@@ -308,8 +368,11 @@ public strictfp class ConfidenceResolution {
         return confidence;
     }
 
-    //IPR method
-    public static MDD testLogULP3(int gamma, int precision, int epsilon, int n, Domains domains) {
+    public static MDD relaxedULPLogarithm(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedULPLogarithm(previous, gamma, precision, epsilon, n, domains, true, false);
+    }
+
+    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -317,7 +380,7 @@ public strictfp class ConfidenceResolution {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testLogULP2(extract, gamma, precision, i, n, domains);
+            confidence = relaxedULPLogarithm(extract, gamma, precision, i, n, domains, information, construction);
 
             // Free the ancient extract
             if(extract != null) {
@@ -381,43 +444,42 @@ public strictfp class ConfidenceResolution {
 
         time = System.currentTimeMillis() - time;
 
-        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
-
-        int nNodes = 0;
-        int nArcs = 0;
-        double nSol = 0;
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
         if(result != null) {
-            nNodes = result.nodes();
-            nArcs = result.arcs();
-            nSol = result.nSolutions();
             precision(result, domains, n, precision);
-
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
+
+            printInformation("Résultats :", result);
+            Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
-        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
-        Logger.out.information("\r\nNombre de solutions : " + nSol);
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
 
         System.out.println();
         return result;
     }
 
+    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedULPLogarithmIPR(gamma, precision, epsilon, n, domains, false, false);
+    }
+
     //**************************************//
     //       RELAXED INTEGER LOGARITHM      //
     //**************************************//
-    //Relaxed method
-    public static MDD testLogInt2(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
+
+    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction){
         long time1;
         long time2;
 
-        Logger.out.information("Test avec le logarithme entier\n");
-        Logger.out.information("Epsilon = " + epsilon + "\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
-
+        if (information) {
+            System.out.println("\n-------------------------------------------------");
+            printParameters("Résolution avec le logarithme entier :", gamma, precision, epsilon);
+            Logger.out.information("Précision du logarithme = " + logPrecision + "\n");
+        }
+        Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
@@ -425,12 +487,18 @@ public strictfp class ConfidenceResolution {
         else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, logPrecision, domains);
 
         time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        Logger.out.setInformation(true);
+        if(information) {
+            System.out.println();
+            if(previous != null){
+                printInformation("Raffinement des solutions incertaines :", confidence);
+            }
+            else {
+                printInformation("Résultats :", confidence);
+            }
+            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            System.out.println("-------------------------------------------------");
+        }
 
         //precision(confidence, domains, n, precision);
 
@@ -439,8 +507,11 @@ public strictfp class ConfidenceResolution {
         return confidence;
     }
 
-    //IPR method
-    public static MDD testLogInt3(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains) {
+    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
+        return relaxedIntegerLogarithm(previous, gamma, precision, epsilon, logPrecision, n, domains, true, false);
+    }
+
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -448,7 +519,7 @@ public strictfp class ConfidenceResolution {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testLogInt2(extract, gamma, precision, i, logPrecision, n, domains);
+            confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, information, construction);
 
             // Free the ancient extract
             if(extract != null) {
@@ -512,80 +583,31 @@ public strictfp class ConfidenceResolution {
 
         time = System.currentTimeMillis() - time;
 
-        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
-
-        int nNodes = 0;
-        int nArcs = 0;
-        double nSol = 0;
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
         if(result != null) {
-            nNodes = result.nodes();
-            nArcs = result.arcs();
-            nSol = result.nSolutions();
             precision(result, domains, n, precision);
-
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
+
+            printInformation("Résultats :", result);
+            Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
-        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
-        Logger.out.information("\r\nNombre de solutions : " + nSol);
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
 
         System.out.println();
         return result;
     }
 
-    public static MDD testLogInt4(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains) {
-        MDD result = null;
-        MDD confidence = null, extract = null;
-        MDD tmp = null, tmp_res = null;
-
-        long time = System.currentTimeMillis();
-
-        confidence = testLogInt2(extract, gamma, precision, epsilon, logPrecision, n, domains);
-        extract = extract(confidence, domains, n, precision, gamma);
-        result = Operation.minus(confidence, extract);
-
-        confidence = testLogInt2(extract, gamma, precision, 15, logPrecision, n, domains);
-        extract = extract(confidence, domains, n, precision, gamma);
-
-        confidence = Operation.minus(confidence, extract);
-        result = Operation.union(result, confidence);
-
-        if(extract != null) Memory.free(extract);
-        if(confidence != null) Memory.free(confidence);
-
-        time = System.currentTimeMillis() - time;
-
-        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
-
-        int nNodes = 0;
-        int nArcs = 0;
-        double nSol = 0;
-
-        if(result != null) {
-            nNodes = result.nodes();
-            nArcs = result.arcs();
-            nSol = result.nSolutions();
-            precision(result, domains, n, precision);
-
-            MDD negation = Operation.negation(result);
-            precision(negation, domains, n, precision);
-        }
-
-        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
-        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
-        Logger.out.information("\r\nNombre de solutions : " + nSol);
-
-
-        System.out.println();
-        return result;
-
-
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
+        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, false, false);
     }
 
+    //**************************************//
+    //                UTILS                 //
+    //**************************************//
     @SuppressWarnings("unchecked")
     public static void precision(MDD result, Domains D, int n, int precision){
         if(result.nSolutions() == 0) {
@@ -640,20 +662,23 @@ public strictfp class ConfidenceResolution {
         return extract;
     }
 
-    private static void printInformation(String method, int gamma, int precision, int epsilon){
-        Logger.out.information(method + "\n");
+    private static void printParameters(String method, int gamma, int precision, int epsilon){
+        System.out.println(method);
         Logger.out.information("Precision = " + precision + "\n");
         Logger.out.information("Gamma = " + gamma + "\n");
         Logger.out.information("Epsilon = " + epsilon + "\n");
     }
 
-    private static void printResult(MDD mdd, long time){
-        System.out.println("\nRésultats :");
+    private static void printInformation(String mddName, MDD mdd){
+        System.out.println(mddName);
         Logger.out.information("Nombre de noeuds = " + mdd.nodes() + "\n");
         Logger.out.information("Nombre d'arcs = " + mdd.arcs() + "\n");
         Logger.out.information("Nombre de solutions = " + mdd.nSolutions() + "\n");
-        Logger.out.information("Temps (ms) = " + (time) + "\n");
     }
+
+    //**************************************//
+    //                TESTS                 //
+    //**************************************//
 
     public static void testSum1(MDDPrinter printer){
         SetOf<Integer> V = Memory.SetOfInteger();
@@ -730,33 +755,6 @@ public strictfp class ConfidenceResolution {
         confidence.accept(printer);
     }
 
-    public static void testBigInteger2(int gamma, int precision, int n, Domains domains){
-
-        long time1;
-        long time2;
-
-        Logger.out.information("Test avec BigInteger\n");
-        System.out.println("Gamma = " + gamma);
-
-        time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
-        time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
-
-        confidence.clearAllAssociations();
-        PMDD test = PMDD.create();
-        confidence.copy(test);
-
-
-
-        Memory.free(confidence);
-    }
-
     public static void testPrimeFactorization1(MDDPrinter printer){
         int gamma = 70;
         int precision = 2;
@@ -828,5 +826,54 @@ public strictfp class ConfidenceResolution {
 
         MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
         confidence.accept(printer);
+    }
+
+    public static MDD testLogInt4(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains) {
+        MDD result = null;
+        MDD confidence = null, extract = null;
+        MDD tmp = null, tmp_res = null;
+
+        long time = System.currentTimeMillis();
+
+        confidence = relaxedIntegerLogarithm(extract, gamma, precision, epsilon, logPrecision, n, domains);
+        extract = extract(confidence, domains, n, precision, gamma);
+        result = Operation.minus(confidence, extract);
+
+        confidence = relaxedIntegerLogarithm(extract, gamma, precision, 15, logPrecision, n, domains);
+        extract = extract(confidence, domains, n, precision, gamma);
+
+        confidence = Operation.minus(confidence, extract);
+        result = Operation.union(result, confidence);
+
+        if(extract != null) Memory.free(extract);
+        if(confidence != null) Memory.free(confidence);
+
+        time = System.currentTimeMillis() - time;
+
+        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
+
+        int nNodes = 0;
+        int nArcs = 0;
+        double nSol = 0;
+
+        if(result != null) {
+            nNodes = result.nodes();
+            nArcs = result.arcs();
+            nSol = result.nSolutions();
+            precision(result, domains, n, precision);
+
+            MDD negation = Operation.negation(result);
+            precision(negation, domains, n, precision);
+        }
+
+        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
+        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
+        Logger.out.information("\r\nNombre de solutions : " + nSol);
+
+
+        System.out.println();
+        return result;
+
+
     }
 }
