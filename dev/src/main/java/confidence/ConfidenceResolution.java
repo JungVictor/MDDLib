@@ -16,65 +16,21 @@ import utils.Logger;
 
 import java.math.BigInteger;
 
-public strictfp class ConfidenceTests {
+public strictfp class ConfidenceResolution {
 
-    public static void testSum1(MDDPrinter printer){
-        SetOf<Integer> V = Memory.SetOfInteger();
-        for(int i = 0; i < 2; i++) V.add(i);
-        MDD sum = MDDBuilder.sum(MDD.create(), 1, 3, 4, V);
+    //**************************************//
+    //           RELAXED PRODUCT            //
+    //**************************************//
 
-        sum.accept(printer);
-    }
-
-    public static void testMul1(MDDPrinter printer, int n){
-        BigInteger min = BigInteger.valueOf(2);
-        BigInteger max = BigInteger.valueOf(8);
-        Domains domains = Domains.create();
-
-        for(int i = 0; i < n; i++){
-            domains.put(i, 1);
-            domains.put(i, 2);
-        }
-
-        MDD mul = MyMDDBuilder.mul(MDD.create(), min, max, n, domains);
-        mul.accept(printer);
-    }
-
-    public static void testMulRelaxed1(MDDPrinter printer){
-        int gamma = 70;
-        int precision = 2;
-        int epsilon = 6;
-        int n = 4;
-        Domains domains = Domains.create();
-
-        domains.put(0, 80);
-        domains.put(0, 90);
-        domains.put(0, 100);
-
-        domains.put(1, 78);
-        domains.put(1, 87);
-        domains.put(1, 97);
-
-        domains.put(2, 73);
-        domains.put(2, 83);
-        domains.put(2, 93);
-
-        domains.put(3, 97);
-        domains.put(3, 98);
-        domains.put(3, 99);
-
-        MDD confidence = MyMDDBuilder.confidenceMulRelaxed(MDD.create(), gamma, precision, epsilon, n, domains);
-        confidence.accept(printer);
-    }
-
-    public static MDD testMulRelaxed2(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+    public static MDD relaxedProduct(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction){
         long time1;
         long time2;
 
-        Logger.out.information("Test avec les entiers et la relaxation\n");
-        Logger.out.information("Epsilon = " + epsilon + "\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
-
+        if (information) {
+            System.out.println("\n-------------------------------------------------");
+            printInformation("Résolution avec le produit relâché", gamma, precision, epsilon);
+        }
+        Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
@@ -82,12 +38,10 @@ public strictfp class ConfidenceTests {
         else MyMDDBuilder.confidenceMulRelaxed(confidence, gamma, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        Logger.out.setInformation(true);
+        if(information) {
+            printResult(confidence, time2-time1);
+        }
 
         //precision(confidence, domains, n, precision);
 
@@ -96,7 +50,11 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
-    public static MDD testMulRelaxed3(int gamma, int precision, int epsilon, int n, Domains domains) {
+    public static MDD relaxedProduct(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedProduct(previous, gamma, precision, epsilon, n, domains, true, false);
+    }
+
+    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -104,7 +62,7 @@ public strictfp class ConfidenceTests {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testMulRelaxed2(extract, gamma, precision, i, n, domains);
+            confidence = relaxedProduct(extract, gamma, precision, i, n, domains, information, construction);
             // Free the ancient extract
             if(extract != null) {
                 Memory.free(extract);
@@ -167,178 +125,51 @@ public strictfp class ConfidenceTests {
 
         time = System.currentTimeMillis() - time;
 
-        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
-
-        int nNodes = 0;
-        int nArcs = 0;
-        double nSol = 0;
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
         if(result != null) {
-            nNodes = result.nodes();
-            nArcs = result.arcs();
-            nSol = result.nSolutions();
             precision(result, domains, n, precision);
-
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
+
+            printResult(result, time);
         }
 
-        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
-        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
-        Logger.out.information("\r\nNombre de solutions : " + nSol);
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
 
         System.out.println();
         return result;
     }
 
-    public static void testBigInteger1(MDDPrinter printer){
-        int gamma = 70;
-        int precision = 2;
-        int n = 4;
-        Domains domains = Domains.create();
-
-        domains.put(0, 80);
-        domains.put(0, 90);
-        domains.put(0, 100);
-
-        domains.put(1, 78);
-        domains.put(1, 87);
-        domains.put(1, 97);
-
-        domains.put(2, 73);
-        domains.put(2, 83);
-        domains.put(2, 93);
-
-        domains.put(3, 97);
-        domains.put(3, 98);
-        domains.put(3, 99);
-
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
-        confidence.accept(printer);
+    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedProductIPR(gamma, precision, epsilon, n, domains, false, false);
     }
 
-    public static void testBigInteger2(int gamma, int precision, int n, Domains domains){
+    //**************************************//
+    //          RELAXED LOGARITHM           //
+    //**************************************//
 
+    public static MDD relaxedLogarithm(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction){
         long time1;
         long time2;
 
-        Logger.out.information("Test avec BigInteger\n");
-        System.out.println("Gamma = " + gamma);
-
-        time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
-        time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
-
-        confidence.clearAllAssociations();
-        PMDD test = PMDD.create();
-        confidence.copy(test);
-
-
-
-        Memory.free(confidence);
-    }
-
-    public static void testPrimeFactorization1(MDDPrinter printer){
-        int gamma = 70;
-        int precision = 2;
-        int n = 4;
-        Domains domains = Domains.create();
-
-        domains.put(0, 80);
-        domains.put(0, 90);
-        domains.put(0, 100);
-
-        domains.put(1, 78);
-        domains.put(1, 87);
-        domains.put(1, 97);
-
-        domains.put(2, 73);
-        domains.put(2, 83);
-        domains.put(2, 93);
-
-        domains.put(3, 97);
-        domains.put(3, 98);
-        domains.put(3, 99);
-
-        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
-        confidence.accept(printer);
-    }
-
-    public static void testPrimeFactorization2(int gamma, int precision, int n, Domains domains){
-
-        long time1;
-        long time2;
-
-        Logger.out.information("Test avec PrimeFactorization\n");
-        System.out.println("Gamma = " + gamma);
-
-        time1 = System.currentTimeMillis();
-        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
-        time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
-        Memory.free(confidence);
-    }
-
-    public static void testLog1(MDDPrinter printer){
-        double gamma = 0.7;
-        int precision = 2;
-        int epsilon = 2;
-        int n = 4;
-        Domains domains = Domains.create();
-
-        domains.put(0, 80);
-        domains.put(0, 90);
-        domains.put(0, 100);
-
-        domains.put(1, 78);
-        domains.put(1, 87);
-        domains.put(1, 97);
-
-        domains.put(2, 73);
-        domains.put(2, 83);
-        domains.put(2, 93);
-
-        domains.put(3, 97);
-        domains.put(3, 98);
-        domains.put(3, 99);
-
-        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
-        confidence.accept(printer);
-    }
-
-    public static MDD testLog2(MDD previous, double gamma, int precision, int epsilon, int n, Domains domains){
-        long time1;
-        long time2;
-
-        Logger.out.information("Test avec le logarithme\n");
-        Logger.out.information("Epsilon = " + epsilon + "\n");
-        Logger.out.information("Gamma = " + gamma + "\n");
-
+        if (information){
+            System.out.println("\n-------------------------------------------------");
+            printInformation("Résolution avec le logarithme flottant", gamma, precision, epsilon);
+        }
+        Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
-
-        if(previous != null) ConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, domains);
-        else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, domains);
+        double gammaDouble = gamma * Math.pow(10, -precision);
+        if(previous != null) ConstraintOperation.confidence(confidence, previous, gammaDouble, precision, epsilon, n, domains);
+        else MyMDDBuilder.confidence(confidence, gammaDouble, precision, epsilon, n, domains);
 
         time2 = System.currentTimeMillis();
-
-        Logger.out.information("");
-        System.out.println("\nNombre de noeuds : " + confidence.nodes());
-        System.out.println("Nombre d'arcs : " + confidence.arcs());
-        System.out.println("Nombre de solutions : " + confidence.nSolutions());
-        System.out.println("Temps de construction : " + (time2 - time1) + " ms.");
+        Logger.out.setInformation(true);
+        if(information){
+            printResult(confidence, time2-time1);
+        }
 
         //precision(confidence, domains, n, precision);
 
@@ -347,7 +178,11 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
-    public static MDD testLog3(double gamma, int precision, int epsilon, int n, Domains domains) {
+    public static MDD relaxedLogarithm(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedLogarithm(previous, gamma, precision, epsilon, n, domains, true, false);
+    }
+
+    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -355,7 +190,7 @@ public strictfp class ConfidenceTests {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = testLog2(extract,gamma * Math.pow(10, -precision), precision, i, n, domains);
+            confidence = relaxedLogarithm(extract, gamma, precision, i, n, domains, information, construction);
 
             // Free the ancient extract
             if(extract != null) {
@@ -419,31 +254,31 @@ public strictfp class ConfidenceTests {
 
         time = System.currentTimeMillis() - time;
 
-        Logger.out.information("\r\nTemps (ms) : " + time + "\n\n");
-
-        int nNodes = 0;
-        int nArcs = 0;
-        double nSol = 0;
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
         if(result != null) {
-            nNodes = result.nodes();
-            nArcs = result.arcs();
-            nSol = result.nSolutions();
             precision(result, domains, n, precision);
-
             MDD negation = Operation.negation(result);
             precision(negation, domains, n, precision);
+
+            printResult(result, time);
         }
 
-        Logger.out.information("\r\nNombre de noeuds : " + nNodes);
-        Logger.out.information("\r\nNombre d'arcs : " + nArcs);
-        Logger.out.information("\r\nNombre de solutions : " + nSol);
-
+        System.out.println("=================================================");
+        System.out.println("=================================================");
 
         System.out.println();
         return result;
     }
 
+    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
+        return relaxedLogarithmIPR(gamma, precision, epsilon, n, domains, false, false);
+    }
+
+    //**************************************//
+    //        RELAXED LOGARITHM ULP         //
+    //**************************************//
+    //Relaxed method
     public static MDD testLogULP2(MDD previous, int gamma, int precision, int epsilon, int n, Domains domains){
         long time1;
         long time2;
@@ -473,6 +308,7 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
+    //IPR method
     public static MDD testLogULP3(int gamma, int precision, int epsilon, int n, Domains domains) {
         MDD result = null;
         MDD confidence = null, extract = null;
@@ -570,6 +406,10 @@ public strictfp class ConfidenceTests {
         return result;
     }
 
+    //**************************************//
+    //       RELAXED INTEGER LOGARITHM      //
+    //**************************************//
+    //Relaxed method
     public static MDD testLogInt2(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
         long time1;
         long time2;
@@ -599,6 +439,7 @@ public strictfp class ConfidenceTests {
         return confidence;
     }
 
+    //IPR method
     public static MDD testLogInt3(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains) {
         MDD result = null;
         MDD confidence = null, extract = null;
@@ -799,4 +640,193 @@ public strictfp class ConfidenceTests {
         return extract;
     }
 
+    private static void printInformation(String method, int gamma, int precision, int epsilon){
+        Logger.out.information(method + "\n");
+        Logger.out.information("Precision = " + precision + "\n");
+        Logger.out.information("Gamma = " + gamma + "\n");
+        Logger.out.information("Epsilon = " + epsilon + "\n");
+    }
+
+    private static void printResult(MDD mdd, long time){
+        System.out.println("\nRésultats :");
+        Logger.out.information("Nombre de noeuds = " + mdd.nodes() + "\n");
+        Logger.out.information("Nombre d'arcs = " + mdd.arcs() + "\n");
+        Logger.out.information("Nombre de solutions = " + mdd.nSolutions() + "\n");
+        Logger.out.information("Temps (ms) = " + (time) + "\n");
+    }
+
+    public static void testSum1(MDDPrinter printer){
+        SetOf<Integer> V = Memory.SetOfInteger();
+        for(int i = 0; i < 2; i++) V.add(i);
+        MDD sum = MDDBuilder.sum(MDD.create(), 1, 3, 4, V);
+
+        sum.accept(printer);
+    }
+
+    public static void testMul1(MDDPrinter printer, int n){
+        BigInteger min = BigInteger.valueOf(2);
+        BigInteger max = BigInteger.valueOf(8);
+        Domains domains = Domains.create();
+
+        for(int i = 0; i < n; i++){
+            domains.put(i, 1);
+            domains.put(i, 2);
+        }
+
+        MDD mul = MyMDDBuilder.mul(MDD.create(), min, max, n, domains);
+        mul.accept(printer);
+    }
+
+    public static void testMulRelaxed1(MDDPrinter printer){
+        int gamma = 70;
+        int precision = 2;
+        int epsilon = 6;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidenceMulRelaxed(MDD.create(), gamma, precision, epsilon, n, domains);
+        confidence.accept(printer);
+    }
+
+    public static void testBigInteger1(MDDPrinter printer){
+        int gamma = 70;
+        int precision = 2;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        confidence.accept(printer);
+    }
+
+    public static void testBigInteger2(int gamma, int precision, int n, Domains domains){
+
+        long time1;
+        long time2;
+
+        Logger.out.information("Test avec BigInteger\n");
+        System.out.println("Gamma = " + gamma);
+
+        time1 = System.currentTimeMillis();
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, n, domains);
+        time2 = System.currentTimeMillis();
+
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
+        System.out.println("Nombre d'arcs : " + confidence.arcs());
+        System.out.println("Nombre de solutions : " + confidence.nSolutions());
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+
+        confidence.clearAllAssociations();
+        PMDD test = PMDD.create();
+        confidence.copy(test);
+
+
+
+        Memory.free(confidence);
+    }
+
+    public static void testPrimeFactorization1(MDDPrinter printer){
+        int gamma = 70;
+        int precision = 2;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
+        confidence.accept(printer);
+    }
+
+    public static void testPrimeFactorization2(int gamma, int precision, int n, Domains domains){
+
+        long time1;
+        long time2;
+
+        Logger.out.information("Test avec PrimeFactorization\n");
+        System.out.println("Gamma = " + gamma);
+
+        time1 = System.currentTimeMillis();
+        MDD confidence = MyMDDBuilder.confidencePF(MDD.create(), gamma, precision, n, domains);
+        time2 = System.currentTimeMillis();
+
+        Logger.out.information("");
+        System.out.println("\nNombre de noeuds : " + confidence.nodes());
+        System.out.println("Nombre d'arcs : " + confidence.arcs());
+        System.out.println("Nombre de solutions : " + confidence.nSolutions());
+        System.out.println("Temps de construction : " + (time2 - time1) + " ms.\n");
+        Memory.free(confidence);
+    }
+
+    public static void testLog1(MDDPrinter printer){
+        double gamma = 0.7;
+        int precision = 2;
+        int epsilon = 2;
+        int n = 4;
+        Domains domains = Domains.create();
+
+        domains.put(0, 80);
+        domains.put(0, 90);
+        domains.put(0, 100);
+
+        domains.put(1, 78);
+        domains.put(1, 87);
+        domains.put(1, 97);
+
+        domains.put(2, 73);
+        domains.put(2, 83);
+        domains.put(2, 93);
+
+        domains.put(3, 97);
+        domains.put(3, 98);
+        domains.put(3, 99);
+
+        MDD confidence = MyMDDBuilder.confidence(MDD.create(), gamma, precision, epsilon, n, domains);
+        confidence.accept(printer);
+    }
 }
