@@ -61,17 +61,46 @@ public class ConstraintOperation {
      * @return the MDD resulting from the intersection between mdd and the alldiff constraint
      */
     static public DecisionDiagram allDiff(DecisionDiagram result, DecisionDiagram mdd, int memory, SetOf<Integer> V, SetOf<Integer> variables){
+
+
         StateNode constraint = StateNode.create();
         ParametersAllDiffMem parameters = ParametersAllDiffMem.create(memory, V, variables);
         constraint.setState(StateAllDiffMem.create(parameters));
 
         result.getRoot().associate(mdd.getRoot(), constraint);
 
-        intersection(result, mdd, constraint);
-
-        Memory.free(constraint);
-        Memory.free(parameters);
+        intersection(result, mdd, constraint, false);
         result.reduce();
+/*
+        DecisionDiagram tmp_res = null;
+        DecisionDiagram tmp_mdd = mdd;
+        int max_iter = mdd.size() - memory;
+        for(int i = 0; i < max_iter + 1; i++) {
+            variables.clear();
+            for(int v = 0; v < memory; v++) variables.add(v+i);
+            System.out.println(variables);
+            StateNode constraint = StateNode.create();
+            ParametersAllDiff parameters = ParametersAllDiff.create(V, variables);
+            constraint.setState(StateAllDiff.create(parameters));
+
+            if(i == max_iter) {
+                result.getRoot().associate(tmp_mdd.getRoot(), constraint);
+                intersection(result, tmp_mdd, constraint);
+                result.reduce();
+                Memory.free(tmp_mdd);
+            } else {
+                tmp_res = result.DD();
+                tmp_res.getRoot().associate(tmp_mdd.getRoot(), constraint);
+                intersection(tmp_res, tmp_mdd, constraint);
+                if(tmp_mdd != mdd) Memory.free(tmp_mdd);
+                tmp_mdd = tmp_res;
+                tmp_res.reduce();
+            }
+
+            Memory.free(parameters);
+            Memory.free(constraint);
+        }*/
+
         return result;
     }
 

@@ -90,14 +90,15 @@ public class StateAllDiffMem extends NodeState {
      */
     @Override
     public String signature(int label, int layer, int size) {
+        if(layer + 1 == size) return "tt";
         StringBuilder builder = new StringBuilder();
         if(constraint.contains(label) && constraint.isVariable(layer-1)) {
             builder.append(label); builder.append(" ");
-            for (int i = 0; i < Math.min(alldiff.length()-2, layer-1); i++) {
+            for (int i = 0; i < Math.min(alldiff.length()-1, layer); i++) {
                 builder.append(alldiff.get(i));
                 builder.append(" ");
             }
-        } else for (int i = 0; i < alldiff.length(); i++) {
+        } else for (int i = 0; i < Math.min(alldiff.length()-1, layer); i++) {
             builder.append(alldiff.get(i));
             builder.append(" ");
         }

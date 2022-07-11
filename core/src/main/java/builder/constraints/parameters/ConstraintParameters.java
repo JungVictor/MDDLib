@@ -14,6 +14,7 @@ public abstract class ConstraintParameters implements Allocable {
 
     // Set of constrained variables
     private SetOf<Integer> variables;
+    private int lastVariable;
 
     /**
      * Constructor. Initialise the allocated index in the allocator
@@ -29,6 +30,8 @@ public abstract class ConstraintParameters implements Allocable {
      */
     protected void setVariables(SetOf<Integer> variables){
         this.variables = variables;
+        lastVariable = -1;
+        if(variables != null) for(int v : variables) if(v > lastVariable) lastVariable = v;
     }
 
     /**
@@ -38,6 +41,24 @@ public abstract class ConstraintParameters implements Allocable {
      */
     public boolean isVariable(int i) {
         return variables == null || variables.contains(i);
+    }
+
+    /**
+     * Return the layer of the last variable
+     * @return The layer of the last variables
+     */
+    public int getLastVariable(){
+        return lastVariable;
+    }
+
+    /**
+     * Return true if there is a layer remaining in the constraint after the given one.
+     * @param layer The layer considered
+     * @return True if there is a layer remaining in the constraint after the given one, false otherwise.
+     */
+    public boolean isLayerRemaining(int layer){
+        if(lastVariable == -1) return true;
+        return layer >= lastVariable;
     }
 
     /**
@@ -63,6 +84,7 @@ public abstract class ConstraintParameters implements Allocable {
     @Override
     public void free(){
         this.variables = null;
+        lastVariable = -1;
     }
 
 }

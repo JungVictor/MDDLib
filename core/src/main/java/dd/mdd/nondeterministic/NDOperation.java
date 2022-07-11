@@ -21,6 +21,8 @@ public class NDOperation {
         // dd1 is the partially ordered MDD
         // dd2 is the fully ordered MDD
 
+        boolean instanceOfND = dd1 instanceof NDMDD;
+
         ArrayOfNodeInterface tts = ArrayOfNodeInterface.create(roots.length);
         for(int i = 0; i < roots.length - 1; i++) tts.set(i, roots.get(i+1));
         tts.set(tts.length - 1, dd1.getTt());
@@ -50,9 +52,17 @@ public class NDOperation {
                         // If we reached the terminal node for this branch, skip
                         if(x2 == tts.get(a-1)) continue;
                         if (x2 != null && x2.containsLabel(v)) {
-                            y1 = x1.getChild(v);
                             y2 = x2.getChild(v);
-                            addArcAndNode(result, x, y1, y2, v, i, a, xs, binder);
+                            // If first MDD is non-deterministic
+                            if(instanceOfND) {
+                                for(Object nd_y1 : ((NDNode) x1).iterateOnChildren(v)) {
+                                    addArcAndNode(result, x, (INode) nd_y1, y2, v, i, a, xs, binder);
+                                }
+                            // If first MDD is deterministic
+                            } else {
+                                y1 = x1.getChild(v);
+                                addArcAndNode(result, x, y1, y2, v, i, a, xs, binder);
+                            }
                         }
                     }
                 }

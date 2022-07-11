@@ -235,6 +235,15 @@ public class PMDD extends MDD {
         return ((PropertyNode) getRoot()).getProperty(propertyName);
     }
 
+    public void removeAllProperties(){
+        for(int i = 0; i < size(); i++){
+            for(Node node : getLayer(i)) {
+                IPropertyNode pnode = (IPropertyNode) node;
+                pnode.clearProperties();
+            }
+        }
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

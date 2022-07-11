@@ -87,6 +87,8 @@ public class StateAllDiff extends NodeState {
      */
     @Override
     public String signature(int label, int layer, int size) {
+        if(!constraint.isLayerRemaining(layer)) return "";
+        if(layer+1 == size) return "";
         StringBuilder builder = new StringBuilder();
         for(int v : constraint.set()) {
             if((v == label && constraint.isVariable(layer-1)) || alldiff.contains(v)) builder.append("1");

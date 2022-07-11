@@ -308,12 +308,12 @@ public class Operation {
     public static boolean inclusion(DecisionDiagram dd1, DecisionDiagram dd2){
         if(dd2.size() > dd1.size()) return false;
 
-        for (int i = 0; i < dd1.size(); i++) {
+        for (int i = 0; i < dd1.size()-1; i++) {
             if(dd1.getDomainSize(i) < dd2.getDomainSize(i)) return false;
-            for(int value : dd1.iterateOnDomain(i)) if(!dd2.domainContains(i, value)) return false;
+            for(int value : dd2.iterateOnDomain(i)) if(!dd1.domainContains(i, value)) return false;
         }
 
-        return inclusion(dd1.getRoot(), dd2.getRoot(), dd2.size());
+        return inclusion(dd2.getRoot(), dd1.getRoot(), dd2.size());
     }
 
     /**

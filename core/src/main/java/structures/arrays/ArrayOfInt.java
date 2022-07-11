@@ -12,7 +12,7 @@ import java.util.Iterator;
 public class ArrayOfInt implements Iterable<Integer>, Allocable {
 
     // Thread safe allocator
-    private final static ThreadLocal<ArrayOfInt.Allocator> localStorage = ThreadLocal.withInitial(ArrayOfInt.Allocator::new);
+    private final static ThreadLocal<Allocator> localStorage = ThreadLocal.withInitial(Allocator::new);
     // Index in Memory
     private final int allocatedIndex;
 
@@ -82,7 +82,7 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
      * Get the allocator. Thread safe.
      * @return The allocator.
      */
-    private static ArrayOfInt.Allocator allocator(){
+    private static Allocator allocator(){
         return localStorage.get();
     }
 
@@ -197,7 +197,7 @@ public class ArrayOfInt implements Iterable<Integer>, Allocable {
      * @return true if the value is contained in the array, false otherwise
      */
     public boolean contains(int value){
-        for(int v : this) if(v == value) return true;
+        for(int i = 0; i < length; i++) if(array[i] == value) return true;
         return false;
     }
 

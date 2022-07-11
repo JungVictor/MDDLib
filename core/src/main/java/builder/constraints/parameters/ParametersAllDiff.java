@@ -79,7 +79,7 @@ public class ParametersAllDiff extends ConstraintParameters {
      * @return True if the value is constrained, false otherwise
      */
     public boolean contains(int label){
-        return V.contains(label);
+        return V == null || V.contains(label);
     }
 
     /**
