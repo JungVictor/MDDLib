@@ -45,7 +45,7 @@ public class DDProxy extends DecisionDiagram {
 
         try {
             proxy.DATA = file.readAllBytes();
-            proxy.position = 0;
+            proxy.position = 1;
             // Mode
             byte b = proxy.DATA[proxy.position++];
             if(b != MDDReader.TOP_DOWN) throw new IllegalArgumentException("The DD must be top-down defined !");
