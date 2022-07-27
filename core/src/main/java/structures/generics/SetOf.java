@@ -104,6 +104,10 @@ public class SetOf<E> implements MemoryObject, CollectionOf<E> {
         return set.contains(object);
     }
 
+    public boolean equals(SetOf<E> set){
+        return set.set.size() == this.set.size() && set.set.containsAll(this.set);
+    }
+
     //**************************************//
     //           MEMORY FUNCTIONS           //
     //**************************************//

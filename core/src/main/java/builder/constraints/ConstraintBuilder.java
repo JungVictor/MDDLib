@@ -221,6 +221,7 @@ public class ConstraintBuilder {
         result.reduce();
         return result;
     }
+
     public static DecisionDiagram sum(DecisionDiagram result, Domains D, int min, int max, int size, SetOf<Integer> variables){
         StateNode snode = StateNode.create();
         ArrayOfInt minValues = ArrayOfInt.create(size);
@@ -245,6 +246,38 @@ public class ConstraintBuilder {
         }
         ParametersSum parameters = ParametersSum.create(min, max, minValues, maxValues, variables);
         snode.setState(StateSum.create(parameters));
+
+        build(result, snode, D, size);
+
+        Memory.free(parameters);
+        result.reduce();
+        return result;
+    }
+
+    public static DecisionDiagram sumOrdered(DecisionDiagram result, Domains D, int min, int max, int size, SetOf<Integer> jumps, SetOf<Integer> variables){
+        StateNode snode = StateNode.create();
+        ArrayOfInt minValues = ArrayOfInt.create(size);
+        ArrayOfInt maxValues = ArrayOfInt.create(size);
+
+        for(int i = size - 2; i >= 0; i--){
+            int vMin = Integer.MAX_VALUE, vMax = Integer.MIN_VALUE;
+            if(variables == null || variables.contains(i)) {
+                for (int v : D.get(i + 1)) {
+                    if (v < vMin) vMin = v;
+                    if (v > vMax) vMax = v;
+                }
+            } else {
+                vMin = 0; vMax = 0;
+            }
+            if(i < size - 1) {
+                vMin += minValues.get(i+1);
+                vMax += maxValues.get(i+1);
+            }
+            minValues.set(i, vMin);
+            maxValues.set(i, vMax);
+        }
+        ParametersSumOrdered parameters = ParametersSumOrdered.create(min, max, minValues, maxValues, jumps, variables);
+        snode.setState(StateSumOrdered.create(parameters));
 
         build(result, snode, D, size);
 

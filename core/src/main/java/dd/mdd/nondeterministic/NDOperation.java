@@ -8,6 +8,7 @@ import dd.mdd.components.Node;
 import dd.mdd.nondeterministic.components.NDNode;
 import memory.Memory;
 import structures.Binder;
+import structures.arrays.ArrayOfInt;
 import structures.arrays.ArrayOfNodeInterface;
 import structures.generics.CollectionOf;
 import structures.successions.SuccessionOfNodeInterface;
@@ -50,15 +51,16 @@ public class NDOperation {
                     for (int a = 1; a < xs.length; a++) {
                         x2 = x.getX(a);
                         // If we reached the terminal node for this branch, skip
-                        if(x2 == tts.get(a-1)) continue;
+                        if (x2 == tts.get(a-1)) continue;
+                        // Else continue
                         if (x2 != null && x2.containsLabel(v)) {
                             y2 = x2.getChild(v);
                             // If first MDD is non-deterministic
-                            if(instanceOfND) {
+                            if(x1 instanceof NDNode) {
                                 for(Object nd_y1 : ((NDNode) x1).iterateOnChildren(v)) {
                                     addArcAndNode(result, x, (INode) nd_y1, y2, v, i, a, xs, binder);
                                 }
-                            // If first MDD is deterministic
+                                // If first MDD is deterministic
                             } else {
                                 y1 = x1.getChild(v);
                                 addArcAndNode(result, x, y1, y2, v, i, a, xs, binder);
@@ -80,6 +82,13 @@ public class NDOperation {
         Memory.free(successors);
 
         //result.reduce();
+        return result;
+    }
+
+    public static MDD partiallyOrderedIntersection(MDD result, DecisionDiagram dd1, DecisionDiagram dd2, ArrayOfNodeInterface roots){
+        NDMDD tmp_res = partiallyOrderedIntersection(NDMDD.create(), dd1, dd2, roots);
+        NDOperation.determinise(result, tmp_res);
+        Memory.free(tmp_res);
         return result;
     }
 

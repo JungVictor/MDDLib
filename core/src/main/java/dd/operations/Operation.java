@@ -485,8 +485,9 @@ public class Operation {
     public static MDD concatenate(ArrayOfMDD mdds){
         MDD result = mdds.get(0).copy();
         for(int i = 1; i < mdds.length(); i++){
+            int size = result.size();
             result.setSize(result.size() + mdds.get(i).size() - 1);
-            mdds.get(i).copy(result, result.getTt(), result.size() - 1);
+            mdds.get(i).copy(result, result.getTt(), size - 1);
         }
         return result;
     }

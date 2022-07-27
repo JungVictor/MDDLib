@@ -252,6 +252,17 @@ public abstract class DecisionDiagram implements Allocable {
      * @return The list of all solutions in the DD.
      */
     public ArrayList<int[]> extractSolutions(){
+        return extractSolutions(-1);
+    }
+
+    /**
+     * Extract all solutions of the DD.
+     * It is recommended that you check if the number of solutions is actually extractable.
+     * @param max Maximum number of solution extracted (-1 = all solutions)
+     * @return The list of all solutions in the DD.
+     */
+    public ArrayList<int[]> extractSolutions(int max){
+        int cpt = 0;
         ArrayList<int[]> solutions = new ArrayList<>();
         // solution
         int[] currentSolution = new int[size()-1];
@@ -267,7 +278,7 @@ public abstract class DecisionDiagram implements Allocable {
         INode current;
         Stack<Integer> labels;
 
-        while (layer >= 0){
+        while (layer >= 0 && cpt != max){
             current = currentNodes[layer];
             labels = notVisited.get(current);
             if(labels.isEmpty()) {
@@ -280,6 +291,7 @@ public abstract class DecisionDiagram implements Allocable {
             // End of the solution
             if(layer+1 >= size()-1) {
                 solutions.add(Arrays.copyOf(currentSolution, currentSolution.length));
+                cpt++;
                 continue;
             }
 
