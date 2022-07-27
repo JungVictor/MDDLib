@@ -121,7 +121,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
         bindCurrentRead(0, dd.getRoot());
 
         // Load each layer
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size-1; i++) {
             loadLayer(dd, i, file);
             swapMaps();
         }
