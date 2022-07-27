@@ -21,10 +21,12 @@ import structures.tuples.TupleOfInt;
 import utils.Logger;
 import utils.SmallMath;
 import utils.io.reader.DDReaderTopDown;
+import utils.io.reader.DDSaverTopDownOTF;
 import utils.io.reader.MDDFileWriter;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 /**
@@ -248,11 +250,7 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
     static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNode constraint){
-        try {
-            intersectionWrite(result, mdd, constraint, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        intersection(result, mdd, constraint, false);
     }
 
     /**
@@ -315,8 +313,8 @@ public class ConstraintOperation {
     }
 
     public static void intersectionWrite(DecisionDiagram result, DecisionDiagram mdd, IStateNode constraint, boolean relaxation) throws IOException {
-        MDDFileWriter file = new MDDFileWriter(new FileOutputStream("tmp_dd_intersection.dd"), 4096);
-        DDReaderTopDown reader = new DDReaderTopDown();
+        MDDFileWriter file = new MDDFileWriter(new RandomAccessFile("tmp_dd_intersection.dd", "rw"), 4096);
+        DDSaverTopDownOTF reader = new DDSaverTopDownOTF();
 
         result.setSize(mdd.size());
         result.getRoot().associate(mdd.getRoot(), constraint);
@@ -329,9 +327,17 @@ public class ConstraintOperation {
 
         int node_constraint = 0;
 
+        // Pointer to the layer position on the file
+        long ptr;
+
+        reader.init(result, file);
+
         for(int i = 1; i < mdd.size(); i++){
+            ptr = reader.tmpWriteNumberOfNodes(file);
             Logger.out.information("\rLAYER " + i);
+            int nodeID = 0;
             for(INode node : result.iterateOnLayer(i-1)){
+                node = reader.getNode(nodeID++);
                 IStateNode x2 = (IStateNode) node.getX2();
                 INode x1 = node.getX1();
                 for(int value : x1.iterateOnChildLabels()) {
@@ -352,11 +358,11 @@ public class ConstraintOperation {
                         Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
                     }
                 }
+                // Save the node and free it
+                reader.saveNode(node, file);
+                Memory.free(node);
             }
-            // Save the layer and free the nodes
-            reader.saveAndFree(result, file, i - 1);
-            for(INode node : result.iterateOnLayer(i-1)) Memory.free(node);
-            // ---------
+            reader.writeNumberOfNodesAtLayer(file, ptr, nodeID);
             for(INode node : currentNodesConstraint) Memory.free(node);
             currentNodesConstraint.clear();
             tmp = currentNodesConstraint;
@@ -364,6 +370,8 @@ public class ConstraintOperation {
             nextNodesConstraint = tmp;
             binder.clear();
             bindings.clear();
+
+            reader.swapMaps();
         }
         file.close();
         Memory.free(currentNodesConstraint);
