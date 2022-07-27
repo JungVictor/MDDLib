@@ -97,17 +97,18 @@ public class Pack implements Allocable {
     /**
      * Function that perform the reduction of a MDD.
      * @param L Layers of the MDD
-     * @param size Size of the MDD
+     * @param start Starting layer for the reduction (the lowest layer)
+     * @param end Ending layer for the reduction (the highest layer)
      * @param V Values to consider when performing reduction
      */
-    static public void pReduce(ListOfLayer L, int size, SetOf<Integer> V){
+    static public void pReduce(ListOfLayer L, int start, int end, SetOf<Integer> V){
         Va.clear();
         for(int v : V) Va.put(v, UnorderedListOfNode.create());
         Na.clear();
         Vlist.clear();
         Nlist.clear();
         LAYERS = L;
-        for(int i = size-2; i > 0; i--) {
+        for(int i = start; i > end; i--) {
             Logger.out.information("\rReducing layer : " + i);
             reduceLayer(L.get(i), i);
         }
@@ -117,6 +118,21 @@ public class Pack implements Allocable {
         for(UnorderedListOfNode nodes : Va.values()) Memory.free(nodes);
         for(UnorderedListOfNode nodes : Na.values()) Memory.free(nodes);
         LAYERS = null;
+    }
+
+    /**
+     * Function that perform the reduction of a MDD.
+     * @param L Layers of the MDD
+     * @param size Size of the MDD
+     * @param V Values to consider when performing reduction
+     */
+    static public void pReduce(ListOfLayer L, int size, SetOf<Integer> V){
+        pReduce(L, size-2, 0, V);
+    }
+
+
+    static public void pReduceI(ListOfLayer L, int i, SetOf<Integer> V){
+        pReduce(L, i, i-1, V);
     }
 
     /**

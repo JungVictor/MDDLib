@@ -12,6 +12,7 @@ import structures.Domains;
 import structures.generics.SetOf;
 import structures.generics.SetOfNode;
 import structures.lists.ListOfILayer;
+import structures.lists.ListOfLayer;
 
 import java.util.InputMismatchException;
 
@@ -218,6 +219,11 @@ public class NDMDD extends DecisionDiagram {
     @Override
     public Iterable<INode> iterateOnLayer(int i){
         return L.get(i);
+    }
+
+    @Override
+    public ListOfLayer getLayers() {
+        return null;
     }
 
     /**

@@ -7,6 +7,7 @@ import dd.operations.HashReduce;
 import memory.AllocatorOf;
 import memory.Memory;
 import structures.arrays.ArrayOfInt;
+import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfBinaryNode;
 
 import java.util.InputMismatchException;
@@ -297,6 +298,11 @@ public class BDD extends DecisionDiagram {
     @Override
     public Iterable iterateOnLayer(int i){
         return L[i];
+    }
+
+    @Override
+    public ListOfLayer getLayers() {
+        return null;
     }
 
     /**

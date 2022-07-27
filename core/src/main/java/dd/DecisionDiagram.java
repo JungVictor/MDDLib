@@ -4,6 +4,7 @@ import dd.interfaces.INode;
 import memory.Allocable;
 import memory.Memory;
 import structures.generics.MapOf;
+import structures.lists.ListOfLayer;
 import structures.lists.UnorderedListOfNodeInterface;
 
 import java.util.ArrayList;
@@ -150,6 +151,8 @@ public abstract class DecisionDiagram implements Allocable {
      * @return Iterable on the nodes of the ith layer
      */
     public abstract Iterable<INode> iterateOnLayer(int i);
+
+    public abstract ListOfLayer getLayers();
 
     /**
      * Get the number of nodes in the ith layer
@@ -361,15 +364,19 @@ public abstract class DecisionDiagram implements Allocable {
      * Delete useless nodes, merge leaves without reducing
      */
     public void cleanup() {
+        cleanup(size - 2);
+        setTT();
+    }
+
+    public void cleanup(int begin) {
         UnorderedListOfNodeInterface removed = UnorderedListOfNodeInterface.create();
-        for (int i = size() - 2; i >= 0; i--) {
+        for (int i = begin; i >= 0; i--) {
             for (INode node : iterateOnLayer(i)) {
                 if (node.numberOfChildren() == 0) removed.add(node);
             }
             for (INode node : removed) removeNode(node, i);
         }
         Memory.free(removed);
-        setTT();
     }
 
     /**

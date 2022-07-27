@@ -5,6 +5,7 @@ import dd.interfaces.INode;
 import memory.Memory;
 import structures.generics.MapOf;
 import structures.lists.ListOfInt;
+import structures.lists.ListOfLayer;
 import utils.SmallMath;
 import utils.io.MDDReader;
 
@@ -225,6 +226,11 @@ public class DDProxy extends DecisionDiagram {
      */
     @Override
     public Iterable<INode> iterateOnLayer(int i) {
+        return null;
+    }
+
+    @Override
+    public ListOfLayer getLayers() {
         return null;
     }
 

@@ -4,19 +4,36 @@ import utils.SmallMath;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class MDDFileReader {
 
-    private final FileInputStream file;
+    private final RandomAccessFile file;
     private final byte[] DATA;
     private final int capacity;
     private int position;
+    private long ptr = 0;
 
-    public MDDFileReader(FileInputStream file, int bufferSize) throws IOException {
+    public MDDFileReader(RandomAccessFile file, int bufferSize) throws IOException {
         this.capacity = bufferSize;
         this.file = file;
         DATA = new byte[capacity];
         fill(0);
+    }
+
+    public void setPointer(long pos){
+        try {
+            // Set the pointer to the file
+            file.seek(pos);
+            position = 0;
+            fill(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public long getPointer(){
+        return ptr+2;
     }
 
     /**
@@ -43,6 +60,7 @@ public class MDDFileReader {
         }
         for(int i = 0; i < b.length; i++) b[i] = DATA[position+i];
         position += b.length;
+        ptr += b.length;
         return b;
     }
 
@@ -51,6 +69,7 @@ public class MDDFileReader {
             fill(0);
             position = 0;
         }
+        ptr++;
         return DATA[position++];
     }
 

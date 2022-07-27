@@ -20,7 +20,11 @@ import structures.generics.SetOfNode;
 import structures.tuples.TupleOfInt;
 import utils.Logger;
 import utils.SmallMath;
+import utils.io.reader.DDReaderTopDown;
+import utils.io.reader.MDDFileWriter;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -69,7 +73,7 @@ public class ConstraintOperation {
 
         result.getRoot().associate(mdd.getRoot(), constraint);
 
-        intersection(result, mdd, constraint, false);
+        intersection(result, mdd, constraint);
         result.reduce();
 /*
         DecisionDiagram tmp_res = null;
@@ -244,7 +248,11 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
     static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNode constraint){
-        intersection(result, mdd, constraint, false);
+        try {
+            intersectionWrite(result, mdd, constraint, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -299,6 +307,65 @@ public class ConstraintOperation {
             binder.clear();
             bindings.clear();
         }
+        Memory.free(currentNodesConstraint);
+        Memory.free(nextNodesConstraint);
+        Memory.free(binder);
+
+        Logger.out.information("\rNodes constructed : " + node_constraint + "\n");
+    }
+
+    public static void intersectionWrite(DecisionDiagram result, DecisionDiagram mdd, IStateNode constraint, boolean relaxation) throws IOException {
+        MDDFileWriter file = new MDDFileWriter(new FileOutputStream("tmp_dd_intersection.dd"), 4096);
+        DDReaderTopDown reader = new DDReaderTopDown();
+
+        result.setSize(mdd.size());
+        result.getRoot().associate(mdd.getRoot(), constraint);
+
+        Binder binder = Binder.create();
+        HashMap<String, IStateNode> bindings = new HashMap<>();
+        SetOfNode<IStateNode> currentNodesConstraint = Memory.SetOfStateNode(),
+                nextNodesConstraint = Memory.SetOfStateNode(),
+                tmp;
+
+        int node_constraint = 0;
+
+        for(int i = 1; i < mdd.size(); i++){
+            Logger.out.information("\rLAYER " + i);
+            for(INode node : result.iterateOnLayer(i-1)){
+                IStateNode x2 = (IStateNode) node.getX2();
+                INode x1 = node.getX1();
+                for(int value : x1.iterateOnChildLabels()) {
+                    NodeState state = x2.getState();
+                    if(state.isValid(value, i, mdd.size())) {
+                        if(!x2.containsLabel(value)) {
+                            String hash = state.signature(value, i, mdd.size());
+                            IStateNode y2 = bindings.get(hash);
+                            if (y2 == null) {
+                                y2 = x2.Node();
+                                node_constraint++;
+                                y2.setState(state.createState(value, i, mdd.size()));
+                                bindings.put(hash, y2);
+                                nextNodesConstraint.add(y2);
+                            } else if(relaxation) y2.getState().merge(state, value, i, result.size());
+                            x2.addChild(value, y2);
+                        }
+                        Operation.addArcAndNode(result, node, x1.getChild(value), x2.getChild(value), value, i, binder);
+                    }
+                }
+            }
+            // Save the layer and free the nodes
+            reader.saveAndFree(result, file, i - 1);
+            for(INode node : result.iterateOnLayer(i-1)) Memory.free(node);
+            // ---------
+            for(INode node : currentNodesConstraint) Memory.free(node);
+            currentNodesConstraint.clear();
+            tmp = currentNodesConstraint;
+            currentNodesConstraint = nextNodesConstraint;
+            nextNodesConstraint = tmp;
+            binder.clear();
+            bindings.clear();
+        }
+        file.close();
         Memory.free(currentNodesConstraint);
         Memory.free(nextNodesConstraint);
         Memory.free(binder);

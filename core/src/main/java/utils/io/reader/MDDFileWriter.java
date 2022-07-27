@@ -23,6 +23,7 @@ public class MDDFileWriter {
      */
     public void flush() throws IOException {
         file.write(DATA, 0, position);
+        file.flush();
         position = 0;
     }
 

@@ -11,6 +11,7 @@ import utils.io.reader.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * <b>MDDReader</b><br>
@@ -88,12 +89,12 @@ public abstract class MDDReader {
     public static boolean load(DecisionDiagram dd, String filename, int bufferSize){
         try {
             // Open the file to read
-            FileInputStream file = new FileInputStream(filename);
+            RandomAccessFile file = new RandomAccessFile(filename, "r");
 
             // Type of DD loaded
             byte[] MODE = new byte[1];
 
-            file.readNBytes(MODE, 0, 1);
+            file.read(MODE, 0, 1);
 
             byte TYPE = MODE[0];
             if((TYPE == MDD || TYPE == COST_MDD) && !(dd instanceof dd.mdd.MDD)) throw new ClassCastException("Given DD cannot be cast as an MDD!");
@@ -101,7 +102,7 @@ public abstract class MDDReader {
             if(TYPE == COST_MDD && !(dd instanceof CostMDD)) Logger.out.information("WARNING : Loading a CostMDD in a MDD.");
 
             // Set the reader corresponding to the mode used to write the file
-            file.readNBytes(MODE, 0, 1);
+            file.read(MODE, 0, 1);
             MDDFileReader mddFile = new MDDFileReader(file, bufferSize);
             if(MODE[0] == BOTTOM_UP) {
                 if(TYPE == COST_MDD) costReaderBottomUp.load(dd, mddFile);
@@ -132,6 +133,47 @@ public abstract class MDDReader {
      */
     public static boolean load(DecisionDiagram dd, String filename){
         return load(dd, filename, 4096);
+    }
+
+
+
+    /**
+     * Load a DecisionDiagram from a file using a buffer of given capacity. <br>
+     * Automatically detect the good loading mode.
+     * @param dd The DecisionDiagram used to load the file
+     * @param filename The name of the file to load
+     * @param bufferSize Size of the buffer
+     * @return True if the operation succeed, false otherwise
+     */
+    public static boolean loadAndReduce(DecisionDiagram dd, String filename, int bufferSize){
+        try {
+            // Open the file to read
+            RandomAccessFile file = new RandomAccessFile(filename, "r");
+
+            // Type of DD loaded
+            byte[] MODE = new byte[1];
+
+            file.read(MODE, 0, 1);
+
+            byte TYPE = MODE[0];
+            if((TYPE == MDD || TYPE == COST_MDD) && !(dd instanceof dd.mdd.MDD)) throw new ClassCastException("Given DD cannot be cast as an MDD!");
+            if(TYPE == BDD && !(dd instanceof dd.bdd.BDD)) Logger.out.information("WARNING : Loading a BDD in a MDD.");
+            if(TYPE == COST_MDD && !(dd instanceof CostMDD)) Logger.out.information("WARNING : Loading a CostMDD in a MDD.");
+
+            // Set the reader corresponding to the mode used to write the file
+            file.read(MODE, 0, 1);
+            MDDFileReader mddFile = new MDDFileReader(file, bufferSize);
+            if(MODE[0] == BOTTOM_UP) {
+                Logger.out.information("WARNING : Unsupported operation for Bottom Up ! Switching to Top Down");
+            }
+            if(TYPE == COST_MDD) Logger.out.information("WARNING : Unsupported operation for Cost MDD !");
+            else readerTopDown.loadAndReduce(dd, mddFile);
+            mddFile.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

@@ -15,6 +15,7 @@ import structures.generics.CollectionOf;
 import structures.generics.SetOf;
 import structures.successions.SuccessionOfNodeInterface;
 import utils.Logger;
+import utils.io.reader.DDReaderTopDown;
 
 /**
  * <b>The class dedicated to perform classical operation on and between MDDs</b>

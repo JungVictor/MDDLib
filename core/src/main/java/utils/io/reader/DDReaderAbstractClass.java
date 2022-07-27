@@ -6,6 +6,7 @@ import dd.interfaces.ICostNode;
 import dd.interfaces.INode;
 import dd.mdd.MDD;
 import dd.mdd.costmdd.CostMDD;
+import utils.Logger;
 import utils.SmallMath;
 import utils.io.MDDReader;
 
@@ -14,8 +15,8 @@ import java.util.HashMap;
 
 public abstract class DDReaderAbstractClass {
 
-    private HashMap<INode, Integer> next, current;
-    private HashMap<Integer, INode> nextR, currentR;
+    protected HashMap<INode, Integer> next, current;
+    protected HashMap<Integer, INode> nextR, currentR;
     private byte[][] elements;
     private int nID;
     private byte MODE;
@@ -254,6 +255,20 @@ public abstract class DDReaderAbstractClass {
      */
     public abstract void save(DecisionDiagram dd, MDDFileWriter file) throws IOException;
 
+
+    /**
+     * Save a DecisionDiagram in the given file on the fly.<br>
+     * This is designed to save layer on the disk during an operation, in order
+     * to release from memory the previous nodes.
+     * @param dd The DecisionDiagram to save
+     * @param file The file in which the DecisionDiagram is saved
+     * @param layer The index of the layer to save
+     * @throws IOException
+     */
+    public void saveAndFree(DecisionDiagram dd, MDDFileWriter file, int layer) throws IOException {
+        Logger.out.information("saveAndFree NOT SUPPORTED FOR THIS READER");
+    }
+
     /**
      * Load a node from the given file and add it to the given DecisionDiagram
      * @param dd The DecisionDiagram in which the node is added
@@ -288,5 +303,28 @@ public abstract class DDReaderAbstractClass {
      * @throws IOException
      */
     public abstract void load(DecisionDiagram dd, MDDFileReader file) throws IOException;
+
+    public void loadAndReduce(DecisionDiagram dd, MDDFileReader file) throws IOException {
+        Logger.out.information("saveAndFree NOT SUPPORTED FOR THIS READER");
+    }
+    protected void loadAndReduceNode(DecisionDiagram dd, int nodeID, int layer, MDDFileReader file) throws IOException {
+        Logger.out.information("saveAndFree NOT SUPPORTED FOR THIS READER");
+    }
+    protected void skipLayer(MDDFileReader file) throws IOException {
+        // Number of nodes
+        int numberOfNodes = readInt(file, MDDReader.NODE);
+        for(int i = 0; i < numberOfNodes; i++) skipNode(file);
+    }
+    protected void skipNode(MDDFileReader file) throws IOException {
+        Logger.out.information("skipNode NOT SUPPORTED FOR THIS READER");
+    }
+    protected void loadAndReduceLayer(DecisionDiagram dd, int layer, MDDFileReader file) throws IOException {
+        // Number of nodes
+        int numberOfNodes = readInt(file, MDDReader.NODE);
+
+        for(int i = 0; i < numberOfNodes; i++) {
+            loadAndReduceNode(dd, i, layer, file);
+        }
+    }
 
 }

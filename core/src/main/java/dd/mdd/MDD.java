@@ -402,6 +402,11 @@ public class MDD extends DecisionDiagram {
         return L.get(i);
     }
 
+    @Override
+    public ListOfLayer getLayers() {
+        return L;
+    }
+
     /**
      * {@inheritDoc}
      */
