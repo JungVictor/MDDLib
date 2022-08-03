@@ -15,7 +15,15 @@ import structures.generics.CollectionOf;
 import structures.generics.SetOf;
 import structures.successions.SuccessionOfNodeInterface;
 import utils.Logger;
+import utils.io.MDDReader;
 import utils.io.reader.DDReaderTopDown;
+import utils.io.reader.DDSaverTopDownOTF;
+import utils.io.reader.MDDFileWriter;
+
+import javax.sound.midi.Soundbank;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * <b>The class dedicated to perform classical operation on and between MDDs</b>
@@ -83,7 +91,11 @@ public class Operation {
      * @return The result of the intersection between mdd1 and mdd2
      */
     public static MDD intersection(MDD result, DecisionDiagram dd1, DecisionDiagram dd2){
-        perform(result, dd1, dd2, Operator.INTERSECTION);
+        try {
+            performWrite(result, dd1.getRoot(), dd2.getRoot(), dd1.size(), SuccessionRule.INTERSECTION, Operator.INTERSECTION);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return result;
     }
 
@@ -606,6 +618,68 @@ public class Operation {
         Memory.free(successors);
 
         result.reduce();
+        return result;
+    }
+
+    private static DecisionDiagram performWrite(DecisionDiagram result, INode root1, INode root2, int size, SuccessionRule rule, Operator OP) throws IOException {
+        MDDFileWriter file = new MDDFileWriter(new RandomAccessFile("tmp_dd_intersection.dd", "rw"), 4096);
+        DDSaverTopDownOTF reader = new DDSaverTopDownOTF();
+
+        DecisionDiagram tmp = result.DD();
+        tmp.setSize(size);
+        Binder binder = Binder.create();
+
+        CollectionOf<Integer> successors = rule.getCollection();
+
+        tmp.getRoot().associate(root1, root2);
+
+        // Pointer to the layer position on the file
+        long ptr;
+        reader.init(tmp, file);
+
+        for(int i = 1; i < size; i++){
+            ptr = reader.tmpWriteNumberOfNodes(file);
+            Logger.out.information("\rLAYER " + i);
+            int nodeID;
+            for(nodeID = 0; nodeID < tmp.getLayerSize(i-1); i++){
+                INode x = reader.getNode(nodeID++);
+                INode x1 = x.getX1(), x2 = x.getX2();
+                INode y1, y2;
+                for(int v : rule.successors(successors, i-1, x)){
+                    boolean a1, a2;
+                    a1 = x1 != null && x1.containsLabel(v);
+                    a2 = x2 != null && x2.containsLabel(v);
+                    if(apply(a1, a2, OP, i == size - 1)) {
+                        y1 = x1 == null ? null : x1.getChild(v);
+                        y2 = x2 == null ? null : x2.getChild(v);
+                        addArcAndNode(tmp, x, y1, y2, v, i, binder);
+                    }
+                    else if(OP == Operator.INCLUSION && a1) return null;
+                }
+                // Save the node and free it
+                reader.saveNode(x, file);
+                Memory.free(x);
+            }
+            reader.writeNumberOfNodesAtLayer(file, ptr, nodeID);
+            if(tmp.getLayerSize(i) == 0) {
+                binder.clear();
+                Memory.free(binder);
+                Logger.out.information("EMPTY LAYER " + i);
+                if (OP == Operator.INCLUSION) return null;
+                if (OP != Operator.MINUS) tmp.setSize(i);
+                //result.reduce();
+                return tmp;
+            }
+            binder.clear();
+            reader.swapMaps();
+        }
+        file.close();
+        Memory.free(binder);
+        Memory.free(successors);
+        Memory.free(tmp);
+
+        MDDReader.loadAndReduce(result, "tmp_dd_intersection.dd", 4096);
+        //result.reduce();
         return result;
     }
 

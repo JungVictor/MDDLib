@@ -250,7 +250,11 @@ public class ConstraintOperation {
      * @param constraint The PNode containing the constraint (= root node of the constraint)
      */
     static protected void intersection(DecisionDiagram result, DecisionDiagram mdd, StateNode constraint){
-        intersection(result, mdd, constraint, false);
+        try {
+            intersectionWrite(result, mdd, constraint, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

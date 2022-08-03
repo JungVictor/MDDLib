@@ -54,7 +54,7 @@ public abstract class MDDReader {
     public static boolean save(DecisionDiagram dd, String filename, int bufferSize){
         try {
             // Open the file to write
-            MDDFileWriter fileWriter = new MDDFileWriter(new RandomAccessFile(filename, "w"), bufferSize);
+            MDDFileWriter fileWriter = new MDDFileWriter(new RandomAccessFile(filename, "rw"), bufferSize);
             if(dd instanceof CostMDD) {
                 if(reader == readerBottomUp) reader = costReaderBottomUp;
                 else reader = costReaderTopDown;

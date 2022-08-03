@@ -180,8 +180,10 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
 
             // Reduction
             V.clear();
-            for(int v : dd.iterateOnDomain(i)) V.add(v);
-            Pack.pReduceI(dd.getLayers(), i, V);
+            if(i < size - 3) {
+                for (int v : dd.iterateOnDomain(i + 1)) V.add(v);
+                Pack.pReduceI(dd.getLayers(), i + 1, V);
+            }
         }
     }
 
@@ -207,7 +209,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
             }
 
             INode child = getNode(childID);
-            dd.addArc(node, value, child, layer);
+            if(child!=null) dd.addArc(node, value, child, layer);
         }
     }
 }

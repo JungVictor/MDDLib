@@ -169,7 +169,7 @@ public class DDSaverTopDownOTF {
 
     public void init(DecisionDiagram dd, MDDFileWriter file) throws IOException {
         // Write the header nad initialise the elements array
-        writeHeader(dd, file, (byte) 4, (byte) 4, (byte) 4, (byte) 4);
+        writeHeader(dd, file, (byte) 5, (byte) 4, (byte) 4, (byte) 4);
         // Write the size of the DD
         int size = dd.size();
         writeInt(file, MDDReader.SIZE, size);
