@@ -99,124 +99,7 @@ public strictfp class ConfidenceSolving {
     }
 
     public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        MDD result = null;
-        MDD confidence = null, extract = null;
-        MDD tmp = null, tmp_res = null;
-
-        long time1;
-        long time2;
-
-        long time = System.currentTimeMillis();
-
-        for (int i = 0; i <= epsilon; i++) {
-            confidence = relaxedProduct(extract, gamma, precision, i, n, domains, information, construction);
-
-            // Free the ancient extract
-            if(extract != null) {
-                Memory.free(extract);
-                extract = null;
-            }
-
-            if(confidence.nSolutions() == 0) break;
-            else if(i == epsilon) {
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                } else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                }
-                break;
-            }
-
-            Logger.out.setInformation(construction);
-            time1 = System.currentTimeMillis();
-            extract = extract(confidence, domains, n, precision, gamma);
-            time2 = System.currentTimeMillis();
-            Logger.out.setInformation(true);
-            if (information) {
-                printInformation("Solutions incertaines extraites :", extract);
-                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            }
-
-            Logger.out.setInformation(construction);
-
-            // Stop
-            if(extract.nSolutions() == 0) {
-
-                Memory.free(extract);
-                extract = null;
-
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                }
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                    Memory.free(confidence);
-                    confidence = null;
-                    tmp_res = null;
-                }
-                break;
-            }
-
-            time1 = System.currentTimeMillis();
-            MDD diff = Operation.minus(confidence, extract);
-            Memory.free(confidence);
-            confidence = null;
-
-            if(diff.nSolutions() > 0) {
-                if (result == null) result = diff;
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, diff);
-                    Memory.free(tmp_res);
-                    Memory.free(diff);
-                }
-            } else Memory.free(diff);
-
-            time2 = System.currentTimeMillis();
-
-            Logger.out.setInformation(true);
-
-            if (information) {
-                if (result == null) {
-                    System.out.println("\nAccumulation des bonnes solutions :");
-                    System.out.println("Aucune bonne solution pour le moment...");
-                }
-                else {
-                    printInformation("\nAccumulation des bonnes solutions :", result);
-                }
-                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
-            }
-        }
-
-        if(extract != null) Memory.free(extract);
-        if(confidence != null) Memory.free(confidence);
-
-        time = System.currentTimeMillis() - time;
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-        if(result != null) {
-            precision(result, domains, n, precision);
-            Logger.out.setInformation(construction);
-            MDD negation = Operation.negation(result);
-            Logger.out.setInformation(true);
-            precision(negation, domains, n, precision);
-
-            printInformation("Résultats :", result);
-            Logger.out.information("Temps (ms) = " + (time) + "\n");
-        }
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-
-        System.out.println();
-        return result;
+        return IPR(0, gamma, precision, epsilon, -1, n, domains, information, construction);
     }
 
     public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains){
@@ -269,124 +152,7 @@ public strictfp class ConfidenceSolving {
     }
 
     public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        MDD result = null;
-        MDD confidence = null, extract = null;
-        MDD tmp = null, tmp_res = null;
-
-        long time1;
-        long time2;
-
-        long time = System.currentTimeMillis();
-
-        for (int i = 0; i <= epsilon; i++) {
-            confidence = relaxedLogarithm(extract, gamma, precision, i, n, domains, information, construction);
-
-            // Free the ancient extract
-            if(extract != null) {
-                Memory.free(extract);
-                extract = null;
-            }
-
-            if(confidence.nSolutions() == 0) break;
-            else if(i == epsilon) {
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                } else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                }
-                break;
-            }
-
-            Logger.out.setInformation(construction);
-            time1 = System.currentTimeMillis();
-            extract = extract(confidence, domains, n, precision, gamma);
-            time2 = System.currentTimeMillis();
-            Logger.out.setInformation(true);
-            if (information) {
-                printInformation("Solutions incertaines extraites :", extract);
-                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            }
-
-            Logger.out.setInformation(construction);
-
-            // Stop
-            if(extract.nSolutions() == 0) {
-
-                Memory.free(extract);
-                extract = null;
-
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                }
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                    Memory.free(confidence);
-                    confidence = null;
-                    tmp_res = null;
-                }
-                break;
-            }
-
-            time1 = System.currentTimeMillis();
-            MDD diff = Operation.minus(confidence, extract);
-            Memory.free(confidence);
-            confidence = null;
-
-            if(diff.nSolutions() > 0) {
-                if (result == null) result = diff;
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, diff);
-                    Memory.free(tmp_res);
-                    Memory.free(diff);
-                }
-            } else Memory.free(diff);
-
-            time2 = System.currentTimeMillis();
-
-            Logger.out.setInformation(true);
-
-            if (information) {
-                if (result == null) {
-                    System.out.println("\nAccumulation des bonnes solutions :");
-                    System.out.println("Aucune bonne solution pour le moment...");
-                }
-                else {
-                    printInformation("\nAccumulation des bonnes solutions :", result);
-                }
-                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
-            }
-        }
-
-        if(extract != null) Memory.free(extract);
-        if(confidence != null) Memory.free(confidence);
-
-        time = System.currentTimeMillis() - time;
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-        if(result != null) {
-            precision(result, domains, n, precision);
-            Logger.out.setInformation(construction);
-            MDD negation = Operation.negation(result);
-            Logger.out.setInformation(true);
-            precision(negation, domains, n, precision);
-
-            printInformation("Résultats :", result);
-            Logger.out.information("Temps (ms) = " + (time) + "\n");
-        }
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-
-        System.out.println();
-        return result;
+        return IPR(1, gamma, precision, epsilon, -1, n, domains, information, construction);
     }
 
     public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
@@ -438,124 +204,7 @@ public strictfp class ConfidenceSolving {
     }
 
     public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        MDD result = null;
-        MDD confidence = null, extract = null;
-        MDD tmp = null, tmp_res = null;
-
-        long time1;
-        long time2;
-
-        long time = System.currentTimeMillis();
-
-        for (int i = 0; i <= epsilon; i++) {
-            confidence = relaxedULPLogarithm(extract, gamma, precision, i, n, domains, information, construction);
-
-            // Free the ancient extract
-            if(extract != null) {
-                Memory.free(extract);
-                extract = null;
-            }
-
-            if(confidence.nSolutions() == 0) break;
-            else if(i == epsilon) {
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                } else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                }
-                break;
-            }
-
-            Logger.out.setInformation(construction);
-            time1 = System.currentTimeMillis();
-            extract = extract(confidence, domains, n, precision, gamma);
-            time2 = System.currentTimeMillis();
-            Logger.out.setInformation(true);
-            if (information) {
-                printInformation("Solutions incertaines extraites :", extract);
-                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            }
-
-            Logger.out.setInformation(construction);
-
-            // Stop
-            if(extract.nSolutions() == 0) {
-
-                Memory.free(extract);
-                extract = null;
-
-                if(result == null) {
-                    result = confidence;
-                    confidence = null;
-                }
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, confidence);
-                    Memory.free(tmp_res);
-                    Memory.free(confidence);
-                    confidence = null;
-                    tmp_res = null;
-                }
-                break;
-            }
-
-            time1 = System.currentTimeMillis();
-            MDD diff = Operation.minus(confidence, extract);
-            Memory.free(confidence);
-            confidence = null;
-
-            if(diff.nSolutions() > 0) {
-                if (result == null) result = diff;
-                else {
-                    tmp_res = result;
-                    result = Operation.union(result, diff);
-                    Memory.free(tmp_res);
-                    Memory.free(diff);
-                }
-            } else Memory.free(diff);
-
-            time2 = System.currentTimeMillis();
-
-            Logger.out.setInformation(true);
-
-            if (information) {
-                if (result == null) {
-                    System.out.println("\nAccumulation des bonnes solutions :");
-                    System.out.println("Aucune bonne solution pour le moment...");
-                }
-                else {
-                    printInformation("\nAccumulation des bonnes solutions :", result);
-                }
-                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
-            }
-        }
-
-        if(extract != null) Memory.free(extract);
-        if(confidence != null) Memory.free(confidence);
-
-        time = System.currentTimeMillis() - time;
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-        if(result != null) {
-            precision(result, domains, n, precision);
-            Logger.out.setInformation(construction);
-            MDD negation = Operation.negation(result);
-            Logger.out.setInformation(true);
-            precision(negation, domains, n, precision);
-
-            printInformation("Résultats :", result);
-            Logger.out.information("Temps (ms) = " + (time) + "\n");
-        }
-
-        System.out.println("=============================================================================");
-        System.out.println("=============================================================================");
-
-        System.out.println();
-        return result;
+        return IPR(2, gamma, precision, epsilon, -1, n, domains, information, construction);
     }
 
     public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
@@ -608,6 +257,14 @@ public strictfp class ConfidenceSolving {
     }
 
     public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
+        return IPR(3, gamma, precision, epsilon, logPrecision, n, domains, information, construction);
+    }
+
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
+        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, false, false);
+    }
+
+    private static MDD IPR(int method, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -618,7 +275,23 @@ public strictfp class ConfidenceSolving {
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
-            confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, information, construction);
+            switch(method){
+                case 1:
+                    confidence = relaxedLogarithm(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+
+                case 2 :
+                    confidence = relaxedULPLogarithm(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+
+                case 3 :
+                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, information, construction);
+                    break;
+
+                default :
+                    confidence = relaxedProduct(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+            }
 
             // Free the ancient extract
             if(extract != null) {
@@ -728,9 +401,6 @@ public strictfp class ConfidenceSolving {
         return result;
     }
 
-    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
-        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, false, false);
-    }
 
     //**************************************//
     //                UTILS                 //
