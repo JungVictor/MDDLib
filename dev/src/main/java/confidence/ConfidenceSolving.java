@@ -63,7 +63,7 @@ public strictfp class ConfidenceSolving {
         long time2;
 
         if (information) {
-            System.out.println("\n-------------------------------------------------");
+            System.out.println("\n-----------------------------------------------------------------------------");
             printParameters("Résolution avec le produit relâché :", gamma, precision, epsilon);
         }
         Logger.out.setInformation(construction);
@@ -79,12 +79,12 @@ public strictfp class ConfidenceSolving {
             System.out.println();
             if(previous != null){
                 printInformation("Raffinement des solutions incertaines :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
             else {
                 printInformation("Résultats :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
-            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -103,15 +103,20 @@ public strictfp class ConfidenceSolving {
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
 
+        long time1;
+        long time2;
+
         long time = System.currentTimeMillis();
 
         for (int i = 0; i <= epsilon; i++) {
             confidence = relaxedProduct(extract, gamma, precision, i, n, domains, information, construction);
+
             // Free the ancient extract
             if(extract != null) {
                 Memory.free(extract);
                 extract = null;
             }
+
             if(confidence.nSolutions() == 0) break;
             else if(i == epsilon) {
                 if(result == null) {
@@ -125,7 +130,17 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            Logger.out.setInformation(construction);
+            time1 = System.currentTimeMillis();
             extract = extract(confidence, domains, n, precision, gamma);
+            time2 = System.currentTimeMillis();
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("Solutions incertaines extraites :", extract);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            }
+
+            Logger.out.setInformation(construction);
 
             // Stop
             if(extract.nSolutions() == 0) {
@@ -147,6 +162,8 @@ public strictfp class ConfidenceSolving {
                 }
                 break;
             }
+
+            time1 = System.currentTimeMillis();
             MDD diff = Operation.minus(confidence, extract);
             Memory.free(confidence);
             confidence = null;
@@ -160,6 +177,21 @@ public strictfp class ConfidenceSolving {
                     Memory.free(diff);
                 }
             } else Memory.free(diff);
+
+            time2 = System.currentTimeMillis();
+
+            Logger.out.setInformation(true);
+
+            if (information) {
+                if (result == null) {
+                    System.out.println("\nAccumulation des bonnes solutions :");
+                    System.out.println("Aucune bonne solution pour le moment...");
+                }
+                else {
+                    printInformation("\nAccumulation des bonnes solutions :", result);
+                }
+                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+            }
         }
 
         if(extract != null) Memory.free(extract);
@@ -167,19 +199,21 @@ public strictfp class ConfidenceSolving {
 
         time = System.currentTimeMillis() - time;
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
         if(result != null) {
             precision(result, domains, n, precision);
+            Logger.out.setInformation(construction);
             MDD negation = Operation.negation(result);
+            Logger.out.setInformation(true);
             precision(negation, domains, n, precision);
 
             printInformation("Résultats :", result);
             Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
 
         System.out.println();
         return result;
@@ -198,7 +232,7 @@ public strictfp class ConfidenceSolving {
         long time2;
 
         if (information){
-            System.out.println("\n-------------------------------------------------");
+            System.out.println("\n-----------------------------------------------------------------------------");
             printParameters("Résolution avec le logarithme flottant :", gamma, precision, epsilon);
         }
         Logger.out.setInformation(construction);
@@ -215,12 +249,12 @@ public strictfp class ConfidenceSolving {
             System.out.println();
             if(previous != null){
                 printInformation("Raffinement des solutions incertaines :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
             else {
                 printInformation("Résultats :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
-            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -238,6 +272,9 @@ public strictfp class ConfidenceSolving {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
+
+        long time1;
+        long time2;
 
         long time = System.currentTimeMillis();
 
@@ -263,7 +300,17 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            Logger.out.setInformation(construction);
+            time1 = System.currentTimeMillis();
             extract = extract(confidence, domains, n, precision, gamma);
+            time2 = System.currentTimeMillis();
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("Solutions incertaines extraites :", extract);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            }
+
+            Logger.out.setInformation(construction);
 
             // Stop
             if(extract.nSolutions() == 0) {
@@ -286,6 +333,7 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            time1 = System.currentTimeMillis();
             MDD diff = Operation.minus(confidence, extract);
             Memory.free(confidence);
             confidence = null;
@@ -299,6 +347,21 @@ public strictfp class ConfidenceSolving {
                     Memory.free(diff);
                 }
             } else Memory.free(diff);
+
+            time2 = System.currentTimeMillis();
+
+            Logger.out.setInformation(true);
+
+            if (information) {
+                if (result == null) {
+                    System.out.println("\nAccumulation des bonnes solutions :");
+                    System.out.println("Aucune bonne solution pour le moment...");
+                }
+                else {
+                    printInformation("\nAccumulation des bonnes solutions :", result);
+                }
+                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+            }
         }
 
         if(extract != null) Memory.free(extract);
@@ -306,19 +369,21 @@ public strictfp class ConfidenceSolving {
 
         time = System.currentTimeMillis() - time;
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
         if(result != null) {
             precision(result, domains, n, precision);
+            Logger.out.setInformation(construction);
             MDD negation = Operation.negation(result);
+            Logger.out.setInformation(true);
             precision(negation, domains, n, precision);
 
             printInformation("Résultats :", result);
             Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
 
         System.out.println();
         return result;
@@ -337,7 +402,7 @@ public strictfp class ConfidenceSolving {
         long time2;
 
         if (information) {
-            System.out.println("\n-------------------------------------------------");
+            System.out.println("\n-----------------------------------------------------------------------------");
             printParameters("Résolution avec le logarithme ULP :", gamma, precision, epsilon);
         }
         Logger.out.setInformation(construction);
@@ -353,12 +418,12 @@ public strictfp class ConfidenceSolving {
             System.out.println();
             if(previous != null){
                 printInformation("Raffinement des solutions incertaines :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
             else {
                 printInformation("Résultats :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
-            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -376,6 +441,9 @@ public strictfp class ConfidenceSolving {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
+
+        long time1;
+        long time2;
 
         long time = System.currentTimeMillis();
 
@@ -401,7 +469,17 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            Logger.out.setInformation(construction);
+            time1 = System.currentTimeMillis();
             extract = extract(confidence, domains, n, precision, gamma);
+            time2 = System.currentTimeMillis();
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("Solutions incertaines extraites :", extract);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            }
+
+            Logger.out.setInformation(construction);
 
             // Stop
             if(extract.nSolutions() == 0) {
@@ -424,6 +502,7 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            time1 = System.currentTimeMillis();
             MDD diff = Operation.minus(confidence, extract);
             Memory.free(confidence);
             confidence = null;
@@ -437,6 +516,21 @@ public strictfp class ConfidenceSolving {
                     Memory.free(diff);
                 }
             } else Memory.free(diff);
+
+            time2 = System.currentTimeMillis();
+
+            Logger.out.setInformation(true);
+
+            if (information) {
+                if (result == null) {
+                    System.out.println("\nAccumulation des bonnes solutions :");
+                    System.out.println("Aucune bonne solution pour le moment...");
+                }
+                else {
+                    printInformation("\nAccumulation des bonnes solutions :", result);
+                }
+                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+            }
         }
 
         if(extract != null) Memory.free(extract);
@@ -444,19 +538,21 @@ public strictfp class ConfidenceSolving {
 
         time = System.currentTimeMillis() - time;
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
         if(result != null) {
             precision(result, domains, n, precision);
+            Logger.out.setInformation(construction);
             MDD negation = Operation.negation(result);
+            Logger.out.setInformation(true);
             precision(negation, domains, n, precision);
 
             printInformation("Résultats :", result);
             Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
 
         System.out.println();
         return result;
@@ -475,7 +571,7 @@ public strictfp class ConfidenceSolving {
         long time2;
 
         if (information) {
-            System.out.println("\n-------------------------------------------------");
+            System.out.println("\n-----------------------------------------------------------------------------");
             printParameters("Résolution avec le logarithme entier :", gamma, precision, epsilon);
             Logger.out.information("Précision du logarithme = " + logPrecision + "\n");
         }
@@ -492,12 +588,12 @@ public strictfp class ConfidenceSolving {
             System.out.println();
             if(previous != null){
                 printInformation("Raffinement des solutions incertaines :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
             else {
                 printInformation("Résultats :", confidence);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
             }
-            Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
-            System.out.println("-------------------------------------------------");
         }
 
         //precision(confidence, domains, n, precision);
@@ -515,6 +611,9 @@ public strictfp class ConfidenceSolving {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
+
+        long time1;
+        long time2;
 
         long time = System.currentTimeMillis();
 
@@ -540,7 +639,17 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            Logger.out.setInformation(construction);
+            time1 = System.currentTimeMillis();
             extract = extract(confidence, domains, n, precision, gamma);
+            time2 = System.currentTimeMillis();
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("Solutions incertaines extraites :", extract);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            }
+
+            Logger.out.setInformation(construction);
 
             // Stop
             if(extract.nSolutions() == 0) {
@@ -563,6 +672,7 @@ public strictfp class ConfidenceSolving {
                 break;
             }
 
+            time1 = System.currentTimeMillis();
             MDD diff = Operation.minus(confidence, extract);
             Memory.free(confidence);
             confidence = null;
@@ -576,6 +686,21 @@ public strictfp class ConfidenceSolving {
                     Memory.free(diff);
                 }
             } else Memory.free(diff);
+
+            time2 = System.currentTimeMillis();
+
+            Logger.out.setInformation(true);
+
+            if (information) {
+                if (result == null) {
+                    System.out.println("\nAccumulation des bonnes solutions :");
+                    System.out.println("Aucune bonne solution pour le moment...");
+                }
+                else {
+                    printInformation("\nAccumulation des bonnes solutions :", result);
+                }
+                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+            }
         }
 
         if(extract != null) Memory.free(extract);
@@ -583,19 +708,21 @@ public strictfp class ConfidenceSolving {
 
         time = System.currentTimeMillis() - time;
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
         if(result != null) {
             precision(result, domains, n, precision);
+            Logger.out.setInformation(construction);
             MDD negation = Operation.negation(result);
+            Logger.out.setInformation(true);
             precision(negation, domains, n, precision);
 
             printInformation("Résultats :", result);
             Logger.out.information("Temps (ms) = " + (time) + "\n");
         }
 
-        System.out.println("=================================================");
-        System.out.println("=================================================");
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
 
         System.out.println();
         return result;
