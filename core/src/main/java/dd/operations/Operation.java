@@ -637,12 +637,14 @@ public class Operation {
         long ptr;
         reader.init(tmp, file);
 
+        System.out.println("BEGIN INTERSECTION");
+
         for(int i = 1; i < size; i++){
             ptr = reader.tmpWriteNumberOfNodes(file);
             Logger.out.information("\rLAYER " + i);
             int nodeID;
-            for(nodeID = 0; nodeID < tmp.getLayerSize(i-1); i++){
-                INode x = reader.getNode(nodeID++);
+            for(nodeID = 0; nodeID < tmp.getLayerSize(i-1); nodeID++){
+                INode x = reader.getNode(nodeID);
                 INode x1 = x.getX1(), x2 = x.getX2();
                 INode y1, y2;
                 for(int v : rule.successors(successors, i-1, x)){
@@ -678,7 +680,7 @@ public class Operation {
         Memory.free(successors);
         Memory.free(tmp);
 
-        MDDReader.loadAndReduce(result, "tmp_dd_intersection.dd", 4096);
+        //MDDReader.loadAndReduce(result, "tmp_dd_intersection.dd", 4096);
         //result.reduce();
         return result;
     }
