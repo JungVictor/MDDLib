@@ -271,6 +271,8 @@ public strictfp class ConfidenceSolving {
 
         long time1;
         long time2;
+        long time3;
+        long time4;
 
         long time = System.currentTimeMillis();
 
@@ -306,7 +308,15 @@ public strictfp class ConfidenceSolving {
                     confidence = null;
                 } else {
                     tmp_res = result;
+                    Logger.out.setInformation(construction);
+                    time1 = System.currentTimeMillis();
                     result = Operation.union(result, confidence);
+                    time2 = System.currentTimeMillis();
+                    Logger.out.setInformation(true);
+                    if (information) {
+                        printInformation("\nAccumulation des bonnes solutions :", result);
+                        Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+                    }
                     Memory.free(tmp_res);
                 }
                 break;
@@ -336,7 +346,14 @@ public strictfp class ConfidenceSolving {
                 }
                 else {
                     tmp_res = result;
+                    time1 = System.currentTimeMillis();
                     result = Operation.union(result, confidence);
+                    time2 = System.currentTimeMillis();
+                    Logger.out.setInformation(true);
+                    if (information) {
+                        printInformation("\nAccumulation des bonnes solutions :", result);
+                        Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
+                    }
                     Memory.free(tmp_res);
                     Memory.free(confidence);
                     confidence = null;
@@ -347,6 +364,7 @@ public strictfp class ConfidenceSolving {
 
             time1 = System.currentTimeMillis();
             MDD diff = Operation.minus(confidence, extract);
+            time2 = System.currentTimeMillis();
             Memory.free(confidence);
             confidence = null;
 
@@ -354,26 +372,35 @@ public strictfp class ConfidenceSolving {
                 if (result == null) result = diff;
                 else {
                     tmp_res = result;
+                    time3 = System.currentTimeMillis();
                     result = Operation.union(result, diff);
+                    time4 = System.currentTimeMillis();
+                    Logger.out.setInformation(true);
+                    if (information) {
+                        printInformation("\nAccumulation des bonnes solutions :", result);
+                        Logger.out.information("Temps de la différence (ms) = " + (time2 - time1) + "\n");
+                        Logger.out.information("Temps de l'union (ms) = " + (time4 - time3) + "\n");
+                        Logger.out.information("Temps cumulé (ms) = " + (time2 - time1 + time4 - time3) + "\n");
+                    }
                     Memory.free(tmp_res);
                     Memory.free(diff);
                 }
-            } else Memory.free(diff);
+            } else {
+                Memory.free(diff);
+                Logger.out.setInformation(true);
 
-            time2 = System.currentTimeMillis();
-
-            Logger.out.setInformation(true);
-
-            if (information) {
-                if (result == null) {
-                    System.out.println("\nAccumulation des bonnes solutions :");
-                    System.out.println("Aucune bonne solution pour le moment...");
+                if (information) {
+                    if (result == null) {
+                        System.out.println("\nAccumulation des bonnes solutions :");
+                        System.out.println("Aucune bonne solution pour le moment...");
+                    }
+                    else {
+                        printInformation("\nAccumulation des bonnes solutions :", result);
+                    }
+                    Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
                 }
-                else {
-                    printInformation("\nAccumulation des bonnes solutions :", result);
-                }
-                Logger.out.information("Temps (ms) = " + (time2 - time1) + "\n");
             }
+
         }
 
         if(extract != null) Memory.free(extract);
@@ -470,7 +497,7 @@ public strictfp class ConfidenceSolving {
         System.out.println(mddName);
         Logger.out.information("Nombre de noeuds = " + mdd.nodes() + "\n");
         Logger.out.information("Nombre d'arcs = " + mdd.arcs() + "\n");
-        Logger.out.information("Nombre de solutions = " + mdd.nSolutions() + "\n");
+        Logger.out.information("Nombre de solutions = " + (long) mdd.nSolutions() + "\n");
     }
 
     //**************************************//
