@@ -386,7 +386,7 @@ public class ConstraintOperation {
         return sumDouble(result, mdd, D, 0, s_max, mapLog, epsilon, n);
     }
 
-    public static MDD confidence(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D) {
+    public static MDD confidence(MDD result, MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, boolean binaryStep, Domains D) {
         MapOf<Integer, Long> map = Memory.MapOfIntegerLong();
         for (int i = 0; i < n; i++) {
             for (int v : D.get(i)) {
@@ -396,7 +396,7 @@ public class ConstraintOperation {
         long s_max = -1 * SmallMath.log(gamma, precision, 10, logPrecision, false);
 
         if (mdd == null) return MDDBuilder.sumRelaxed(result, 0, s_max, map, epsilon, logPrecision, n, D);
-        return sumRelaxed(result, mdd, D, 0, s_max, map, epsilon, logPrecision, n);
+        return sumRelaxed(result, mdd, D, 0, s_max, map, epsilon, logPrecision, n, binaryStep);
     }
 
     // ****** //
@@ -520,8 +520,8 @@ public class ConstraintOperation {
         return result;
     }
 
-    public static MDD sumRelaxed(MDD result, MDD mdd, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size) {
-        // CHECK MyConstraintBuilder sumDouble IF MAKING CHANGE TO THIS FUNCTION !
+    public static MDD sumRelaxed(MDD result, MDD mdd, Domains D, long min, long max, MapOf<Integer, Long> map, int epsilon, int precision, int size, boolean binaryStep) {
+        // CHECK ConstraintBuilder sumRelaxed IF MAKING CHANGE TO THIS FUNCTION !
         StateNode snode = StateNode.create();
         ArrayOfLong minValues = ArrayOfLong.create(size);
         ArrayOfLong maxValues = ArrayOfLong.create(size);
@@ -544,13 +544,40 @@ public class ConstraintOperation {
             minValues.set(i, vMin);
             maxValues.set(i, vMax);
         }
-        ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision, null);
-        snode.setState(StateSumRelaxed.create(parameters));
 
-        intersection(result, mdd, snode, true);
 
-        Memory.free(snode);
-        Memory.free(parameters);
+        if (binaryStep){
+            int maxBitNumber = 0;
+            long value;
+            int count;
+            for (Integer key : map.keySet()){
+                count = 0;
+                value = map.get(key);
+                while (value > 0){
+                    count ++;
+                    value = value >> 1;
+                }
+                if (count > maxBitNumber) maxBitNumber = count;
+            }
+
+            ParametersSumBinaryRelaxed parameters = ParametersSumBinaryRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision, maxBitNumber, null);
+            snode.setState(StateSumBinaryRelaxed.create(parameters));
+
+            intersection(result, mdd, snode, true);
+
+            Memory.free(snode);
+            Memory.free(parameters);
+        }
+        else {
+            ParametersSumRelaxed parameters = ParametersSumRelaxed.create(min, max, minValues, maxValues, map, epsilon, precision, null);
+            snode.setState(StateSumRelaxed.create(parameters));
+
+            intersection(result, mdd, snode, true);
+
+            Memory.free(snode);
+            Memory.free(parameters);
+        }
+
         result.reduce();
         return result;
     }

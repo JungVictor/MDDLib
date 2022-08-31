@@ -215,7 +215,7 @@ public strictfp class ConfidenceSolving {
     //       RELAXED INTEGER LOGARITHM      //
     //**************************************//
 
-    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction){
+    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean binaryStep, boolean information, boolean construction){
         long time1;
         long time2;
 
@@ -223,13 +223,15 @@ public strictfp class ConfidenceSolving {
             System.out.println("\n-----------------------------------------------------------------------------");
             printParameters("Résolution avec le logarithme entier :", gamma, precision, epsilon);
             Logger.out.information("Précision du logarithme = " + logPrecision + "\n");
+            if (binaryStep) Logger.out.information("Étapes : binaires\n");
+            else Logger.out.information("Étapes : chiffres en base 10\n");
         }
         Logger.out.setInformation(construction);
         time1 = System.currentTimeMillis();
         MDD confidence = MDD.create();
 
-        if(previous != null) ConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, logPrecision, domains);
-        else MyMDDBuilder.confidence(confidence, gamma, precision, epsilon, n, logPrecision, domains);
+        if(previous != null) ConstraintOperation.confidence(confidence, previous, gamma, precision, epsilon, n, logPrecision, binaryStep, domains);
+        else MDDBuilder.confidence(confidence, gamma, precision, epsilon, n, logPrecision, binaryStep, domains);
 
         time2 = System.currentTimeMillis();
         Logger.out.setInformation(true);
@@ -252,17 +254,24 @@ public strictfp class ConfidenceSolving {
         return confidence;
     }
 
-    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
-        return relaxedIntegerLogarithm(previous, gamma, precision, epsilon, logPrecision, n, domains, true, false);
+    public static MDD relaxedIntegerLogarithm(MDD previous, int gamma, int precision, int epsilon, int logPrecision, int n, boolean binaryStep, Domains domains){
+        return relaxedIntegerLogarithm(previous, gamma, precision, epsilon, logPrecision, n, domains, binaryStep,true, false);
     }
 
-    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean binaryStep, boolean information, boolean construction) {
+        if (binaryStep) {
+            return IPR(4, gamma, precision, epsilon, logPrecision, n, domains, information, construction);
+        }
         return IPR(3, gamma, precision, epsilon, logPrecision, n, domains, information, construction);
     }
 
-    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains){
-        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, false, false);
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, boolean binaryStep, Domains domains){
+        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, binaryStep, false, false);
     }
+
+    //**************************************//
+    //                 IPR                  //
+    //**************************************//
 
     private static MDD IPR(int method, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
         MDD result = null;
@@ -287,7 +296,11 @@ public strictfp class ConfidenceSolving {
                     break;
 
                 case 3 :
-                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, information, construction);
+                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, false, information, construction);
+                    break;
+
+                case 4 :
+                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, true, information, construction);
                     break;
 
                 default :
@@ -659,11 +672,11 @@ public strictfp class ConfidenceSolving {
 
         long time = System.currentTimeMillis();
 
-        confidence = relaxedIntegerLogarithm(extract, gamma, precision, epsilon, logPrecision, n, domains);
+        confidence = relaxedIntegerLogarithm(extract, gamma, precision, epsilon, logPrecision, n, false, domains);
         extract = extract(confidence, domains, n, precision, gamma);
         result = Operation.minus(confidence, extract);
 
-        confidence = relaxedIntegerLogarithm(extract, gamma, precision, 15, logPrecision, n, domains);
+        confidence = relaxedIntegerLogarithm(extract, gamma, precision, 15, logPrecision, n, false, domains);
         extract = extract(confidence, domains, n, precision, gamma);
 
         confidence = Operation.minus(confidence, extract);

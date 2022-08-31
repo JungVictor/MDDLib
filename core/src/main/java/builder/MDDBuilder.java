@@ -521,8 +521,8 @@ public class MDDBuilder {
         return ConstraintOperation.confidenceULP(mdd, null, gamma, precision, epsilon, n, D);
     }
 
-    public static MDD confidence(MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, Domains D){
-        return ConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, logPrecision, D);
+    public static MDD confidence(MDD mdd, int gamma, int precision, int epsilon, int n, int logPrecision, boolean binaryStep, Domains D){
+        return ConstraintOperation.confidence(mdd, null, gamma, precision, epsilon, n, logPrecision, binaryStep, D);
     }
 
 }
