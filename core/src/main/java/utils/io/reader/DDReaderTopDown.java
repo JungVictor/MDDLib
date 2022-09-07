@@ -180,7 +180,7 @@ public class DDReaderTopDown extends DDReaderAbstractClass {
 
             // Reduction
             V.clear();
-            if(i < size - 3) {
+            if(i < size - 2) {
                 for (int v : dd.iterateOnDomain(i + 1)) V.add(v);
                 Pack.pReduceI(dd.getLayers(), i + 1, V);
             }
