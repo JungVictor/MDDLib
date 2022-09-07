@@ -358,7 +358,7 @@ public class Operation {
 
     /**
      *
-     * @param result The MDD that will contains the result of the operation
+     * @param result The MDD that will contain the result of the operation
      * @param root1 The root node of the first MDD
      * @param root2 The root node of the second MDD
      * @param size The size of the MDD result
@@ -409,7 +409,7 @@ public class Operation {
     }
 
     /**
-     * @param result The MDD that will contains the result of the operation
+     * @param result The MDD that will contain the result of the operation
      * @param mdd1 The first MDD
      * @param mdd2 The second MDD
      * @param OP Type of operation (union, intersection, ...)
@@ -555,7 +555,7 @@ public class Operation {
 
     /**
      * Stock the result in the given result MDD
-     * @param result The MDD that will contains the result of the operation
+     * @param result The MDD that will contain the result of the operation
      * @param mdds The first MDD
      * @param OP Type of operation (union, intersection, ...)
      * @return The MDD resulting from : mdd1 OP mdd2 OP mdd3 OP ... OP mddn
@@ -589,9 +589,9 @@ public class Operation {
             for(Node x : result.getLayer(i-1)){
                 SuccessionOfNodeInterface xs = x.getAssociations();
                 for(int v : rule.successors(successors, i-1, x)){
-                    for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n).containsLabel(v));
+                    for(int n = 0; n < xs.length(); n++) a.set(n, xs.get(n) != null && xs.get(n).containsLabel(v));
                     if(apply(a, OP)) {
-                        for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n).getChild(v));
+                        for(int n = 0; n < xs.length(); n++) ys.set(n, xs.get(n) == null ? null : xs.get(n).getChild(v));
                         addArcAndNode(result, x, ys, v, i, binder);
                     }
                     for(int n = 0; n < xs.length(); n++) a.set(n, false);
