@@ -78,7 +78,7 @@ public strictfp class StateProductRelaxed extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateProductRelaxed state = StateProductRelaxed.create(constraint);
-        if(constraint.isVariable(layer-1)) {
+        if(constraint.inScope(layer-1)) {
             state.mul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
         } else state.mul = mul;
         return state;
@@ -89,7 +89,7 @@ public strictfp class StateProductRelaxed extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
         double newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
         //Lignes à revoir pour l'ordre dans lequel les multiplications sont faites
@@ -110,7 +110,7 @@ public strictfp class StateProductRelaxed extends NodeState {
     @Override
     public String signature(int label, int layer, int size){
         double newMul = mul;
-        if(constraint.isVariable(layer-1)) newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
+        if(constraint.inScope(layer-1)) newMul = SmallMath.multiplyCeil(mul, label, constraint.maxProbaDomains());
 
         double minPotential = SmallMath.multiplyCeil(newMul, constraint.vMin(layer-1), constraint.maxProbaEpsilon());
         double maxPotential = SmallMath.multiplyCeil(newMul, constraint.vMax(layer-1), constraint.maxProbaEpsilon());

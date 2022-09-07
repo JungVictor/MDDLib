@@ -89,6 +89,16 @@ public abstract class AbstractNode implements Allocable, INode {
      */
     public abstract int numberOfParents(int label);
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public int numberOfParents(){
+        int cpt = 0;
+        for(int v : iterateOnParentLabels()) cpt += numberOfParents(v);
+        return cpt;
+    }
+
     /**
      * Get the out-going labels
      * @return All out-going labels

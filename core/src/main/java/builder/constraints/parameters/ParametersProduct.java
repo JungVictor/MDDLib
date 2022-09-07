@@ -48,14 +48,14 @@ public class ParametersProduct extends ConstraintParameters {
      * @param max The maximum value of the product
      * @param vMin The minimum product achievable from a certain layer
      * @param vMax The maximum product achievable from a certain layer
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> variables){
+    protected void init(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -64,12 +64,12 @@ public class ParametersProduct extends ConstraintParameters {
      * @param max The maximum value of the product
      * @param vMin The minimum product achievable from a certain layer
      * @param vMax The maximum product achievable from a certain layer
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersProduct object
      */
-    public static ParametersProduct create(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> variables){
+    public static ParametersProduct create(BigInteger min, BigInteger max, ArrayOfBigInteger vMin, ArrayOfBigInteger vMax, SetOf<Integer> scope){
         ParametersProduct object = allocator().allocate();
-        object.init(min, max, vMin, vMax, variables);
+        object.init(min, max, vMin, vMax, scope);
         return object;
     }
 

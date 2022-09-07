@@ -37,16 +37,16 @@ public class ParametersSubset extends ConstraintParameters{
         super(allocatedIndex);
     }
 
-    private void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
+    private void init(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> scope){
         for(int i = 0; i < word.length+1; i++){
             datas.add(i, SubsetData.create(i, word, alphabetSize, maxSequenceSize));
         }
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
-    public static ParametersSubset create(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> variables){
+    public static ParametersSubset create(ArrayOfInt word, int alphabetSize, int maxSequenceSize, SetOf<Integer> scope){
         ParametersSubset object = allocator().allocate();
-        object.init(word, alphabetSize, maxSequenceSize, variables);
+        object.init(word, alphabetSize, maxSequenceSize, scope);
         return object;
     }
 

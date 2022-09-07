@@ -79,7 +79,7 @@ public strictfp class StateSumBinaryRelaxed extends NodeState {
     public NodeState createState(int label, int layer, int size) {
         StateSumBinaryRelaxed state = StateSumBinaryRelaxed.create(constraint);
         state.sum = sum;
-        if(constraint.isVariable(layer-1)) state.sum += constraint.map(label);
+        if(constraint.inScope(layer-1)) state.sum += constraint.map(label);
         return state;
     }
 
@@ -88,7 +88,7 @@ public strictfp class StateSumBinaryRelaxed extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
 
         long value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
@@ -104,7 +104,7 @@ public strictfp class StateSumBinaryRelaxed extends NodeState {
     @Override
     public String signature(int label, int layer, int size){
         long value = 0;
-        if(constraint.isVariable(layer-1)) value = constraint.map(label);
+        if(constraint.inScope(layer-1)) value = constraint.map(label);
         long minPotential = sum + value + constraint.vMin(layer-1);
         long maxPotential = sum + value + constraint.vMax(layer-1);
 

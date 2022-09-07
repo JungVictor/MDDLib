@@ -42,22 +42,22 @@ public class ParametersAllDiff extends ConstraintParameters {
     /**
      * Initialisation of the parameters.
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(SetOf<Integer> V, SetOf<Integer> variables){
+    protected void init(SetOf<Integer> V, SetOf<Integer> scope){
         this.V = V;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
      * Get a ParametersAllDiff object from the allocator.
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersAllDiff object
      */
-    public static ParametersAllDiff create(SetOf<Integer> V, SetOf<Integer> variables){
+    public static ParametersAllDiff create(SetOf<Integer> V, SetOf<Integer> scope){
         ParametersAllDiff object = allocator().allocate();
-        object.init(V, variables);
+        object.init(V, scope);
         return object;
     }
 

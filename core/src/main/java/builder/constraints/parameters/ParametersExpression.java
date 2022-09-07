@@ -39,10 +39,10 @@ public class ParametersExpression extends ConstraintParameters {
 
     /**
      * Initialisation of the parameters.
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(SetOf<Integer> variables, HashMap<Integer, HashSet<Expression>> expressions, ArrayOfInt min, ArrayOfInt max){
-        super.setVariables(variables);
+    protected void init(SetOf<Integer> scope, HashMap<Integer, HashSet<Expression>> expressions, ArrayOfInt min, ArrayOfInt max){
+        super.setScope(scope);
         this.expressions = expressions;
         this.min = min;
         this.max = max;
@@ -50,12 +50,12 @@ public class ParametersExpression extends ConstraintParameters {
 
     /**
      * Get a ParametersAllDiff object from the allocator.
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersAllDiff object
      */
-    public static ParametersExpression create(SetOf<Integer> variables, HashMap<Integer, HashSet<Expression>> expressions, ArrayOfInt min, ArrayOfInt max){
+    public static ParametersExpression create(SetOf<Integer> scope, HashMap<Integer, HashSet<Expression>> expressions, ArrayOfInt min, ArrayOfInt max){
         ParametersExpression object = allocator().allocate();
-        object.init(variables, expressions, min, max);
+        object.init(scope, expressions, min, max);
         return object;
     }
 

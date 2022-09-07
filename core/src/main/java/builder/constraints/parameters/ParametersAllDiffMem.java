@@ -42,23 +42,23 @@ public class ParametersAllDiffMem extends ConstraintParameters {
     /**
      * Initialisation of the parameters.
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(int capacity, SetOf<Integer> V, SetOf<Integer> variables){
+    protected void init(int capacity, SetOf<Integer> V, SetOf<Integer> scope){
         this.V = V;
         this.capacity = capacity;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
      * Get a ParametersAllDiffMem object from the allocator.
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersAllDiffMem object
      */
-    public static ParametersAllDiffMem create(int capacity, SetOf<Integer> V, SetOf<Integer> variables){
+    public static ParametersAllDiffMem create(int capacity, SetOf<Integer> V, SetOf<Integer> scope){
         ParametersAllDiffMem object = allocator().allocate();
-        object.init(capacity, V, variables);
+        object.init(capacity, V, scope);
         return object;
     }
 

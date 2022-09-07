@@ -56,9 +56,9 @@ public class ParametersSumBinaryRelaxed extends ConstraintParameters {
      * @param epsilon The precision of the sum
      * @param precision The precision of the values
      * @param maxBitNumber The maximum number of bit used to represent the values in the map
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, int maxBitNumber, SetOf<Integer> variables){
+    protected void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, int maxBitNumber, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -67,7 +67,7 @@ public class ParametersSumBinaryRelaxed extends ConstraintParameters {
         this.epsilon = epsilon;
         this.precision = precision;
         this.maxBitNumber = maxBitNumber;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -80,12 +80,12 @@ public class ParametersSumBinaryRelaxed extends ConstraintParameters {
      * @param epsilon The precision of the sum
      * @param precision The precision of the values
      * @param maxBitNumber The maximum number of bit used to represent the values in the map
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersSumBinaryRelaxed object
      */
-    public static ParametersSumBinaryRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, int maxBitNumber, SetOf<Integer> variables){
+    public static ParametersSumBinaryRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, int maxBitNumber, SetOf<Integer> scope){
         ParametersSumBinaryRelaxed object = allocator().allocate();
-        object.init(min, max, vMin, vMax, map, epsilon, precision, maxBitNumber, variables);
+        object.init(min, max, vMin, vMax, map, epsilon, precision, maxBitNumber, scope);
         return object;
     }
 

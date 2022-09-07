@@ -47,15 +47,15 @@ public class ParametersSumOrdered extends ConstraintParameters {
      * @param max The maximum value of the sum
      * @param vMin The minimum sum achievable from a certain layer
      * @param vMax The maximum sum achievable from a certain layer
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> jumps, SetOf<Integer> variables){
+    protected void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> jumps, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.jumps = jumps;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -64,12 +64,12 @@ public class ParametersSumOrdered extends ConstraintParameters {
      * @param max The maximum value of the sum
      * @param vMin The minimum sum achievable from a certain layer
      * @param vMax The maximum sum achievable from a certain layer
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersSum object
      */
-    public static ParametersSumOrdered create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> jumps, SetOf<Integer> variables){
+    public static ParametersSumOrdered create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, SetOf<Integer> jumps, SetOf<Integer> scope){
         ParametersSumOrdered object = allocator().allocate();
-        object.init(min, max, vMin, vMax, jumps, variables);
+        object.init(min, max, vMin, vMax, jumps, scope);
         return object;
     }
 

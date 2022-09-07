@@ -70,7 +70,7 @@ public class StateAllDiff extends NodeState {
     public NodeState createState(int label, int layer, int size) {
         StateAllDiff state = StateAllDiff.create(constraint);
         state.alldiff.add(alldiff);
-        if(constraint.contains(label) && constraint.isVariable(layer-1)) state.alldiff.add(label);
+        if(constraint.contains(label) && constraint.inScope(layer-1)) state.alldiff.add(label);
         return state;
     }
 
@@ -79,7 +79,7 @@ public class StateAllDiff extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        return !constraint.isVariable(layer-1) || !constraint.contains(label) || !alldiff.contains(label);
+        return !constraint.inScope(layer-1) || !constraint.contains(label) || !alldiff.contains(label);
     }
 
     /**
@@ -91,7 +91,7 @@ public class StateAllDiff extends NodeState {
         if(layer+1 == size) return "";
         StringBuilder builder = new StringBuilder();
         for(int v : constraint.set()) {
-            if((v == label && constraint.isVariable(layer-1)) || alldiff.contains(v)) builder.append("1");
+            if((v == label && constraint.inScope(layer-1)) || alldiff.contains(v)) builder.append("1");
             else builder.append("0");
         }
         return builder.toString();

@@ -48,11 +48,11 @@ public class ParametersMapSum extends ParametersSum {
      * @param vMin The minimum sum achievable from a certain layer
      * @param vMax The maximum sum achievable from a certain layer
      * @param map The map associating labels with values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> variables){
+    protected void init(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> scope){
         this.map = map;
-        super.init(min, max, vMin, vMax, variables);
+        super.init(min, max, vMin, vMax, scope);
     }
 
     /**
@@ -62,12 +62,12 @@ public class ParametersMapSum extends ParametersSum {
      * @param vMin The minimum sum achievable from a certain layer
      * @param vMax The maximum sum achievable from a certain layer
      * @param map The map associating labels with values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersMapSum object
      */
-    public static ParametersMapSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> variables){
+    public static ParametersMapSum create(int min, int max, ArrayOfInt vMin, ArrayOfInt vMax, MapOf<Integer, Integer> map, SetOf<Integer> scope){
         ParametersMapSum object = allocator().allocate();
-        object.init(min, max, vMin, vMax, map, variables);
+        object.init(min, max, vMin, vMax, map, scope);
         return object;
     }
 

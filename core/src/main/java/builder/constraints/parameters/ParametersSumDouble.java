@@ -52,16 +52,16 @@ public class ParametersSumDouble extends ConstraintParameters {
      * @param vMax The maximum sum achievable from a certain layer
      * @param mapDouble The map associating labels with values
      * @param epsilon The precision of the sum
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int epsilon, SetOf<Integer> variables){
+    protected void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int epsilon, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.mapDouble = mapDouble;
         this.epsilon = epsilon;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -72,12 +72,12 @@ public class ParametersSumDouble extends ConstraintParameters {
      * @param vMax The maximum sum achievable from a certain layer
      * @param mapDouble The map associating labels with values
      * @param precision The precision of the sum
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersSumDouble object
      */
-    public static ParametersSumDouble create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision, SetOf<Integer> variables){
+    public static ParametersSumDouble create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, MapOf<Integer, Double> mapDouble, int precision, SetOf<Integer> scope){
         ParametersSumDouble object = allocator().allocate();
-        object.init(min, max, vMin, vMax, mapDouble, precision, variables);
+        object.init(min, max, vMin, vMax, mapDouble, precision, scope);
         return object;
     }
 

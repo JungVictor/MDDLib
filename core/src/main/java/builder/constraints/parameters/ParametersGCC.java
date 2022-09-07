@@ -46,25 +46,25 @@ public class ParametersGCC extends ConstraintParameters {
     /**
      * Initialisation of the parameters.
      * @param gcc The values of the GCC
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables, int violations){
+    protected void init(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> scope, int violations){
         this.gcc = gcc;
         this.minimum = 0;
         this.violations = violations;
         for(TupleOfInt tuple : gcc.values()) minimum += tuple.getFirst();
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
      * Get a ParametersGCC object from the allocator.
      * @param gcc The values of the GCC
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersGCC object
      */
-    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> variables){
+    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, SetOf<Integer> scope){
         ParametersGCC object = allocator().allocate();
-        object.init(gcc, variables, 0);
+        object.init(gcc, scope, 0);
         return object;
     }
 
@@ -72,12 +72,12 @@ public class ParametersGCC extends ConstraintParameters {
      * Get a ParametersGCC object from the allocator.
      * @param gcc The values of the GCC
      * @param violations The maximum number of violations allowed
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersGCC object
      */
-    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, int violations, SetOf<Integer> variables){
+    public static ParametersGCC create(MapOf<Integer, TupleOfInt> gcc, int violations, SetOf<Integer> scope){
         ParametersGCC object = allocator().allocate();
-        object.init(gcc, variables, violations);
+        object.init(gcc, scope, violations);
         return object;
     }
 

@@ -1,13 +1,9 @@
 package builder.constraints.states;
 
-import builder.constraints.parameters.ParametersAllDiff;
 import builder.constraints.parameters.ParametersExpression;
 import memory.AllocatorOf;
 import memory.Memory;
-import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
-import structures.generics.SetOf;
-import structures.lists.ListOfInt;
 import utils.expressions.Expression;
 
 public class StateExpression extends NodeState {
@@ -78,7 +74,7 @@ public class StateExpression extends NodeState {
         state.nExpr.clear();
         for(int key : values) state.values.put(key, values.get(key));
         for(int key : nExpr) state.nExpr.put(key, nExpr.get(key));
-        if(constraint.isVariable(layer-1)) {
+        if(constraint.inScope(layer-1)) {
             state.values.put(layer - 1, label);
             for(Expression expr : constraint.expressions(layer - 1))
                 if(expr.lastVariable() <= layer - 1) state.removeExpression(state.values, state.nExpr, expr);
@@ -92,7 +88,7 @@ public class StateExpression extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
 
         MapOf<Integer, Integer> tmp = Memory.MapOfIntegerInteger();
         tmp.copy(values);
@@ -119,7 +115,7 @@ public class StateExpression extends NodeState {
      */
     @Override
     public String signature(int label, int layer, int size) {
-        if(!constraint.isVariable(layer - 1)) return values.toString();
+        if(!constraint.inScope(layer - 1)) return values.toString();
         StringBuilder builder = new StringBuilder();
 
         MapOf<Integer, Integer> tmp = Memory.MapOfIntegerInteger(), tmp_exp = Memory.MapOfIntegerInteger();

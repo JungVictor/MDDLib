@@ -100,6 +100,13 @@ public interface INode extends Freeable {
     int numberOfParents(int label);
 
     /**
+     * The number of ingoing arcs
+     *
+     * @return The number of ingoing arcs
+     */
+    int numberOfParents();
+
+    /**
      * Get the out-going labels
      *
      * @return All out-going labels

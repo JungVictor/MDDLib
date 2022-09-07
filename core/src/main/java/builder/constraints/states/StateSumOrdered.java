@@ -1,6 +1,5 @@
 package builder.constraints.states;
 
-import builder.constraints.parameters.ParametersSum;
 import builder.constraints.parameters.ParametersSumOrdered;
 import memory.AllocatorOf;
 
@@ -80,7 +79,7 @@ public class StateSumOrdered extends NodeState {
         label = constraint.value(label);
         StateSumOrdered state = StateSumOrdered.create(constraint);
         state.sum = sum;
-        if(constraint.isVariable(layer-1)) state.sum += label;
+        if(constraint.inScope(layer-1)) state.sum += label;
         if(!constraint.isJump(layer)) state.lowestValue = label;
         else state.lowestValue = Integer.MAX_VALUE;
         return state;
@@ -91,7 +90,7 @@ public class StateSumOrdered extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
         label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
@@ -105,7 +104,7 @@ public class StateSumOrdered extends NodeState {
      */
     @Override
     public String signature(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) label = 0;
+        if(!constraint.inScope(layer-1)) label = 0;
         label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);

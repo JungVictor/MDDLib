@@ -54,9 +54,9 @@ public class ParametersSumRelaxed extends ConstraintParameters {
      * @param map The map associating labels with values
      * @param epsilon The precision of the sum
      * @param precision The precision of the values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
+    protected void init(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
@@ -64,7 +64,7 @@ public class ParametersSumRelaxed extends ConstraintParameters {
         this.map = map;
         this.epsilon = epsilon;
         this.precision = precision;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -76,12 +76,12 @@ public class ParametersSumRelaxed extends ConstraintParameters {
      * @param map The map associating labels with values
      * @param epsilon The precision of the sum
      * @param precision The precision of the values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersSumRelaxed object
      */
-    public static ParametersSumRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> variables){
+    public static ParametersSumRelaxed create(long min, long max, ArrayOfLong vMin, ArrayOfLong vMax, MapOf<Integer, Long> map, int epsilon, int precision, SetOf<Integer> scope){
         ParametersSumRelaxed object = allocator().allocate();
-        object.init(min, max, vMin, vMax, map, epsilon, precision, variables);
+        object.init(min, max, vMin, vMax, map, epsilon, precision, scope);
         return object;
     }
 

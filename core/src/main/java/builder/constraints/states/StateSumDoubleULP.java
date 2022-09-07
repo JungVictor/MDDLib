@@ -79,7 +79,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateSumDoubleULP state = StateSumDoubleULP.create(constraint);
-        if(!constraint.isVariable(layer-1)) state.sum = sum;
+        if(!constraint.inScope(layer-1)) state.sum = sum;
         else state.sum = Math.nextDown(sum + constraint.mapDouble(label));
         return state;
     }
@@ -89,7 +89,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
         double doubleLabel = constraint.mapDouble(label);
         double minPotential = Math.nextDown(sum + doubleLabel + constraint.vMin(layer-1));
         //Revoir maxPotential
@@ -105,7 +105,7 @@ public strictfp class StateSumDoubleULP extends NodeState {
     @Override
     public String signature(int label, int layer, int size){
         double doubleLabel;
-        if(constraint.isVariable(layer-1)) doubleLabel = constraint.mapDouble(label);
+        if(constraint.inScope(layer-1)) doubleLabel = constraint.mapDouble(label);
         else doubleLabel = 0;
 
         double minPotential = Math.nextDown(sum + doubleLabel + constraint.vMin(layer-1));

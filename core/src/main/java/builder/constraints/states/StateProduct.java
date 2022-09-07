@@ -78,7 +78,7 @@ public class StateProduct extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateProduct state = StateProduct.create(constraint);
-        if(constraint.isVariable(layer-1)) {
+        if(constraint.inScope(layer-1)) {
             BigInteger bigIntLabel = BigInteger.valueOf(label);
             state.mul = mul.multiply(bigIntLabel);
         } else state.mul = mul;
@@ -90,7 +90,7 @@ public class StateProduct extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
         BigInteger bigIntLabel = BigInteger.valueOf(label);
         BigInteger newMul = mul.multiply(bigIntLabel);
 
@@ -112,7 +112,7 @@ public class StateProduct extends NodeState {
     @Override
     public String signature(int label, int layer, int size){
         BigInteger newMul;
-        if(constraint.isVariable(layer-1)) {
+        if(constraint.inScope(layer-1)) {
             BigInteger bigIntLabel = BigInteger.valueOf(label);
             newMul = mul.multiply(bigIntLabel);
         } else newMul = mul;

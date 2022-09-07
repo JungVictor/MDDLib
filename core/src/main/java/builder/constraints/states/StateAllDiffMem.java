@@ -70,7 +70,7 @@ public class StateAllDiffMem extends NodeState {
     @Override
     public NodeState createState(int label, int layer, int size) {
         StateAllDiffMem state = StateAllDiffMem.create(constraint);
-        if(constraint.contains(label) && constraint.isVariable(layer-1)) {
+        if(constraint.contains(label) && constraint.inScope(layer-1)) {
             for (int i = 0; i < alldiff.length() - 1; i++) state.alldiff.set(i+1, alldiff.get(i));
             state.alldiff.set(0, label);
         } else for (int i = 0; i < alldiff.length(); i++) state.alldiff.set(i, alldiff.get(i));
@@ -82,7 +82,7 @@ public class StateAllDiffMem extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        return !constraint.isVariable(layer-1) || !constraint.contains(label) || !alldiff.contains(label);
+        return !constraint.inScope(layer-1) || !constraint.contains(label) || !alldiff.contains(label);
     }
 
     /**
@@ -92,7 +92,7 @@ public class StateAllDiffMem extends NodeState {
     public String signature(int label, int layer, int size) {
         if(layer + 1 == size) return "tt";
         StringBuilder builder = new StringBuilder();
-        if(constraint.contains(label) && constraint.isVariable(layer-1)) {
+        if(constraint.contains(label) && constraint.inScope(layer-1)) {
             builder.append(label); builder.append(" ");
             for (int i = 0; i < Math.min(alldiff.length()-1, layer); i++) {
                 builder.append(alldiff.get(i));

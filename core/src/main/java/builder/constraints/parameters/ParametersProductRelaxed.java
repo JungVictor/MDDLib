@@ -50,16 +50,16 @@ public class ParametersProductRelaxed extends ConstraintParameters {
      * @param vMax The maximum product achievable from a certain layer
      * @param maxProbaDomains The precision of the value of the domain
      * @param maxProbaEpsilon The precision of the value of the product
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> variables){
+    protected void init(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> scope){
         this.min = min;
         this.max = max;
         this.vMin = vMin;
         this.vMax = vMax;
         this.maxProbaDomains = maxProbaDomains;
         this.maxProbaEpsilon = maxProbaEpsilon;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -70,12 +70,12 @@ public class ParametersProductRelaxed extends ConstraintParameters {
      * @param vMax The maximum product achievable from a certain layer
      * @param maxProbaDomains The precision of the value of the domain
      * @param maxProbaEpsilon The precision of the value of the product
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersProductRelaxed object
      */
-    public static ParametersProductRelaxed create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> variables){
+    public static ParametersProductRelaxed create(double min, double max, ArrayOfDouble vMin, ArrayOfDouble vMax, double maxProbaDomains, double maxProbaEpsilon, SetOf<Integer> scope){
         ParametersProductRelaxed object = allocator().allocate();
-        object.init(min, max, vMin, vMax, maxProbaDomains, maxProbaEpsilon, variables);
+        object.init(min, max, vMin, vMax, maxProbaDomains, maxProbaEpsilon, scope);
         return object;
     }
 

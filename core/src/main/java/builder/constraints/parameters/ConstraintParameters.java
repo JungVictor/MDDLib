@@ -13,7 +13,7 @@ public abstract class ConstraintParameters implements Allocable {
     private final int allocatedIndex;
 
     // Set of constrained variables
-    private SetOf<Integer> variables;
+    private SetOf<Integer> scope;
     private int lastVariable;
 
     /**
@@ -26,12 +26,12 @@ public abstract class ConstraintParameters implements Allocable {
 
     /**
      * Initialise the set of constrained variables
-     * @param variables Set of constrained variables
+     * @param scope Set of constrained variables
      */
-    protected void setVariables(SetOf<Integer> variables){
-        this.variables = variables;
+    protected void setScope(SetOf<Integer> scope){
+        this.scope = scope;
         lastVariable = -1;
-        if(variables != null) for(int v : variables) if(v > lastVariable) lastVariable = v;
+        if(scope != null) for(int v : scope) if(v > lastVariable) lastVariable = v;
     }
 
     /**
@@ -39,8 +39,8 @@ public abstract class ConstraintParameters implements Allocable {
      * @param i The index of the variable
      * @return True if the variable is constrained, false otherwise.
      */
-    public boolean isVariable(int i) {
-        return variables == null || variables.contains(i);
+    public boolean inScope(int i) {
+        return scope == null || scope.contains(i);
     }
 
     /**
@@ -66,8 +66,8 @@ public abstract class ConstraintParameters implements Allocable {
      * @return The number of constrained variables
      */
     public int numberOfVariables(){
-        if(variables == null) return -1;
-        return variables.size();
+        if(scope == null) return -1;
+        return scope.size();
     }
 
     /**
@@ -83,7 +83,7 @@ public abstract class ConstraintParameters implements Allocable {
      */
     @Override
     public void free(){
-        this.variables = null;
+        this.scope = null;
         lastVariable = -1;
     }
 

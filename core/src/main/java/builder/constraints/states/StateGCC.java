@@ -93,7 +93,7 @@ public class StateGCC extends NodeState {
             if(count.get(v) > constraint.max(v)) state.violations += count.get(v) - constraint.max(v);
             if(count.get(v) + potential < constraint.min(v)) state.violations += constraint.min(v) - count.get(v);
         }
-        if(!constraint.isVariable(layer-1)) return state;
+        if(!constraint.inScope(layer-1)) return state;
         if(state.count.contains(label)){
             if (count.get(label) < constraint.min(label)) state.minimum--;
             // If we are sure that, whatever the value, we satisfy the gcc, we remove the value
@@ -115,7 +115,7 @@ public class StateGCC extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size) {
-        if(!constraint.isVariable(layer-1)) return true;
+        if(!constraint.inScope(layer-1)) return true;
         int potential = size - layer - 1;
         int minimum = this.minimum;
 
@@ -143,7 +143,7 @@ public class StateGCC extends NodeState {
             else if(count.get(v) >= constraint.min(v) && count.get(v) + (size-1) - layer <= constraint.max(v)) continue;
             builder.append(v);
             builder.append(" -> ");
-            if(v != label || !constraint.isVariable(layer-1)) builder.append(count.get(v));
+            if(v != label || !constraint.inScope(layer-1)) builder.append(count.get(v));
             else builder.append(count.get(v)+1);
             builder.append("; ");
         }

@@ -47,14 +47,14 @@ public class ParametersAmong extends ConstraintParameters {
      * @param min The minimum number of occurrences
      * @param max The maximum number of occurrences
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      */
-    protected void init(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
+    protected void init(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> scope){
         this.q = q;
         this.min = min;
         this.max = max;
         this.V = V;
-        super.setVariables(variables);
+        super.setScope(scope);
     }
 
     /**
@@ -63,12 +63,12 @@ public class ParametersAmong extends ConstraintParameters {
      * @param min The minimum number of occurrences
      * @param max The maximum number of occurrences
      * @param V The set of constrained values
-     * @param variables The set of constrained variables
+     * @param scope The set of constrained variables
      * @return a fresh ParametersAmong object.
      */
-    public static ParametersAmong create(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> variables){
+    public static ParametersAmong create(int q, int min, int max, SetOf<Integer> V, SetOf<Integer> scope){
         ParametersAmong object = allocator().allocate();
-        object.init(q, min, max, V, variables);
+        object.init(q, min, max, V, scope);
         return object;
     }
 
