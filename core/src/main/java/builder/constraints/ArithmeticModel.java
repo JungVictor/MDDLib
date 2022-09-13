@@ -37,6 +37,29 @@ public class ArithmeticModel {
         return expr;
     }
 
+    public IStateNode state(Domains D, int size){
+        // Min and max values initialisation
+        ArrayOfInt min = ArrayOfInt.create(size);
+        ArrayOfInt max = ArrayOfInt.create(size);
+        for(int i = 0; i < size; i++) {
+            int vMin = Integer.MAX_VALUE;
+            int vMax = Integer.MIN_VALUE;
+            for(int v : D.get(i)) {
+                if(v < vMin) vMin = v;
+                if(v > vMax) vMax = v;
+            }
+            min.set(i, vMin);
+            max.set(i, vMax);
+        }
+
+        ParametersExpression parameters = ParametersExpression.create(variables, expressions, min, max);
+        StateExpression expression = StateExpression.create(parameters);
+
+        IStateNode constraint = StateNode.create();
+        constraint.setState(expression);
+        return constraint;
+    }
+
     /**
      * Build the DD corresponding to the logical AND between all added expressions.
      * @param result The DDs to stock the result

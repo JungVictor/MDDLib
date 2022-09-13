@@ -58,7 +58,7 @@ public abstract class ConstraintParameters implements Allocable {
      */
     public boolean isLayerRemaining(int layer){
         if(lastVariable == -1) return true;
-        return layer >= lastVariable;
+        return layer <= lastVariable;
     }
 
     /**

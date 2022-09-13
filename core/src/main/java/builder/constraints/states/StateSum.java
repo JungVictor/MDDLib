@@ -86,7 +86,8 @@ public class StateSum extends NodeState {
      */
     @Override
     public boolean isValid(int label, int layer, int size){
-        if(!constraint.inScope(layer-1)) return true;
+        if(!constraint.inScope(layer-1))
+            return true;
         label = constraint.value(label);
         int minPotential = sum + label + constraint.vMin(layer-1);
         int maxPotential = sum + label + constraint.vMax(layer-1);
