@@ -3,9 +3,6 @@ package ui;
 import builder.constraints.ArithmeticModel;
 import builder.constraints.parameters.*;
 import builder.constraints.states.*;
-import dd.DecisionDiagram;
-import dd.bdd.BDD;
-import dd.bdd.components.BinaryStateNode;
 import dd.interfaces.IStateNode;
 import dd.mdd.MDD;
 import dd.mdd.components.StateNode;
@@ -13,13 +10,13 @@ import memory.Memory;
 import structures.arrays.ArrayOfInt;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
-import structures.lists.ListOfInt;
 import structures.tuples.TupleOfInt;
 
 public class Constraint {
 
     private MDD mdd = null;
     private boolean toBuild = false;
+    private boolean toOTF = false;
     private IStateNode node = null;
     private Variable[] scope = null;
 
@@ -182,8 +179,22 @@ public class Constraint {
         return toBuild;
     }
 
+    public boolean isOTF(){
+        return toOTF;
+    }
+
     public void setMDD(MDD mdd){
         this.mdd = mdd;
+    }
+
+    public void mustBuild(){
+        toBuild = true;
+        toOTF = false;
+    }
+
+    public void mustOTF(){
+        toBuild = false;
+        toOTF = true;
     }
 
 }

@@ -52,7 +52,7 @@ public class Variable {
      * @param step The value of the step while building the domain
      */
     public void setDomain(int start, int stop, int step){
-        int[] domain = new int[(stop-start)/step];
+        int[] domain = new int[(stop-start+1)/step];
         int i = 0;
         for(int v = start; v <= stop; v+=step) domain[i++] = v;
         this.domain = domain;
