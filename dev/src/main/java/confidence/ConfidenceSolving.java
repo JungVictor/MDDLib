@@ -10,6 +10,7 @@ import memory.Memory;
 import dd.mdd.pmdd.PMDD;
 import representation.MDDPrinter;
 import structures.Domains;
+import structures.arrays.ArrayOfMDD;
 import structures.generics.MapOf;
 import structures.generics.SetOf;
 import utils.Logger;
@@ -98,12 +99,12 @@ public strictfp class ConfidenceSolving {
         return relaxedProduct(previous, gamma, precision, epsilon, n, domains, true, false);
     }
 
-    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        return IPR(0, gamma, precision, epsilon, -1, n, domains, information, construction);
+    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step, boolean information, boolean construction) {
+        return IPR(0, gamma, precision, epsilon, -1, n, domains, step, information, construction);
     }
 
-    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains){
-        return relaxedProductIPR(gamma, precision, epsilon, n, domains, false, false);
+    public static MDD relaxedProductIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step){
+        return relaxedProductIPR(gamma, precision, epsilon, n, domains, step, false, false);
     }
 
     //**************************************//
@@ -151,12 +152,12 @@ public strictfp class ConfidenceSolving {
         return relaxedLogarithm(previous, gamma, precision, epsilon, n, domains, true, false);
     }
 
-    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        return IPR(1, gamma, precision, epsilon, -1, n, domains, information, construction);
+    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step, boolean information, boolean construction) {
+        return IPR(1, gamma, precision, epsilon, -1, n, domains, step, information, construction);
     }
 
-    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
-        return relaxedLogarithmIPR(gamma, precision, epsilon, n, domains, false, false);
+    public static MDD relaxedLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step){
+        return relaxedLogarithmIPR(gamma, precision, epsilon, n, domains, step, false, false);
     }
 
     //**************************************//
@@ -203,12 +204,12 @@ public strictfp class ConfidenceSolving {
         return relaxedULPLogarithm(previous, gamma, precision, epsilon, n, domains, true, false);
     }
 
-    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, boolean information, boolean construction) {
-        return IPR(2, gamma, precision, epsilon, -1, n, domains, information, construction);
+    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step, boolean information, boolean construction) {
+        return IPR(2, gamma, precision, epsilon, -1, n, domains, step, information, construction);
     }
 
-    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains){
-        return relaxedULPLogarithmIPR(gamma, precision, epsilon, n, domains, false, false);
+    public static MDD relaxedULPLogarithmIPR(int gamma, int precision, int epsilon, int n, Domains domains, int step){
+        return relaxedULPLogarithmIPR(gamma, precision, epsilon, n, domains, step, false, false);
     }
 
     //**************************************//
@@ -258,22 +259,22 @@ public strictfp class ConfidenceSolving {
         return relaxedIntegerLogarithm(previous, gamma, precision, epsilon, logPrecision, n, domains, binaryStep,true, false);
     }
 
-    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean binaryStep, boolean information, boolean construction) {
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, int step, boolean binaryStep, boolean information, boolean construction) {
         if (binaryStep) {
-            return IPR(4, gamma, precision, epsilon, logPrecision, n, domains, information, construction);
+            return IPR(4, gamma, precision, epsilon, logPrecision, n, domains, step, information, construction);
         }
-        return IPR(3, gamma, precision, epsilon, logPrecision, n, domains, information, construction);
+        return IPR(3, gamma, precision, epsilon, logPrecision, n, domains, step, information, construction);
     }
 
-    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, boolean binaryStep, Domains domains){
-        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, binaryStep, false, false);
+    public static MDD relaxedIntegerLogarithmIPR(int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, int step, boolean binaryStep){
+        return relaxedIntegerLogarithmIPR(gamma, precision, epsilon, logPrecision, n, domains, step, binaryStep, false, false);
     }
 
     //**************************************//
     //                 IPR                  //
     //**************************************//
 
-    private static MDD IPR(int method, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
+    private static MDD IPR(int method, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, int step, boolean information, boolean construction) {
         MDD result = null;
         MDD confidence = null, extract = null;
         MDD tmp = null, tmp_res = null;
@@ -285,7 +286,7 @@ public strictfp class ConfidenceSolving {
 
         long time = System.currentTimeMillis();
 
-        for (int i = 0; i <= epsilon; i++) {
+        for (int i = 0; i <= epsilon; i = i + step) {
             switch(method){
                 case 1:
                     confidence = relaxedLogarithm(extract, gamma, precision, i, n, domains, information, construction);
@@ -441,6 +442,168 @@ public strictfp class ConfidenceSolving {
         return result;
     }
 
+    private static MDD IPRUnion(int method, int gamma, int precision, int epsilon, int logPrecision, int n, Domains domains, boolean information, boolean construction) {
+        System.out.println("UNION GLOBAL");
+        MDD result = null;
+        MDD confidence = null, extract = null;
+        MDD tmp = null, tmp_res = null;
+
+        long time1;
+        long time2;
+
+        ArrayOfMDD certainSolutionsMDDs = ArrayOfMDD.create(epsilon);
+        for (int i = 0; i < certainSolutionsMDDs.length(); i++) {
+            certainSolutionsMDDs.set(i, MDD.create());
+            certainSolutionsMDDs.get(i).setSize(n+1);
+        }
+
+        long time = System.currentTimeMillis();
+
+        int count = 0;
+        for (int i = 0; i <= epsilon; i++) {
+            switch(method){
+                case 1:
+                    confidence = relaxedLogarithm(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+
+                case 2 :
+                    confidence = relaxedULPLogarithm(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+
+                case 3 :
+                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, false, information, construction);
+                    break;
+
+                case 4 :
+                    confidence = relaxedIntegerLogarithm(extract, gamma, precision, i, logPrecision, n, domains, true, information, construction);
+                    break;
+
+                default :
+                    confidence = relaxedProduct(extract, gamma, precision, i, n, domains, information, construction);
+                    break;
+            }
+
+            // Free the ancient extract
+            if(extract != null) {
+                Memory.free(extract);
+                extract = null;
+            }
+
+            if(confidence.nSolutions() == 0) break;
+            else if(i == epsilon) {
+                certainSolutionsMDDs.set(i, confidence);
+                count++;
+                break;
+            }
+
+            Logger.out.setInformation(construction);
+            time1 = System.currentTimeMillis();
+            extract = extract(confidence, domains, n, precision, gamma);
+            time2 = System.currentTimeMillis();
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("Solutions incertaines extraites :", extract);
+                Logger.out.information("Temps (ms) = " + (time2-time1) + "\n");
+            }
+
+            Logger.out.setInformation(construction);
+
+            // Stop
+            if(extract.nSolutions() == 0) {
+
+                Memory.free(extract);
+                extract = null;
+
+                certainSolutionsMDDs.set(i, confidence);
+                count++;
+                break;
+            }
+
+            time1 = System.currentTimeMillis();
+            MDD diff = Operation.minus(confidence, extract);
+            time2 = System.currentTimeMillis();
+            Memory.free(confidence);
+            confidence = null;
+
+
+            certainSolutionsMDDs.set(i, diff);
+            count++;
+            Logger.out.setInformation(true);
+            if (information) {
+                printInformation("\nAccumulation des bonnes solutions :", diff);
+                Logger.out.information("Temps de la différence (ms) = " + (time2 - time1) + "\n");
+            }
+
+
+
+        }
+
+        //if(extract != null) Memory.free(extract);
+        //if(confidence != null) Memory.free(confidence);
+
+        ArrayOfMDD union = ArrayOfMDD.create(count);
+        System.out.println(count);
+
+        for (int i = 0; i < count; i++) {
+            union.set(i, certainSolutionsMDDs.get(i));
+            System.out.println("NODE : " + union.get(i).nodes());
+            System.out.println("ARC : " + union.get(i).arcs());
+            System.out.println("SOLUTION : " + union.get(i).nSolutions());
+            System.out.println("====================");
+        }
+
+        for (int i = 1; i < union.length(); i++) {
+            MDD e = union.get(i);
+            int j = i;
+            while (j > 0 && e.nodes() > union.get(j-1).nodes()){
+                union.set(j, union.get(j-1));
+                j = j - 1;
+            }
+            union.set(j, e);
+        }
+
+        Logger.out.setInformation(construction);
+        time1 = System.currentTimeMillis();
+
+        int beginning = 0;
+        while (union.get(beginning).nodes() <= 2){
+            beginning++;
+        }
+        result = union.get(beginning);
+        for (int i = beginning + 1; i < union.length(); i++) {
+            result = Operation.union(result, union.get(i));
+        }
+
+
+        //result = Operation.union(union);
+        time2 = System.currentTimeMillis();
+
+        Logger.out.setInformation(true);
+        if (information) {
+            printInformation("\nAccumulation des bonnes solutions :", result);
+            Logger.out.information("Temps de l'union (ms) = " + (time2 - time1) + "\n");
+        }
+        time = System.currentTimeMillis() - time;
+
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
+        if(result != null) {
+            precision(result, domains, n, precision);
+            Logger.out.setInformation(construction);
+            MDD negation = Operation.negation(result);
+            Logger.out.setInformation(true);
+            precision(negation, domains, n, precision);
+
+            printInformation("Résultats :", result);
+            Logger.out.information("Temps (ms) = " + (time) + "\n");
+        }
+
+        System.out.println("=============================================================================");
+        System.out.println("=============================================================================");
+
+        System.out.println();
+        return result;
+    }
 
     //**************************************//
     //                UTILS                 //
